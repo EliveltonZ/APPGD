@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="pt-br" data-swal2-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Excluir Projetos</title>
+    <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=3babded601f2d38b631faad479765390">
+    <link rel="stylesheet" href="assets/css/delete_projetos.min.css?h=88a3c32f502fed4d05bbd1b31f68e400">
+<link rel="icon" href="/assets/img/icone.png">
+    <script src="assets/js/deleteProjetos.js" type="module"></script>
+</head>
+
+<body style="font-family: 'Nunito Sans', sans-serif;">
+    <div class="d-flex justify-content-center" style="position: static;overflow: auto; align-content: center;">
+        <div class="text-nowrap d-block align-content-center" id="modal-div" style="width: 90%;height: 100vh;max-width: 1000px;">
+            <div id="div-conteiner"><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DADOS DO CLIENTE</label>
+                <div class="display-div" style="display: flex;gap: 20px;">
+                    <div><label class="form-label d-block">Num. OC:</label><input type="text" id="txt_numoc" class="d-block" required="" style="width:100%;" autocomplete="off"></div>
+                    <div><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block" required="" style="width:100%;" autocomplete="off" disabled=""></div>
+                    <div style="min-width: 67%;"><label class="form-label d-block">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block" required="" style="width:100%;" autocomplete="off" disabled=""></div>
+                </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DADOS DO PROJETO</label>
+                <div class="display-div" style="display: flex;gap: 10px;">
+                    <div style="min-width: 15%;"><label class="form-label">Tipo do Ambiente:</label><input type="text" id="txt_tipoambiente" class="d-block" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 35%;"><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block" required="" style="width:100%;" autocomplete="off" disabled=""></div>
+                    <div><label class="form-label d-block">N° Projeto:</label><input type="text" id="txt_numproj" class="d-block" style="width:100%;" autocomplete="off" disabled=""></div>
+                    <div style="min-width: 18%;"><label class="form-label">Vendedor:</label><input type="text" id="txt_vendedor" class="d-block" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 18%;"><label class="form-label">Liberador:</label><input type="text" id="txt_liberador" class="d-block" style="width:100%;" disabled=""></div>
+                </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DATAS DO PROJETO</label>
+                <div class="display-div" style="display: flex;gap: 10px;">
+                    <div style="min-width: 16%;"><label class="form-label d-block">Data do Contrato:</label><input id="txt_datacontrato" type="date" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 16%;"><label class="form-label d-block">Data da Assinatura:</label><input id="txt_dataassinatura" type="date" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 16%;"><label class="form-label d-block">Chegou na Fabrica</label><input id="txt_chegoufabrica" type="date" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 16%;"><label class="form-label d-block">Data de Entrega:</label><input id="txt_dataentrega" type="date" style="width:100%;" required="" disabled=""></div>
+                    <div><label class="form-label d-block">Loja:</label><input type="text" id="txt_loja" class="d-block" style="width:100%;" autocomplete="off" disabled=""></div>
+                    <div><label class="form-label d-block">Tipo do Cliente:</label><input type="text" id="txt_tipocliente" class="d-block" style="width:100%;" disabled=""></div>
+                    <div style="min-width: 10%;"><label class="form-label d-block">Etapa:</label><input type="text" id="txt_etapa" class="d-block" style="width:100%;" disabled=""></div>
+                </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">VALORES DO PROJETO</label>
+                <div class="display-div" style="display: flex;gap: 10px;">
+                    <div style="min-width: 22%;"><label class="form-label d-block">Tipo do Contrato:</label><input type="text" id="txt_tipocontrato" class="d-block" style="width:100%;" disabled=""></div>
+                    <div><label class="form-label d-block">Valor Bruto:</label><input id="txt_valorbruto" type="text" class="d-block" placeholder="R$ 0,00" oninput="formatarMoeda(this)" autocomplete="off" disabled style="width:100%;"></div>
+                    <div><label class="form-label d-block">Valor Negociado:</label><input id="txt_valornegociado" type="text" class="d-block" placeholder="R$ 0,00" oninput="formatarMoeda(this)" autocomplete="off" disabled style="width:100%;"></div>
+                    <div><label class="form-label d-block">Custo Material:</label><input id="txt_customaterial" type="text" class="d-block" placeholder="R$ 0,00" oninput="formatarMoeda(this)" disabled autocomplete="off" style="width:100%;"></div>
+                    <div><label class="form-label d-block">Custo Adicional:</label><input id="txt_custoadicional" type="text" class="d-block" placeholder="R$ 0,00" oninput="formatarMoeda(this)" disabled autocomplete="off" style="width:100%;"></div>
+                </div>
+                <div class="d-flex justify-content-center" style="margin-left: 20px;"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" id="bt_delete" type="button" style="margin: 20px;">Deletar</button></div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
+</body>
+
+</html>

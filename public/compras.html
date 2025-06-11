@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="pt-br" data-swal2-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Compras</title>
+    <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=4033ca14a16b187d1f4dcac457bf31d9">
+    <link rel="stylesheet" href="assets/css/compras.min.css?h=b898cc0bc6c845895d37634858e7eba7">
+<link rel="icon" href="/assets/img/icone.png">
+    <script type="module" src="/assets/js/compras.js"></script>
+</head>
+
+<body style="font-family: 'Nunito Sans', sans-serif;">
+    <div style="display: flex; flex-direction: column; height:100vh">
+        <h1 class="text-center text-primary" style="margin: 20px;text-shadow: 0px 0px 7px;">RELATÓRIO DE COMPRAS</h1>
+        <div class="table-responsive">
+            <table class="table" id="table">
+                <thead>
+                    <tr>
+                        <th>Contrato</th>
+                        <th>Cliente</th>
+                        <th>Ambiente</th>
+                        <th>Descrição</th>
+                        <th>Medida</th>
+                        <th>Parc.</th>
+                        <th>Cartão</th>
+                        <th>Qtd</th>
+                        <th>Fornecedor</th>
+                        <th>Entrega</th>
+                        <th>Compra</th>
+                        <th>Previsão</th>
+                        <th>Recebido</th>
+                        <th>Status</th>
+                        <th>Categoria</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="height: 31.5px;margin-top: 23px;">
+                    <p class="text-center text-danger" style="font-size: 25px;font-weight: bold;width: 100%;text-shadow: 0px 0px 7px;">COMPRAS</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <div class="d-flex justify-content-center">
+                        <div class="text-nowrap d-block" style="width: 90%;max-width: 500px;">
+                            <div style="display: flex; gap: 10px;"><label class="form-label d-block">ID:</label><input type="text" id="txt_id" class="d-block" disabled="" required="" style="width: 100%;text-align: center;"><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block" disabled="" required="" style="width: 150%;text-align: center;"></div><label class="form-label d-block" style="margin-top: 10px;">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block" disabled="" required="" style="width:100%;"><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block" disabled="" required="" style="width:100%;"><label class="form-label d-block">Descrição:</label><input type="text" id="txt_descricao" class="d-block" required="" style="width:100%;">
+                            <div style="display: flex;margin-top: 14px; gap: 10px">
+                                <div><label class="form-label d-block">Medida:</label><input type="text" id="txt_medida" class="d-block" required="" style="width: 100%;text-align: center;"></div>
+                                <div><label class="form-label d-block">Parc:</label><input type="text" id="txt_parcelamento" class="d-block" required="" style="width: 100%;text-align: center;"></div>
+                                <div></div>
+                                <div><label class="form-label d-block">Cartão:</label><input type="text" id="txt_cartao" class="d-block" required="" style="width: 100%;text-align: center;"></div>
+                            </div>
+                            <div class="justify-content-between" style="display: flex;gap: 10px;margin-top: 10px;">
+                                <div><label class="form-label d-block">Qtd:</label><input type="text" id="txt_quantidade" class="d-block" required="" style="width: 100%;text-align: center;"></div>
+                                <div style="min-width: 70%;"><label class="form-label d-block">Fornecedor:</label><input type="text" id="txt_fornecedor" class="d-block" required="" style="width:100%;"></div>
+                            </div>
+                            <div class="justify-content-between" id="div-datas" style="display: flex;width: 100%;margin-top: 10px;">
+                                <div style="width: 33%;"><label class="form-label d-block">Compra:</label><input id="txt_compra" type="date" style="text-align: center;max-width: 100%;"></div>
+                                <div style="width: 33%;"><label class="form-label d-block">Previsão:</label><input id="txt_previsao" type="date" style="text-align: center;max-width: 100%;"></div>
+                                <div style="width: 33%;"><label class="form-label d-block">Recebido:</label><input id="txt_recebido" type="date" style="text-align: center;max-width: 100%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-center"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" id="bt_update" type="button" style="margin: 20px;">Salvar</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
+</body>
+
+</html>

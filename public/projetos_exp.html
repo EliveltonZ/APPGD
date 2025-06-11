@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="pt-br" data-swal2-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Expedição</title>
+    <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=6530f7e4d7cbcf978d4dbfb9da59a99a">
+    <link rel="stylesheet" href="assets/css/animate.min.min.css?h=5512c3e92e3931978c9ddcc7dbeed22b">
+    <link rel="stylesheet" href="assets/css/projetos_exp.min.css?h=7d9e311f8b449d0d0f967931ce23397e">
+<script type="module" src="/assets/js/projetosExp.js"></script>
+    <link rel="icon" href="/assets/img/icone.png">
+</head>
+
+<body style="font-family: 'Nunito Sans', sans-serif;">
+    <div style="display: flex; flex-direction: column; height: 100vh;">
+        <div class="d-flex justify-content-end align-items-center" style="margin: initial;margin-top: 10px;margin-right: 10px;margin-left: 10px;"><label class="form-label" style="margin: 0px;">Entrega Maior que:&nbsp;</label><input id="txt_datafilter" type="date" style="width: 140px;text-align: center;" onblur="fillTable()"></div>
+        <h1 class="text-danger" style="text-align: center;margin: 20px;text-shadow: 0px 0px 7px;">Controle de Expedição</h1>
+        <div class="table-responsive" id="container">
+            <table class="table" id="table">
+                <thead>
+                    <tr>
+                        <th>N°</th>
+                        <th>*</th>
+                        <th>NumOC</th>
+                        <th>Pdd</th>
+                        <th>E</th>
+                        <th>C.C.</th>
+                        <th>Cliente</th>
+                        <th>Contrato</th>
+                        <th>N.P.</th>
+                        <th>Ambiente</th>
+                        <th>Tipo</th>
+                        <th>Prazo</th>
+                        <th>Fabrica</th>
+                        <th>Lote</th>
+                        <th>Status</th>
+                        <th>Iniciado</th>
+                        <th>Pronto</th>
+                        <th>Entrega</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="height: 31.5px;margin-top: 23px;">
+                    <p class="text-center text-danger" style="font-size: 25px;font-weight: bold;width: 100%;text-shadow: 0px 0px 7px;">EXPEDIÇÃO</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
+                </div>
+                <div class="modal-body text-start">
+                    <div class="d-flex justify-content-center">
+                        <div class="text-nowrap d-block" id="div-modal" style="width: 90%;font-size: 12px;">
+                            <div class="d-flex justify-content-between display-div">
+                                <div style="min-width: 48%;">
+                                    <div class="d-flex justify-content-between display-div">
+                                        <div style="min-width: 48%;"><label class="form-label d-block">Ordem de Compra:</label><input type="text" id="txt_numoc" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                        <div style="min-width: 48%;"><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                    </div>
+                                    <div class="display-div"><label class="form-label d-block">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                </div>
+                                <div style="margin-right: 10px;"></div>
+                                <div class="justify-content-between display-div" style="display: flex;min-width: 48%;">
+                                    <div style="min-width: 48%;">
+                                        <div><label class="form-label d-block">Corte Certo:</label><input type="text" id="txt_codcc" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                        <div><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                        <div><label class="form-label d-block">N° Projeto:</label><input type="text" id="txt_numproj" class="d-block" disabled="" style="width:100%;"></div>
+                                    </div>
+                                    <div></div>
+                                    <div style="min-width: 48%;">
+                                        <div><label class="form-label d-block">Lote:</label><input type="text" id="txt_lote" class="d-block" disabled="" style="width:100%;"></div>
+                                        <div><label class="form-label d-block">Chegou Fabrica:</label><input type="text" id="txt_chegoufabrica" class="d-block" disabled="" style="width:100%;"></div>
+                                        <div><label class="form-label d-block">Prazo:</label><input type="text" id="txt_dataentrega" class="d-block" disabled="" style="width:100%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="height:40px;"></div>
+                            <div class="justify-content-between display-div" style="display: flex;">
+                                <div id="div-acessorios">
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_acessoriosavulsos" class="form-check-input"><label class="form-check-label" for="formCheck-1" style="width: 118px;">Acessórios Avulsos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_acessoriosavulsosq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_acessoriosavulsosl" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_paineis" class="form-check-input"><label class="form-check-label" for="formCheck-2" style="width: 118px;">Paineis</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_paineisq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_paineisl" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_portaaluminio" class="form-check-input"><label class="form-check-label" for="formCheck-10" style="width: 118px;">Portas de Alumínio</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_portaaluminioq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_portaaluminiol" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_vidroespelho" class="form-check-input"><label class="form-check-label" for="formCheck-9" style="width: 118px;">Vidros / Espelhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_vidroespelhoq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_vidroespelhol" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_pecapintura" class="form-check-input"><label class="form-check-label" for="formCheck-8" style="width: 118px;">Peças c/ Pinturas</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_pecapinturaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_pecapintural" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_tapecaria" class="form-check-input"><label class="form-check-label" for="formCheck-7" style="width: 118px;">Tapeçaria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_tapecariaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_tapecarial" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_serralheria" class="form-check-input"><label class="form-check-label" for="formCheck-6" style="width: 118px;">Serralheria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_serralheriaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_serralherial" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_cabide" class="form-check-input"><label class="form-check-label" for="formCheck-5" style="width: 118px;">Cabide</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_cabideq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_cabidel" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_trilhos" class="form-check-input"><label class="form-check-label" for="formCheck-4" style="width: 118px;">Trilhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_trilhosq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_trilhosl" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;">
+                                        <div class="form-check"><input type="checkbox" id="chk_volumesmodulacao" class="form-check-input"><label class="form-check-label" for="formCheck-3" style="width: 118px;">Volumes Modulação</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_volumesmodulacaoq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_volumesmodulacaol" style="text-align: center;width: 100%;" autocomplete="off">
+                                    </div>
+                                    <div class="d-flex" style="margin-top:10px;margin-bottom:10px;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Total Vol.</label><input type="text" id="txt_volmod" style="width: 26%;text-align: center;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Local</label><select id="txt_tamanho" style="text-align: center;width: 100%;" autocomplete="off">
+                                            <option value="-" selected="">-</option>
+                                            <option value="PEQUENO">PEQUENO</option>
+                                            <option value="MEDIO">MEDIO</option>
+                                            <option value="GRANDE">GRANDE</option>
+                                        </select></div>
+                                </div>
+                                <div class="margin-setor"></div>
+                                <div style="min-width: 48%;margin-left: 3%;">
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Embalagem Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_embalagem" style="margin-right: 4px;"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between"><input id="txt_embalageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalageminicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_embalageminicio&#39;);"></div><label class="form-label d-block">Embalagem&nbsp;Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_embalagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalagemfim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_embalagemfim&#39;);"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_embalagemid" style="width:60px;margin-right:10px;text-align:center;" onblur="getUsuario(this.value, &#39;txt_embalagemresp&#39;)" autocomplete="off"><input type="text" id="txt_embalagemresp" disabled="" style="width:100%;"></div>
+                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Pronto:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_pronto" type="date" style="width: 90%;"><input type="checkbox" id="chk_pronto" style="width: 5%;" onclick="setarData(this, &#39;txt_pronto&#39;);"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_prontoid" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off" onblur="getUsuario(this.value, &#39;txt_prontoresp&#39;)"><input type="text" id="txt_prontoresp" disabled="" style="width:100%;"></div>
+                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Entrega:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_entrega" type="date" style="width: 90%;"><input type="checkbox" id="chk_entrega" style="width: 5%;" onclick="setarData(this, &#39;txt_entrega&#39;);"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_entregaid" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off" onblur="getUsuario(this.value, &#39;txt_entregaresp&#39;)"><input type="text" id="txt_entregaresp" disabled="" style="width:100%;"></div>
+                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Almoxarifado:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_separacao" type="datetime-local" style="width: 90%;" name="txt_separacao"><input type="checkbox" id="chk_separacao" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_separacao&#39;);"></div>
+                                    <div class="d-flex justify-content-between" style="margin-top: 10px;"><label class="form-label d-block">Entregue c/ Pendências:</label><input type="checkbox" id="chk_pendencia" style="width: 5%;" onclick=""></div>
+                                </div>
+                            </div>
+                            <div style="height:30px;"></div><label class="form-label d-block">Observações:</label><textarea id="txt_observacoes" style="width: 100%;overflow: auto;height: 90px;"></textarea>
+                            <div class="table-responsive">
+                                <table class="table" id="table_acessorios">
+                                    <thead>
+                                        <tr style="font-size: 9px;text-align: center;">
+                                            <th>Descrição</th>
+                                            <th>Medida</th>
+                                            <th>Qtd</th>
+                                            <th>Compra</th>
+                                            <th>Previsão</th>
+                                            <th>Recebido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="d-flex justify-content-center" style="width: 100%;"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" type="button" onclick="setDataExpedicao()">Salvar</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
+</body>
+
+</html>

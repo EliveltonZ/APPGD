@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="pt-br" data-swal2-theme="auto">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Previsões</title>
+    <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=6530f7e4d7cbcf978d4dbfb9da59a99a">
+    <link rel="stylesheet" href="assets/css/projetos_prev.min.css?h=0affadfb78705a1d99076b0761e23caf">
+<script src="assets/js/projetosPrev.js" type="module"></script>
+    <link rel="icon" href="/assets/img/icone.png">
+</head>
+
+<body style="font-family: 'Nunito Sans', sans-serif;">
+    <div style="display: flex; flex-direction: column; height: 100vh;">
+        <h1 class="text-center text-success" style="margin: 20px;text-shadow: 0px 0px 7px;">Planejamento de Produção</h1>
+        <div class="table-responsive text-center" id="container">
+            <table class="table" id="table">
+                <thead>
+                    <tr style="font-size: 12px;">
+                        <th class="text-center">N°</th>
+                        <th class="text-center">*</th>
+                        <th class="text-center">Pdd</th>
+                        <th class="text-center">E</th>
+                        <th class="text-center">C.C.</th>
+                        <th class="text-center">Lote</th>
+                        <th class="text-center">Cliente</th>
+                        <th class="text-center">Contrato</th>
+                        <th class="text-center">Ambiente</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Prazo</th>
+                        <th class="text-center">Material</th>
+                        <th class="text-center">Corte</th>
+                        <th class="text-center">Custom.</th>
+                        <th class="text-center">Coladeira</th>
+                        <th class="text-center">Usinagem</th>
+                        <th class="text-center">Painel</th>
+                        <th class="text-center">Montagem</th>
+                        <th class="text-center">Embalagem</th>
+                        <th class="text-center">Separação</th>
+                        <th class="text-center">Entrega</th>
+                        <th class="text-center">Previsão</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex justify-content-center" style="height: 31.5px;margin-top: 23px;">
+                    <p class="text-center text-success" style="font-size: 25px;font-weight: bold;text-align: center;width: 100%;text-shadow: 0px 0px 7px;">PREVISÕES</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <div class="text-nowrap d-block" id="div-modal" style="width: 90%;font-size: 12px;">
+                            <div class="d-flex justify-content-between display-div gap">
+                                <div style="min-width: 58%;"><label class="form-label d-block">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                <div style="min-width: 40%;"><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block" disabled="" required="" style="width:100%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between display-div gap margin-top" style="margin-top: 10px; gap: 10px;">
+                                <div><label class="form-label d-block">Numero O.C.:</label><input type="text" id="txt_numoc" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">Corte Certo:</label><input type="text" id="txt_codcc" class="d-block" disabled="" required="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">N° Projeto:</label><input type="text" id="txt_numproj" class="d-block" disabled="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">Lote:</label><input type="text" id="txt_lote" class="d-block" disabled="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">Chegou Fabrica:</label><input type="text" id="txt_chegoufabrica" class="d-block" disabled="" style="width:100%;"></div>
+                                <div><label class="form-label d-block">Prazo:</label><input type="text" id="txt_dataentrega" class="d-block" disabled="" style="width:100%;"></div>
+                            </div>
+                            <div class="d-flex display-div gap" style="margin-top: 40px; gap:10px">
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Corte Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_corte" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_corteinicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Corte&nbsp;Fim:</label><input id="txt_cortefim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_corteid" style="margin-right: 10px;text-align: center;width: 40px;" disabled=""><input type="text" id="txt_corteresp" disabled="" style="width: 100%;"></div>
+                                </div>
+                                <div style="height:40px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Customização Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_customizacao" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_customizacaoinicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Customização&nbsp;Fim:</label><input id="txt_customizacaofim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_customizacaoid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_customizacaoresp" disabled="" style="width:100%;"></div>
+                                </div>
+                                <div style="height:40px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Coladeira Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_coladeira" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_coladeirainicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Coladeira&nbsp;Fim:</label><input id="txt_coladeirafim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_coladeiraid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_coladeiraresp" disabled="" style="width:100%;"></div>
+                                </div>
+                                <div style="height:40px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Usinagem Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_usinagem" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_usinageminicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Usinagem Fim:</label><input id="txt_usinagemfim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_usinagemid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_usinagemresp" disabled="" style="width:100%;"></div>
+                                </div>
+                            </div>
+                            <div style="height:40px;"></div>
+                            <div class="d-flex justify-content-between display-div gap">
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Paineis Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_paineis" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_paineisinicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Paineis Fim:</label><input id="txt_paineisfim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_paineisid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_paineisresp" disabled="" style="width:100%;"></div>
+                                </div>
+                                <div style="height:40px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Montagem Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_montagem" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_montageminicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Montagem Fim:</label><input id="txt_montagemfim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_montagemid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_montagemresp" disabled="" style="width:100%;"></div>
+                                </div>
+                                <div style="height:40px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Embalagem Inicio:</label>
+                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_embalagem" style="margin-right: 4px;" disabled=""></div>
+                                    </div><input id="txt_embalageminicio" type="datetime-local" style="width:100%;" disabled=""><label class="form-label d-block">Embalagem fim:</label><input id="txt_embalagemfim" type="datetime-local" style="width:100%;" disabled="">
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_embalagemid" style="width: 40px;margin-right: 10px;text-align: center;" disabled=""><input type="text" id="txt_embalagemresp" disabled="" style="width:100%;"></div>
+                                </div>
+                            </div>
+                            <div style="margin:30px;"></div><label class="form-label d-block">Observações:</label><textarea id="txt_observacoes" style="width: 100%;" disabled=""></textarea>
+                            <div style="margin:30px;"></div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr style="font-size: 9px;text-align: center;">
+                                            <th>Descrição</th>
+                                            <th>Medida</th>
+                                            <th>Qtd</th>
+                                            <th>Compra</th>
+                                            <th>Previsão</th>
+                                            <th>Recebido</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="table-group-divider"></tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-center"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
+</body>
+
+</html>

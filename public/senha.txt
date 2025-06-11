@@ -1,0 +1,32 @@
+KjXg@9148
+
+infinityfree
+usuario: if0_37528613
+senha: bSKukZRFKUqthV
+
+site: https://www.freemysqlhosting.net/dashboard/
+usuario: lifeva7817@avzong.com
+senha: bSKukZRFKUqthV
+
+banco de dados:
+Hi
+
+Your account number is: 985384
+
+Your new database is now ready to use.
+
+To connect to your database use these details
+
+Server: sql10.freemysqlhosting.net
+Name: sql10738464
+Username: sql10738464
+Password: SN1iAtM9kh
+Port number: 3306
+
+https://www.youtube.com/watch?v=QVRcBCOH1gE
+
+SupaBase
+Usuario: linip18605@gholar.com
+Senha: SN1iAtM9kh@
+url: "https://sozgbyfpjljktpotbmkp.supabase.co"
+key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvemdieWZwamxqa3Rwb3RibWtwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU4MzQ1MzQsImV4cCI6MjA1MTQxMDUzNH0.o3_foPVk7KKR-NL9Ds1ldVB402im8mSIoGCNu5nWvgQ"
