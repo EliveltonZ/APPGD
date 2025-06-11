@@ -4,7 +4,7 @@ import {
   setData,
   messageInformation,
   messageQuestion,
-  addEventById,
+  addEventBySelector,
 } from "./utils.js";
 
 function exibirNome(element) {
@@ -66,5 +66,5 @@ window.addEventListener("DOMContentLoaded", () => {
   exibirResp("txt_resp");
 });
 
-addEventById("#link_logout", "click", logout);
-addEventById("#bt_capa", "click", clickPrint);
+addEventBySelector("#link_logout", "click", logout);
+addEventBySelector("#bt_capa", "click", clickPrint);

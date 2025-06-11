@@ -3,9 +3,10 @@ import {
   setFocus,
   enableEnterAsTab,
   getText,
-  addEventById,
+  addEventBySelector,
   messageInformation,
   messageQuestion,
+  criarSpinnerGlobal,
 } from "./utils.js";
 
 async function find_id() {
@@ -100,7 +101,8 @@ window.addEventListener("DOMContentLoaded", () => {
   setFocus("txt_id");
   document.getElementById("txt_id").value = "";
   enableEnterAsTab();
+  criarSpinnerGlobal();
 });
 
-addEventById("#bt_login", "click", passwordValidation);
-addEventById("#txt_id", "blur", find_id);
+addEventBySelector("#bt_login", "click", passwordValidation);
+addEventBySelector("#txt_id", "blur", find_id);

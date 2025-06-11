@@ -7,7 +7,7 @@
     <title>Sistema GD</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=6530f7e4d7cbcf978d4dbfb9da59a99a">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=3b6c9b1688d82a4111b132d5b3736cc7">
     <link rel="stylesheet" href="assets/css/animate.min.min.css?h=5512c3e92e3931978c9ddcc7dbeed22b">
 <link rel="icon" href="/assets/img/icone.png">
     <script src="assets/js/index.js" type="module" defer></script>
@@ -15,10 +15,10 @@
 
 <body class="d-flex justify-content-center align-items-center justify-content-xl-center" style="height: 100vh;font-family: 'Nunito Sans', sans-serif;">
     <form style="width: 500px;">
-        <div class="d-flex justify-content-center" style="margin: 20px;"><img class="d-flex" src="assets/img/gd-color.png" style="width: 90%;"></div>
+        <div class="d-flex justify-content-center" style="margin: 20px;"><img class="d-flex" src="assets/img/Capturar.png?h=585181b55d7fbff25d723edd33ba6b19" style="width: 90%;"></div>
         <div class="justify-content-center align-content-center" style="box-shadow: inset 0px 0px 4px 0px rgba(42,42,42,0.53);text-shadow: 0px 0px 8px rgba(0,0,0,0.85);padding: 30px;border-radius: 20px;font-size: 16px;border-color: rgba(255,255,255,0.34);">
             <div style="display: flex;gap:20px">
-                <div class="justify-content-center" style="display: block;"><label class="form-label" style="font-weight: bold;">ID:</label><input class="form-control" type="text" id="txt_id" autocomplete="off" style="text-align: center;" onblur="find_id()"></div>
+                <div class="justify-content-center" style="display: block;"><label class="form-label" style="font-weight: bold;">ID:</label><input class="form-control" type="text" id="txt_id" autocomplete="off" style="text-align: center;"></div>
                 <div class="justify-content-center" style="display: block;min-width: 70%;"><label class="form-label" style="font-weight: bold;">Login:</label><input class="form-control" type="text" id="txt_login" autocomplete="off" style="text-align: center;" disabled=""></div>
             </div><label class="form-label d-block" style="margin-top: 10px;font-weight: bold;">Senha:</label><input class="form-control" type="password" id="password" style="text-align: center;" required=""><button class="btn btn-success" data-bss-hover-animate="pulse" id="bt_login" type="button" style="margin-left: 9%;margin-top: 35px;width: 82%;color: var(--bs-body-bg);" data-bs-target="/menu.html">Entrar</button>
         </div>

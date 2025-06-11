@@ -10,7 +10,7 @@ import {
   onclickHighlightRow,
   loadPage,
   colorStatus,
-  addEventById,
+  addEventBySelector,
   createModal,
   messageInformation,
   messageQuestion,
@@ -175,4 +175,4 @@ document.addEventListener("DOMContentLoaded", (event) => {
   allUpperCase();
 });
 
-addEventById("#bt_update", "click", setAcessorios);
+addEventBySelector("#bt_update", "click", setAcessorios);

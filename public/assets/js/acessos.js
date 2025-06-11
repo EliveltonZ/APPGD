@@ -106,5 +106,5 @@ window.addEventListener("DOMContentLoaded", () => {
   senhaFocus();
 });
 
-addEventById("bt_salvar", "click", setUserAccess);
-addEventById("txt_id", "blur", getUserAccess);
+addEventById("#bt_salvar", "click", setUserAccess);
+addEventById("#txt_id", "blur", getUserAccess);

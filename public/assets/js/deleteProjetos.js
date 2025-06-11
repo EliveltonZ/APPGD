@@ -5,7 +5,7 @@ import {
   setFocus,
   loadPage,
   enableEnterAsTab,
-  addEventById,
+  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
@@ -78,5 +78,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableEnterAsTab();
 });
 
-addEventById("#txt_numoc", "blur", getDeleteProjetos);
-addEventById("#bt_delete", "click", setDeleteProjeto);
+addEventBySelector("#txt_numoc", "blur", getDeleteProjetos);
+addEventBySelector("#bt_delete", "click", setDeleteProjeto);

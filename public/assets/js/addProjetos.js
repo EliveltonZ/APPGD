@@ -8,7 +8,7 @@ import {
   allUpperCase,
   enableEnterAsTab,
   changeFormatCurrency,
-  addEventById,
+  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
@@ -124,5 +124,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableEnterAsTab();
 });
 
-addEventById("#txt_contrato", "blur", getContrato);
-addEventById("#bt_salvar", "click", insertProject);
+addEventBySelector("#txt_contrato", "blur", getContrato);
+addEventBySelector("#bt_salvar", "click", insertProject);

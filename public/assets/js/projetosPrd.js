@@ -360,3 +360,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
   onclickHighlightRow("table");
   window.addEventListener("resize", ajustarTamanhoModal);
 });
+
+addEventById();

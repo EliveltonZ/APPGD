@@ -487,7 +487,6 @@ export function modalBarCode() {
               advanced: [{ focusMode: "continuous" }],
             },
             area: {
-              // <- Limitação da área de leitura
               top: `${limitRead(height)}%`,
               right: `${limitRead(width)}%`,
               left: `${limitRead(width)}%`,
@@ -550,11 +549,70 @@ function limitRead(value) {
   return (100 - value) / 2;
 }
 
-export function addEventById(element, event, _function) {
+export function addEventBySelector(element, event, _function) {
   const el = document.querySelector(element);
   if (el) {
     el.addEventListener(event, _function);
   } else {
-    console.warn(`Elemento com ID "${element}" não encontrado.`);
+    console.warn(`Elemento com Selector "${element}" não encontrado.`);
   }
 }
+
+// === Criar spinner global automaticamente ===
+export function criarSpinnerGlobal() {
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.id = "spinner-global";
+  spinnerDiv.style.cssText = `
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    text-align: center;
+    font-family: Arial;
+  `;
+
+  spinnerDiv.innerHTML = `
+    <div style="
+      border: 6px solid #eee;
+      border-top: 6px solid #333;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    "></div>
+    <p>Aguarde</p>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  `;
+
+  document.body.appendChild(spinnerDiv);
+}
+
+// === Substitui o fetch global ===
+(function () {
+  criarSpinnerGlobal();
+
+  const originalFetch = window.fetch;
+
+  window.fetch = async function (...args) {
+    const spinner = document.getElementById("spinner-global");
+    if (spinner) spinner.style.display = "block";
+
+    try {
+      const res = await originalFetch(...args);
+      return res;
+    } catch (err) {
+      alert("Erro de conexão. Verifique sua internet ou o servidor.");
+      throw err;
+    } finally {
+      if (spinner) spinner.style.display = "none";
+    }
+  };
+})();

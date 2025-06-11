@@ -12,7 +12,7 @@ import {
   createModal,
   exportarParaExcel,
   clearInputFields,
-  addEventById,
+  addEventBySelector,
   messageQuestion,
   messageInformation,
 } from "./utils.js";
@@ -253,9 +253,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableEnterAsTab();
 });
 
-addEventById("#txt_numoc", "blur", getProjetoPcp);
-addEventById("#bt_salvar", "click", setProjetoPcp);
-addEventById("#bt_startlote", "click", setStartLote);
-addEventById("#bt_export", "click", exportarDados);
-addEventById("#bt_gerar_lote", "click", gerarLote);
-addEventById("#bt_modal_lote", "click", openModalLote);
+addEventBySelector("#txt_numoc", "blur", getProjetoPcp);
+addEventBySelector("#bt_salvar", "click", setProjetoPcp);
+addEventBySelector("#bt_startlote", "click", setStartLote);
+addEventBySelector("#bt_export", "click", exportarDados);
+addEventBySelector("#bt_gerar_lote", "click", gerarLote);
+addEventBySelector("#bt_modal_lote", "click", openModalLote);

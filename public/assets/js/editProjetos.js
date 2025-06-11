@@ -10,7 +10,7 @@ import {
   enableEnterAsTab,
   changeFormatCurrency,
   clearInputFields,
-  addEventById,
+  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
@@ -132,5 +132,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableEnterAsTab();
 });
 
-addEventById("#txt_numoc", "blur", getEditProjetos);
-addEventById("#bt_update", "click", setEditProjetos);
+addEventBySelector("#txt_numoc", "blur", getEditProjetos);
+addEventBySelector("#bt_update", "click", setEditProjetos);

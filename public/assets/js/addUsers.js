@@ -3,7 +3,7 @@ import {
   loadPage,
   allUpperCase,
   getText,
-  addEventById,
+  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
@@ -77,4 +77,4 @@ document.addEventListener("DOMContentLoaded", (event) => {
   setFocus("txt_login");
 });
 
-addEventById("#bt_adicionar", "click", insertUser);
+addEventBySelector("#bt_adicionar", "click", insertUser);
