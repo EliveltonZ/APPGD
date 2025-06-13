@@ -1,6 +1,5 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-// import Quagga from "https://unpkg.com/@ericblade/quagga2@1.2.6/dist/quagga.min.js";
 
 export function setData(elememt) {
   var campoDataHora = document.getElementById(elememt);
@@ -571,19 +570,17 @@ export function criarSpinnerGlobal() {
     z-index: 9999;
     text-align: center;
     font-family: Arial;
+    border: 6px solid #eee;
+    border-top: 6px solid #333;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: auto;
   `;
 
   spinnerDiv.innerHTML = `
-    <div style="
-      border: 6px solid #eee;
-      border-top: 6px solid #333;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: auto;
-    "></div>
-    <p>Aguarde</p>
+    <div></div>
     <style>
       @keyframes spin {
         0% { transform: rotate(0deg); }
