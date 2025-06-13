@@ -1,4 +1,3 @@
-import Swal from "./sweetalert2.esm.all.min.js";
 import {
   checkValue,
   setText,
@@ -16,11 +15,12 @@ import {
   onclickHighlightRow,
   createModal,
   modalBarCode,
+  messageInformation,
+  messageQuestion,
+  addEventBySelector,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
-
-loadPage("producao", "projetos_prd.html");
 
 async function fillTable() {
   try {
@@ -82,16 +82,12 @@ async function fillTable() {
       tbody.appendChild(tr);
     });
   } catch (error) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Não foi possível carregar os dados.",
-    });
+    messageInformation("error", "Erro", "Não foi possível carregar os dados.");
     console.error("Erro ao preencher tabela:", error);
   }
 }
 
-window.fillTableAcessorios = async function (ordemdecompra) {
+async function fillTableAcessorios(ordemdecompra) {
   const response = await fetch(
     `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
   );
@@ -127,53 +123,41 @@ window.fillTableAcessorios = async function (ordemdecompra) {
       tbody.appendChild(tr);
     });
   } catch (err) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: `Não foi possível carregar os dados. ${err.message}`,
-    });
+    messageInformation(
+      "error",
+      "ERRO",
+      `Não foi possível carregar os dados. ${err.message}`
+    );
   }
-};
+}
 
 function getFirstColumnValue(td) {
   const row = td.parentNode;
   return row.cells[2].innerText;
 }
 
-window.clicked = function () {
-  document
-    .getElementById("table")
-    .addEventListener("dblclick", async function (event) {
-      const td = event.target;
-      const tr = td.closest(".open-modal-row");
+async function handleClikedTable(event) {
+  const td = event.target;
+  const tr = td.closest(".open-modal-row");
+  if (!tr || td.tagName !== "TD") return;
+  const firstColumnValue = getFirstColumnValue(td);
+  await getProducao(firstColumnValue);
+  await fillTableAcessorios(firstColumnValue);
+  createModal("modal");
+}
 
-      if (!tr || td.tagName !== "TD") return;
-
-      const firstColumnValue = getFirstColumnValue(td);
-
-      await getProducao(firstColumnValue);
-      await fillTableAcessorios(firstColumnValue);
-
-      createModal("modal");
-    });
-};
-
-window.getUsuario = async function (id, campo) {
+async function getUsuario(id, campo) {
   const response = await fetch(`/getUsuario?p_id=${id}`);
   if (!response.ok) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Não foi possivel buscar Usuario",
-    });
+    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
     return;
   }
   const data = await response.json();
   const nome = data[0].nome;
   document.getElementById(campo).value = nome;
-};
+}
 
-window.getProducao = async function (ordemdecompra) {
+async function getProducao(ordemdecompra) {
   try {
     const response = await fetch(
       `/getProducao?p_ordemdecompra=${ordemdecompra}`
@@ -199,7 +183,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_cortefim", item.cortefim);
       setChecked("chk_corte", item.cortepausa);
       setText("txt_corteid", item.corteresp);
-      getUsuario(document.getElementById("txt_corteid").value, "txt_corteresp");
+      getUsuario(getText("txt_corteid"), "txt_corteresp");
       setChecked("chk_corteinicio", false);
       setChecked("chk_cortefim", false);
 
@@ -207,10 +191,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_customizacaofim", item.customizacaofim);
       setChecked("chk_customizacao", item.customizacaopausa);
       setText("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(
-        document.getElementById("txt_customizacaoid").value,
-        "txt_customizacaoresp"
-      );
+      getUsuario(getText("txt_customizacaoid"), "txt_customizacaoresp");
       setChecked("chk_customizacaoinicio", false);
       setChecked("chk_customizacaofim", false);
 
@@ -218,10 +199,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_coladeirafim", item.coladeirafim);
       setChecked("chk_coladeira", item.coladeirapausa);
       setText("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(
-        document.getElementById("txt_coladeiraid").value,
-        "txt_coladeiraresp"
-      );
+      getUsuario(getText("txt_coladeiraid"), "txt_coladeiraresp");
       setChecked("chk_coladeirainicio", false);
       setChecked("chk_coladeirafim", false);
 
@@ -229,10 +207,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_usinagemfim", item.usinagemfim);
       setChecked("chk_usinagem", item.usinagempausa);
       setText("txt_usinagemid", item.usinagemresp);
-      getUsuario(
-        document.getElementById("txt_usinagemid").value,
-        "txt_usinagemresp"
-      );
+      getUsuario(getText("txt_usinagemid"), "txt_usinagemresp");
       setChecked("chk_usinageminicio", false);
       setChecked("chk_usinagemfim", false);
 
@@ -241,10 +216,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_montagemfim", item.montagemfim);
       setChecked("chk_montagem", item.montagempausa);
       setText("txt_montagemid", item.montagemresp);
-      getUsuario(
-        document.getElementById("txt_montagemid").value,
-        "txt_montagemresp"
-      );
+      getUsuario(getText("txt_montagemid"), "txt_montagemresp");
       setChecked("chk_montageminicio", false);
       setChecked("chk_montagemfim", false);
 
@@ -253,10 +225,7 @@ window.getProducao = async function (ordemdecompra) {
       setText("txt_paineisfim", item.paineisfim);
       setChecked("chk_paineis", item.paineispausa);
       setText("txt_paineisid", item.paineisresp);
-      getUsuario(
-        document.getElementById("txt_paineisid").value,
-        "txt_paineisresp"
-      );
+      getUsuario(getText("txt_paineisid"), "txt_paineisresp");
       setChecked("chk_paineisinicio", false);
       setChecked("chk_paineisfim", false);
 
@@ -265,20 +234,14 @@ window.getProducao = async function (ordemdecompra) {
   } catch (err) {
     alert(err.message);
   }
-};
+}
 
 window.setarDataHora = function (checkbox, text) {
   setDateTime(checkbox, text);
 };
 
-window.setDataProducao = async function () {
-  const result = await Swal.fire({
-    icon: "question",
-    text: "Deseja confirmar Alterações?",
-    showDenyButton: true,
-    denyButtonText: "Cancelar",
-    confirmButtonText: "Confirmar",
-  });
+async function setDataProducao() {
+  const result = await messageQuestion(null, "Deseja confirmar Alterações?");
 
   if (result.isConfirmed) {
     try {
@@ -325,40 +288,87 @@ window.setDataProducao = async function () {
       if (!response.ok) {
         const errText = await response.text();
         console.log(errText);
-        Swal.fire({
-          icon: "error",
-          text: "Ocorreu um erro ao salvar os dados!",
-        });
+        messageInformation(
+          "error",
+          "ERRO",
+          "Ocorreu um erro ao salvar os dados!"
+        );
       } else {
-        Swal.fire({
-          icon: "success",
-          title: "Sucesso",
-          text: "Alterações confirmadas com sucesso!",
-        });
+        messageInformation(
+          "success",
+          "Sucesso",
+          "Alterações confirmadas com sucesso!"
+        );
       }
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        text: "Falha na comunicação com o servidor!" + err.message,
-      });
+      messageInformation(
+        "error",
+        "ERRO",
+        "Falha na comunicação com o servidor!" + err.message
+      );
     }
   }
-};
+}
 
-window.readBarCode = function () {
-  modalBarCode();
-};
+function handleClickCheckbox() {
+  const operation = [
+    "corte",
+    "customizacao",
+    "coladeira",
+    "usinagem",
+    "montagem",
+    "paineis",
+  ];
+
+  operation.forEach((item) => {
+    addEventBySelector(`#chk_${item}inicio`, "click", () =>
+      setarDataHora(`#chk_${item}inicio`, `txt_${item}inicio`)
+    );
+
+    addEventBySelector(`#chk_${item}fim`, "click", () =>
+      setarDataHora(`#chk_${item}fim`, `txt_${item}fim`)
+    );
+  });
+}
 
 document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
+  loadPage("producao", "projetos_prd.html");
   fillTable();
   enableTableFilterSort("table");
-  clicked();
   onmouseover("table");
   enableEnterAsTab();
   ajustarTamanhoModal();
   onclickHighlightRow("table");
   window.addEventListener("resize", ajustarTamanhoModal);
+  handleClickCheckbox();
 });
 
-addEventById();
+addEventBySelector("#bt_salvar", "click", setDataProducao);
+addEventBySelector("#table", "dblclick", handleClikedTable);
+
+addEventBySelector("#txt_corteid", "blur", () =>
+  getUsuario(getText("txt_corteid"), "txt_corteresp")
+);
+
+addEventBySelector("#txt_customizacaoid", "blur", () =>
+  getUsuario(getText("txt_customizacaoid"), "txt_customizacaoresp")
+);
+
+addEventBySelector("#txt_coladeiraid", "blur", () =>
+  getUsuario(getText("txt_coladeiraid"), "txt_coladeiraresp")
+);
+
+addEventBySelector("#txt_usinagemid", "blur", () =>
+  getUsuario(getText("txt_usinagemid"), "txt_usinagemresp")
+);
+
+addEventBySelector("#txt_montagemid", "blur", () =>
+  getUsuario(getText("txt_montagemid"), "txt_montagemresp")
+);
+
+addEventBySelector("#txt_paineisid", "blur", () =>
+  getUsuario(getText("txt_paineisid"), "txt_paineisresp")
+);
+
+addEventBySelector("#bt_scan", "click", modalBarCode);

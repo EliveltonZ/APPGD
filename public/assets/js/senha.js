@@ -1,5 +1,10 @@
-import Swal from "./sweetalert2.esm.all.min.js";
-import { setFocus, getText, setText, messageInformation } from "./utils.js";
+import {
+  setFocus,
+  getText,
+  setText,
+  messageInformation,
+  addEventBySelector,
+} from "./utils.js";
 
 setText("txt_id", localStorage.getItem("id"));
 setText("txt_nome", localStorage.getItem("usuario"));
@@ -64,11 +69,7 @@ async function setPassword() {
   }
 }
 
-window.texte = async function () {
-  setPassword();
-};
-
-window.alterarSenha = async function () {
+async function alterarSenha() {
   const data = await checkPassword();
   const hasData = Array.isArray(data)
     ? data.length > 0
@@ -83,8 +84,10 @@ window.alterarSenha = async function () {
   } else {
     messageInformation("error", "Erro", "Senha digitada é inválida!");
   }
-};
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   setFocus("txt_senhaatual");
 });
+
+addEventBySelector("#bt_senha", "click", alterarSenha);

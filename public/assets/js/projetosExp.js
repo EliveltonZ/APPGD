@@ -16,20 +16,24 @@ import {
   colorAcessorios,
   onclickHighlightRow,
   createModal,
+  addEventBySelector,
+  messageInformation,
+  messageQuestion,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
 
-window.fillTableAcessorios = async function (ordemdecompra) {
+async function fillTableAcessorios(ordemdecompra) {
   const response = await fetch(
     `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
   );
 
   if (!response.ok) {
-    Swal.fire({
-      icon: "error",
-      text: `não foi possivel carregar dados de acessorios !!! ${error.message}`,
-    });
+    messageInformation(
+      "error",
+      "ERRO",
+      `não foi possivel carregar dados de acessorios !!! ${error.message}`
+    );
   } else {
     const tbody = document.querySelectorAll("table tbody")[1];
     tbody.innerHTML = "";
@@ -61,9 +65,9 @@ window.fillTableAcessorios = async function (ordemdecompra) {
       tbody.appendChild(tr);
     });
   }
-};
+}
 
-window.fillTable = async function () {
+async function fillTable() {
   const container = document.getElementById("container");
   const scrollPos = container.scrollTop;
   const date_condition = getText("txt_datafilter");
@@ -75,11 +79,7 @@ window.fillTable = async function () {
     const data = await response.json();
 
     if (!response.ok) {
-      Swal.fire({
-        icon: "error",
-        title: "Erro",
-        text: "Não foi possivel carregar os dados",
-      });
+      messageInformation("error", "Erro", "Não foi possivel carregar os dados");
     } else {
       const tbody = document.querySelector("tbody");
       tbody.innerHTML = "";
@@ -131,31 +131,23 @@ window.fillTable = async function () {
       container.scrollTop = scrollPos;
     }
   }
-};
+}
 
 function getFirstColumnValue(td) {
   const row = td.parentNode;
   return row.cells[2].innerText;
 }
 
-window.clicked = function () {
-  document
-    .getElementById("table")
-    .addEventListener("dblclick", async function (event) {
-      clearInputFields();
-      const td = event.target;
-      const tr = td.closest(".open-modal-row");
-
-      if (!tr || td.tagName !== "TD") return;
-
-      const firstColumnValue = getFirstColumnValue(td);
-
-      await getExpedicao(firstColumnValue);
-      await fillTableAcessorios(firstColumnValue);
-
-      createModal("modal");
-    });
-};
+async function handleClick(event) {
+  clearInputFields();
+  const td = event.target;
+  const tr = td.closest(".open-modal-row");
+  if (!tr || td.tagName !== "TD") return;
+  const firstColumnValue = getFirstColumnValue(td);
+  await getExpedicao(firstColumnValue);
+  await fillTableAcessorios(firstColumnValue);
+  createModal("modal");
+}
 
 function clearInputFields() {
   document.querySelectorAll('input[type="text"]').forEach((input) => {
@@ -171,33 +163,25 @@ function clearInputFields() {
   });
 }
 
-window.getUsuario = async function (id, campo) {
+async function getUsuario(id, campo) {
   const response = await fetch(`/getUsuario?p_id=${id}`);
   if (!response.ok) {
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Não foi possivel buscar Usuario",
-    });
-  } else {
-    const data = await response.json();
-    const nome = data[0].nome;
-    document.getElementById(campo).value = nome;
+    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
+    return;
   }
-};
+  const data = await response.json();
+  const nome = data[0].nome;
+  document.getElementById(campo).value = nome;
+}
 
-window.getExpedicao = async function (ordemdecompra) {
+async function getExpedicao(ordemdecompra) {
   const response = await fetch(
     `/getExpedicao?p_ordemdecompra=${ordemdecompra}`
   );
 
   if (!response.ok) {
     const errText = await response.text();
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: `${errText}`,
-    });
+    messageInformation("error", "ERRO", `${errText}`);
   } else {
     const data = await response.json();
     data.forEach((item) => {
@@ -218,23 +202,14 @@ window.getExpedicao = async function (ordemdecompra) {
       setChecked("chk_pendencia", item.pendencia);
       setText("txt_separacao", item.separacao);
       setText("txt_prontoid", item.conferido);
-      getUsuario(
-        document.getElementById("txt_prontoid").value,
-        "txt_prontoresp"
-      );
+      getUsuario(getText("txt_prontoid"), "txt_prontoresp");
       setText("txt_entregaid", item.motorista);
-      getUsuario(
-        document.getElementById("txt_entregaid").value,
-        "txt_entregaresp"
-      );
+      getUsuario(getText("txt_entregaid"), "txt_entregaresp");
       setText("txt_embalageminicio", item.embalageminicio);
       setText("txt_embalagemfim", item.embalagemfim);
       setChecked("chk_embalagem", item.embalagempausa);
       setText("txt_embalagemid", item.embalagemresp);
-      getUsuario(
-        document.getElementById("txt_embalagemid").value,
-        "txt_embalagemresp"
-      );
+      getUsuario(getText("txt_embalagemid"), "txt_embalagemresp");
       setChecked("chk_acessoriosavulsos", item.avulso);
       setText("txt_acessoriosavulsosl", item.avulsol);
       setText("txt_acessoriosavulsosq", item.avulsoq);
@@ -272,24 +247,10 @@ window.getExpedicao = async function (ordemdecompra) {
       setChecked("chk_embalagemfim", false);
     });
   }
-};
+}
 
-window.setarDataHora = function (checkbox, text) {
-  setDateTime(checkbox, text);
-};
-
-window.setarData = function (checkbox, text) {
-  setDate(checkbox, text);
-};
-
-window.setDataExpedicao = async function () {
-  const result = await Swal.fire({
-    icon: "question",
-    text: "Deseja confirmar Alterações?",
-    showDenyButton: true,
-    denyButtonText: "Cancelar",
-    confirmButtonText: "Confirmar",
-  });
+async function setDataExpedicao() {
+  const result = await messageQuestion(null, "Deseja confirmar Alterações?");
 
   if (result.isConfirmed) {
     try {
@@ -347,35 +308,80 @@ window.setDataExpedicao = async function () {
       });
 
       if (!response.ok) {
-        Swal.fire({
-          icon: "error",
-          text: `Ocorreu um erro ao salvar os dados! ${error.message}`,
-        });
+        messageInformation(
+          "error",
+          "ERRO",
+          `Ocorreu um erro ao salvar os dados! ${error.message}`
+        );
       } else {
-        Swal.fire({
-          icon: "success",
-          text: "Alterações confirmadas com sucesso!",
-        });
+        messageInformation(
+          "success",
+          "Sucesso",
+          "Alterações confirmadas com sucesso!"
+        );
         fillTable();
       }
     } catch (err) {
-      Swal.fire({
-        icon: "error",
-        text: `Falha na comunicação com o servidor! ${err.message}`,
-      });
+      messageInformation(
+        "error",
+        "ERRO",
+        `Falha na comunicação com o servidor! ${err.message}`
+      );
     }
   }
-};
+}
+
+function handleClickCheckbox() {
+  const operation = ["embalagem"];
+
+  operation.forEach((item) => {
+    addEventBySelector(`#chk_${item}inicio`, "click", () =>
+      setarDataHora(`#chk_${item}inicio`, `txt_${item}inicio`)
+    );
+
+    addEventBySelector(`#chk_${item}fim`, "click", () =>
+      setarDataHora(`#chk_${item}fim`, `txt_${item}fim`)
+    );
+  });
+}
 
 document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("expedicao", "projetos_exp.html");
-  fillTable();
-  clicked();
+
   enableEnterAsTab();
   onmouseover("table");
   enableTableFilterSort("table");
   onclickHighlightRow("table");
   window.addEventListener("resize", ajustarTamanhoModal);
+  handleClickCheckbox();
 });
+
+addEventBySelector("#table", "dblclick", handleClick);
+addEventBySelector("#txt_datafilter", "blur", fillTable);
+addEventBySelector("#bt_salvar", "click", setDataExpedicao);
+
+addEventBySelector("#txt_embalagemid", "blur", () =>
+  getUsuario(getText("txt_embalagemid"), "txt_embalagemresp")
+);
+
+addEventBySelector("#txt_prontoid", "blur", () =>
+  getUsuario(getText("txt_prontoid"), "txt_prontoresp")
+);
+
+addEventBySelector("#txt_entregaid", "blur", () =>
+  getUsuario(getText("txt_entregaid"), "txt_entregaresp")
+);
+
+addEventBySelector(`#chk_pronto`, "click", () =>
+  setDate(`#chk_pronto`, `txt_pronto`)
+);
+
+addEventBySelector(`#chk_entrega`, "click", () =>
+  setDate(`#chk_entrega`, `txt_entrega`)
+);
+
+addEventBySelector(`#chk_separacao`, "click", () =>
+  setDateTime(`#chk_separacao`, `txt_separacao`)
+);

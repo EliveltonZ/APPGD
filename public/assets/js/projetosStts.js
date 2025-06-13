@@ -10,11 +10,13 @@ import {
   colorAcessorios,
   onclickHighlightRow,
   createModal,
+  messageInformation,
+  addEventBySelector,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
 
-window.fillTable = async function () {
+async function fillTable() {
   const date_condition = getText("txt_datafilter");
 
   if (date_condition) {
@@ -24,11 +26,11 @@ window.fillTable = async function () {
 
     if (!response.ok) {
       const errText = response.statusText;
-      Swal.fire({
-        icon: "error",
-        title: "Erro",
-        text: "Não foi possivel carregar os dados" + errText,
-      });
+      messageInformation(
+        "error",
+        "ERRO",
+        "Não foi possivel carregar os dados" + errText
+      );
     } else {
       const tbody = document.querySelector("tbody");
       tbody.innerHTML = "";
@@ -82,18 +84,19 @@ window.fillTable = async function () {
       });
     }
   }
-};
+}
 
-window.fillTableAcessorios = async function (ordemdecompra) {
+async function fillTableAcessorios(ordemdecompra) {
   const response = await fetch(
     `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
   );
 
   if (!response.ok) {
-    Swal.fire({
-      icon: "error",
-      text: `não foi possivel carregar dados de acessorios !!! ${error.message}`,
-    });
+    messageInformation(
+      "error",
+      "ERRO",
+      `não foi possivel carregar dados de acessorios !!!`
+    );
   } else {
     const tbody = document.querySelectorAll("table tbody")[1];
     tbody.innerHTML = "";
@@ -123,28 +126,24 @@ window.fillTableAcessorios = async function (ordemdecompra) {
       tbody.appendChild(tr);
     });
   }
-};
+}
 
 function getFirstColumnValue(td) {
   const row = td.parentNode;
   return row.cells[2].innerText;
 }
 
-window.clicked = function () {
-  document
-    .getElementById("table")
-    .addEventListener("dblclick", async function (event) {
-      const td = event.target;
-      const tr = td.closest(".open-modal-row");
+async function handleClikedTable(event) {
+  const td = event.target;
+  const tr = td.closest(".open-modal-row");
 
-      if (!tr || td.tagName !== "TD") return;
+  if (!tr || td.tagName !== "TD") return;
 
-      const firstColumnValue = getFirstColumnValue(td);
-      await getStatus(firstColumnValue);
-      await fillTableAcessorios(firstColumnValue);
-      createModal("modal");
-    });
-};
+  const firstColumnValue = getFirstColumnValue(td);
+  await getStatus(firstColumnValue);
+  await fillTableAcessorios(firstColumnValue);
+  createModal("modal");
+}
 
 function setTextInner(element, value) {
   document.getElementById(element).innerText = value;
@@ -203,10 +202,12 @@ document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
   fillTable();
-  clicked();
   onmouseover("table");
   ajustarTamanhoModal();
   onclickHighlightRow("table");
   enableTableFilterSort("table");
   window.addEventListener("resize", ajustarTamanhoModal);
 });
+
+addEventBySelector("#table", "dblclick", handleClikedTable);
+addEventBySelector("#txt_datafilter", "blur", fillTable);

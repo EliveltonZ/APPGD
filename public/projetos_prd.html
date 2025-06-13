@@ -7,16 +7,17 @@
     <title>Produção</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=3b6c9b1688d82a4111b132d5b3736cc7">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=9663b21008bef2156e30de944bf5a973">
     <link rel="stylesheet" href="assets/css/projetos_prd.min.css?h=2926d6f3438a3fed1b4a26d84263cd3a">
 <link rel="icon" href="assets/img/icone.png">
     <script type="module" src="assets/js/projetosPrd.js"></script>
+    <script src="https://unpkg.com/@ericblade/quagga2@1.2.6/dist/quagga.min.js"></script>
 </head>
 
 <body style="font-family: 'Nunito Sans', sans-serif;">
     <div style="display: flex;flex-direction: column;height: 100vh;">
         <div class="d-flex align-items-center">
-            <h1 class="text-primary" style="text-align: center;text-shadow: 0px 0px 7px;margin: 20px;width: 100%;">Controle de Produção</h1><button class="btn btn-primary" id="bt_scan" type="button" style="height: 40px;" onclick="readBarCode()">Scan</button>
+            <h1 class="text-primary" style="text-align: center;text-shadow: 0px 0px 7px;margin: 20px;width: 100%;">Controle de Produção</h1><button class="btn btn-primary" id="bt_scan" type="button" style="height: 40px;">Scan</button>
         </div>
         <div class="table-responsive" id="container">
             <table class="table" id="table">
@@ -70,27 +71,27 @@
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Corte Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_corte" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_corteinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_corteinicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_corteinicio&#39;);"></div><label class="form-label d-block">Corte&nbsp;Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_cortefim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_cortefim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_cortefim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_corteid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_corteresp&#39;)" autocomplete="off"><input type="text" id="txt_corteresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_corteinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_corteinicio" style="width: 5%;"></div><label class="form-label d-block">Corte&nbsp;Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_cortefim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_cortefim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_corteid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_corteresp" disabled="" style="width:100%;"></div>
                                 </div>
                                 <div style="margin-right: 40px;"></div>
                                 <div class="margin-setor">
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Customização Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_customizacao" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_customizacaoinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_customizacaoinicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_customizacaoinicio&#39;);"></div><label class="form-label d-block">Customização&nbsp;Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_customizacaofim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_customizacaofim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_customizacaofim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_customizacaoid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_customizacaoresp&#39;)" autocomplete="off"><input type="text" id="txt_customizacaoresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_customizacaoinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_customizacaoinicio" style="width: 5%;"></div><label class="form-label d-block">Customização&nbsp;Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_customizacaofim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_customizacaofim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_customizacaoid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_customizacaoresp" disabled="" style="width:100%;"></div>
                                 </div>
                                 <div style="margin-right: 40px;"></div>
                                 <div class="margin-setor">
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Coladeira Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_coladeira" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_coladeirainicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_coladeirainicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_coladeirainicio&#39;);"></div><label class="form-label d-block">Coladeira&nbsp;Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_coladeirafim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_coladeirafim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_coladeirafim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_coladeiraid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_coladeiraresp&#39;)" autocomplete="off"><input type="text" id="txt_coladeiraresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_coladeirainicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_coladeirainicio" style="width: 5%;"></div><label class="form-label d-block">Coladeira&nbsp;Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_coladeirafim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_coladeirafim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_coladeiraid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_coladeiraresp" disabled="" style="width:100%;"></div>
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between display-div" style="margin-top: 3%;">
@@ -98,27 +99,27 @@
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Usinagem Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_usinagem" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_usinageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_usinageminicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_usinageminicio&#39;);"></div><label class="form-label d-block">Usinagem Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_usinagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_usinagemfim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_usinagemfim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_usinagemid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_usinagemresp&#39;)" autocomplete="off"><input type="text" id="txt_usinagemresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_usinageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_usinageminicio" style="width: 5%;"></div><label class="form-label d-block">Usinagem Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_usinagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_usinagemfim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_usinagemid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_usinagemresp" disabled="" style="width:100%;"></div>
                                 </div>
                                 <div style="margin-right: 40px;"></div>
                                 <div class="margin-setor">
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Montagem Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_montagem" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_montageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_montageminicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_montageminicio&#39;);"></div><label class="form-label d-block">Montagem Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_montagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_montagemfim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_montagemfim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_montagemid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_montagemresp&#39;)" autocomplete="off"><input type="text" id="txt_montagemresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_montageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_montageminicio" style="width: 5%;"></div><label class="form-label d-block">Montagem Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_montagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_montagemfim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_montagemid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_montagemresp" disabled="" style="width:100%;"></div>
                                 </div>
                                 <div style="margin-right: 40px;"></div>
                                 <div class="margin-setor">
                                     <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Paineis Inicio:</label>
                                         <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_paineis" style="margin-right: 4px;"></div>
                                     </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_paineisinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_paineisinicio" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_paineisinicio&#39;);"></div><label class="form-label d-block">Paineis Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_paineisfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_paineisfim" style="width: 5%;" onclick="setarDataHora(this, &#39;txt_paineisfim&#39;);"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_paineisid" style="width: 40px;margin-right: 10px;text-align: center;" onblur="getUsuario(this.value, &#39;txt_paineisresp&#39;)" autocomplete="off"><input type="text" id="txt_paineisresp" disabled="" style="width:100%;"></div>
+                                    <div class="d-flex justify-content-between"><input id="txt_paineisinicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_paineisinicio" style="width: 5%;"></div><label class="form-label d-block">Paineis Fim:</label>
+                                    <div class="d-flex justify-content-between"><input id="txt_paineisfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_paineisfim" style="width: 5%;"></div>
+                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_paineisid" style="width: 40px;margin-right: 10px;text-align: center;" autocomplete="off"><input type="text" id="txt_paineisresp" disabled="" style="width:100%;"></div>
                                 </div>
                             </div><label class="form-label d-block" style="margin-top: 3%;">Observações:</label><textarea id="txt_observacoes" style="width: 100%;overflow: auto;height: 90px;"></textarea>
                             <div style="margin:30px;"></div>
@@ -141,13 +142,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <div class="d-flex justify-content-center" style="width: 100%;"><button class="btn btn-primary d-flex" id="bt_salvar" type="button" onclick="setDataProducao()">Salvar</button></div>
+                    <div class="d-flex justify-content-center" style="width: 100%;"><button class="btn btn-primary d-flex" id="bt_salvar" type="button">Salvar</button></div>
                 </div>
             </div>
         </div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
-    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
 
 </html>

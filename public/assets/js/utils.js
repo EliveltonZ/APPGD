@@ -268,8 +268,8 @@ export function printPag(pagina) {
 
 export function setDateTime(checkbox, text) {
   var campoDataHora = document.getElementById(text);
-
-  if (checkbox.checked) {
+  const element = document.querySelector(checkbox);
+  if (element.checked) {
     Swal.fire({
       icon: "question",
       confirmButtonText: "Sim",
@@ -287,7 +287,7 @@ export function setDateTime(checkbox, text) {
         var dataHoraFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
         campoDataHora.value = dataHoraFormatada;
       } else {
-        document.getElementById(checkbox.id).checked = false;
+        document.getElementById(element.id).checked = false;
       }
     });
   }
@@ -295,8 +295,8 @@ export function setDateTime(checkbox, text) {
 
 export function setDate(checkbox, text) {
   var campoDataHora = document.getElementById(text);
-
-  if (checkbox.checked) {
+  const element = document.querySelector(checkbox);
+  if (element.checked) {
     Swal.fire({
       icon: "question",
       confirmButtonText: "Sim",
@@ -312,7 +312,7 @@ export function setDate(checkbox, text) {
         var dataHoraFormatada = `${ano}-${mes}-${dia}`;
         campoDataHora.value = dataHoraFormatada;
       } else {
-        document.getElementById(checkbox.id).checked = false;
+        document.getElementById(element.id).checked = false;
       }
     });
   }
@@ -373,11 +373,12 @@ export function colorAcessorios(item) {
 }
 
 export function messageInformation(icon, title, message) {
-  Swal.fire({
+  const dialog = Swal.fire({
     icon: icon,
     title: title,
     text: message,
   });
+  return dialog;
 }
 
 export async function messageQuestion(
@@ -558,7 +559,6 @@ export function addEventBySelector(element, event, _function) {
   }
 }
 
-// === Criar spinner global automaticamente ===
 export function criarSpinnerGlobal() {
   const spinnerDiv = document.createElement("div");
   spinnerDiv.id = "spinner-global";
@@ -595,7 +595,6 @@ export function criarSpinnerGlobal() {
   document.body.appendChild(spinnerDiv);
 }
 
-// === Substitui o fetch global ===
 (function () {
   criarSpinnerGlobal();
 

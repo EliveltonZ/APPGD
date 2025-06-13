@@ -172,8 +172,8 @@ async function getProjetosLote() {
 }
 
 async function openModalLote() {
-  getLastLote();
-  getProjetosLote();
+  await getLastLote();
+  await getProjetosLote();
   createModal("modal-3");
 }
 

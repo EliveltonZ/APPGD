@@ -74,7 +74,7 @@ async function passwordValidation(event) {
     const pwdInput = document.getElementById("password");
     pwdInput.value = "";
     pwdInput.focus();
-    messageInformation("error", "Erro", "Senha digitada é inválida!");
+    messageInformation("error", "Erro", "Senha digitada é inválida !");
   }
 }
 

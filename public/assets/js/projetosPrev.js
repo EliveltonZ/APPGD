@@ -11,6 +11,10 @@ import {
   colorAcessorios,
   onclickHighlightRow,
   createModal,
+  messageInformation,
+  messageQuestion,
+  getText,
+  addEventBySelector,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -23,16 +27,12 @@ function checkText(item) {
   }
 }
 
-window.fillTable = async function () {
+async function fillTable() {
   const response = await fetch("/fillTablePrevisao");
   const data = await response.json();
 
   if (!response.ok) {
-    sweetalert2.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Não foi possivel carregar os dados",
-    });
+    messageInformation("error", "ERRO", "Não foi possivel carregar os dados");
   } else {
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
@@ -102,18 +102,19 @@ window.fillTable = async function () {
       num = num + 1;
     });
   }
-};
+}
 
-window.fillTableAcessorios = async function (ordemdecompra) {
+async function fillTableAcessorios(ordemdecompra) {
   const response = await fetch(
     `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
   );
 
   if (!response.ok) {
-    sweetalert2.fire({
-      icon: "error",
-      text: `não foi possivel carregar dados de acessorios !!! ${error.message}`,
-    });
+    messageInformation(
+      "error",
+      "ERRO",
+      `não foi possivel carregar dados de acessorios !!! ${error.message}`
+    );
   } else {
     const tbody = document.querySelectorAll("table tbody")[1];
     tbody.innerHTML = "";
@@ -144,53 +145,38 @@ window.fillTableAcessorios = async function (ordemdecompra) {
       tbody.appendChild(tr);
     });
   }
-};
+}
 
 function getFirstColumnValue(td) {
   const row = td.parentNode;
   return row.cells[22].innerText;
 }
 
-window.clicked = function () {
-  document
-    .getElementById("table")
-    .addEventListener("dblclick", async function (event) {
-      const td = event.target;
-      const tr = td.closest(".open-modal-row");
+async function handleTableClicked(event) {
+  const td = event.target;
+  const tr = td.closest(".open-modal-row");
+  if (!tr || td.tagName !== "TD") return;
+  const firstColumnValue = getFirstColumnValue(td);
+  await getPrevisao(firstColumnValue);
+  await fillTableAcessorios(firstColumnValue);
+  createModal("modal");
+}
 
-      if (!tr || td.tagName !== "TD") return;
-
-      const firstColumnValue = getFirstColumnValue(td);
-
-      await getPrevisao(firstColumnValue);
-      await fillTableAcessorios(firstColumnValue);
-
-      createModal("modal");
-    });
-};
-
-window.getUsuario = async function (id, campo) {
+async function getUsuario(id, campo) {
   const response = await fetch(`/getUsuario?p_id=${id}`);
   if (!response.ok) {
-    sweetalert2.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Não foi possivel buscar Usuario",
-    });
-  } else {
-    const data = await response.json();
-    const nome = data[0].nome;
-    document.getElementById(campo).value = nome;
+    messageInformation("error", "ERRO", `Não foi possivel buscar Usuario`);
+    return;
   }
-};
+  const data = await response.json();
+  const nome = data[0].nome;
+  document.getElementById(campo).value = nome;
+}
 
-window.getPrevisao = async function (ordemdecompra) {
+async function getPrevisao(ordemdecompra) {
   const response = await fetch(`/getPrevisao?p_ordemdecompra=${ordemdecompra}`);
   if (!response.ok) {
-    sweetalert2.fire({
-      icon: "error",
-      text: `Ocorreu um erro ${error.message}`,
-    });
+    messageInformation("error", "ERRO", `Ocorreu um erro ${error.message}`);
   } else {
     const data = await response.json();
     data.forEach((item) => {
@@ -208,78 +194,61 @@ window.getPrevisao = async function (ordemdecompra) {
       setText("txt_cortefim", item.cortefim);
       setChecked("chk_corte", item.cortepausa);
       setText("txt_corteid", item.corteresp);
-      getUsuario(document.getElementById("txt_corteid").value, "txt_corteresp");
+      getUsuario(getText("txt_corteid"), "txt_corteresp");
 
       setText("txt_customizacaoinicio", item.customizacaoinicio);
       setText("txt_customizacaofim", item.customizacaofim);
       setChecked("chk_customizacao", item.customizacaopausa);
       setText("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(
-        document.getElementById("txt_customizacaoid").value,
-        "txt_customizacaoresp"
-      );
+      getUsuario(getText("txt_customizacaoid"), "txt_customizacaoresp");
 
       setText("txt_coladeirainicio", item.coladeirainicio);
       setText("txt_coladeirafim", item.coladeirafim);
       setChecked("chk_coladeira", item.coladeirapausa);
       setText("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(
-        document.getElementById("txt_coladeiraid").value,
-        "txt_coladeiraresp"
-      );
+      getUsuario(getText("txt_coladeiraid"), "txt_coladeiraresp");
 
       setText("txt_usinageminicio", item.usinageminicio);
       setText("txt_usinagemfim", item.usinagemfim);
       setChecked("chk_usinagem", item.usinagempausa);
       setText("txt_usinagemid", item.usinagemresp);
-      getUsuario(
-        document.getElementById("txt_usinagemid").value,
-        "txt_usinagemresp"
-      );
+      getUsuario(getText("txt_usinagemid"), "txt_usinagemresp");
 
       setText("txt_montageminicio", item.montageminicio);
       setText("txt_montagemfim", item.montagemfim);
       setText("txt_montagemfim", item.montagemfim);
       setChecked("chk_montagem", item.montagempausa);
       setText("txt_montagemid", item.montagemresp);
-      getUsuario(
-        document.getElementById("txt_montagemid").value,
-        "txt_montagemresp"
-      );
+      getUsuario(getText("txt_montagemid"), "txt_montagemresp");
 
       setText("txt_paineisinicio", item.paineisinicio);
       setText("txt_paineisfim", item.paineisfim);
       setText("txt_paineisfim", item.paineisfim);
       setChecked("chk_paineis", item.paineispausa);
       setText("txt_paineisid", item.paineisresp);
-      getUsuario(
-        document.getElementById("txt_paineisid").value,
-        "txt_paineisresp"
-      );
+      getUsuario(getText("txt_paineisid"), "txt_paineisresp");
 
       setText("txt_embalageminicio", item.embalageminicio);
       setText("txt_embalagemfim", item.embalagemfim);
       setText("txt_embalagemfim", item.embalagemfim);
       setChecked("chk_embalagem", item.embalagempausa);
       setText("txt_embalagemid", item.embalagemresp);
-      getUsuario(
-        document.getElementById("txt_embalagemid").value,
-        "txt_embalagemresp"
-      );
+      getUsuario(getText("txt_embalagemid"), "txt_embalagemresp");
 
       setText("txt_observacoes", item.observacoes);
     });
   }
-};
+}
 
 document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("previsao", "projetos_prev.html");
   fillTable();
-  clicked();
   onmouseover("table");
   enableTableFilterSort("table");
   onclickHighlightRow("table");
   window.addEventListener("resize", ajustarTamanhoModal);
 });
+
+addEventBySelector("#table", "dblclick", handleTableClicked);
