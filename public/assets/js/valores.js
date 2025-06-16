@@ -9,8 +9,6 @@ import {
 
 import { enableTableFilterSort } from "./filtertable.js";
 
-loadPage("valores", "valores.html");
-
 window.fillTable = async function name() {
   const response = await fetch("/fillTableValores");
 
@@ -45,6 +43,7 @@ window.fillTable = async function name() {
 };
 
 document.addEventListener("DOMContentLoaded", (event) => {
+  loadPage("valores", "valores.html");
   fillTable();
   onmouseover("table");
   onclickHighlightRow("table");

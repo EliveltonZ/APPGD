@@ -78,23 +78,43 @@ async function passwordValidation(event) {
   }
 }
 
-function setDataUsuario(data) {
-  localStorage.setItem("id", data.id);
-  localStorage.setItem("usuario", data.login);
-  localStorage.setItem("adicionar_projetos", data.adicionar_projetos);
-  localStorage.setItem("producao", data.producao);
-  localStorage.setItem("expedicao", data.expedicao);
-  localStorage.setItem("adicionar_usuarios", data.adicionar_usuarios);
-  localStorage.setItem("acesso", data.acesso);
-  localStorage.setItem("definicoes", data.definicoes);
-  localStorage.setItem("pcp", data.pcp);
-  localStorage.setItem("previsao", data.previsao);
-  localStorage.setItem("compras", data.compras);
-  localStorage.setItem("ativo", data.ativo);
-  localStorage.setItem("producao_assistencia", data.producao_assistencia);
-  localStorage.setItem("solicitar_assistencia", data.solicitar_assistencia);
-  localStorage.setItem("valores", data.valores);
-  localStorage.setItem("logistica", data.logistica);
+async function setDataUsuario(user) {
+  try {
+    const payload = {
+      user: user.id,
+      nome: user.nome,
+      permissoes: user.permissoes,
+      login: user.login,
+      adicionar_projetos: user.adicionar_projetos,
+      producao: user.producao,
+      expedicao: user.expedicao,
+      adicionar_usuarios: user.adicionar_usuarios,
+      acesso: user.acesso,
+      definicoes: user.definicoes,
+      pcp: user.pcp,
+      previsao: user.previsao,
+      compras: user.compras,
+      ativo: user.ativo,
+      producao_assistencia: user.producao_assistencia,
+      solicitar_assistencia: user.solicitar_assistencia,
+      valores: user.valores,
+      logistica: user.logistica,
+    };
+
+    const response = await fetch("/setPermission", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao salvar permissões no backend");
+    }
+
+    console.log("Dados de usuário enviados com sucesso!");
+  } catch (error) {
+    console.error("Erro ao enviar dados:", error);
+  }
 }
 
 window.addEventListener("DOMContentLoaded", () => {

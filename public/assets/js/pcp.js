@@ -247,7 +247,7 @@ async function exportarDados() {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  // loadPage("pcp", "pcp.html");
+  loadPage("pcp", "pcp.html");
   setData("txt_data");
   onmouseover("table");
   enableEnterAsTab();

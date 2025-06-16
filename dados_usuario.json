@@ -1,0 +1,18 @@
+{
+  "user": 1,
+  "login": "ELIVELTON GONZAGA",
+  "adicionar_projetos": true,
+  "producao": true,
+  "expedicao": true,
+  "adicionar_usuarios": true,
+  "acesso": true,
+  "definicoes": true,
+  "pcp": true,
+  "previsao": true,
+  "compras": true,
+  "ativo": true,
+  "producao_assistencia": true,
+  "solicitar_assistencia": true,
+  "valores": true,
+  "logistica": true
+}

@@ -229,22 +229,26 @@ export function createModal(modal) {
   _modal.show();
 }
 
-function checkBoolean(valor) {
-  if (valor == "true") {
-    return true;
-  } else {
-    return false;
-  }
-}
+export async function loadPage(accessKey, page) {
+  try {
+    const response = await fetch("/checkPermission", {
+      credentials: "include",
+    });
 
-export function loadPage(access, page) {
-  const valor = checkBoolean(localStorage.getItem(access));
-  const currentPage = window.location.pathname.split("/").pop();
+    if (!response.ok) throw new Error("Não autenticado");
 
-  if (valor && currentPage !== page) {
-    window.location.href = `/${page}`;
-  } else if (!valor && currentPage !== "error.html") {
-    window.location.href = "error.html";
+    const permissoes = await response.json();
+    const temAcesso = Boolean(permissoes[accessKey]);
+    const currentPage = window.location.pathname.split("/").pop();
+
+    if (temAcesso && currentPage !== page) {
+      window.location.href = `/${page}`;
+    } else if (!temAcesso && currentPage !== "error.html") {
+      window.location.href = "error.html";
+    }
+  } catch (err) {
+    console.error("Erro ao verificar permissão:", err);
+    window.location.href = "index.html";
   }
 }
 
@@ -254,14 +258,6 @@ export function convertDecimal(num) {
   } else {
     num = 0;
     return `${parseFloat(num.toFixed(2))}%`;
-  }
-}
-
-export function printPag(pagina) {
-  var iframe = document.getElementById(pagina);
-
-  if (iframe.contentDocument.readyState === "complete") {
-    iframe.contentWindow.print();
   }
 }
 
@@ -559,6 +555,9 @@ export function addEventBySelector(element, event, _function) {
 }
 
 export function criarSpinnerGlobal() {
+  // Verifica se o spinner já foi criado
+  if (document.getElementById("spinner-global")) return;
+
   const spinnerDiv = document.createElement("div");
   spinnerDiv.id = "spinner-global";
   spinnerDiv.style.cssText = `
@@ -568,47 +567,64 @@ export function criarSpinnerGlobal() {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9999;
-    text-align: center;
-    font-family: Arial;
+    padding: 10px;
+  `;
+
+  const loader = document.createElement("div");
+  loader.style.cssText = `
     border: 6px solid #eee;
     border-top: 6px solid #333;
     border-radius: 50%;
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-    margin: auto;
   `;
 
-  spinnerDiv.innerHTML = `
-    <div></div>
-    <style>
+  spinnerDiv.appendChild(loader);
+  document.body.appendChild(spinnerDiv);
+
+  if (!document.getElementById("spinner-style")) {
+    const style = document.createElement("style");
+    style.id = "spinner-style";
+    style.textContent = `
       @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }
-    </style>
-  `;
-
-  document.body.appendChild(spinnerDiv);
+    `;
+    document.head.appendChild(style);
+  }
 }
 
+// Define URLs que não devem exibir o spinner
+const urlsIgnoradas = ["/fillElements", "/fillTableAcessorios"];
+
+// Verifica se a URL deve ou não exibir o spinner
+function deveMostrarSpinner(url) {
+  return !urlsIgnoradas.some((ignorada) => url.includes(ignorada));
+}
+
+// Substitui o fetch global com controle de spinner
 (function () {
   criarSpinnerGlobal();
 
   const originalFetch = window.fetch;
 
-  window.fetch = async function (...args) {
+  window.fetch = async function (input, init) {
+    const url = typeof input === "string" ? input : input.url;
+    const mostrarSpinner = deveMostrarSpinner(url);
     const spinner = document.getElementById("spinner-global");
-    if (spinner) spinner.style.display = "block";
+
+    if (mostrarSpinner && spinner) spinner.style.display = "block";
 
     try {
-      const res = await originalFetch(...args);
-      return res;
-    } catch (err) {
+      const response = await originalFetch(input, init);
+      return response;
+    } catch (error) {
       alert("Erro de conexão. Verifique sua internet ou o servidor.");
-      throw err;
+      throw error;
     } finally {
-      if (spinner) spinner.style.display = "none";
+      if (mostrarSpinner && spinner) spinner.style.display = "none";
     }
   };
 })();

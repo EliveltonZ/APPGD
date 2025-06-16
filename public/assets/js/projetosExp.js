@@ -349,7 +349,6 @@ document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("expedicao", "projetos_exp.html");
-
   enableEnterAsTab();
   onmouseover("table");
   enableTableFilterSort("table");

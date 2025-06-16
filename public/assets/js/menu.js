@@ -7,14 +7,10 @@ import {
   addEventBySelector,
 } from "./utils.js";
 
-function exibirNome(element) {
-  const usuario = localStorage.getItem("usuario");
-  document.getElementById(element).innerText = usuario;
-}
-
-function exibirResp(element) {
-  const usuario = localStorage.getItem("usuario");
-  document.getElementById(element).value = usuario;
+async function exibirNome() {
+  const usuario = await getValue("login");
+  document.getElementById("txt_usuario").innerText = usuario;
+  document.getElementById("txt_resp").value = usuario;
 }
 
 function exitSistem() {
@@ -31,6 +27,17 @@ function checkUrgente() {
   }
 }
 
+async function getValue(accessKey) {
+  const response = await fetch("/checkPermission", {
+    credentials: "include",
+  });
+
+  if (!response.ok) throw new Error("Não autenticado");
+
+  const permissoes = await response.json();
+  return permissoes[accessKey];
+}
+
 async function findBuyOrder() {
   localStorage.setItem("numoc", document.getElementById("txt_numoc").value);
   localStorage.setItem("resp", document.getElementById("txt_resp").value);
@@ -44,7 +51,7 @@ function printPage() {
   var iframe = document.getElementById("iframeImpressao");
   setTimeout(function () {
     iframe.contentWindow.print();
-  }, 1000);
+  }, 1500);
 }
 
 async function clickPrint() {
@@ -62,8 +69,7 @@ async function logout() {
 
 window.addEventListener("DOMContentLoaded", () => {
   setData("txt_data");
-  exibirNome("txt_usuario");
-  exibirResp("txt_resp");
+  exibirNome();
 });
 
 addEventBySelector("#link_logout", "click", logout);

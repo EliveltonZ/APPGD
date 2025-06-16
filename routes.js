@@ -18,6 +18,7 @@ const valoresController = require("./controllers/valoresController");
 const projetosPrevController = require("./controllers/projetosPrevController");
 const projetosSttsController = require("./controllers/projetosSttsController");
 const senhaController = require("./controllers/senhaController");
+const usuariosController = require("./controllers/usuariosController");
 
 // rotas utils.js
 route.get("/getUsuario", ultilsController.getUsuario);
@@ -96,6 +97,10 @@ route.put("/setUserAccess", acessoCrontroller.setUserAccess);
 
 // rotas senha.js
 route.put("/alterarSenha", senhaController.alterarSenha);
+
+// rotas acessos pagina
+route.post("/setPermission", usuariosController.setPermissions);
+route.get("/checkPermission", usuariosController.checkPermissao);
 
 route.get("/user-data", (req, res) => {
   if (!req.session.user) {

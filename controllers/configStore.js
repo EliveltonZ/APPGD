@@ -1,8 +1,5 @@
-const store = new Map();
+const path = require("path");
 
-module.exports = {
-  setUser: (id, data) => store.set(id, data),
-  getUser: (id) => store.get(id),
-  hasUser: (id) => store.has(id),
-  deleteUser: (id) => store.delete(id),
-};
+const filePath = path.join(__dirname, "dados_usuario.json");
+
+module.exports = {};
