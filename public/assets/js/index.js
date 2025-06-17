@@ -69,7 +69,7 @@ async function passwordValidation(event) {
 
   if (hasData) {
     setDataUsuario(data[0]);
-    window.location.href = "menu.html";
+    window.location.href = "/menu.html";
   } else {
     const pwdInput = document.getElementById("password");
     pwdInput.value = "";

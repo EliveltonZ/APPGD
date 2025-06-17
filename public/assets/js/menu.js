@@ -57,7 +57,7 @@ async function logout() {
   if (result.isConfirmed) {
     await clearDataUsuario();
     localStorage.clear();
-    document.location.href = "/";
+    window.location.href = "/";
   }
 }
 async function loadData() {
