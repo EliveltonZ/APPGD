@@ -38,7 +38,7 @@ async function getValue(accessKey) {
   return permissoes[accessKey];
 }
 
-async function findBuyOrder() {
+function findBuyOrder() {
   localStorage.setItem("numoc", document.getElementById("txt_numoc").value);
   localStorage.setItem("resp", document.getElementById("txt_resp").value);
   localStorage.setItem("tipo", document.getElementById("txt_tipo").value);
@@ -47,16 +47,14 @@ async function findBuyOrder() {
   document.getElementById("iframeImpressao").contentWindow.location.reload();
 }
 
-function printPage() {
+async function printPage() {
+  findBuyOrder();
+  await loadData();
+  document.getElementById("iframeImpressao").contentWindow.location.reload();
   var iframe = document.getElementById("iframeImpressao");
   setTimeout(function () {
     iframe.contentWindow.print();
-  }, 1500);
-}
-
-async function clickPrint() {
-  findBuyOrder();
-  printPage();
+  }, 500);
 }
 
 async function logout() {
@@ -66,6 +64,46 @@ async function logout() {
     document.location.href = "index.html";
   }
 }
+async function loadData() {
+  const buyOrder = getText("txt_numoc");
+  await fillElements(buyOrder);
+  await fillTableAcessorios(buyOrder);
+}
+
+async function fillElements(buyOrder) {
+  if (!buyOrder || buyOrder.trim() === "") {
+    console.warn("Ordem de compra inválida ou ausente. Cancelando fetch.");
+    return;
+  }
+
+  const response = await fetch(`/fillElements?p_ordemdecompra=${buyOrder}`);
+
+  if (!response.ok) {
+    const errTExt = await response.text();
+    console.error("Erro ao carregar os dados:", errTExt);
+  } else {
+    const numoc = `${buyOrder.slice(0, 8)}-${buyOrder.slice(-2)}`;
+    const data = await response.json();
+    localStorage.setItem("project", JSON.stringify(data[0]));
+  }
+}
+
+async function fillTableAcessorios(buyOrder) {
+  const response = await fetch(
+    `/fillTableAcessorios?p_ordemdecompra=${buyOrder}`
+  );
+
+  try {
+    const data = await response.json();
+    localStorage.setItem("acessorios", JSON.stringify(data));
+  } catch (err) {
+    messageInformation(
+      "error",
+      "Erro",
+      `Não foi possível carregar os dados. ${err.message}`
+    );
+  }
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   setData("txt_data");
@@ -73,4 +111,4 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 addEventBySelector("#link_logout", "click", logout);
-addEventBySelector("#bt_capa", "click", clickPrint);
+addEventBySelector("#bt_capa", "click", await printPage);

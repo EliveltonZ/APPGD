@@ -596,15 +596,12 @@ export function criarSpinnerGlobal() {
   }
 }
 
-// Define URLs que não devem exibir o spinner
 const urlsIgnoradas = ["/fillElements", "/fillTableAcessorios"];
 
-// Verifica se a URL deve ou não exibir o spinner
 function deveMostrarSpinner(url) {
   return !urlsIgnoradas.some((ignorada) => url.includes(ignorada));
 }
 
-// Substitui o fetch global com controle de spinner
 (function () {
   criarSpinnerGlobal();
 
