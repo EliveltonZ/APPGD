@@ -60,6 +60,7 @@ async function printPage() {
 async function logout() {
   const result = await messageQuestion(null, "Deseja sair do Sistema ?");
   if (result.isConfirmed) {
+    await clearDataUsuario();
     localStorage.clear();
     document.location.href = "index.html";
   }
@@ -102,6 +103,45 @@ async function fillTableAcessorios(buyOrder) {
       "Erro",
       `Não foi possível carregar os dados. ${err.message}`
     );
+  }
+}
+
+async function clearDataUsuario() {
+  try {
+    const payload = {
+      user: "",
+      nome: "",
+      permissoes: false,
+      login: "Não Logado",
+      adicionar_projetos: false,
+      producao: false,
+      expedicao: false,
+      adicionar_usuarios: false,
+      acesso: false,
+      definicoes: false,
+      pcp: false,
+      previsao: false,
+      compras: false,
+      ativo: false,
+      producao_assistencia: false,
+      solicitar_assistencia: false,
+      valores: false,
+      logistica: false,
+    };
+
+    const response = await fetch("/setPermission", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro ao salvar permissões no backend");
+    }
+
+    console.log("Dados de usuário enviados com sucesso!");
+  } catch (error) {
+    console.error("Erro ao enviar dados:", error);
   }
 }
 

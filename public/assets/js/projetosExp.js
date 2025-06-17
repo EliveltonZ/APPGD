@@ -106,10 +106,10 @@ async function fillTable() {
             <td>${item.ambiente}</td>
             <td style="text-align: center;">${checkValue(item.tipo)}</td>
             <td style="text-align: center;">${convertDataBr(
-              checkValue(item.chegoufabrica)
+              checkValue(item.dataentrega)
             )}</td>
             <td style="text-align: center;">${convertDataBr(
-              checkValue(item.dataentrega)
+              checkValue(item.chegoufabrica)
             )}</td>
             <td style="text-align: center;">${checkValue(item.lote)}</td>
             <td style="text-align: center; ${cor_status}">${item.status}</td>
@@ -200,6 +200,7 @@ async function getExpedicao(ordemdecompra) {
       setText("txt_pronto", item.pronto);
       setText("txt_entrega", item.entrega);
       setChecked("chk_pendencia", item.pendencia);
+      setChecked("chk_parcial", item.parcial);
       setText("txt_separacao", item.separacao);
       setText("txt_prontoid", item.conferido);
       getUsuario(getText("txt_prontoid"), "txt_prontoresp");
@@ -259,6 +260,7 @@ async function setDataExpedicao() {
         p_pronto: getText("txt_pronto"),
         p_entrega: getText("txt_entrega"),
         p_pendencia: getChecked("chk_pendencia"),
+        p_parcial: getChecked("chk_parcial"),
         p_separacao: getText("txt_separacao"),
         p_conferido: getText("txt_prontoid"),
         p_motorista: getText("txt_entregaid"),

@@ -343,19 +343,21 @@ export function enableEnterAsTab() {
 
 export function colorStatus(item) {
   if (item === "ATRASADO") {
-    return "color: red;";
+    return "color: rgb(255, 0, 0)";
   } else if (item === "INICIADO") {
-    return "color:rgb(233, 221, 0)";
+    return "color:rgb(194, 184, 6)";
   } else if (item === "A VENCER") {
     return "color: rgb(226, 109, 0)";
   } else if (item === "PENDENCIA") {
     return "color:rgb(186, 2, 227)";
   } else if (item === "URGENTE") {
-    return "color: rgb(40, 114, 224)";
+    return "color: rgb(59, 186, 255)";
   } else if (item === "PRONTO" || item === "OK") {
-    return "color: rgb(70, 136, 0)";
+    return "color: rgb(81, 154, 2)";
   } else if (item === "ENTREGUE") {
     return "color: rgb(93, 90, 245)";
+  } else if (item === "PARCEADO") {
+    return "color: rgb(2, 188, 188)";
   }
 }
 
