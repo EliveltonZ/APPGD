@@ -13,11 +13,6 @@ async function exibirNome() {
   document.getElementById("txt_resp").value = usuario;
 }
 
-function exitSistem() {
-  localStorage.clear();
-  document.location.href = "index.html";
-}
-
 function checkUrgente() {
   const checked = document.getElementById("chk_urgente").checked;
   if (checked) {
@@ -54,7 +49,7 @@ async function printPage() {
   var iframe = document.getElementById("iframeImpressao");
   setTimeout(function () {
     iframe.contentWindow.print();
-  }, 500);
+  }, 200);
 }
 
 async function logout() {
@@ -62,7 +57,7 @@ async function logout() {
   if (result.isConfirmed) {
     await clearDataUsuario();
     localStorage.clear();
-    document.location.href = "index.html";
+    document.location.href = "/";
   }
 }
 async function loadData() {

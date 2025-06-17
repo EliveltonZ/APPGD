@@ -5,7 +5,7 @@ import {
   setChecked,
   loadPage,
   enableEnterAsTab,
-  addEventById,
+  addEventBySelector,
   messageQuestion,
   messageInformation,
 } from "./utils.js";
@@ -106,5 +106,5 @@ window.addEventListener("DOMContentLoaded", () => {
   senhaFocus();
 });
 
-addEventById("#bt_salvar", "click", setUserAccess);
-addEventById("#txt_id", "blur", getUserAccess);
+addEventBySelector("#bt_salvar", "click", setUserAccess);
+addEventBySelector("#txt_id", "blur", getUserAccess);
