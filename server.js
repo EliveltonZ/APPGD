@@ -3,7 +3,7 @@ const app = express();
 const path = require("path");
 const cors = require("cors");
 const routes = require("./routes");
-const session = require("express-session");
+const cookieParser = require("cookie-parser");
 
 const useCors = true;
 
@@ -16,14 +16,7 @@ if (useCors) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  session({
-    secret: "s3cr3t!A9$7@#Uihx82&1Zqwe912hjk*&j",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true },
-  })
-);
+app.use(cookieParser("s3cr3t!A9$7@#Uihx82&1Zqwe912hjk*&j"));
 
 app.use("/", routes);
 
