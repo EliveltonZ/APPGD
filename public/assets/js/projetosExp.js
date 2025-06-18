@@ -19,6 +19,8 @@ import {
   addEventBySelector,
   messageInformation,
   messageQuestion,
+  getDateFilter,
+  setDateFilter,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -332,6 +334,19 @@ async function setDataExpedicao() {
     }
   }
 }
+async function getDataFilterExp() {
+  const data = await getDateFilter(1);
+  setText("txt_datafilter", data[0].p_data);
+  fillTable();
+}
+
+async function setDataFilterExp() {
+  const data = {
+    p_id: 1,
+    p_date: getText("txt_datafilter"),
+  };
+  await setDateFilter(data);
+}
 
 function handleClickCheckbox() {
   const operation = ["embalagem"];
@@ -352,6 +367,7 @@ document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("expedicao", "projetos_exp.html");
   enableEnterAsTab();
+  getDataFilterExp();
   onmouseover("table");
   enableTableFilterSort("table");
   onclickHighlightRow("table");
@@ -361,6 +377,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
 
 addEventBySelector("#table", "dblclick", handleClick);
 addEventBySelector("#txt_datafilter", "blur", fillTable);
+addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
 addEventBySelector("#bt_salvar", "click", setDataExpedicao);
 
 addEventBySelector("#txt_embalagemid", "blur", () =>

@@ -27,6 +27,8 @@ route.get("/getGroupedAmbiente", ultilsController.getGroupedAmbiente);
 route.get("/getGroupedVendedor", ultilsController.getGroupedVendedor);
 route.get("/getGroupedAcessorios", ultilsController.getGroupedAcessorios);
 route.get("/fillTableAcessorios", ultilsController.fillTableAcessorios);
+route.get("/getDate", ultilsController.getDate);
+route.put("/setDate", ultilsController.setDate);
 
 // rotas index.js
 route.post("/passwordValidation", indexController.passwordValidation);

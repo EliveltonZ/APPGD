@@ -248,7 +248,7 @@ export async function loadPage(accessKey, page) {
     }
   } catch (err) {
     console.error("Erro ao verificar permissão:", err);
-    window.location.href = "index.html";
+    window.location.href = "error.html";
   }
 }
 
@@ -376,6 +376,20 @@ export function messageInformation(icon, title, message) {
     text: message,
   });
   return dialog;
+}
+
+export async function getDateFilter(params) {
+  const response = await fetch(`/getDate?p_id=${params}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function setDateFilter(params) {
+  const response = await fetch("/setDate", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
 }
 
 export async function messageQuestion(
