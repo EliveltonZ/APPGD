@@ -4,10 +4,9 @@ import {
   setText,
   messageInformation,
   addEventBySelector,
+  getCookie,
+  enableEnterAsTab,
 } from "./utils.js";
-
-setText("txt_id", localStorage.getItem("id"));
-setText("txt_nome", localStorage.getItem("usuario"));
 
 function setTextEmpty(element) {
   document.getElementById(element).value = "";
@@ -86,8 +85,12 @@ async function alterarSenha() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", (event) => {
   setFocus("txt_senhaatual");
+  enableEnterAsTab();
 });
+
+setText("txt_id", await getCookie("id"));
+setText("txt_nome", await getCookie("login"));
 
 addEventBySelector("#bt_senha", "click", alterarSenha);

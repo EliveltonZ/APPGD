@@ -128,7 +128,7 @@ export function enableTableFilterSort(tableId) {
       popup.innerHTML = `
         <div class="card-body p-3">
           <h6 class="card-title mb-2">Filtrar coluna</h6>
-          <input type="text" id="searchInput" class="form-control form-control-sm mb-3" placeholder="Buscar...">
+          <input type="text" id="searchInput" autocomplete="off" class="form-control form-control-sm mb-3" placeholder="Buscar...">
           <button class="btn btn-sm btn-secondary mb-2" id="toggleSelectAll">Marcar/Desmarcar Todos</button>
           <div class="overflow-auto mb-3" style="max-height:200px;">
             ${uniqueValues

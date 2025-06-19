@@ -378,20 +378,6 @@ export function messageInformation(icon, title, message) {
   return dialog;
 }
 
-export async function getDateFilter(params) {
-  const response = await fetch(`/getDate?p_id=${params}`);
-  const data = await response.json();
-  return data;
-}
-
-export async function setDateFilter(params) {
-  const response = await fetch("/setDate", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
-  });
-}
-
 export async function messageQuestion(
   title,
   message,
@@ -407,6 +393,31 @@ export async function messageQuestion(
     confirmButtonText: confirmButtonText,
   });
   return result;
+}
+
+export async function getDateFilter(params) {
+  const response = await fetch(`/getDate?p_id=${params}`);
+  const data = await response.json();
+  return data;
+}
+
+export async function setDateFilter(params) {
+  const response = await fetch("/setDate", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+}
+
+export async function getCookie(key) {
+  const response = await fetch("/checkPermission", {
+    credentials: "include",
+  });
+
+  if (!response.ok) throw new Error("Não autenticado");
+
+  const cookie = await response.json();
+  return cookie[key];
 }
 
 export function exportarParaExcel(

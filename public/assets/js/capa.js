@@ -70,6 +70,6 @@ function loadData() {
   fillTableAcessorios(ordemdecompra);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", (event) => {
   loadData();
 });

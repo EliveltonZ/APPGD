@@ -7,6 +7,7 @@ import {
   messageInformation,
   messageQuestion,
   criarSpinnerGlobal,
+  getCookie,
 } from "./utils.js";
 
 async function find_id() {
@@ -81,8 +82,7 @@ async function passwordValidation(event) {
 async function setDataUsuario(user) {
   try {
     const payload = {
-      user: user.id,
-      nome: user.nome,
+      id: user.id,
       permissoes: user.permissoes,
       login: user.login,
       adicionar_projetos: user.adicionar_projetos,

@@ -5,10 +5,11 @@ import {
   messageInformation,
   messageQuestion,
   addEventBySelector,
+  getCookie,
 } from "./utils.js";
 
 async function exibirNome() {
-  const usuario = await getValue("login");
+  const usuario = await getCookie("login");
   document.getElementById("txt_usuario").innerText = usuario;
   document.getElementById("txt_resp").value = usuario;
 }
@@ -22,24 +23,12 @@ function checkUrgente() {
   }
 }
 
-async function getValue(accessKey) {
-  const response = await fetch("/checkPermission", {
-    credentials: "include",
-  });
-
-  if (!response.ok) throw new Error("Não autenticado");
-
-  const permissoes = await response.json();
-  return permissoes[accessKey];
-}
-
 function findBuyOrder() {
   localStorage.setItem("numoc", document.getElementById("txt_numoc").value);
   localStorage.setItem("resp", document.getElementById("txt_resp").value);
   localStorage.setItem("tipo", document.getElementById("txt_tipo").value);
   localStorage.setItem("urgente", checkUrgente());
   localStorage.setItem("data", document.getElementById("txt_data").value);
-  document.getElementById("iframeImpressao").contentWindow.location.reload();
 }
 
 async function printPage() {
@@ -49,7 +38,7 @@ async function printPage() {
   var iframe = document.getElementById("iframeImpressao");
   setTimeout(function () {
     iframe.contentWindow.print();
-  }, 200);
+  }, 500);
 }
 
 async function logout() {
@@ -104,8 +93,7 @@ async function fillTableAcessorios(buyOrder) {
 async function clearDataUsuario() {
   try {
     const payload = {
-      user: "",
-      nome: "",
+      id: "",
       permissoes: false,
       login: "Não Logado",
       adicionar_projetos: false,
@@ -140,10 +128,10 @@ async function clearDataUsuario() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", (event) => {
   setData("txt_data");
   exibirNome();
 });
 
 addEventBySelector("#link_logout", "click", logout);
-addEventBySelector("#bt_capa", "click", await printPage);
+addEventBySelector("#bt_capa", "click", printPage);
