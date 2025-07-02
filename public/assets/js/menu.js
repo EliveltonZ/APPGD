@@ -31,11 +31,21 @@ function findBuyOrder() {
   localStorage.setItem("data", document.getElementById("txt_data").value);
 }
 
-async function printPage() {
+async function printPageCapa() {
   findBuyOrder();
   await loadData();
   document.getElementById("iframeImpressao").contentWindow.location.reload();
   var iframe = document.getElementById("iframeImpressao");
+  setTimeout(function () {
+    iframe.contentWindow.print();
+  }, 500);
+}
+
+async function printPageCapaPendencia() {
+  findBuyOrder();
+  await loadData();
+  document.getElementById("iframeImpressao1").contentWindow.location.reload();
+  var iframe = document.getElementById("iframeImpressao1");
   setTimeout(function () {
     iframe.contentWindow.print();
   }, 500);
@@ -49,6 +59,7 @@ async function logout() {
     window.location.href = "/";
   }
 }
+
 async function loadData() {
   const buyOrder = getText("txt_numoc");
   await fillElements(buyOrder);
@@ -134,4 +145,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 addEventBySelector("#link_logout", "click", logout);
-addEventBySelector("#bt_capa", "click", printPage);
+addEventBySelector("#bt_capa", "click", printPageCapa);
+addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);

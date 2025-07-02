@@ -78,13 +78,18 @@ export function checkValue(value) {
 }
 
 export function convertDataBr(date) {
-  if (date == "-") {
+  if (date === "-" || !date) {
     return "-";
-  } else {
-    const parse_date = date.split("-");
-    const format_date = `${parse_date[2]}/${parse_date[1]}/${parse_date[0]}`;
-    return format_date;
   }
+
+  const [data, hora] = date.split("T");
+  const [ano, mes, dia] = data.split("-");
+
+  let dataFormatada = `${dia}/${mes}/${ano}`;
+  if (hora) {
+    dataFormatada += ` ${hora}`;
+  }
+  return dataFormatada;
 }
 
 export function convertDataISO(date) {
@@ -582,7 +587,6 @@ export function addEventBySelector(element, event, _function) {
 }
 
 export function criarSpinnerGlobal() {
-  // Verifica se o spinner já foi criado
   if (document.getElementById("spinner-global")) return;
 
   const spinnerDiv = document.createElement("div");
