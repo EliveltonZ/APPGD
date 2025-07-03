@@ -318,12 +318,12 @@ async function setDataExpedicao() {
           `Ocorreu um erro ao salvar os dados! ${error.message}`
         );
       } else {
+        await fillTable();
         messageInformation(
           "success",
           "Sucesso",
           "Alterações confirmadas com sucesso!"
         );
-        fillTable();
       }
     } catch (err) {
       messageInformation(
@@ -334,6 +334,7 @@ async function setDataExpedicao() {
     }
   }
 }
+
 async function getDataFilterExp() {
   const data = await getDateFilter(1);
   setText("txt_datafilter", data[0].p_data);

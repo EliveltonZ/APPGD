@@ -32,6 +32,11 @@ function findBuyOrder() {
 }
 
 async function printPageCapa() {
+  if (getText("txt_tipo") == "-") {
+    messageInformation("warning", "Atenção", "Selecione o tipo do Projeto");
+    return;
+  }
+
   findBuyOrder();
   await loadData();
   document.getElementById("iframeImpressao").contentWindow.location.reload();

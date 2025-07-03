@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>APP GD</title>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=af3ecff37190627d4a39dbcd1481560f">
-    <link rel="stylesheet" href="assets/css/capa.min.css?h=5fe48f17587e2b2de77335f43e5601b5">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=415f527d4cabd8cb9c748e4a7b12f031">
+    <link rel="stylesheet" href="assets/css/capa.min.css?h=2d4c42fe4df907fcbacc0203c3091490">
 <link rel="icon" href="/assets/img/icone.png">
     <script src="assets/js/capa.js" type="module"></script>
 </head>
@@ -28,9 +28,9 @@
             <div class="d-flex justify-content-center align-items-center" style="width: 61px;"><label class="form-label fw-bold margin-0">URG</label></div>
         </div>
         <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;">
-            <div class="div-border-right div-border-top" style="width: 122px;"><label class="form-label margin-text-etapas label-none" id="lb_corte">Label</label></div>
-            <div class="justify-content-center align-items-center div-border-right div-border-top" style="width: 96px;"><label class="form-label margin-text-etapas label-none" id="lb_lote">Label</label></div>
-            <div class="justify-content-center div-border-right div-border-top" style="width: 104px;"><label class="form-label margin-text-etapas label-none" id="lb_pedido">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label label-none margin-0" id="lb_corte">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 96px;"><label class="form-label label-none margin-0" id="lb_lote">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label label-none margin-0" id="lb_pedido">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_contrato">-</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 110px;"><label class="form-label margin-0" id="lb_qproj">-</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label margin-0" id="lb_numproj">-</label></div>
@@ -47,7 +47,7 @@
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label fw-bold margin-0">AMBIENTE:</label></div>
             <div class="d-flex align-items-center div-border-right div-border-top" style="width: 343px;"><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente" style="margin-left: 5px;">-</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;background: #C6E0B4;"><label class="form-label fw-bold margin-0">ENTREGA:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_entrega" style="color: var(--bs-red)">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_dataentrega" style="color: var(--bs-red)">-</label></div>
         </div>
         <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;margin-top: 0;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label fw-bold div-border-right margin-0">VENDEDOR:</label></div>
@@ -57,14 +57,14 @@
         </div>
         <div class="div-border" style="height: 75px;margin-top: 8px;">
             <div class="d-flex justify-content-center title" style="background: #BDD7EE"><label class="form-label">CORES DO PROJETO + OBSERVAÇÕES</label></div>
-            <div class="div-border-top" style="height: 33.3%;"></div>
+            <div class="div-border-top" style="height: 33.3%;"><label class="form-label label-none" id="lb_observacoes">...</label></div>
             <div class="div-border-top" style="height: 33.3%;"></div>
         </div>
         <div class="d-flex justify-content-center title" style="background: #F9ADAD;margin-top: 8px;"><label class="form-label">INFORMAÇÕES DE PRODUÇÃO</label></div>
         <div class="d-flex div-border" style="height: 50px;width: 100%;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 18%;"><label class="form-label text-nowrap align-items-center margin-0" id="lb_tipo" style="color: var(--bs-emphasis-color);font-size: 13px;">-</label></div>
             <div class="div-border" style="width: 27%;">
-                <div class="d-flex align-items-center div-border-right div-border-top div-border-bottom" style="height: 50%;"><label class="form-label margin-0" style="font-size: 10px;margin-left: 3px;margin-top: 2px;">Responsavel:</label><label class="form-label text-nowrap margin-0" id="lb_responsavel" style="font-size: 10px;margin-left: 6px">-</label></div>
+                <div class="d-flex align-items-center div-border-right div-border-top div-border-bottom" style="height: 50%;"><label class="form-label margin-0" style="font-size: 10px;margin-left: 3px;margin-top: 2px;">Responsavel:</label><label class="form-label text-nowrap fw-bold margin-0" id="lb_responsavel" style="font-size: 10px;margin-left: 6px">-</label></div>
                 <div class="d-flex align-items-center div-border-right div-border-top" style="height: 50%;"><label class="form-label margin-0" style="font-size: 10px;margin-left: 3px;width: 59.8px;margin-top: 2px;text-align: right;">Data:</label><label class="form-label text-nowrap margin-0" id="lb_data" style="margin-left: 6px;">-</label></div>
             </div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 27%;"><label class="form-label fw-bold align-items-center margin-0">ENVIADO P/ CORTE</label></div>
@@ -78,62 +78,62 @@
             <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;background: #BDD7EE;width: 170px;"><label class="form-label fw-bold margin-0" style="color: var(--bs-emphasis-color);">INICIO:</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;background: #BDD7EE;width: 170px;"><label class="form-label fw-bold margin-0" style="color: var(--bs-emphasis-color);">FIM:</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;background: #BDD7EE;width: 120px;"><label class="form-label fw-bold margin-0" style="color: var(--bs-emphasis-color);">RESPONSAVEL:</label></div>
-            <div class="d-flex justify-content-center align-items-center" style="height: 100%;background: #BDD7EE;width: 120px;"><label class="form-label fw-bold margin-0" style="color: var(--bs-emphasis-color);">INTERRUPÇAO?</label></div>
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;background: #BDD7EE;width: 120px;"><label class="form-label fw-bold margin-0" style="color: var(--bs-emphasis-color);">PAUSA:</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">CORTE:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_corte_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_corte_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_corte_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_corte">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_corte_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_corte_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_corte_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_corte">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">CUSTOMIZACÃO:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_customizacao_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_customizacao_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_custom_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_custom">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_customizacao_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_customizacao_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_custom_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_custom">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">COLADEIRA:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_coladeira_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_coladeira_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_coladeira_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_coladeira">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_coladeira_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_coladeira_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_coladeira_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_coladeira">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">USINAGEM:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_usinagem_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_usinagem_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_usinagem_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_usinagem">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_usinagem_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_usinagem_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_usinagem_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_usinagem">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">MONTAGEM:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_montagem_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_montagem_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_montagem_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_montagem">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_montagem_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_montagem_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_montagem_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_montagem">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">PAINEIS:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_paineis_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_paineis_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_paineis_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_paineis">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_paineis_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_paineis_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_paineis_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_paineis">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">EMBALAGEM:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_embalagem_inicio">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 170px;"><label class="form-label d-flex justify-content-center align-items-end label-etapas" id="lb_embalagem_fim">___/___/___&nbsp; ___:___</label></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_embalagem_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_embalagem">Label</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_embalagem_inicio">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-width"><label class="form-label label-etapas label-etapas" id="lb_embalagem_fim">___/___/___&nbsp; ___:___</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_embalagem_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_pausa_embalagem">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 122.766px;"><label class="form-label fw-bold margin-0">ACAB. ESPECIAIS:</label></div>
             <div class="div-border-right div-border-top" style="width: 340px;"></div>
-            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_especiais_resp">Label</label></div>
-            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none">Label</label></div>
+            <div class="d-flex justify-content-center div-border-right div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none" id="lb_especiais_resp">...</label></div>
+            <div class="d-flex justify-content-center div-border-top" style="width: 120px;"><label class="form-label margin-text-etapas label-none">...</label></div>
         </div>
         <div class="div-border" style="height: 50px;margin-top: 8px;margin-bottom: 8px;">
             <div class="d-flex justify-content-center title margin-0" style="background: #BDD7EE"><label class="form-label">PENDÊNCIAS PARA EXPEDIÇÃO</label></div>
@@ -143,125 +143,125 @@
             <div class="div-border" style="height: 24px;"><label class="form-label">EXPEDIÇÃO</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 28%;"><label class="form-label fw-bold margin-0 font-9">VOLUMES DE MODULAÇÃO / PEÇAS:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 198px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="background: #BDD7EE;width: 27%;"><label class="form-label fw-bold margin-0 font-9">VOLUMES DE MODULAÇÃO / PEÇAS:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 205px;"><label class="form-label margin-0 label-none" id="lb_modulosq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_modulosl">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">ACESSÓRIOS AVULSOS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">ACESSÓRIOS AVULSOS</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label div-border-top margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_avulsoq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_avulsol">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">PAINEIS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">PAINEIS</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_paineisq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_paineisl">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold div-border-right margin-0 font-9">PORTAS DE ALUMÍNIO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold div-border-right margin-0 font-9">PORTAS DE ALUMÍNIO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_portaaluminioq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_portaaluminiol">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">VIDROS / ESPELHOS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">VIDROS / ESPELHOS</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_vidrosq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_vidrosl">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">PINTURAS / LAQUEAÇÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">PINTURAS / LAQUEAÇÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_pecaspintadasq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_pecaspintadasl">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">TAPEÇARIAS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">TAPEÇARIAS</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_tapecariaq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_tapecarial">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">SERRALHERIA</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">SERRALHERIA</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label div-border-top margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_serralheriaq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_serralherial">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">CABIDES</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">CABIDES</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_cabideq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_cabidel">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114.766px;"><label class="form-label fw-bold margin-0 font-9">TRILHOS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #BDD7EE;width: 114px;"><label class="form-label fw-bold margin-0 font-9">TRILHOS</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0"> □ SIM</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 59.6406px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;"> □ NÃO</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">VOLUMES:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 80px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top label-none" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_trilhoq">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 60px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">BOX:</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 80px;"><label class="form-label margin-0 label-none" id="lb_trilhol">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #BDD7EE;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="div-border-top" style="height: 100%;width: 140px;"></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 0px;height: 26px;">
-            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #F9ADAD;width: 114.766px;"><label class="form-label fw-bold margin-0" style="font-size: 10px;">TOTAL VOLUMES</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 119.6px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;background: #F9ADAD;width: 114px;"><label class="form-label fw-bold margin-0" style="font-size: 10px;">TOTAL VOLUMES</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 119px;"><label class="form-label margin-0 label-none" id="lb_totalvolumes">...</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 141px;background: #F9ADAD;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">PRONTO P/ ENTREGA</label></div>
-            <div class="div-border-right div-border-top" style="height: 100%;width: 200px;padding-left: 2px;"><label class="form-label div-border-top" style="font-size: 9px;">DATA:</label></div>
+            <div class="div-border-right div-border-top" style="height: 100%;width: 159px;padding-left: 2px;"><label class="form-label div-border-top" style="font-size: 9px;">DATA:</label></div>
             <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="height: 100%;width: 120px;background: #F9ADAD;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 10px;">CONFERIDO POR:</label></div>
-            <div class="div-border-top" style="height: 100%;width: 120px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 100%;width: 140px;"><label class="form-label margin-0 label-none" id="lb_conferido">...</label></div>
         </div>
         <div class="d-flex div-border" style="margin-top: 8px;height: 26px;">
             <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;background: #C6E0B4;width: 114.766px;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-weight: bold;font-size: 9px;">SAIDA P/ ENTREGA</label></div>
             <div class="div-border-right" style="height: 100%;width: 238px;"><label class="form-label" style="color: var(--bs-emphasis-color);font-size: 9px;">DATA E HORA:</label></div>
-            <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;width: 153px;background: #C6E0B4;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 9px;font-weight: bold;">RESPONSAVEL CARREGAMENTO</label></div>
-            <div style="height: 100%;width: 203px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="height: 100%;width: 153px;background: #C6E0B4;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-size: 9px;font-weight: bold;">MOTORISTA RESPONSAVEL</label></div>
+            <div class="d-flex justify-content-center align-items-center" style="height: 100%;width: 203px;"><label class="form-label margin-0 label-none" id="lb_motorista">...</label></div>
         </div>
         <div class="div-border" style="margin-top: 10px;">
             <div class="d-flex justify-content-center title" style="background: #BDD7EE;"><label class="form-label">ACESSÓRIOS LANÇADOS</label></div>

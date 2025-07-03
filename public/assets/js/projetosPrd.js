@@ -287,7 +287,6 @@ async function setDataProducao() {
 
       if (!response.ok) {
         const errText = await response.text();
-        console.log(errText);
         messageInformation(
           "error",
           "ERRO",
