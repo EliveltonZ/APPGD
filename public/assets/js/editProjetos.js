@@ -126,8 +126,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("adicionar_projetos", "edit_projetos.html");
   setFocus("txt_numoc");
   getGroupedData("getGroupedAmbiente", "txt_tipoambiente", "tipo_ambiente");
-  getGroupedData("getGroupedLiberador", "txt_liberador", "p_liberador");
-  getGroupedData("getGroupedVendedor", "txt_vendedor", "p_vendedor");
+  getGroupedData("getGroupedLiberador", "liberadores", "p_liberador");
+  getGroupedData("getGroupedVendedor", "vendedores", "p_vendedor");
   allUpperCase();
   enableEnterAsTab();
 });

@@ -347,23 +347,18 @@ export function enableEnterAsTab() {
 }
 
 export function colorStatus(item) {
-  if (item === "ATRASADO") {
-    return "color: rgb(255, 0, 0)";
-  } else if (item === "INICIADO") {
-    return "color:rgb(194, 184, 6)";
-  } else if (item === "A VENCER") {
-    return "color: rgb(226, 109, 0)";
-  } else if (item === "PENDENCIA") {
-    return "color:rgb(186, 2, 227)";
-  } else if (item === "URGENTE") {
-    return "color: rgb(59, 186, 255)";
-  } else if (item === "PRONTO" || item === "OK") {
-    return "color: rgb(81, 154, 2)";
-  } else if (item === "ENTREGUE") {
-    return "color: rgb(93, 90, 245)";
-  } else if (item === "PARCEADO") {
-    return "color: rgb(2, 188, 188)";
-  }
+  const colors = {
+    ATRASADO: "color: rgb(255, 0, 0)",
+    INICIADO: "color: rgb(194, 184, 6)",
+    "A VENCER": "color: rgb(226, 109, 0)",
+    PENDENCIA: "color: rgb(186, 2, 227)",
+    URGENTE: "color: rgb(59, 186, 255)",
+    PRONTO: "color: rgb(81, 154, 2)",
+    ENTREGUE: "color: rgb(93, 90, 245)",
+    PARCEADO: "color: rgb(2, 188, 188)",
+  };
+
+  return colors[item] || "color: black";
 }
 
 export function colorAcessorios(item) {
@@ -374,11 +369,22 @@ export function colorAcessorios(item) {
   }
 }
 
+export async function getUsuario(id, campo) {
+  const response = await fetch(`/getUsuario?p_id=${id}`);
+  if (!response.ok) {
+    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
+    return;
+  }
+  const data = await response.json();
+  const nome = data[0].nome;
+  document.getElementById(campo).value = nome;
+}
+
 export function messageInformation(icon, title, message) {
   const dialog = Swal.fire({
     icon: icon,
     title: title,
-    text: message,
+    html: message,
   });
   return dialog;
 }
@@ -392,7 +398,7 @@ export async function messageQuestion(
   const result = await Swal.fire({
     icon: "question",
     title: title,
-    text: message,
+    html: message,
     showDenyButton: true,
     denyButtonText: cancelButtonText,
     confirmButtonText: confirmButtonText,
@@ -443,33 +449,33 @@ export function exportarParaExcel(
   XLSX.writeFile(workbook, nomeArquivo);
 }
 
-export function modalBarCode() {
+export async function modalBarCode() {
   const width = 80;
   const height = 30;
 
-  Swal.fire({
-    html: `
-         <style>
+  return await new Promise((resolve, reject) => {
+    Swal.fire({
+      html: `
+        <style>
           .swal2-popup.full-modal {
             width: 100% !important;
             height: 90vh !important;
             padding: 0 !important;
             margin: 0 !important;
             border-radius: 0 !important;
-            overflow: hidden
+            overflow: hidden;
           }
-  
+
           #swal2-html-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
           }
-  
-          .drawingBuffer{
-          display: none;
+
+          .drawingBuffer {
+            display: none;
           }
-  
         </style>
         <div id="camera-popup" style="
           width: 100%;
@@ -483,7 +489,6 @@ export function modalBarCode() {
           align-items: center;
           overflow: hidden;
         ">
-          <!-- Overlay para alinhar o código de barras -->
           <div id="overlay-frame" style="
             position: absolute;
             width: ${width}%;
@@ -494,82 +499,81 @@ export function modalBarCode() {
           "></div>
         </div>
       `,
-    customClass: {
-      popup: "full-modal",
-    },
-    showConfirmButton: false,
-    showCloseButton: true,
-    backdrop: false,
-    allowOutsideClick: false,
-    didOpen: () => {
-      Quagga.init(
-        {
-          inputStream: {
-            name: "Live",
-            type: "LiveStream",
-            target: document.getElementById("camera-popup"),
-            constraints: {
-              facingMode: "environment",
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
-              advanced: [{ focusMode: "continuous" }],
+      customClass: {
+        popup: "full-modal",
+      },
+      showConfirmButton: false,
+      showCloseButton: true,
+      backdrop: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Quagga.init(
+          {
+            inputStream: {
+              name: "Live",
+              type: "LiveStream",
+              target: document.getElementById("camera-popup"),
+              constraints: {
+                facingMode: "environment",
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                advanced: [{ focusMode: "continuous" }],
+              },
+              area: {
+                top: `${limitRead(height)}%`,
+                right: `${limitRead(width)}%`,
+                left: `${limitRead(width)}%`,
+                bottom: `${limitRead(height)}%`,
+              },
             },
-            area: {
-              top: `${limitRead(height)}%`,
-              right: `${limitRead(width)}%`,
-              left: `${limitRead(width)}%`,
-              bottom: `${limitRead(height)}%`,
+            locator: {
+              patchSize: "large",
+              halfSample: false,
+            },
+            locate: true,
+            decoder: {
+              readers: [
+                "code_128_reader",
+                "ean_reader",
+                "ean_8_reader",
+                "upc_reader",
+                "upc_e_reader",
+                "code_39_reader",
+                "code_93_reader",
+              ],
             },
           },
-          locator: {
-            patchSize: "large",
-            halfSample: false,
-          },
-          locate: true,
-          decoder: {
-            readers: [
-              "code_128_reader",
-              "ean_reader",
-              "ean_8_reader",
-              "upc_reader",
-              "upc_e_reader",
-              "code_39_reader",
-              "code_93_reader",
-            ],
-          },
-        },
-        (err) => {
-          if (err) {
-            console.error("Erro ao iniciar Quagga:", err);
+          (err) => {
+            if (err) {
+              console.error("Erro ao iniciar Quagga:", err);
+              reject(err);
+              return;
+            }
+            Quagga.start();
+          }
+        );
+
+        Quagga.onDetected((data) => {
+          const codigo = data.codeResult.code;
+
+          const regexPadrao = /^(?:\d{6}|\d{9})$/;
+          if (!regexPadrao.test(codigo)) {
+            alert("Código de barras inválido");
             return;
           }
-          Quagga.start();
-        }
-      );
 
-      Quagga.onDetected((data) => {
-        const codigo = data.codeResult.code;
+          Swal.close();
+          Quagga.stop();
+          Quagga.offDetected();
 
-        const regexPadrao = /^(?:\d{6}|\d{9})$/;
-        if (!regexPadrao.test(codigo)) {
-          alert(`Código de barras invalido`);
-          return;
-        }
-
-        alert(`Código lido: ${codigo}`);
-        Swal.close();
+          resolve(codigo);
+        });
+      },
+      willClose: () => {
         Quagga.stop();
         Quagga.offDetected();
-
-        document.getElementById(
-          "codigoLido"
-        ).textContent = `Código Lido: ${codigo}`;
-      });
-    },
-    willClose: () => {
-      Quagga.stop();
-      Quagga.offDetected();
-    },
+      },
+    });
   });
 }
 
@@ -578,11 +582,13 @@ function limitRead(value) {
 }
 
 export function addEventBySelector(element, event, _function) {
-  const el = document.querySelector(element);
-  if (el) {
-    el.addEventListener(event, _function);
+  const elements = document.querySelectorAll(element);
+  if (elements.length) {
+    elements.forEach((el) => {
+      el.addEventListener(event, _function);
+    });
   } else {
-    console.warn(`Elemento com Selector "${element}" não encontrado.`);
+    console.warn(`Nenhum elemento com o seletor "${element}" foi encontrado.`);
   }
 }
 
@@ -656,3 +662,29 @@ function deveMostrarSpinner(url) {
     }
   };
 })();
+
+export function detectarDispositivo() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+  if (/android/i.test(userAgent)) {
+    return "Android";
+  }
+
+  if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+    return "iOS";
+  }
+
+  if (/Win/.test(userAgent)) {
+    return "Windows";
+  }
+
+  if (/Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent)) {
+    return "MacOS";
+  }
+
+  if (/Linux/.test(userAgent)) {
+    return "Linux";
+  }
+
+  return "Desconhecido";
+}

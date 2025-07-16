@@ -9,4 +9,6 @@ module.exports = {
   getGroupedAcessorios: createRpcHandler("get_group_by_acessorios", "query"),
   getDate: createRpcHandler("get_data", "query"),
   setDate: createRpcHandler("set_data", "body"),
+  setEtapa: createRpcHandler("set_etapa", "body"),
+  getCodigoBarras: createRpcHandler("get_projeto_codigo_barras", "query"),
 };

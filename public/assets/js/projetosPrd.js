@@ -18,6 +18,7 @@ import {
   messageInformation,
   messageQuestion,
   addEventBySelector,
+  getUsuario,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -46,7 +47,9 @@ async function fillTable() {
 
       tr.innerHTML = `
         <td style="text-align: center;">${num}</td>
-        <td style="text-align: center; ${cor_a}">${item.a}</td>
+        <td class="hover-col" style="text-align: center; ${cor_a}">${
+        item.a
+      }</td>
         <td style="text-align: center;">${item.ordemdecompra}</td>
         <td style="text-align: center;">${checkValue(item.pedido)}</td>
         <td style="text-align: center;">${checkValue(item.etapa)}</td>
@@ -76,11 +79,16 @@ async function fillTable() {
         <td style="text-align: center;">${convertDataBr(
           checkValue(item.entrega)
         )}</td>
+        <td class="info-col" style="display:none;">${checkValue(
+          item.observacoes
+        )}</td>
       `;
-
       num++;
       tbody.appendChild(tr);
     });
+
+    addEventBySelector(".hover-col", "mouseover", showToolTip);
+    addEventBySelector(".hover-col", "mouseleave", hideToolTip);
   } catch (error) {
     messageInformation("error", "Erro", "Não foi possível carregar os dados.");
     console.error("Erro ao preencher tabela:", error);
@@ -146,15 +154,22 @@ async function handleClikedTable(event) {
   createModal("modal");
 }
 
-async function getUsuario(id, campo) {
-  const response = await fetch(`/getUsuario?p_id=${id}`);
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
-    return;
+function showToolTip(event) {
+  const tooltip = document.getElementById("tooltips");
+  if (event) {
+    const text =
+      event.target.parentElement.querySelector(".info-col").textContent;
+    tooltip.textContent = text;
+    tooltip.style.display = "block";
+    const rect = event.target.getBoundingClientRect();
+    tooltip.style.top = rect.top + window.scrollY + rect.height + 5 + "px";
+    tooltip.style.left = rect.left + window.scrollX + "px";
   }
-  const data = await response.json();
-  const nome = data[0].nome;
-  document.getElementById(campo).value = nome;
+}
+
+function hideToolTip() {
+  const tooltip = document.getElementById("tooltips");
+  tooltip.style.display = "none";
 }
 
 async function getProducao(ordemdecompra) {
@@ -236,9 +251,9 @@ async function getProducao(ordemdecompra) {
   }
 }
 
-window.setarDataHora = function (checkbox, text) {
+function setarDataHora(checkbox, text) {
   setDateTime(checkbox, text);
-};
+}
 
 async function setDataProducao() {
   const result = await messageQuestion(null, "Deseja confirmar Alterações?");
@@ -369,5 +384,3 @@ addEventBySelector("#txt_montagemid", "blur", () =>
 addEventBySelector("#txt_paineisid", "blur", () =>
   getUsuario(getText("txt_paineisid"), "txt_paineisresp")
 );
-
-addEventBySelector("#bt_scan", "click", modalBarCode);

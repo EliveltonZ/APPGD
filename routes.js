@@ -29,6 +29,8 @@ route.get("/getGroupedAcessorios", ultilsController.getGroupedAcessorios);
 route.get("/fillTableAcessorios", ultilsController.fillTableAcessorios);
 route.get("/getDate", ultilsController.getDate);
 route.put("/setDate", ultilsController.setDate);
+route.put("/setEtapa", ultilsController.setEtapa);
+route.get("/getCodigoBarras", ultilsController.getCodigoBarras);
 
 // rotas index.js
 route.post("/passwordValidation", indexController.passwordValidation);
@@ -77,7 +79,7 @@ route.get("/fillTableValores", valoresController.fillTableValores);
 // rotas projetosProd.js
 route.get("/filltablePrd", ProjetosProdController.fillTable);
 route.get("/getProducao", ProjetosProdController.getProducao);
-
+route.get("/getProducaoBarcode", ProjetosProdController.getProducaoBarcode);
 route.put("/setDataProducao", ProjetosProdController.setDataProducao);
 
 // rotas projetosPrev.js

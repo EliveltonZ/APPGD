@@ -12,7 +12,10 @@ import {
 
 async function getUserAccess() {
   const id = document.getElementById("txt_id").value.trim();
-  if (!id) return;
+  if (!id || id <= 0) {
+    messageInformation("error", "ERRO", "ID precisa ser numero maior que 0");
+    return;
+  }
 
   try {
     const response = await fetch(
@@ -64,6 +67,7 @@ function senhaFocus() {
 }
 
 async function setUserAccess() {
+  if (getText("txt_id") <= 0) return;
   const result = await messageQuestion(null, "Deseja confirmar alterações?");
 
   if (result.isConfirmed) {

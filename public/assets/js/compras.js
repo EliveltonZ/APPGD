@@ -68,9 +68,6 @@ async function getAcessoriosCompras() {
           <td style="text-align: center;">${checkValue(item.qtd)}</td>
           <td>${checkValue(item.fornecedor)}</td>
           <td style="text-align: center;">${convertDataBr(
-            checkValue(item.chegoufabrica)
-          )}</td>
-          <td style="text-align: center;">${convertDataBr(
             checkValue(item.dataentrega)
           )}</td>
           <td style="text-align: center;">${convertDataBr(
@@ -81,20 +78,23 @@ async function getAcessoriosCompras() {
           )}</td>
           <td style="text-align: center;">${convertDataBr(
             checkValue(item.recebido)
-          )}</td>
+          )}</td>      
           <td style="text-align: center; ${cor_status};">${checkValue(
         item.status
       )}</td>
-      <td style="text-align: center; display: none">${checkValue(
-        item.id
-      )}</td>`;
+          <td style="text-align: center; display: none">${checkValue(
+            item.id
+          )}</td>
+          <td>${checkValue(item.categoria)}</td>
+        `;
+
       tbody.appendChild(tr);
     });
   }
 }
 
 function fillElement(element) {
-  const id = getColumnValue(element, 15);
+  const id = getColumnValue(element, 14);
   const contrato = getColumnValue(element, 0);
   const cliente = getColumnValue(element, 1);
   const ambiente = getColumnValue(element, 2);
@@ -104,9 +104,9 @@ function fillElement(element) {
   const cartao = getColumnValue(element, 6);
   const quantidade = getColumnValue(element, 7);
   const fornecedor = getColumnValue(element, 8);
-  const compra = convertDataISO(getColumnValue(element, 11));
-  const previsao = convertDataISO(getColumnValue(element, 12));
-  const recebido = convertDataISO(getColumnValue(element, 13));
+  const compra = convertDataISO(getColumnValue(element, 10));
+  const previsao = convertDataISO(getColumnValue(element, 11));
+  const recebido = convertDataISO(getColumnValue(element, 12));
   setText("txt_id", id);
   setText("txt_contrato", contrato);
   setText("txt_cliente", cliente);
@@ -157,12 +157,12 @@ async function setAcessorios() {
     const errText = await response.text();
     messageInformation("error", "ERRO", `erro ao salvar alterações ${errText}`);
   } else {
+    await getAcessoriosCompras();
     messageInformation(
       "success",
       "Sucesso",
       "alterações salvas com Sucesso !!!"
     );
-    getAcessoriosCompras();
   }
 }
 

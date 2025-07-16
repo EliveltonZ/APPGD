@@ -15,6 +15,7 @@ import {
   messageQuestion,
   getText,
   addEventBySelector,
+  getUsuario,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -160,17 +161,6 @@ async function handleTableClicked(event) {
   await getPrevisao(firstColumnValue);
   await fillTableAcessorios(firstColumnValue);
   createModal("modal");
-}
-
-async function getUsuario(id, campo) {
-  const response = await fetch(`/getUsuario?p_id=${id}`);
-  if (!response.ok) {
-    messageInformation("error", "ERRO", `Não foi possivel buscar Usuario`);
-    return;
-  }
-  const data = await response.json();
-  const nome = data[0].nome;
-  document.getElementById(campo).value = nome;
 }
 
 async function getPrevisao(ordemdecompra) {

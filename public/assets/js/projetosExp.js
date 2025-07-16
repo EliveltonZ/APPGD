@@ -21,6 +21,7 @@ import {
   messageQuestion,
   getDateFilter,
   setDateFilter,
+  getUsuario,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -163,17 +164,6 @@ function clearInputFields() {
   document.querySelectorAll("Select").forEach((input) => {
     input.value = "";
   });
-}
-
-async function getUsuario(id, campo) {
-  const response = await fetch(`/getUsuario?p_id=${id}`);
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
-    return;
-  }
-  const data = await response.json();
-  const nome = data[0].nome;
-  document.getElementById(campo).value = nome;
 }
 
 async function getExpedicao(ordemdecompra) {
@@ -347,6 +337,10 @@ async function setDataFilterExp() {
     p_date: getText("txt_datafilter"),
   };
   await setDateFilter(data);
+}
+
+function setarDataHora(checkbox, text) {
+  setDateTime(checkbox, text);
 }
 
 function handleClickCheckbox() {
