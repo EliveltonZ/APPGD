@@ -218,6 +218,13 @@ async function getPrevisao(ordemdecompra) {
       setText("txt_paineisid", item.paineisresp);
       getUsuario(getText("txt_paineisid"), "txt_paineisresp");
 
+      setText("txt_acabamentoinicio", item.acabamentoinicio);
+      setText("txt_acabamentofim", item.acabamentofim);
+      setText("txt_acabamentofim", item.acabamentofim);
+      setChecked("chk_acabamento", item.acabamentopausa);
+      setText("txt_acabamentoid", item.acabamentoresp);
+      getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp");
+
       setText("txt_embalageminicio", item.embalageminicio);
       setText("txt_embalagemfim", item.embalagemfim);
       setText("txt_embalagemfim", item.embalagemfim);

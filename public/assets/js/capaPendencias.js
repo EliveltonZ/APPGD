@@ -77,6 +77,11 @@ function fillElements(ordemdecompra) {
   setInnerText("lb_montagem_resp", data.p_montagem_resp);
   setInnerText("lb_pausa_montagem", checkBoolean(data.p_montagempausa));
 
+  setInnerText("lb_acabamento_inicio", convertDataBr(data.p_acabamentoinicio));
+  setInnerText("lb_acabamento_fim", convertDataBr(data.p_acabamentofim));
+  setInnerText("lb_acabamento_resp", data.p_acabamento_resp);
+  setInnerText("lb_pausa_acabamento", checkBoolean(data.p_acabamentopausa));
+
   setInnerText("lb_embalagem_inicio", convertDataBr(data.p_embalageminicio));
   setInnerText("lb_embalagem_fim", convertDataBr(data.p_embalagemfim));
   setInnerText("lb_embalagem_resp", data.p_embalagem_resp);

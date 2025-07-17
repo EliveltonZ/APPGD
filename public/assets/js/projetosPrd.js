@@ -228,7 +228,6 @@ async function getProducao(ordemdecompra) {
 
       setText("txt_montageminicio", item.montageminicio);
       setText("txt_montagemfim", item.montagemfim);
-      setText("txt_montagemfim", item.montagemfim);
       setChecked("chk_montagem", item.montagempausa);
       setText("txt_montagemid", item.montagemresp);
       getUsuario(getText("txt_montagemid"), "txt_montagemresp");
@@ -237,12 +236,19 @@ async function getProducao(ordemdecompra) {
 
       setText("txt_paineisinicio", item.paineisinicio);
       setText("txt_paineisfim", item.paineisfim);
-      setText("txt_paineisfim", item.paineisfim);
       setChecked("chk_paineis", item.paineispausa);
       setText("txt_paineisid", item.paineisresp);
       getUsuario(getText("txt_paineisid"), "txt_paineisresp");
       setChecked("chk_paineisinicio", false);
       setChecked("chk_paineisfim", false);
+
+      setText("txt_acabamentoinicio", item.acabamentoinicio);
+      setText("txt_acabamentofim", item.acabamentofim);
+      setChecked("chk_acabamento", item.acabamentopausa);
+      setText("txt_acabamentoid", item.acabamentoresp);
+      getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp");
+      setChecked("chk_acabamentoinicio", false);
+      setChecked("chk_acabamentofim", false);
 
       setText("txt_observacoes", item.observacoes);
     });
@@ -291,6 +297,12 @@ async function setDataProducao() {
         p_paineisfim: getText("txt_paineisfim"),
         p_paineisresp: getText("txt_paineisid"),
         p_paineispausa: getChecked("chk_paineis"),
+
+        p_acabamentoinicio: getText("txt_acabamentoinicio"),
+        p_acabamentofim: getText("txt_acabamentofim"),
+        p_acabamentoresp: getText("txt_acabamentoid"),
+        p_acabamentopausa: getChecked("chk_acabamento"),
+
         p_observacoes: getText("txt_observacoes"),
       };
 
@@ -332,6 +344,7 @@ function handleClickCheckbox() {
     "usinagem",
     "montagem",
     "paineis",
+    "acabamento",
   ];
 
   operation.forEach((item) => {
@@ -383,4 +396,8 @@ addEventBySelector("#txt_montagemid", "blur", () =>
 
 addEventBySelector("#txt_paineisid", "blur", () =>
   getUsuario(getText("txt_paineisid"), "txt_paineisresp")
+);
+
+addEventBySelector("#txt_acabamentoid", "blur", () =>
+  getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp")
 );

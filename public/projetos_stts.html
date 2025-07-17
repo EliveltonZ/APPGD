@@ -7,7 +7,7 @@
     <title>Status</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=98a88ad75bfe40fb56e7da4e9ebc0d6a">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=3b55e7fe250fc89a8aac70016f594c7f">
     <link rel="stylesheet" href="assets/css/projetos_stts.min.css?h=18eaeeeb36e171c8a9eaceec8ca70ae7">
     <link rel="stylesheet" href="assets/css/modal.min.css?h=15885214e91da51768301c797b6ac80c">
 <script type="module" src="/assets/js/projetosStts.js"></script>
@@ -73,20 +73,21 @@
                             <div class="d-flex justify-content-between display-div" style="gap:150px;">
                                 <div class="d-flex justify-content-between display-div gap" style="width: 66%; gap:130px;">
                                     <div style="width: 50%;">
-                                        <div class="d-flex justify-content-around gap" style="border: 1px solid rgba(133,135,150,0.23);margin-bottom: 40px;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">CORTE:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_corte" style="text-align: center;margin-top: 9px;">...</label></div>
-                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">CUSTOMIZAÇÃO:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_customizacao" style="text-align: center;margin-top: 9px;">...</label></div>
-                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">COLADEIRA:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_coladeira" style="text-align: center;margin-top: 9px;">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="border: 1px solid rgba(133,135,150,0.23);margin-bottom: 40px;"><label class="form-label">CORTE:</label><label class="form-label" id="lb_corte">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">CUSTOMIZAÇÃO:</label><label class="form-label" id="lb_customizacao">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">COLADEIRA:</label><label class="form-label" id="lb_coladeira">...</label></div>
                                     </div>
                                     <div style="width: 50%;">
-                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">USINAGEM:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_usinagem" style="text-align: center;margin-top: 9px;">...</label></div>
-                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">MONTAGEM:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_montagem" style="text-align: center;margin-top: 9px;">...</label></div>
-                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">PAINEIS:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_paineis" style="text-align: center;margin-top: 9px;">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">USINAGEM:</label><label class="form-label" id="lb_usinagem">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">MONTAGEM:</label><label class="form-label" id="lb_montagem">...</label></div>
+                                        <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">PAINEIS:</label><label class="form-label" id="lb_paineis">...</label></div>
                                     </div>
                                 </div>
                                 <div style="width: 33%;">
                                     <div>
                                         <div>
-                                            <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label d-block d-xl-flex justify-content-xl-center" style="text-align: center;margin-top: 9px;">EMBALAGEM:</label><label class="form-label d-block d-xl-flex justify-content-xl-center" id="lb_embalagem" style="text-align: center;margin-top: 9px;">...</label></div>
+                                            <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">ACABAMENTO:</label><label class="form-label" id="lb_acabamento">...</label></div>
+                                            <div class="d-flex justify-content-around gap" style="margin-bottom: 40px;border: 1px solid rgba(133,135,150,0.23) ;"><label class="form-label">EMBALAGEM:</label><label class="form-label" id="lb_embalagem">...</label></div>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between display-div gap" style="gap: 10px;">
@@ -127,7 +128,6 @@
         </div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
-    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
 
 </html>
