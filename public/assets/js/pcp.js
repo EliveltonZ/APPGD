@@ -211,10 +211,10 @@ async function gerarLote() {
     }
 
     try {
-      checkboxesMarcados.forEach((linha) => {
+      for (const linha of checkboxesMarcados) {
         const numOC = linha.querySelector("td:first-child").textContent;
-        setLote(numOC, lote);
-      });
+        await setLote(numOC, lote);
+      }
       messageInformation("success", "Sucesso", "Lote gerado com sucesso!");
     } catch (err) {
       messageInformation(

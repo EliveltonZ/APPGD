@@ -19,9 +19,17 @@ import {
   messageQuestion,
   addEventBySelector,
   getUsuario,
+  sendMail,
+  getConfig,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
+
+function checkPrevisao(firtItem, secondItem) {
+  if (firtItem != secondItem) {
+    return "color: rgba(242, 164, 38, 1)";
+  }
+}
 
 async function fillTable() {
   try {
@@ -42,14 +50,13 @@ async function fillTable() {
       const tr = document.createElement("tr");
       tr.classList.add("open-modal-row");
 
-      const cor_status = colorStatus(item.status);
-      const cor_a = colorAcessorios(item.total);
+      const corStatus = colorStatus(item.status);
+      const corA = colorAcessorios(item.total);
+      const corPrev = checkPrevisao(item.previsao, item.dataentrega);
 
       tr.innerHTML = `
         <td style="text-align: center;">${num}</td>
-        <td class="hover-col" style="text-align: center; ${cor_a}">${
-        item.a
-      }</td>
+        <td class="hover-col" style="text-align: center; ${corA}">${item.a}</td>
         <td style="text-align: center;">${item.ordemdecompra}</td>
         <td style="text-align: center;">${checkValue(item.pedido)}</td>
         <td style="text-align: center;">${checkValue(item.etapa)}</td>
@@ -66,13 +73,13 @@ async function fillTable() {
           checkValue(item.dataentrega)
         )}</td>
         <td style="text-align: center;">${checkValue(item.lote)}</td>
-        <td style="text-align: center; ${cor_status}">${item.status}</td>
+        <td style="text-align: center; ${corStatus}">${item.status}</td>
         <td style="text-align: center;">${convertDataBr(
           checkValue(item.iniciado)
         )}</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.previsao)
-        )}</td>
+        <td style="text-align: center; ${corPrev}">${convertDataBr(
+        checkValue(item.previsao)
+      )}</td>
         <td style="text-align: center;">${convertDataBr(
           checkValue(item.pronto)
         )}</td>
@@ -193,6 +200,7 @@ async function getProducao(ordemdecompra) {
       setText("txt_lote", item.lote);
       setText("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
       setText("txt_dataentrega", convertDataBr(item.dataentrega));
+      setText("txt_previsao", item.previsao);
 
       setText("txt_corteinicio", item.corteinicio);
       setText("txt_cortefim", item.cortefim);
@@ -252,6 +260,7 @@ async function getProducao(ordemdecompra) {
 
       setText("txt_observacoes", item.observacoes);
     });
+    localStorage.setItem("previsao", convertDataBr(getText("txt_previsao")));
   } catch (err) {
     alert(err.message);
   }
@@ -304,6 +313,7 @@ async function setDataProducao() {
         p_acabamentopausa: getChecked("chk_acabamento"),
 
         p_observacoes: getText("txt_observacoes"),
+        p_previsao: getText("txt_previsao"),
       };
 
       const response = await fetch("/setDataProducao", {
@@ -325,6 +335,7 @@ async function setDataProducao() {
           "Sucesso",
           "Alterações confirmadas com sucesso!"
         );
+        await sendEmail();
       }
     } catch (err) {
       messageInformation(
@@ -333,6 +344,24 @@ async function setDataProducao() {
         "Falha na comunicação com o servidor!" + err.message
       );
     }
+  }
+}
+
+async function sendEmail() {
+  const prevOld = localStorage.getItem("previsao");
+  const contrato = getText("txt_contrato");
+  const cliente = getText("txt_cliente");
+  const ambiente = getText("txt_ambiente");
+  const previsao = convertDataBr(getText("txt_previsao"));
+  const email = await getConfig(1);
+  if (prevOld != previsao) {
+    const text = `*** ${contrato} - ${cliente} - ${ambiente} - PREV: ${previsao} ***`;
+    const data = {
+      destination: email[0].p_email,
+      title: text,
+      body: "Previsão Alterada",
+    };
+    await sendMail(data);
   }
 }
 

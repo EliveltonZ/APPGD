@@ -19,8 +19,8 @@ import {
   addEventBySelector,
   messageInformation,
   messageQuestion,
-  getDateFilter,
-  setDateFilter,
+  getConfig,
+  setConfig,
   getUsuario,
 } from "./utils.js";
 
@@ -326,7 +326,7 @@ async function setDataExpedicao() {
 }
 
 async function getDataFilterExp() {
-  const data = await getDateFilter(1);
+  const data = await getConfig(1);
   setText("txt_datafilter", data[0].p_data);
   fillTable();
 }
@@ -336,7 +336,7 @@ async function setDataFilterExp() {
     p_id: 1,
     p_date: getText("txt_datafilter"),
   };
-  await setDateFilter(data);
+  await setConfig(data);
 }
 
 function setarDataHora(checkbox, text) {

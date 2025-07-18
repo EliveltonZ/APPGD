@@ -19,6 +19,10 @@ const projetosPrevController = require("./controllers/projetosPrevController");
 const projetosSttsController = require("./controllers/projetosSttsController");
 const senhaController = require("./controllers/senhaController");
 const usuariosController = require("./controllers/usuariosController");
+const emailController = require("./controllers/emailController");
+
+// rota para envio de email
+route.post("/sendMail", emailController.sendMails);
 
 // rotas utils.js
 route.get("/getUsuario", ultilsController.getUsuario);

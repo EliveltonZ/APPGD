@@ -406,13 +406,13 @@ export async function messageQuestion(
   return result;
 }
 
-export async function getDateFilter(params) {
+export async function getConfig(params) {
   const response = await fetch(`/getDate?p_id=${params}`);
   const data = await response.json();
   return data;
 }
 
-export async function setDateFilter(params) {
+export async function setConfig(params) {
   const response = await fetch("/setDate", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -633,7 +633,7 @@ export function criarSpinnerGlobal() {
   }
 }
 
-const urlsIgnoradas = ["/fillElements", "/fillTableAcessorios"];
+const urlsIgnoradas = ["/fillElements", "/fillTableAcessorios", "/sendMail"];
 
 function deveMostrarSpinner(url) {
   return !urlsIgnoradas.some((ignorada) => url.includes(ignorada));
@@ -687,4 +687,23 @@ export function detectarDispositivo() {
   }
 
   return "Desconhecido";
+}
+
+export async function sendMail(data) {
+  try {
+    const response = await fetch("/sendMail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      messageInformation("error", "ERRO", "Não foi possivel enviar o E-mail");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error; // Opcional: relançar o erro para ser tratado em outro lugar
+  }
 }

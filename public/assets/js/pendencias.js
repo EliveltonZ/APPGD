@@ -16,6 +16,12 @@ import {
 } from "./utils.js";
 
 async function getContrato() {
+  if (!getText("txt_contrato") || !Number(getText("txt_contrato"))) {
+    messageInformation("error", "ERRO", "Contrato Invalido");
+    setText("txt_contrato", "");
+    return;
+  }
+
   const response = await fetch(
     `/getContratoPendencias?p_contrato=${getText("txt_contrato")}`
   );
@@ -24,9 +30,7 @@ async function getContrato() {
     messageInformation("error", "ERRO", "Contrato não localizado");
   } else {
     const data = await response.json();
-    document.getElementById("txt_entrega").value = convertDataBr(
-      data[0].p_dataentrega
-    );
+    setText("txt_entrega", convertDataBr(data[0].p_dataentrega));
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
 

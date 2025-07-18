@@ -12,8 +12,8 @@ import {
   createModal,
   messageInformation,
   addEventBySelector,
-  getDateFilter,
-  setDateFilter,
+  getConfig,
+  setConfig,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -201,7 +201,7 @@ async function getStatus(ordemdecompra) {
 }
 
 async function getDataFilterStts() {
-  const data = await getDateFilter(2);
+  const data = await getConfig(2);
   setText("txt_datafilter", data[0].p_data);
   fillTable();
 }
@@ -211,7 +211,7 @@ async function setDataFilterStts() {
     p_id: 2,
     p_date: getText("txt_datafilter"),
   };
-  await setDateFilter(data);
+  await setConfig(data);
 }
 
 document.addEventListener("resize", ajustarTamanhoModal);
