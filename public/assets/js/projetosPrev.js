@@ -150,6 +150,21 @@ async function fillTableAcessorios(ordemdecompra) {
   }
 }
 
+function getFirstColumnValue(td) {
+  const row = td.parentNode;
+  return row.cells[22].innerText;
+}
+
+async function handleTableClicked(event) {
+  const td = event.target;
+  const tr = td.closest(".open-modal-row");
+  if (!tr || td.tagName !== "TD") return;
+  const firstColumnValue = getFirstColumnValue(td);
+  await getPrevisao(firstColumnValue);
+  await fillTableAcessorios(firstColumnValue);
+  createModal("modal");
+}
+
 async function getPrevisao(ordemdecompra) {
   const response = await fetch(`/getPrevisao?p_ordemdecompra=${ordemdecompra}`);
   if (!response.ok) {
@@ -222,11 +237,6 @@ async function getPrevisao(ordemdecompra) {
       setText("txt_observacoes", item.observacoes);
     });
   }
-}
-
-function getUsuarios() {
-  const meuHTML = document.getElementById("modal-1").innerHTML;
-  messageInformation(null, null, meuHTML);
 }
 
 async function filltableUsuarios() {
