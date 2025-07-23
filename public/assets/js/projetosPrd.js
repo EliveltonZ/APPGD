@@ -21,15 +21,11 @@ import {
   getUsuario,
   sendMail,
   getConfig,
+  checkPrevisao,
+  getOperadores,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
-
-function checkPrevisao(firtItem, secondItem) {
-  if (firtItem != secondItem) {
-    return "color: rgba(242, 164, 38, 1)";
-  }
-}
 
 async function fillTable() {
   try {
@@ -353,12 +349,13 @@ async function sendEmail() {
   const cliente = getText("txt_cliente");
   const ambiente = getText("txt_ambiente");
   const previsao = convertDataBr(getText("txt_previsao"));
-  const email = await getConfig(1);
   if (prevOld != previsao) {
+    const email = await getConfig(1);
     const text = `*** ${contrato} - ${cliente} - ${ambiente} - PREV: ${previsao} ***`;
     const data = {
       destination: email[0].p_email,
       title: text,
+
       body: "Previsão Alterada",
     };
     await sendMail(data);
@@ -387,10 +384,30 @@ function handleClickCheckbox() {
   });
 }
 
+function getUsuarios() {
+  const meuHTML = document.getElementById("modal-1").innerHTML;
+  messageInformation(null, null, meuHTML);
+}
+
+async function filltableUsuarios() {
+  const data = await getOperadores();
+  const tbody = document.querySelector("#modal-1 tbody");
+  tbody.innerHTML = "";
+  data.forEach((element) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${element.p_id}</td>
+      <td>${element.p_nome}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("producao", "projetos_prd.html");
   fillTable();
+  filltableUsuarios();
   enableTableFilterSort("table");
   onmouseover("table");
   enableEnterAsTab();
@@ -430,3 +447,5 @@ addEventBySelector("#txt_paineisid", "blur", () =>
 addEventBySelector("#txt_acabamentoid", "blur", () =>
   getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp")
 );
+
+addEventBySelector("#bt_funcionarios", "click", getUsuarios);

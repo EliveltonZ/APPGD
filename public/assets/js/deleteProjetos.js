@@ -11,6 +11,9 @@ import {
 } from "./utils.js";
 
 async function getDeleteProjetos() {
+  const ordemdecompra = Number(getText("txt_numoc"));
+  if (!Number.isInteger(ordemdecompra)) return;
+
   const response = await fetch(
     `/getDeleteProjetos?p_ordemdecompra=${getText("txt_numoc")}`
   );

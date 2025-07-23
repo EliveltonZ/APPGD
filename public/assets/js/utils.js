@@ -358,7 +358,13 @@ export function colorStatus(item) {
     PARCEADO: "color: rgb(2, 188, 188)",
   };
 
-  return colors[item] || "color: black";
+  return colors[item] || "";
+}
+
+export function checkPrevisao(firtItem, secondItem) {
+  if (firtItem != secondItem) {
+    return "color: rgba(242, 164, 38, 1)";
+  }
 }
 
 export function colorAcessorios(item) {
@@ -404,6 +410,12 @@ export async function messageQuestion(
     confirmButtonText: confirmButtonText,
   });
   return result;
+}
+
+export async function getOperadores() {
+  const response = await fetch("/getOperadores");
+  const data = await response.json();
+  return data;
 }
 
 export async function getConfig(params) {

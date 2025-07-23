@@ -22,6 +22,7 @@ import {
   getConfig,
   setConfig,
   getUsuario,
+  getOperadores,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -357,6 +358,25 @@ function handleClickCheckbox() {
   });
 }
 
+function getUsuarios() {
+  const meuHTML = document.getElementById("modal-1").innerHTML;
+  messageInformation(null, null, meuHTML);
+}
+
+async function filltableUsuarios() {
+  const data = await getOperadores();
+  const tbody = document.querySelector("#modal-1 tbody");
+  tbody.innerHTML = "";
+  data.forEach((element) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${element.p_id}</td>
+      <td>${element.p_nome}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
@@ -368,6 +388,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   onclickHighlightRow("table");
   window.addEventListener("resize", ajustarTamanhoModal);
   handleClickCheckbox();
+  filltableUsuarios();
 });
 
 addEventBySelector("#table", "dblclick", handleClick);
@@ -398,3 +419,5 @@ addEventBySelector(`#chk_entrega`, "click", () =>
 addEventBySelector(`#chk_separacao`, "click", () =>
   setDateTime(`#chk_separacao`, `txt_separacao`)
 );
+
+addEventBySelector("#bt_funcionarios", "click", getUsuarios);

@@ -16,6 +16,7 @@ import {
   getText,
   addEventBySelector,
   getUsuario,
+  checkPrevisao,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -55,6 +56,7 @@ async function fillTable() {
 
       const cor_status = colorStatus(item.status);
       const cor_a = colorAcessorios(item.total);
+      const corPrev = checkPrevisao(item.previsao, item.dataentrega);
 
       tr.innerHTML = `
             
@@ -91,9 +93,9 @@ async function fillTable() {
             <td style="text-align: center; white-space: nowrap">${convertDataBr(
               checkValue(item.dataentrega)
             )}</td>
-            <td style="text-align: center; white-space: nowrap">${convertDataBr(
-              checkValue(item.previsao)
-            )}</td>
+            <td style="text-align: center; white-space: nowrap; ${corPrev}">${convertDataBr(
+        checkValue(item.previsao)
+      )}</td>
             <td style="text-align: center; display:none">${
               item.ordemdecompra
             }</td>
@@ -146,21 +148,6 @@ async function fillTableAcessorios(ordemdecompra) {
       tbody.appendChild(tr);
     });
   }
-}
-
-function getFirstColumnValue(td) {
-  const row = td.parentNode;
-  return row.cells[22].innerText;
-}
-
-async function handleTableClicked(event) {
-  const td = event.target;
-  const tr = td.closest(".open-modal-row");
-  if (!tr || td.tagName !== "TD") return;
-  const firstColumnValue = getFirstColumnValue(td);
-  await getPrevisao(firstColumnValue);
-  await fillTableAcessorios(firstColumnValue);
-  createModal("modal");
 }
 
 async function getPrevisao(ordemdecompra) {
@@ -235,6 +222,25 @@ async function getPrevisao(ordemdecompra) {
       setText("txt_observacoes", item.observacoes);
     });
   }
+}
+
+function getUsuarios() {
+  const meuHTML = document.getElementById("modal-1").innerHTML;
+  messageInformation(null, null, meuHTML);
+}
+
+async function filltableUsuarios() {
+  const data = await getOperadores();
+  const tbody = document.querySelector("#modal-1 tbody");
+  tbody.innerHTML = "";
+  data.forEach((element) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${element.p_id}</td>
+      <td>${element.p_nome}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 document.addEventListener("resize", ajustarTamanhoModal);
