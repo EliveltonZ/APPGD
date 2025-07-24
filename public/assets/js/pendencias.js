@@ -222,6 +222,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableEnterAsTab();
   onmouseover("table");
   onmouseover("table-1");
+  onmouseover("");
   getGroupedData("getGroupedAcessorios", "txt_categoria", "p_categoria");
 });
 

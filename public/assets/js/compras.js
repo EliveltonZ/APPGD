@@ -81,11 +81,11 @@ async function getAcessoriosCompras() {
           )}</td>      
           <td style="text-align: center; ${cor_status};">${checkValue(
         item.status
-      )}</td>
+      )}</td>  
+          <td>${checkValue(item.categoria)}</td>
           <td style="text-align: center; display: none">${checkValue(
             item.id
           )}</td>
-          <td>${checkValue(item.categoria)}</td>
         `;
 
       tbody.appendChild(tr);
@@ -94,7 +94,7 @@ async function getAcessoriosCompras() {
 }
 
 function fillElement(element) {
-  const id = getColumnValue(element, 14);
+  const id = getColumnValue(element, 15);
   const contrato = getColumnValue(element, 0);
   const cliente = getColumnValue(element, 1);
   const ambiente = getColumnValue(element, 2);
