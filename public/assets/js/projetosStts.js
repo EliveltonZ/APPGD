@@ -159,9 +159,7 @@ function setTextInner(element, value) {
 }
 
 async function getStatus(ordemdecompra) {
-  const response = await fetch(
-    `/getProjetosStts?p_ordemdecompra=${ordemdecompra}`
-  );
+  const response = await fetch(`/getStatus?p_ordemdecompra=${ordemdecompra}`);
 
   if (!response.ok) {
     Swal.fire({
@@ -189,6 +187,7 @@ async function getStatus(ordemdecompra) {
       setTextInner("lb_usinagem", item.susinagem);
       setTextInner("lb_montagem", item.smontagem);
       setTextInner("lb_paineis", item.spaineis);
+      setTextInner("lb_acabamento", item.sacabamento);
       setTextInner("lb_embalagem", item.sembalagem);
       setTextInner("lb_previsao", convertDataBr(checkValue(item.previsao)));
       setTextInner("lb_pronto", convertDataBr(checkValue(item.pronto)));

@@ -98,7 +98,7 @@ route.get("/getExpedicao", projetosExpController.getExpedicao);
 
 // rotas projetosStts.js
 route.get("/fillTableStts", projetosSttsController.fillTable);
-route.get("/getProjetosStts", projetosSttsController.getStatus);
+route.get("/getStatus", projetosSttsController.getStatus);
 
 // rotas acessos.js
 route.get("/getUserAccess", acessoCrontroller.getUserAccess);

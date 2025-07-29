@@ -405,8 +405,6 @@ export async function messageQuestion(
     icon: "question",
     title: title,
     html: message,
-    input: "text",
-    input: "checkbox",
     showDenyButton: true,
     denyButtonText: cancelButtonText,
     confirmButtonText: confirmButtonText,
