@@ -14,6 +14,7 @@ import {
   addEventBySelector,
   getConfig,
   setConfig,
+  setInnerHtml,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -147,55 +148,99 @@ async function handleClikedTable(event) {
   createModal("modal");
 }
 
-function setTextInner(element, value) {
-  document.getElementById(element).innerText = value;
-  if (value == "FINALIZADO") {
-    document.getElementById(element).style.color = "green";
-  } else if (value == "INICIADO") {
-    document.getElementById(element).style.color = "yellow";
-  } else {
-    document.getElementById(element).style.color = "gray";
+// Aplica cor baseada no status
+function applyStatusColor(elementId, status) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  const color =
+    {
+      FINALIZADO: "green",
+      INICIADO: "yellow",
+    }[status] || "gray";
+
+  el.style.color = color;
+}
+
+// Define o innerHTML e aplica cor de status
+function setTextInner(elementId, value) {
+  setInnerHtml(elementId, value);
+  applyStatusColor(elementId, value);
+}
+
+// Converte, verifica e aplica datas formatadas
+function setFormattedText(id, value) {
+  const formatted = convertDataBr(checkValue(value));
+  setText(id, formatted);
+}
+
+// Aplica valores simples em campos
+function applyBasicFields(item) {
+  setText("txt_numoc", item.ordemdecompra);
+  setText("txt_cliente", item.cliente);
+  setText("txt_contrato", item.contrato);
+  setText("txt_codcc", item.codcc);
+  setText("txt_ambiente", item.ambiente);
+  setText("txt_numproj", item.numproj);
+  setText("txt_lote", item.lote);
+  setText("txt_observacoes", item.observacoes);
+}
+
+// Aplica campos de data
+function applyDateFields(item) {
+  setFormattedText("txt_chegoufabrica", item.chegoufabrica);
+  setFormattedText("txt_dataentrega", item.dataentrega);
+}
+
+// Aplica campos de status ou datas com cores
+function applyStatusFields(item) {
+  const statusFields = {
+    lb_corte: item.scorte,
+    lb_customizacao: item.scustom,
+    lb_coladeira: item.scoladeira,
+    lb_usinagem: item.susinagem,
+    lb_montagem: item.smontagem,
+    lb_paineis: item.spaineis,
+    lb_acabamento: item.sacabamento,
+    lb_embalagem: item.sembalagem,
+    lb_previsao: convertDataBr(checkValue(item.previsao)),
+    lb_pronto: convertDataBr(checkValue(item.pronto)),
+    lb_entrega: convertDataBr(checkValue(item.entrega)),
+    lb_tamanho: item.tamanho,
+    lb_total_volumes: item.totalvolumes,
+  };
+
+  for (const [id, value] of Object.entries(statusFields)) {
+    setTextInner(id, value);
   }
 }
 
-async function getStatus(ordemdecompra) {
-  const response = await fetch(`/getStatus?p_ordemdecompra=${ordemdecompra}`);
+// Mostra alerta em caso de erro
+function showError(message) {
+  Swal.fire({
+    icon: "error",
+    text: `Não foi possível carregar os dados: ${message}`,
+  });
+}
 
-  if (!response.ok) {
-    Swal.fire({
-      icon: "error",
-      text: `não foi possivel carregar dados ${error.message}`,
-    });
-  } else {
+// Função principal
+async function getStatus(ordemDeCompra) {
+  try {
+    const response = await fetch(`/getStatus?p_ordemdecompra=${ordemDeCompra}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP status ${response.status}`);
+    }
+
     const data = await response.json();
+
     data.forEach((item) => {
-      setText("txt_numoc", item.ordemdecompra);
-      setText("txt_cliente", item.cliente);
-      setText("txt_contrato", item.contrato);
-      setText("txt_codcc", item.codcc);
-      setText("txt_ambiente", item.ambiente);
-      setText("txt_numproj", item.numproj);
-      setText("txt_lote", item.lote);
-      setText(
-        "txt_chegoufabrica",
-        convertDataBr(checkValue(item.chegoufabrica))
-      );
-      setText("txt_dataentrega", convertDataBr(checkValue(item.dataentrega)));
-      setTextInner("lb_corte", item.scorte);
-      setTextInner("lb_customizacao", item.scustom);
-      setTextInner("lb_coladeira", item.scoladeira);
-      setTextInner("lb_usinagem", item.susinagem);
-      setTextInner("lb_montagem", item.smontagem);
-      setTextInner("lb_paineis", item.spaineis);
-      setTextInner("lb_acabamento", item.sacabamento);
-      setTextInner("lb_embalagem", item.sembalagem);
-      setTextInner("lb_previsao", convertDataBr(checkValue(item.previsao)));
-      setTextInner("lb_pronto", convertDataBr(checkValue(item.pronto)));
-      setTextInner("lb_entrega", convertDataBr(checkValue(item.entrega)));
-      setTextInner("lb_tamanho", item.tamanho);
-      setTextInner("lb_total_volumes", item.totalvolumes);
-      setText("txt_observacoes", item.observacoes);
+      applyBasicFields(item);
+      applyDateFields(item);
+      applyStatusFields(item);
     });
+  } catch (error) {
+    showError(error.message);
   }
 }
 

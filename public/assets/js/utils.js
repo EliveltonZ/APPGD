@@ -20,6 +20,10 @@ export function setText(element, value) {
   document.getElementById(element).value = value;
 }
 
+export function setInnerHtml(element, value) {
+  document.getElementById(element).innerHTML = value;
+}
+
 export function getChecked(element) {
   let value = document.getElementById(element).checked;
   return value === "" ? null : value;
@@ -430,6 +434,36 @@ export async function setConfig(params) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(params),
   });
+}
+
+export function handleClass(element, nameClass, type) {
+  // Obtém o elemento pelo ID
+  const item = document.getElementById(element);
+
+  // Verifica se o item existe
+  if (!item) {
+    console.error(`Elemento com ID "${element}" não encontrado.`);
+    return;
+  }
+
+  // Verifica se o nome da classe é válido
+  if (!nameClass || typeof nameClass !== "string") {
+    console.error("O nome da classe não é válido.");
+    return;
+  }
+
+  // Verifica o tipo de operação e executa
+  if (type.toLowerCase() === "add") {
+    item.classList.add(nameClass);
+    return;
+  }
+  if (type.toLowerCase() === "remove") {
+    item.classList.remove(nameClass);
+    return;
+  }
+
+  // Caso o tipo não seja reconhecido
+  console.error(`Tipo de operação "${type}" não identificado.`);
 }
 
 export async function getCookie(key) {
