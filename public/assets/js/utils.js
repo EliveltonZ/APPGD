@@ -297,6 +297,17 @@ export function setDateTime(checkbox, text) {
   }
 }
 
+export function dateTimeNow() {
+  var dataAtual = new Date();
+  var ano = dataAtual.getFullYear();
+  var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
+  var dia = String(dataAtual.getDate()).padStart(2, "0");
+  var hora = String(dataAtual.getHours()).padStart(2, "0");
+  var minuto = String(dataAtual.getMinutes()).padStart(2, "0");
+  var dataHoraFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
+  return dataHoraFormatada;
+}
+
 export function setDate(checkbox, text) {
   var campoDataHora = document.getElementById(text);
   const element = document.querySelector(checkbox);

@@ -254,6 +254,14 @@ async function getProducao(ordemdecompra) {
       setChecked("chk_acabamentoinicio", false);
       setChecked("chk_acabamentofim", false);
 
+      setText("txt_embalageminicio", item.embalageminicio);
+      setText("txt_embalagemfim", item.embalagemfim);
+      setChecked("chk_embalagem", item.embalagempausa);
+      setText("txt_embalagemid", item.embalagemresp);
+      getUsuario(getText("txt_embalagemid"), "txt_embalagemresp");
+      setChecked("chk_embalageminicio", false);
+      setChecked("chk_embalagemfim", false);
+
       setText("txt_observacoes", item.observacoes);
     });
     localStorage.setItem("previsao", convertDataBr(getText("txt_previsao")));
@@ -307,6 +315,11 @@ async function setDataProducao() {
         p_acabamentofim: getText("txt_acabamentofim"),
         p_acabamentoresp: getText("txt_acabamentoid"),
         p_acabamentopausa: getChecked("chk_acabamento"),
+
+        p_embalageminicio: getText("txt_embalageminicio"),
+        p_embalagemfim: getText("txt_embalagemfim"),
+        p_embalagemresp: getText("txt_embalagemid"),
+        p_embalagempausa: getChecked("chk_embalagem"),
 
         p_observacoes: getText("txt_observacoes"),
         p_previsao: getText("txt_previsao"),
@@ -371,6 +384,7 @@ function handleClickCheckbox() {
     "montagem",
     "paineis",
     "acabamento",
+    "embalagem",
   ];
 
   operation.forEach((item) => {
@@ -446,6 +460,10 @@ addEventBySelector("#txt_paineisid", "blur", () =>
 
 addEventBySelector("#txt_acabamentoid", "blur", () =>
   getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp")
+);
+
+addEventBySelector("#txt_embalagemid", "blur", () =>
+  getUsuario(getText("txt_embalagemid"), "txt_embalagemresp")
 );
 
 addEventBySelector("#bt_funcionarios", "click", getUsuarios);
