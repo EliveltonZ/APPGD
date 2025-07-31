@@ -299,6 +299,7 @@ function setDateTimeSetor(barcode) {
   const element = `txt_${etapa}${action}`;
   try {
     setText(element, dateTimeNow());
+    setText("txt_scan", "");
   } catch (erro) {
     messageInformation("error", "ERRO", `${erro}`);
   }
@@ -307,6 +308,7 @@ function setDateTimeSetor(barcode) {
 async function buttonReadCodeBar() {
   const returns = await modalBarCode();
   setDateTimeSetor(returns);
+  setText("txt_scan", "");
 }
 
 addEventBySelector("#bt_salvar", "click", setDataProducao);
