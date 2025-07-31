@@ -342,12 +342,12 @@ addEventBySelector("#txt_embalagemid", "blur", () =>
   getUsuario(getText("txt_embalagemid"), "txt_embalagemresp")
 );
 
-addEventBySelector("#txt_pedido", "blur", () =>
+addEventBySelector("#txt_pedido", "change", () =>
   getProducaoPedido(getText("txt_pedido"))
 );
 
 checkMachine();
 addEventBySelector("#bt_scan", "click", buttonReadCodeBar);
-addEventBySelector("#txt_scan", "blur", () =>
+addEventBySelector("#txt_scan", "change", () =>
   setDateTimeSetor(getText("txt_scan"))
 );
