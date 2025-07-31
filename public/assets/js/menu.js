@@ -45,10 +45,11 @@ async function printPageCapa() {
   await loadData();
   document.getElementById("iframeImpressao").contentWindow.location.reload();
   var iframe = document.getElementById("iframeImpressao");
-  setTimeout(function () {
+  setTimeout(async function () {
     iframe.contentWindow.print();
     handleClass("lb_capa", "d-none", "remove");
     handleClass("spinner", "d-none", "add");
+    await setType(getText("txt_numoc"), getText("txt_tipo"));
   }, 500);
 }
 
@@ -151,6 +152,17 @@ async function clearDataUsuario() {
     console.log("Dados de usuário enviados com sucesso!");
   } catch (error) {
     console.error("Erro ao enviar dados:", error);
+  }
+}
+
+async function setType(p_ordemdecompra, p_tipo) {
+  const response = await fetch(
+    `/setTipo?p_ordemdecompra=${p_ordemdecompra}&p_tipo=${p_tipo}`
+  );
+
+  if (!response.ok) {
+    const result = await response.json();
+    messageInformation("error", "ERRO", `${result}`);
   }
 }
 

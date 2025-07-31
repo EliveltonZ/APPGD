@@ -36,6 +36,7 @@ route.put("/setDate", ultilsController.setDate);
 route.put("/setEtapa", ultilsController.setEtapa);
 route.get("/getCodigoBarras", ultilsController.getCodigoBarras);
 route.get("/getOperadores", ultilsController.getOperadores);
+route.get("/setTipo", ultilsController.setTipo);
 
 // rotas index.js
 route.post("/passwordValidation", indexController.passwordValidation);

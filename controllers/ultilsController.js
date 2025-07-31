@@ -12,4 +12,5 @@ module.exports = {
   setEtapa: createRpcHandler("set_etapa", "body"),
   getCodigoBarras: createRpcHandler("get_projeto_codigo_barras", "query"),
   getOperadores: createRpcHandler("get_operadores", "query"),
+  setTipo: createRpcHandler("set_tipo", "query"),
 };
