@@ -49,7 +49,11 @@ async function printPageCapa() {
     iframe.contentWindow.print();
     handleClass("lb_capa", "d-none", "remove");
     handleClass("spinner", "d-none", "add");
-    await setType(getText("txt_numoc"), getText("txt_tipo"));
+    await setType(
+      getText("txt_numoc"),
+      getText("txt_tipo"),
+      getChecked("chk_urgente")
+    );
   }, 500);
 }
 
@@ -155,9 +159,9 @@ async function clearDataUsuario() {
   }
 }
 
-async function setType(p_ordemdecompra, p_tipo) {
+async function setType(p_ordemdecompra, p_tipo, p_urgente) {
   const response = await fetch(
-    `/setTipo?p_ordemdecompra=${p_ordemdecompra}&p_tipo=${p_tipo}`
+    `/setTipo?p_ordemdecompra=${p_ordemdecompra}&p_tipo=${p_tipo}&p_urgente=${p_urgente}`
   );
 
   if (!response.ok) {

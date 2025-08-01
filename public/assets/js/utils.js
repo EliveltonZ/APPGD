@@ -447,6 +447,11 @@ export async function setConfig(params) {
   });
 }
 
+export function getIndexColumnValue(td, index) {
+  const row = td.parentNode;
+  return row.cells[index].innerText;
+}
+
 export function handleClass(element, nameClass, type) {
   // Obtém o elemento pelo ID
   const item = document.getElementById(element);

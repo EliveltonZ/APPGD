@@ -23,6 +23,7 @@ import {
   setConfig,
   getUsuario,
   getOperadores,
+  getIndexColumnValue,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -136,21 +137,20 @@ async function fillTable() {
     }
   }
 }
-
-function getFirstColumnValue(td) {
-  const row = td.parentNode;
-  return row.cells[2].innerText;
-}
-
 async function handleClick(event) {
   clearInputFields();
   const td = event.target;
   const tr = td.closest(".open-modal-row");
   if (!tr || td.tagName !== "TD") return;
-  const firstColumnValue = getFirstColumnValue(td);
-  await getExpedicao(firstColumnValue);
-  await fillTableAcessorios(firstColumnValue);
-  createModal("modal");
+  const firstColumnValue = getIndexColumnValue(td, 2);
+  const secondColumnValue = getIndexColumnValue(td, 5);
+  if (secondColumnValue != "-") {
+    await getExpedicao(firstColumnValue);
+    await fillTableAcessorios(firstColumnValue);
+    createModal("modal");
+  } else {
+    messageInformation("warning", "ATENÇÃO", "Projeto não Calculado");
+  }
 }
 
 function clearInputFields() {

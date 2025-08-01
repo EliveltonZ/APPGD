@@ -23,6 +23,7 @@ import {
   getConfig,
   checkPrevisao,
   getOperadores,
+  getIndexColumnValue,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -142,19 +143,19 @@ async function fillTableAcessorios(ordemdecompra) {
   }
 }
 
-function getFirstColumnValue(td) {
-  const row = td.parentNode;
-  return row.cells[2].innerText;
-}
-
 async function handleClikedTable(event) {
   const td = event.target;
   const tr = td.closest(".open-modal-row");
   if (!tr || td.tagName !== "TD") return;
-  const firstColumnValue = getFirstColumnValue(td);
-  await getProducao(firstColumnValue);
-  await fillTableAcessorios(firstColumnValue);
-  createModal("modal");
+  const firstColumnValue = getIndexColumnValue(td, 2);
+  const secondColumnValue = getIndexColumnValue(td, 5);
+  if (secondColumnValue != "-") {
+    await getProducao(firstColumnValue);
+    await fillTableAcessorios(firstColumnValue);
+    createModal("modal");
+  } else {
+    messageInformation("warning", "ATENÇÃO", "Projeto não Calculado");
+  }
 }
 
 function showToolTip(event) {
