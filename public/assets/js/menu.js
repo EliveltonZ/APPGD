@@ -1,13 +1,8 @@
 import {
-  getChecked,
-  getText,
-  setData,
+  Dom,
   messageInformation,
   messageQuestion,
-  addEventBySelector,
   getCookie,
-  setInnerHtml,
-  handleClass,
 } from "./utils.js";
 
 async function exibirNome() {
@@ -34,40 +29,40 @@ function findBuyOrder() {
 }
 
 async function printPageCapa() {
-  if (getText("txt_tipo") == "-") {
+  if (Dom.getValue("txt_tipo") == "-") {
     messageInformation("warning", "Atenção", "Selecione o tipo do Projeto");
     return;
   }
 
-  handleClass("lb_capa", "d-none", "add");
-  handleClass("spinner", "d-none", "remove");
+  Dom.handleClass("lb_capa", "d-none", "add");
+  Dom.handleClass("spinner", "d-none", "remove");
   findBuyOrder();
   await loadData();
   document.getElementById("iframeImpressao").contentWindow.location.reload();
   var iframe = document.getElementById("iframeImpressao");
   setTimeout(async function () {
     iframe.contentWindow.print();
-    handleClass("lb_capa", "d-none", "remove");
-    handleClass("spinner", "d-none", "add");
+    Dom.handleClass("lb_capa", "d-none", "remove");
+    Dom.handleClass("spinner", "d-none", "add");
     await setType(
-      getText("txt_numoc"),
-      getText("txt_tipo"),
-      getChecked("chk_urgente")
+      Dom.getValue("txt_numoc"),
+      Dom.getValue("txt_tipo"),
+      Dom.getChecked("chk_urgente")
     );
   }, 500);
 }
 
 async function printPageCapaPendencia() {
-  handleClass("lb_pendencias", "d-none", "add");
-  handleClass("spinner-1", "d-none", "remove");
+  Dom.handleClass("lb_pendencias", "d-none", "add");
+  Dom.handleClass("spinner-1", "d-none", "remove");
   findBuyOrder();
   await loadData();
   document.getElementById("iframeImpressao1").contentWindow.location.reload();
   var iframe = document.getElementById("iframeImpressao1");
   setTimeout(function () {
     iframe.contentWindow.print();
-    handleClass("lb_pendencias", "d-none", "remove");
-    handleClass("spinner-1", "d-none", "add");
+    Dom.handleClass("lb_pendencias", "d-none", "remove");
+    Dom.handleClass("spinner-1", "d-none", "add");
   }, 500);
 }
 
@@ -81,7 +76,7 @@ async function logout() {
 }
 
 async function loadData() {
-  const buyOrder = getText("txt_numoc");
+  const buyOrder = Dom.getValue("txt_numoc");
   await fillElements(buyOrder);
   await fillTableAcessorios(buyOrder);
 }
@@ -171,10 +166,10 @@ async function setType(p_ordemdecompra, p_tipo, p_urgente) {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  setData("txt_data");
+  Dom.setData("txt_data");
   exibirNome();
 });
 
-addEventBySelector("#link_logout", "click", logout);
-addEventBySelector("#bt_capa", "click", printPageCapa);
-addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
+Dom.addEventBySelector("#link_logout", "click", logout);
+Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
+Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);

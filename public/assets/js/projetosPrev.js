@@ -1,8 +1,7 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
+  Dom,
   checkValue,
-  setText,
-  setChecked,
   convertDataBr,
   ajustarTamanhoModal,
   onmouseover,
@@ -13,8 +12,6 @@ import {
   createModal,
   messageInformation,
   messageQuestion,
-  getText,
-  addEventBySelector,
   getUsuario,
   checkPrevisao,
 } from "./utils.js";
@@ -172,69 +169,69 @@ async function getPrevisao(ordemdecompra) {
   } else {
     const data = await response.json();
     data.forEach((item) => {
-      setText("txt_numoc", item.ordemdecompra);
-      setText("txt_cliente", item.cliente);
-      setText("txt_contrato", item.contrato);
-      setText("txt_codcc", item.codcc);
-      setText("txt_ambiente", item.ambiente);
-      setText("txt_numproj", item.numproj);
-      setText("txt_lote", item.lote);
-      setText("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
-      setText("txt_dataentrega", convertDataBr(item.dataentrega));
+      Dom.setValue("txt_numoc", item.ordemdecompra);
+      Dom.setValue("txt_cliente", item.cliente);
+      Dom.setValue("txt_contrato", item.contrato);
+      Dom.setValue("txt_codcc", item.codcc);
+      Dom.setValue("txt_ambiente", item.ambiente);
+      Dom.setValue("txt_numproj", item.numproj);
+      Dom.setValue("txt_lote", item.lote);
+      Dom.setValue("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
+      Dom.setValue("txt_dataentrega", convertDataBr(item.dataentrega));
 
-      setText("txt_corteinicio", item.corteinicio);
-      setText("txt_cortefim", item.cortefim);
-      setChecked("chk_corte", item.cortepausa);
-      setText("txt_corteid", item.corteresp);
-      getUsuario(getText("txt_corteid"), "txt_corteresp");
+      Dom.setValue("txt_corteinicio", item.corteinicio);
+      Dom.setValue("txt_cortefim", item.cortefim);
+      Dom.setChecked("chk_corte", item.cortepausa);
+      Dom.setValue("txt_corteid", item.corteresp);
+      getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp");
 
-      setText("txt_customizacaoinicio", item.customizacaoinicio);
-      setText("txt_customizacaofim", item.customizacaofim);
-      setChecked("chk_customizacao", item.customizacaopausa);
-      setText("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(getText("txt_customizacaoid"), "txt_customizacaoresp");
+      Dom.setValue("txt_customizacaoinicio", item.customizacaoinicio);
+      Dom.setValue("txt_customizacaofim", item.customizacaofim);
+      Dom.setChecked("chk_customizacao", item.customizacaopausa);
+      Dom.setValue("txt_customizacaoid", item.customizacaoresp);
+      getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp");
 
-      setText("txt_coladeirainicio", item.coladeirainicio);
-      setText("txt_coladeirafim", item.coladeirafim);
-      setChecked("chk_coladeira", item.coladeirapausa);
-      setText("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(getText("txt_coladeiraid"), "txt_coladeiraresp");
+      Dom.setValue("txt_coladeirainicio", item.coladeirainicio);
+      Dom.setValue("txt_coladeirafim", item.coladeirafim);
+      Dom.setChecked("chk_coladeira", item.coladeirapausa);
+      Dom.setValue("txt_coladeiraid", item.coladeiraresp);
+      getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp");
 
-      setText("txt_usinageminicio", item.usinageminicio);
-      setText("txt_usinagemfim", item.usinagemfim);
-      setChecked("chk_usinagem", item.usinagempausa);
-      setText("txt_usinagemid", item.usinagemresp);
-      getUsuario(getText("txt_usinagemid"), "txt_usinagemresp");
+      Dom.setValue("txt_usinageminicio", item.usinageminicio);
+      Dom.setValue("txt_usinagemfim", item.usinagemfim);
+      Dom.setChecked("chk_usinagem", item.usinagempausa);
+      Dom.setValue("txt_usinagemid", item.usinagemresp);
+      getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp");
 
-      setText("txt_montageminicio", item.montageminicio);
-      setText("txt_montagemfim", item.montagemfim);
-      setText("txt_montagemfim", item.montagemfim);
-      setChecked("chk_montagem", item.montagempausa);
-      setText("txt_montagemid", item.montagemresp);
-      getUsuario(getText("txt_montagemid"), "txt_montagemresp");
+      Dom.setValue("txt_montageminicio", item.montageminicio);
+      Dom.setValue("txt_montagemfim", item.montagemfim);
+      Dom.setValue("txt_montagemfim", item.montagemfim);
+      Dom.setChecked("chk_montagem", item.montagempausa);
+      Dom.setValue("txt_montagemid", item.montagemresp);
+      getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp");
 
-      setText("txt_paineisinicio", item.paineisinicio);
-      setText("txt_paineisfim", item.paineisfim);
-      setText("txt_paineisfim", item.paineisfim);
-      setChecked("chk_paineis", item.paineispausa);
-      setText("txt_paineisid", item.paineisresp);
-      getUsuario(getText("txt_paineisid"), "txt_paineisresp");
+      Dom.setValue("txt_paineisinicio", item.paineisinicio);
+      Dom.setValue("txt_paineisfim", item.paineisfim);
+      Dom.setValue("txt_paineisfim", item.paineisfim);
+      Dom.setChecked("chk_paineis", item.paineispausa);
+      Dom.setValue("txt_paineisid", item.paineisresp);
+      getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp");
 
-      setText("txt_acabamentoinicio", item.acabamentoinicio);
-      setText("txt_acabamentofim", item.acabamentofim);
-      setText("txt_acabamentofim", item.acabamentofim);
-      setChecked("chk_acabamento", item.acabamentopausa);
-      setText("txt_acabamentoid", item.acabamentoresp);
-      getUsuario(getText("txt_acabamentoid"), "txt_acabamentoresp");
+      Dom.setValue("txt_acabamentoinicio", item.acabamentoinicio);
+      Dom.setValue("txt_acabamentofim", item.acabamentofim);
+      Dom.setValue("txt_acabamentofim", item.acabamentofim);
+      Dom.setChecked("chk_acabamento", item.acabamentopausa);
+      Dom.setValue("txt_acabamentoid", item.acabamentoresp);
+      getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp");
 
-      setText("txt_embalageminicio", item.embalageminicio);
-      setText("txt_embalagemfim", item.embalagemfim);
-      setText("txt_embalagemfim", item.embalagemfim);
-      setChecked("chk_embalagem", item.embalagempausa);
-      setText("txt_embalagemid", item.embalagemresp);
-      getUsuario(getText("txt_embalagemid"), "txt_embalagemresp");
+      Dom.setValue("txt_embalageminicio", item.embalageminicio);
+      Dom.setValue("txt_embalagemfim", item.embalagemfim);
+      Dom.setValue("txt_embalagemfim", item.embalagemfim);
+      Dom.setChecked("chk_embalagem", item.embalagempausa);
+      Dom.setValue("txt_embalagemid", item.embalagemresp);
+      getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp");
 
-      setText("txt_observacoes", item.observacoes);
+      Dom.setValue("txt_observacoes", item.observacoes);
     });
   }
 }
@@ -264,4 +261,4 @@ document.addEventListener("DOMContentLoaded", (event) => {
   window.addEventListener("resize", ajustarTamanhoModal);
 });
 
-addEventBySelector("#table", "dblclick", handleTableClicked);
+Dom.addEventBySelector("#table", "dblclick", handleTableClicked);

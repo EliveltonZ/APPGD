@@ -1,9 +1,7 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
-  setFocus,
+  Dom,
   enableEnterAsTab,
-  getText,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
   criarSpinnerGlobal,
@@ -35,11 +33,11 @@ async function find_id() {
     txtLogin.value = data[0].login;
   } catch (err) {
     txtLogin.value = "";
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Número de ID não encontrado na base de dados!",
-    }).then(() => {
+    messageInformation(
+      "error",
+      "Erro",
+      "Número de ID não encontrado na base de dados!"
+    ).then(() => {
       txtId.value = "";
       txtId.focus();
     });
@@ -48,8 +46,8 @@ async function find_id() {
 
 async function passwordValidation(event) {
   const dict = {
-    p_id: getText("txt_id"),
-    p_senha: getText("password"),
+    p_id: Dom.getValue("txt_id"),
+    p_senha: Dom.getValue("password"),
   };
 
   const response = await fetch("/passwordValidation", {
@@ -118,11 +116,11 @@ async function setDataUsuario(user) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  setFocus("txt_id");
+  Dom.setFocus("txt_id");
   document.getElementById("txt_id").value = "";
   enableEnterAsTab();
   criarSpinnerGlobal();
 });
 
-addEventBySelector("#bt_login", "click", passwordValidation);
-addEventBySelector("#txt_id", "blur", find_id);
+Dom.addEventBySelector("#bt_login", "click", passwordValidation);
+Dom.addEventBySelector("#txt_id", "blur", find_id);

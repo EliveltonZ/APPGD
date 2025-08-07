@@ -1,9 +1,6 @@
 import {
-  setFocus,
-  getText,
-  setText,
+  Dom,
   messageInformation,
-  addEventBySelector,
   getCookie,
   enableEnterAsTab,
 } from "./utils.js";
@@ -14,8 +11,8 @@ function setTextEmpty(element) {
 
 async function checkPassword() {
   const dict = {
-    p_id: getText("txt_id"),
-    p_senha: getText("txt_senhaatual"),
+    p_id: Dom.getValue("txt_id"),
+    p_senha: Dom.getValue("txt_senhaatual"),
   };
 
   const response = await fetch("/passwordValidation", {
@@ -34,8 +31,8 @@ async function checkPassword() {
 async function setPassword() {
   try {
     const _dict = {
-      p_id: getText("txt_id"),
-      p_senha: getText("txt_novasenha"),
+      p_id: Dom.getValue("txt_id"),
+      p_senha: Dom.getValue("txt_novasenha"),
     };
 
     if (!_dict.p_id || !_dict.p_senha) {
@@ -75,7 +72,7 @@ async function alterarSenha() {
     : data && Object.keys(data).length > 0;
 
   if (hasData) {
-    if (getText("txt_novasenha") == getText("txt_confirmsenha")) {
+    if (Dom.getValue("txt_novasenha") == Dom.getValue("txt_confirmsenha")) {
       await setPassword();
     } else {
       messageInformation("warning", "Atenção", "Senhas nao conferem!!!");
@@ -86,11 +83,11 @@ async function alterarSenha() {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  setFocus("txt_senhaatual");
+  Dom.setFocus("txt_senhaatual");
   enableEnterAsTab();
 });
 
-setText("txt_id", await getCookie("id"));
-setText("txt_nome", await getCookie("login"));
+Dom.setValue("txt_id", await getCookie("id"));
+Dom.setValue("txt_nome", await getCookie("login"));
 
-addEventBySelector("#bt_senha", "click", alterarSenha);
+Dom.addEventBySelector("#bt_senha", "click", alterarSenha);

@@ -1,16 +1,13 @@
 import {
+  Dom,
   checkValue,
-  setText,
-  getText,
   convertDataBr,
   convertDataISO,
   getColumnValue,
-  allUpperCase,
   onmouseover,
   onclickHighlightRow,
   loadPage,
   colorStatus,
-  addEventBySelector,
   createModal,
   messageInformation,
   messageQuestion,
@@ -107,19 +104,19 @@ function fillElement(element) {
   const compra = convertDataISO(getColumnValue(element, 10));
   const previsao = convertDataISO(getColumnValue(element, 11));
   const recebido = convertDataISO(getColumnValue(element, 12));
-  setText("txt_id", id);
-  setText("txt_contrato", contrato);
-  setText("txt_cliente", cliente);
-  setText("txt_ambiente", ambiente);
-  setText("txt_descricao", descricao);
-  setText("txt_medida", medida);
-  setText("txt_parcelamento", parcelamento);
-  setText("txt_cartao", cartao);
-  setText("txt_quantidade", quantidade);
-  setText("txt_fornecedor", fornecedor);
-  setText("txt_compra", compra);
-  setText("txt_previsao", previsao);
-  setText("txt_recebido", recebido);
+  Dom.setValue("txt_id", id);
+  Dom.setValue("txt_contrato", contrato);
+  Dom.setValue("txt_cliente", cliente);
+  Dom.setValue("txt_ambiente", ambiente);
+  Dom.setValue("txt_descricao", descricao);
+  Dom.setValue("txt_medida", medida);
+  Dom.setValue("txt_parcelamento", parcelamento);
+  Dom.setValue("txt_cartao", cartao);
+  Dom.setValue("txt_quantidade", quantidade);
+  Dom.setValue("txt_fornecedor", fornecedor);
+  Dom.setValue("txt_compra", compra);
+  Dom.setValue("txt_previsao", previsao);
+  Dom.setValue("txt_recebido", recebido);
 }
 
 document
@@ -135,16 +132,16 @@ document
 
 async function setAcessorios() {
   const data = {
-    p_id: getText("txt_id"),
-    p_descricao: getText("txt_descricao"),
-    p_medida: getText("txt_medida"),
-    p_parcelamento: getText("txt_parcelamento"),
-    p_numcard: getText("txt_cartao"),
-    p_qtd: getText("txt_quantidade"),
-    p_fornecedor: getText("txt_fornecedor"),
-    p_datacompra: getText("txt_compra"),
-    p_previsao: getText("txt_previsao"),
-    p_recebido: getText("txt_recebido"),
+    p_id: Dom.getValue("txt_id"),
+    p_descricao: Dom.getValue("txt_descricao"),
+    p_medida: Dom.getValue("txt_medida"),
+    p_parcelamento: Dom.getValue("txt_parcelamento"),
+    p_numcard: Dom.getValue("txt_cartao"),
+    p_qtd: Dom.getValue("txt_quantidade"),
+    p_fornecedor: Dom.getValue("txt_fornecedor"),
+    p_datacompra: Dom.getValue("txt_compra"),
+    p_previsao: Dom.getValue("txt_previsao"),
+    p_recebido: Dom.getValue("txt_recebido"),
   };
 
   const response = await fetch("/setAcessorios", {
@@ -172,7 +169,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   onmouseover("table");
   onclickHighlightRow("table");
   enableTableFilterSort("table");
-  allUpperCase();
+  Dom.allUpperCase();
 });
 
-addEventBySelector("#bt_update", "click", setAcessorios);
+Dom.addEventBySelector("#bt_update", "click", setAcessorios);

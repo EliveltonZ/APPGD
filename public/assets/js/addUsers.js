@@ -1,9 +1,7 @@
 import {
-  setFocus,
+  Dom,
   loadPage,
   allUpperCase,
-  getText,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
@@ -24,27 +22,22 @@ async function getMaxId() {
   }
 }
 
-function getValue(element) {
-  const value = document.getElementById(element).value.toUpperCase();
-  return value;
-}
-
 async function insertUser() {
   const result = await messageQuestion(
     "Confirmar",
-    `Deseja adicionar ${getText("txt_login")} ?`
+    `Deseja adicionar ${Dom.getValue("txt_login")} ?`
   );
 
   if (result.isConfirmed) {
     const data = {
-      p_id: getValue("txt_id"),
-      p_login: getValue("txt_login"),
+      p_id: Dom.getValue("txt_id"),
+      p_login: Dom.getValue("txt_login"),
       p_senha: "123456",
-      p_setor: getValue("txt_setor"),
-      p_camiseta: getValue("txt_camiseta"),
-      p_calca: getValue("txt_calca"),
-      p_sapato: getValue("txt_sapato"),
-      p_local: getValue("txt_local"),
+      p_setor: Dom.getValue("txt_setor"),
+      p_camiseta: Dom.getValue("txt_camiseta"),
+      p_calca: Dom.getValue("txt_calca"),
+      p_sapato: Dom.getValue("txt_sapato"),
+      p_local: Dom.getValue("txt_local"),
     };
 
     const response = await fetch("/insertUser", {
@@ -64,7 +57,7 @@ async function insertUser() {
       messageInformation(
         "success",
         "Sucesso",
-        `Usuário ${getValue("txt_login")} inserido com sucesso !!!`
+        `Usuário ${Dom.getValue("txt_login")} inserido com sucesso !!!`
       );
     }
   }
@@ -72,9 +65,9 @@ async function insertUser() {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("adicionar_usuarios", "add_users.html");
-  allUpperCase();
+  Dom.allUpperCase();
   getMaxId();
-  setFocus("txt_login");
+  Dom.setFocus("txt_login");
 });
 
-addEventBySelector("#bt_adicionar", "click", insertUser);
+Dom.addEventBySelector("#bt_adicionar", "click", insertUser);

@@ -1,8 +1,7 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
+  Dom,
   checkValue,
-  setText,
-  getText,
   convertDataBr,
   ajustarTamanhoModal,
   onmouseover,
@@ -11,16 +10,14 @@ import {
   onclickHighlightRow,
   createModal,
   messageInformation,
-  addEventBySelector,
   getConfig,
   setConfig,
-  setInnerHtml,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
 
 async function fillTable() {
-  const date_condition = getText("txt_datafilter");
+  const date_condition = Dom.getValue("txt_datafilter");
 
   if (date_condition) {
     const response = await fetch(
@@ -164,26 +161,26 @@ function applyStatusColor(elementId, status) {
 
 // Define o innerHTML e aplica cor de status
 function setTextInner(elementId, value) {
-  setInnerHtml(elementId, value);
+  Dom.setInnerHtml(elementId, value);
   applyStatusColor(elementId, value);
 }
 
 // Converte, verifica e aplica datas formatadas
 function setFormattedText(id, value) {
   const formatted = convertDataBr(checkValue(value));
-  setText(id, formatted);
+  Dom.setValue(id, formatted);
 }
 
 // Aplica valores simples em campos
 function applyBasicFields(item) {
-  setText("txt_numoc", item.ordemdecompra);
-  setText("txt_cliente", item.cliente);
-  setText("txt_contrato", item.contrato);
-  setText("txt_codcc", item.codcc);
-  setText("txt_ambiente", item.ambiente);
-  setText("txt_numproj", item.numproj);
-  setText("txt_lote", item.lote);
-  setText("txt_observacoes", item.observacoes);
+  Dom.setValue("txt_numoc", item.ordemdecompra);
+  Dom.setValue("txt_cliente", item.cliente);
+  Dom.setValue("txt_contrato", item.contrato);
+  Dom.setValue("txt_codcc", item.codcc);
+  Dom.setValue("txt_ambiente", item.ambiente);
+  Dom.setValue("txt_numproj", item.numproj);
+  Dom.setValue("txt_lote", item.lote);
+  Dom.setValue("txt_observacoes", item.observacoes);
 }
 
 // Aplica campos de data
@@ -215,14 +212,6 @@ function applyStatusFields(item) {
   }
 }
 
-// Mostra alerta em caso de erro
-function showError(message) {
-  Swal.fire({
-    icon: "error",
-    text: `Não foi possível carregar os dados: ${message}`,
-  });
-}
-
 // Função principal
 async function getStatus(ordemDeCompra) {
   try {
@@ -240,20 +229,23 @@ async function getStatus(ordemDeCompra) {
       applyStatusFields(item);
     });
   } catch (error) {
-    showError(error.message);
+    messageInformation(
+      "error",
+      `Não foi possível carregar os dados: ${error.message}`
+    );
   }
 }
 
 async function getDataFilterStts() {
   const data = await getConfig(2);
-  setText("txt_datafilter", data[0].p_data);
+  Dom.setValue("txt_datafilter", data[0].p_data);
   fillTable();
 }
 
 async function setDataFilterStts() {
   const data = {
     p_id: 2,
-    p_date: getText("txt_datafilter"),
+    p_date: Dom.getValue("txt_datafilter"),
   };
   await setConfig(data);
 }
@@ -270,6 +262,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
   window.addEventListener("resize", ajustarTamanhoModal);
 });
 
-addEventBySelector("#table", "dblclick", handleClikedTable);
-addEventBySelector("#txt_datafilter", "blur", fillTable);
-addEventBySelector("#txt_datafilter", "blur", setDataFilterStts);
+Dom.addEventBySelector("#table", "dblclick", handleClikedTable);
+Dom.addEventBySelector("#txt_datafilter", "blur", fillTable);
+Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterStts);

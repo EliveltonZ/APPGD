@@ -1,18 +1,11 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
-  setFocus,
-  setData,
-  getText,
-  setText,
-  getChecked,
-  setChecked,
+  Dom,
   loadPage,
   onmouseover,
   enableEnterAsTab,
   createModal,
   exportarParaExcel,
-  clearInputFields,
-  addEventBySelector,
   messageQuestion,
   messageInformation,
 } from "./utils.js";
@@ -34,8 +27,8 @@ async function setStartLote() {
 
   if (result.isConfirmed) {
     const data = {
-      p_iniciado: getText("txt_data"),
-      p_lote: getText("txt_loteiniciar"),
+      p_iniciado: Dom.getValue("txt_data"),
+      p_lote: Dom.getValue("txt_loteiniciar"),
     };
 
     const response = await fetch("/setStartLote", {
@@ -62,9 +55,9 @@ async function setStartLote() {
 }
 
 async function getProjetoPcp() {
-  if (getText("txt_numoc")) {
+  if (Dom.getValue("txt_numoc")) {
     const response = await fetch(
-      `/getProjetoPcp?p_ordemdecompra=${getText("txt_numoc")}`
+      `/getProjetoPcp?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
     );
 
     if (!response.ok) {
@@ -74,27 +67,27 @@ async function getProjetoPcp() {
         "ERRO",
         "Erro ao buscar ordem de compra" + errText
       );
-      clearInputFields();
+      Dom.clearInputFields();
     } else {
       const data = await response.json();
       data.forEach((element) => {
-        setText("txt_contrato", element.p_contrato),
-          setText("txt_cliente", element.p_cliente),
-          setChecked("chk_urgente", element.p_urgente),
-          setText("txt_codcc", element.p_codcc),
-          setText("txt_ambiente", element.p_ambiente),
-          setText("txt_numproj", element.p_numproj),
-          setText("txt_lote", element.p_lote),
-          setText("txt_pedido", element.p_pedido),
-          setText("txt_chegada", convertDate(element.p_chegoufabrica)),
-          setText("txt_entrega", convertDate(element.p_dataentrega)),
-          setText("txt_tipo", element.p_tipo),
-          setText("txt_pecas", element.p_peças),
-          setText("txt_area", element.p_area);
+        Dom.setValue("txt_contrato", element.p_contrato),
+          Dom.setValue("txt_cliente", element.p_cliente),
+          Dom.setChecked("chk_urgente", element.p_urgente),
+          Dom.setValue("txt_codcc", element.p_codcc),
+          Dom.setValue("txt_ambiente", element.p_ambiente),
+          Dom.setValue("txt_numproj", element.p_numproj),
+          Dom.setValue("txt_lote", element.p_lote),
+          Dom.setValue("txt_pedido", element.p_pedido),
+          Dom.setValue("txt_chegada", convertDate(element.p_chegoufabrica)),
+          Dom.setValue("txt_entrega", convertDate(element.p_dataentrega)),
+          Dom.setValue("txt_tipo", element.p_tipo),
+          Dom.setValue("txt_pecas", element.p_peças),
+          Dom.setValue("txt_area", element.p_area);
       });
     }
   } else {
-    clearInputFields();
+    Dom.clearInputFields();
   }
 }
 
@@ -103,14 +96,14 @@ async function setProjetoPcp() {
 
   if (result.isConfirmed) {
     const data = {
-      p_ordemdecompra: getText("txt_numoc"),
-      p_urgente: getChecked("chk_urgente"),
-      p_codcc: getText("txt_codcc"),
-      p_lote: getText("txt_lote"),
-      p_pedido: getText("txt_pedido"),
-      p_tipo: getText("txt_tipo"),
-      p_pecas: getText("txt_pecas"),
-      p_area: getText("txt_area"),
+      p_ordemdecompra: Dom.getValue("txt_numoc"),
+      p_urgente: Dom.getChecked("chk_urgente"),
+      p_codcc: Dom.getValue("txt_codcc"),
+      p_lote: Dom.getValue("txt_lote"),
+      p_pedido: Dom.getValue("txt_pedido"),
+      p_tipo: Dom.getValue("txt_tipo"),
+      p_pecas: Dom.getValue("txt_pecas"),
+      p_area: Dom.getValue("txt_area"),
     };
 
     const response = await fetch("/setProjetoPcp", {
@@ -191,7 +184,7 @@ async function setLote(ordemdecompra, lote) {
 }
 
 async function gerarLote() {
-  const lote = getText("txt_gerar_lote");
+  const lote = Dom.getValue("txt_gerar_lote");
   const result = await messageQuestion(null, `Deseja gerar o Lote ${lote} ?`);
 
   if (result.isConfirmed) {
@@ -227,11 +220,10 @@ async function gerarLote() {
 }
 
 async function exportarDados() {
-  console.log(getText("txt_inicio"), getText("txt_fim"));
   const response = await fetch(
-    `/exportarDados?data_inicio=${getText("txt_inicio")}&data_fim=${getText(
-      "txt_fim"
-    )}`
+    `/exportarDados?data_inicio=${Dom.getValue(
+      "txt_inicio"
+    )}&data_fim=${Dom.getValue("txt_fim")}`
   );
   if (!response.ok) {
     const errtext = await response.text();
@@ -248,14 +240,14 @@ async function exportarDados() {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("pcp", "pcp.html");
-  setData("txt_data");
+  Dom.setData("txt_data");
   onmouseover("table");
   enableEnterAsTab();
 });
 
-addEventBySelector("#txt_numoc", "blur", getProjetoPcp);
-addEventBySelector("#bt_salvar", "click", setProjetoPcp);
-addEventBySelector("#bt_startlote", "click", setStartLote);
-addEventBySelector("#bt_export", "click", exportarDados);
-addEventBySelector("#bt_gerar_lote", "click", gerarLote);
-addEventBySelector("#bt_modal_lote", "click", openModalLote);
+Dom.addEventBySelector("#txt_numoc", "blur", getProjetoPcp);
+Dom.addEventBySelector("#bt_salvar", "click", setProjetoPcp);
+Dom.addEventBySelector("#bt_startlote", "click", setStartLote);
+Dom.addEventBySelector("#bt_export", "click", exportarDados);
+Dom.addEventBySelector("#bt_gerar_lote", "click", gerarLote);
+Dom.addEventBySelector("#bt_modal_lote", "click", openModalLote);

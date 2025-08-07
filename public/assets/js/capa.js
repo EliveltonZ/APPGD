@@ -1,8 +1,4 @@
-import { convertDataBr, checkValue, messageInformation } from "./utils.js";
-
-function setInnerText(element, value) {
-  document.getElementById(element).innerText = value;
-}
+import { convertDataBr, checkValue, messageInformation, Dom } from "./utils.js";
 
 function getLocalStorageItem(item) {
   return localStorage.getItem(item);
@@ -19,19 +15,19 @@ function colorUrgente(value) {
 function fillElements(ordemdecompra) {
   const data = JSON.parse(localStorage.getItem("project"));
   const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
-  setInnerText("lb_contrato", data.p_contrato);
-  setInnerText("lb_qproj", Number(data.p_numproj.slice(-2)));
-  setInnerText("lb_numproj", data.p_numproj);
-  setInnerText("lb_cliente", data.p_cliente);
-  setInnerText("lb_ambiente", data.p_ambiente);
-  setInnerText("lb_vendedor", data.p_vendedor);
-  setInnerText("lb_dataentrega", convertDataBr(data.p_dataentrega));
-  setInnerText("lb_liberador", data.p_liberador);
-  setInnerText("lb_numoc", numoc);
-  setInnerText("lb_responsavel", getLocalStorageItem("resp"));
-  setInnerText("lb_data", convertDataBr(getLocalStorageItem("data")));
-  setInnerText("lb_tipo", getLocalStorageItem("tipo"));
-  setInnerText("lb_urgente", getLocalStorageItem("urgente"));
+  Dom.setInnerHtml("lb_contrato", data.p_contrato);
+  Dom.setInnerHtml("lb_qproj", Number(data.p_numproj.slice(-2)));
+  Dom.setInnerHtml("lb_numproj", data.p_numproj);
+  Dom.setInnerHtml("lb_cliente", data.p_cliente);
+  Dom.setInnerHtml("lb_ambiente", data.p_ambiente);
+  Dom.setInnerHtml("lb_vendedor", data.p_vendedor);
+  Dom.setInnerHtml("lb_dataentrega", convertDataBr(data.p_dataentrega));
+  Dom.setInnerHtml("lb_liberador", data.p_liberador);
+  Dom.setInnerHtml("lb_numoc", numoc);
+  Dom.setInnerHtml("lb_responsavel", getLocalStorageItem("resp"));
+  Dom.setInnerHtml("lb_data", convertDataBr(getLocalStorageItem("data")));
+  Dom.setInnerHtml("lb_tipo", getLocalStorageItem("tipo"));
+  Dom.setInnerHtml("lb_urgente", getLocalStorageItem("urgente"));
   colorUrgente(getLocalStorageItem("urgente"));
 }
 

@@ -1,21 +1,18 @@
 import {
-  setText,
-  getText,
+  Dom,
   formatCurrency,
-  setFocus,
   loadPage,
   enableEnterAsTab,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
 } from "./utils.js";
 
 async function getDeleteProjetos() {
-  const ordemdecompra = Number(getText("txt_numoc"));
+  const ordemdecompra = Number(Dom.getValue("txt_numoc"));
   if (!Number.isInteger(ordemdecompra)) return;
 
   const response = await fetch(
-    `/getDeleteProjetos?p_ordemdecompra=${getText("txt_numoc")}`
+    `/getDeleteProjetos?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
   );
 
   if (!response.ok) {
@@ -24,25 +21,25 @@ async function getDeleteProjetos() {
     const data = await response.json();
     if (data && data.length > 0) {
       data.forEach((item) => {
-        setText("txt_contrato", item.contrato);
-        setText("txt_cliente", item.cliente);
-        setText("txt_tipoambiente", item.tipoambiente);
-        setText("txt_ambiente", item.ambiente);
-        setText("txt_numproj", item.numproj);
-        setText("txt_vendedor", item.vendedor);
-        setText("txt_liberador", item.liberador);
-        setText("txt_datacontrato", item.datacontrato);
-        setText("txt_dataassinatura", item.dataassinatura);
-        setText("txt_chegoufabrica", item.chegoufabrica);
-        setText("txt_dataentrega", item.dataentrega);
-        setText("txt_loja", item.loja);
-        setText("txt_tipocliente", item.tipocliente);
-        setText("txt_etapa", item.etapa);
-        setText("txt_tipocontrato", item.tipocontrato);
-        setText("txt_valorbruto", formatCurrency(item.valorbruto));
-        setText("txt_valornegociado", formatCurrency(item.valornegociado));
-        setText("txt_customaterial", formatCurrency(item.customaterial));
-        setText(
+        Dom.setValue("txt_contrato", item.contrato);
+        Dom.setValue("txt_cliente", item.cliente);
+        Dom.setValue("txt_tipoambiente", item.tipoambiente);
+        Dom.setValue("txt_ambiente", item.ambiente);
+        Dom.setValue("txt_numproj", item.numproj);
+        Dom.setValue("txt_vendedor", item.vendedor);
+        Dom.setValue("txt_liberador", item.liberador);
+        Dom.setValue("txt_datacontrato", item.datacontrato);
+        Dom.setValue("txt_dataassinatura", item.dataassinatura);
+        Dom.setValue("txt_chegoufabrica", item.chegoufabrica);
+        Dom.setValue("txt_dataentrega", item.dataentrega);
+        Dom.setValue("txt_loja", item.loja);
+        Dom.setValue("txt_tipocliente", item.tipocliente);
+        Dom.setValue("txt_etapa", item.etapa);
+        Dom.setValue("txt_tipocontrato", item.tipocontrato);
+        Dom.setValue("txt_valorbruto", formatCurrency(item.valorbruto));
+        Dom.setValue("txt_valornegociado", formatCurrency(item.valornegociado));
+        Dom.setValue("txt_customaterial", formatCurrency(item.customaterial));
+        Dom.setValue(
           "txt_custoadicional",
           formatCurrency(item.customaterialadicional)
         );
@@ -60,7 +57,7 @@ async function setDeleteProjeto() {
     const response = await fetch("/setDeleteProjeto", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ p_ordemdecompra: getText("txt_numoc") }),
+      body: JSON.stringify({ p_ordemdecompra: Dom.getValue("txt_numoc") }),
     });
 
     if (!response.ok) {
@@ -71,15 +68,17 @@ async function setDeleteProjeto() {
         "Sucesso",
         "Projeto excluido com Sucesso !!!"
       );
+      Dom.clearInputFields();
+      Dom.setFocus("txt_numoc");
     }
   }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("adicionar_projetos", "delete_projetos.html");
-  setFocus("txt_numoc");
+  Dom.setFocus("txt_numoc");
   enableEnterAsTab();
 });
 
-addEventBySelector("#txt_numoc", "blur", getDeleteProjetos);
-addEventBySelector("#bt_delete", "click", setDeleteProjeto);
+Dom.addEventBySelector("#txt_numoc", "blur", getDeleteProjetos);
+Dom.addEventBySelector("#bt_delete", "click", setDeleteProjeto);

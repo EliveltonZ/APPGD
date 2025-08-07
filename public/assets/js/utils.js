@@ -1,42 +1,125 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
-export function setData(elememt) {
-  var campoDataHora = document.getElementById(elememt);
-  var dataAtual = new Date();
-  var ano = dataAtual.getFullYear();
-  var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
-  var dia = String(dataAtual.getDate()).padStart(2, "0");
-  var dataHoraFormatada = `${ano}-${mes}-${dia}`;
-  campoDataHora.value = dataHoraFormatada;
-}
+export class Dom {
+  static getValue(element) {
+    const value = document.getElementById(element).value.toUpperCase();
+    return value === "" ? null : value;
+  }
 
-export function getText(element) {
-  let value = document.getElementById(element).value.toUpperCase();
-  return value === "" ? null : value;
-}
+  static setValue(element, value) {
+    document.getElementById(element).value = value;
+  }
 
-export function setText(element, value) {
-  document.getElementById(element).value = value;
-}
+  static setInnerHtml(element, value) {
+    document.getElementById(element).innerHTML = value;
+  }
 
-export function setInnerHtml(element, value) {
-  document.getElementById(element).innerHTML = value;
-}
+  static getChecked(element) {
+    let value = document.getElementById(element).checked;
+    return value === "" ? null : value;
+  }
 
-export function getChecked(element) {
-  let value = document.getElementById(element).checked;
-  return value === "" ? null : value;
-}
+  static setChecked(element, boolean) {
+    document.getElementById(element).checked = boolean;
+  }
 
-export function setChecked(element, boolean) {
-  document.getElementById(element).checked = boolean;
+  static setFocus(elememt) {
+    document.getElementById(elememt).focus();
+  }
+
+  static setData(elememt) {
+    var campoDataHora = document.getElementById(elememt);
+    var dataAtual = new Date();
+    var ano = dataAtual.getFullYear();
+    var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
+    var dia = String(dataAtual.getDate()).padStart(2, "0");
+    var dataHoraFormatada = `${ano}-${mes}-${dia}`;
+    campoDataHora.value = dataHoraFormatada;
+  }
+
+  static clearInputFields(exceptionsIds = []) {
+    // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
+    const allFields = document.querySelectorAll(
+      'input[type="text"], input[type="checkbox"], select, input[type="date"]'
+    );
+
+    allFields.forEach((field) => {
+      // Verificar se o campo não está na lista de exceções pelos IDs
+      if (!exceptionsIds.includes(field.id)) {
+        if (field.type === "text") {
+          field.value = "";
+        } else if (field.type === "checkbox") {
+          field.checked = false;
+        } else if (field.tagName.toLowerCase() === "select") {
+          field.value = "";
+        } else if (field.type === "date") {
+          field.value = "";
+        }
+      }
+    });
+  }
+
+  static addEventBySelector(element, event, _function) {
+    const elements = document.querySelectorAll(element);
+    if (elements.length) {
+      elements.forEach((el) => {
+        el.addEventListener(event, _function);
+      });
+    } else {
+      console.warn(
+        `Nenhum elemento com o seletor "${element}" foi encontrado.`
+      );
+    }
+  }
+
+  static handleClass(element, nameClass, type) {
+    // Obtém o elemento pelo ID
+    const item = document.getElementById(element);
+
+    // Verifica se o item existe
+    if (!item) {
+      console.error(`Elemento com ID "${element}" não encontrado.`);
+      return;
+    }
+
+    // Verifica se o nome da classe é válido
+    if (!nameClass || typeof nameClass !== "string") {
+      console.error("O nome da classe não é válido.");
+      return;
+    }
+
+    // Verifica o tipo de operação e executa
+    if (type.toLowerCase() === "add") {
+      item.classList.add(nameClass);
+      return;
+    }
+    if (type.toLowerCase() === "remove") {
+      item.classList.remove(nameClass);
+      return;
+    }
+
+    // Caso o tipo não seja reconhecido
+    console.error(`Tipo de operação "${type}" não identificado.`);
+  }
+
+  static allUpperCase() {
+    document.querySelectorAll('input[type="text"]').forEach((input) => {
+      input.addEventListener("input", function () {
+        setUpperCase(input);
+      });
+    });
+  }
 }
 
 export function formatValueDecimal(valorInput) {
-  const valorFormatado = valorInput.replace(/[^0-9,]/g, "");
-  const resultado = valorFormatado.replace(",", ".");
-  return resultado;
+  if (valorInput) {
+    const valorFormatado = valorInput.replace(/[^0-9,]/g, "");
+    const resultado = valorFormatado.replace(",", ".");
+    return resultado;
+  } else {
+    return 0;
+  }
 }
 
 export function changeFormatCurrency(e) {
@@ -62,15 +145,6 @@ export function formatCurrency(valor) {
       currency: "BRL",
     });
   }
-}
-
-export function setFocus(elememt) {
-  document.getElementById(elememt).focus();
-}
-
-export function getValue(element) {
-  const value = document.getElementById(element).value.toUpperCase();
-  return value;
 }
 
 export function checkValue(value) {
@@ -165,21 +239,25 @@ export function allUpperCase() {
   });
 }
 
-export function clearInputFields() {
-  document.querySelectorAll('input[type="text"]').forEach((input) => {
-    input.value = "";
-  });
+export function clearInputFields(exceptionsIds = []) {
+  // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
+  const allFields = document.querySelectorAll(
+    'input[type="text"], input[type="checkbox"], select, input[type="date"]'
+  );
 
-  document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-    checkbox.checked = false;
-  });
-
-  document.querySelectorAll("Select").forEach((input) => {
-    input.value = "";
-  });
-
-  document.querySelectorAll('input[type="date"]').forEach((input) => {
-    input.value = "";
+  allFields.forEach((field) => {
+    // Verificar se o campo não está na lista de exceções pelos IDs
+    if (!exceptionsIds.includes(field.id)) {
+      if (field.type === "text") {
+        field.value = "";
+      } else if (field.type === "checkbox") {
+        field.checked = false;
+      } else if (field.tagName.toLowerCase() === "select") {
+        field.value = "";
+      } else if (field.type === "date") {
+        field.value = "";
+      }
+    }
   });
 }
 
@@ -390,15 +468,18 @@ export function colorAcessorios(item) {
   }
 }
 
-export async function getUsuario(id, campo) {
-  const response = await fetch(`/getUsuario?p_id=${id}`);
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
-    return;
+export function applyDateMask(event) {
+  let input = event.target;
+  let value = input.value.replace(/\D/g, ""); // Remove qualquer caractere não numérico
+
+  // Aplica a máscara MM/YY
+  if (value.length <= 2) {
+    input.value = value.replace(/(\d{2})/, "$1");
+  } else if (value.length <= 4) {
+    input.value = value.replace(/(\d{2})(\d{2})/, "$1/$2");
+  } else {
+    input.value = value.substring(0, 4).replace(/(\d{2})(\d{2})/, "$1/$2");
   }
-  const data = await response.json();
-  const nome = data[0].nome;
-  document.getElementById(campo).value = nome;
 }
 
 export function messageInformation(icon, title, message) {
@@ -427,6 +508,17 @@ export async function messageQuestion(
   return result;
 }
 
+export async function getUsuario(id, campo) {
+  const response = await fetch(`/getUsuario?p_id=${id}`);
+  if (!response.ok) {
+    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
+    return;
+  }
+  const data = await response.json();
+  const nome = data[0].nome;
+  document.getElementById(campo).value = nome;
+}
+
 export async function getOperadores() {
   const response = await fetch("/getOperadores");
   const data = await response.json();
@@ -447,41 +539,6 @@ export async function setConfig(params) {
   });
 }
 
-export function getIndexColumnValue(td, index) {
-  const row = td.parentNode;
-  return row.cells[index].innerText;
-}
-
-export function handleClass(element, nameClass, type) {
-  // Obtém o elemento pelo ID
-  const item = document.getElementById(element);
-
-  // Verifica se o item existe
-  if (!item) {
-    console.error(`Elemento com ID "${element}" não encontrado.`);
-    return;
-  }
-
-  // Verifica se o nome da classe é válido
-  if (!nameClass || typeof nameClass !== "string") {
-    console.error("O nome da classe não é válido.");
-    return;
-  }
-
-  // Verifica o tipo de operação e executa
-  if (type.toLowerCase() === "add") {
-    item.classList.add(nameClass);
-    return;
-  }
-  if (type.toLowerCase() === "remove") {
-    item.classList.remove(nameClass);
-    return;
-  }
-
-  // Caso o tipo não seja reconhecido
-  console.error(`Tipo de operação "${type}" não identificado.`);
-}
-
 export async function getCookie(key) {
   const response = await fetch("/checkPermission", {
     credentials: "include",
@@ -491,6 +548,30 @@ export async function getCookie(key) {
 
   const cookie = await response.json();
   return cookie[key];
+}
+
+export async function sendMail(data) {
+  try {
+    const response = await fetch("/sendMail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      messageInformation("error", "ERRO", "Não foi possivel enviar o E-mail");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error; // Opcional: relançar o erro para ser tratado em outro lugar
+  }
+}
+
+export function getIndexColumnValue(td, index) {
+  const row = td.parentNode;
+  return row.cells[index].innerText;
 }
 
 export function exportarParaExcel(
@@ -643,17 +724,6 @@ function limitRead(value) {
   return (100 - value) / 2;
 }
 
-export function addEventBySelector(element, event, _function) {
-  const elements = document.querySelectorAll(element);
-  if (elements.length) {
-    elements.forEach((el) => {
-      el.addEventListener(event, _function);
-    });
-  } else {
-    console.warn(`Nenhum elemento com o seletor "${element}" foi encontrado.`);
-  }
-}
-
 export function criarSpinnerGlobal() {
   if (document.getElementById("spinner-global")) return;
 
@@ -749,23 +819,4 @@ export function detectarDispositivo() {
   }
 
   return "Desconhecido";
-}
-
-export async function sendMail(data) {
-  try {
-    const response = await fetch("/sendMail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      messageInformation("error", "ERRO", "Não foi possivel enviar o E-mail");
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    throw error; // Opcional: relançar o erro para ser tratado em outro lugar
-  }
 }

@@ -1,36 +1,33 @@
 import {
-  getText,
-  setText,
+  Dom,
   loadPage,
-  setFocus,
   onmouseover,
   convertDataBr,
   convertDataISO,
   getGroupedData,
   enableEnterAsTab,
   checkValue,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
   createModal,
 } from "./utils.js";
 
 async function getContrato() {
-  if (!getText("txt_contrato") || !Number(getText("txt_contrato"))) {
+  if (!Dom.getValue("txt_contrato") || !Number(Dom.getValue("txt_contrato"))) {
     messageInformation("error", "ERRO", "Contrato Invalido");
-    setText("txt_contrato", "");
+    Dom.setValue("txt_contrato", "");
     return;
   }
 
   const response = await fetch(
-    `/getContratoPendencias?p_contrato=${getText("txt_contrato")}`
+    `/getContratoPendencias?p_contrato=${Dom.getValue("txt_contrato")}`
   );
 
   if (!response.ok) {
     messageInformation("error", "ERRO", "Contrato não localizado");
   } else {
     const data = await response.json();
-    setText("txt_entrega", convertDataBr(data[0].p_dataentrega));
+    Dom.setValue("txt_entrega", convertDataBr(data[0].p_dataentrega));
     const tbody = document.querySelector("tbody");
     tbody.innerHTML = "";
 
@@ -56,7 +53,7 @@ function getFirstColumnValue(td, index) {
 
 async function fillTableAcessorios() {
   const response = await fetch(
-    `/fillTableAPendencia?p_ordemdecompra=${getText("txt_numoc")}`
+    `/fillTableAPendencia?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
   );
 
   if (!response.ok) {
@@ -91,20 +88,20 @@ async function fillTableAcessorios() {
   }
 }
 
-function getTextLowCase(element) {
+function Dom.getValueLowCase(element) {
   let value = document.getElementById(element).value;
   return value === "" ? null : value;
 }
 
 function clear() {
-  setText("txt_categoria", "");
-  setText("txt_descricao", "");
-  setText("txt_medida", "");
-  setText("txt_qtd", "");
-  setText("txt_fornecedor", "");
-  setText("txt_compra", "");
-  setText("txt_previsao", "");
-  setText("txt_recebido", "");
+  Dom.setValue("txt_categoria", "");
+  Dom.setValue("txt_descricao", "");
+  Dom.setValue("txt_medida", "");
+  Dom.setValue("txt_qtd", "");
+  Dom.setValue("txt_fornecedor", "");
+  Dom.setValue("txt_compra", "");
+  Dom.setValue("txt_previsao", "");
+  Dom.setValue("txt_recebido", "");
 }
 
 async function deleteRow(button) {
@@ -161,9 +158,9 @@ function handleTableClick(event) {
     const firstColumnValue = getFirstColumnValue(event.target, 0);
     const secondColumnValue = getFirstColumnValue(event.target, 1);
     const treeColumnValue = getFirstColumnValue(event.target, 2);
-    setText("txt_numoc", firstColumnValue);
-    setText("txt_cliente", secondColumnValue);
-    setText("txt_ambiente", treeColumnValue);
+    Dom.setValue("txt_numoc", firstColumnValue);
+    Dom.setValue("txt_cliente", secondColumnValue);
+    Dom.setValue("txt_ambiente", treeColumnValue);
     fillTableAcessorios(firstColumnValue);
     createModal("modal");
   }
@@ -176,14 +173,14 @@ function getLineItens(event) {
     row.querySelectorAll("td").forEach(function (cell) {
       cellValues.push(cell.textContent);
     });
-    setText("txt_categoria", cellValues[1]);
-    setText("txt_descricao", cellValues[2]);
-    setText("txt_medida", cellValues[3]);
-    setText("txt_qtd", cellValues[4]);
-    setText("txt_fornecedor", cellValues[5]);
-    setText("txt_compra", convertDataISO(checkValue(cellValues[6])));
-    setText("txt_previsao", convertDataISO(checkValue(cellValues[7])));
-    setText("txt_recebido", convertDataISO(checkValue(cellValues[8])));
+    Dom.setValue("txt_categoria", cellValues[1]);
+    Dom.setValue("txt_descricao", cellValues[2]);
+    Dom.setValue("txt_medida", cellValues[3]);
+    Dom.setValue("txt_qtd", cellValues[4]);
+    Dom.setValue("txt_fornecedor", cellValues[5]);
+    Dom.setValue("txt_compra", convertDataISO(checkValue(cellValues[6])));
+    Dom.setValue("txt_previsao", convertDataISO(checkValue(cellValues[7])));
+    Dom.setValue("txt_recebido", convertDataISO(checkValue(cellValues[8])));
   }
 }
 
@@ -193,15 +190,15 @@ async function insertAcessorios() {
   if (result.isConfirmed) {
     try {
       const data = {
-        p_ordemdecompra: getText("txt_numoc"),
+        p_ordemdecompra: Dom.getValue("txt_numoc"),
         p_categoria: document.getElementById("txt_categoria").value,
-        p_descricao: getText("txt_descricao"),
-        p_medida: getText("txt_medida"),
-        p_quantidade: getText("txt_qtd"),
-        p_fornecedor: getText("txt_fornecedor"),
-        p_compra: getText("txt_compra"),
-        p_previsao: getText("txt_previsao"),
-        p_recebido: getText("txt_recebido"),
+        p_descricao: Dom.getValue("txt_descricao"),
+        p_medida: Dom.getValue("txt_medida"),
+        p_quantidade: Dom.getValue("txt_qtd"),
+        p_fornecedor: Dom.getValue("txt_fornecedor"),
+        p_compra: Dom.getValue("txt_compra"),
+        p_previsao: Dom.getValue("txt_previsao"),
+        p_recebido: Dom.getValue("txt_recebido"),
       };
 
       const response = await fetch("/insertAcessorios", {
@@ -209,7 +206,7 @@ async function insertAcessorios() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      fillTableAcessorios(getText("txt_numoc"));
+      fillTableAcessorios(Dom.getValue("txt_numoc"));
     } catch {
       messageInformation("error", "ERRO", "Não foi possível inserir acessório");
     }
@@ -217,7 +214,7 @@ async function insertAcessorios() {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  setFocus("txt_contrato");
+  Dom.setFocus("txt_contrato");
   loadPage("compras", "pendencias.html");
   enableEnterAsTab();
   onmouseover("table");
@@ -226,8 +223,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   getGroupedData("getGroupedAcessorios", "txt_categoria", "p_categoria");
 });
 
-addEventBySelector("#txt_contrato", "blur", getContrato);
-addEventBySelector("#bt_adicionar", "click", insertAcessorios);
-addEventBySelector("#table", "click", handleTableClick);
-addEventBySelector("#table-1", "dblclick", getLineItens);
-addEventBySelector("#table-1", "click", handleDeleteButtonClick);
+Dom.addEventBySelector("#txt_contrato", "blur", getContrato);
+Dom.addEventBySelector("#bt_adicionar", "click", insertAcessorios);
+Dom.addEventBySelector("#table", "click", handleTableClick);
+Dom.addEventBySelector("#table-1", "dblclick", getLineItens);
+Dom.addEventBySelector("#table-1", "click", handleDeleteButtonClick);

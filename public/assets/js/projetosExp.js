@@ -1,10 +1,7 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
+  Dom,
   checkValue,
-  setText,
-  getText,
-  setChecked,
-  getChecked,
   convertDataBr,
   ajustarTamanhoModal,
   onmouseover,
@@ -16,7 +13,6 @@ import {
   colorAcessorios,
   onclickHighlightRow,
   createModal,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
   getConfig,
@@ -75,7 +71,7 @@ async function fillTableAcessorios(ordemdecompra) {
 async function fillTable() {
   const container = document.getElementById("container");
   const scrollPos = container.scrollTop;
-  const date_condition = getText("txt_datafilter");
+  const date_condition = Dom.getValue("txt_datafilter");
 
   if (date_condition) {
     const response = await fetch(
@@ -178,67 +174,70 @@ async function getExpedicao(ordemdecompra) {
   } else {
     const data = await response.json();
     data.forEach((item) => {
-      setText("txt_numoc", item.ordemdecompra);
-      setText("txt_cliente", item.cliente);
-      setText("txt_contrato", item.contrato);
-      setText("txt_codcc", item.codcc);
-      setText("txt_ambiente", item.ambiente);
-      setText("txt_numproj", item.numproj);
-      setText("txt_lote", item.lote);
-      setText(
+      Dom.setValue("txt_numoc", item.ordemdecompra);
+      Dom.setValue("txt_cliente", item.cliente);
+      Dom.setValue("txt_contrato", item.contrato);
+      Dom.setValue("txt_codcc", item.codcc);
+      Dom.setValue("txt_ambiente", item.ambiente);
+      Dom.setValue("txt_numproj", item.numproj);
+      Dom.setValue("txt_lote", item.lote);
+      Dom.setValue(
         "txt_chegoufabrica",
         convertDataBr(checkValue(item.chegoufabrica))
       );
-      setText("txt_dataentrega", convertDataBr(checkValue(item.dataentrega)));
-      setText("txt_pronto", item.pronto);
-      setText("txt_entrega", item.entrega);
-      setChecked("chk_pendencia", item.pendencia);
-      setChecked("chk_parcial", item.parcial);
-      setText("txt_separacao", item.separacao);
-      setText("txt_prontoid", item.conferido);
-      getUsuario(getText("txt_prontoid"), "txt_prontoresp");
-      setText("txt_entregaid", item.motorista);
-      getUsuario(getText("txt_entregaid"), "txt_entregaresp");
-      setText("txt_embalageminicio", item.embalageminicio);
-      setText("txt_embalagemfim", item.embalagemfim);
-      setChecked("chk_embalagem", item.embalagempausa);
-      setText("txt_embalagemid", item.embalagemresp);
-      getUsuario(getText("txt_embalagemid"), "txt_embalagemresp");
-      setChecked("chk_acessoriosavulsos", item.avulso);
-      setText("txt_acessoriosavulsosl", item.avulsol);
-      setText("txt_acessoriosavulsosq", item.avulsoq);
-      setChecked("chk_cabide", item.cabide);
-      setText("txt_cabidel", item.cabidel);
-      setText("txt_cabideq", item.cabideq);
-      setChecked("chk_paineis", item.paineis);
-      setText("txt_paineisl", item.paineisl);
-      setText("txt_paineisq", item.paineisq);
-      setChecked("chk_pecapintura", item.pecaspintadas);
-      setText("txt_pecapintural", item.pecaspintadasl);
-      setText("txt_pecapinturaq", item.pecaspintadasq);
-      setChecked("chk_portaaluminio", item.portaaluminio);
-      setText("txt_portaaluminiol", item.portaaluminiol);
-      setText("txt_portaaluminioq", item.portaaluminioq);
-      setChecked("chk_serralheria", item.serralheria);
-      setText("txt_serralherial", item.serralherial);
-      setText("txt_serralheriaq", item.serralheriaq);
-      setChecked("chk_tapecaria", item.tapecaria);
-      setText("txt_tapecarial", item.tapecarial);
-      setText("txt_tapecariaq", item.tapecariaq);
-      setChecked("chk_trilhos", item.trilho);
-      setText("txt_trilhosl", item.trilhol);
-      setText("txt_trilhosq", item.trilhoq);
-      setChecked("chk_vidroespelho", item.vidros);
-      setText("txt_vidroespelhol", item.vidrosl);
-      setText("txt_vidroespelhoq", item.vidrosq);
-      setChecked("chk_volumesmodulacao", item.volmod);
-      setText("txt_volumesmodulacaol", item.modulosl);
-      setText("txt_volumesmodulacaoq", item.modulosq);
-      setText("txt_volmod", item.totalvolumes);
-      setText("txt_tamanho", item.tamanho);
-      setText("txt_observacoes", item.observacoes);
-      setChecked("chk_embalageminicio", false);
-      setChecked("chk_embalagemfim", false);
+      Dom.setValue(
+        "txt_dataentrega",
+        convertDataBr(checkValue(item.dataentrega))
+      );
+      Dom.setValue("txt_pronto", item.pronto);
+      Dom.setValue("txt_entrega", item.entrega);
+      Dom.setChecked("chk_pendencia", item.pendencia);
+      Dom.setChecked("chk_parcial", item.parcial);
+      Dom.setValue("txt_separacao", item.separacao);
+      Dom.setValue("txt_prontoid", item.conferido);
+      getUsuario(Dom.getValue("txt_prontoid"), "txt_prontoresp");
+      Dom.setValue("txt_entregaid", item.motorista);
+      getUsuario(Dom.getValue("txt_entregaid"), "txt_entregaresp");
+      Dom.setValue("txt_embalageminicio", item.embalageminicio);
+      Dom.setValue("txt_embalagemfim", item.embalagemfim);
+      Dom.setChecked("chk_embalagem", item.embalagempausa);
+      Dom.setValue("txt_embalagemid", item.embalagemresp);
+      getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp");
+      Dom.setChecked("chk_acessoriosavulsos", item.avulso);
+      Dom.setValue("txt_acessoriosavulsosl", item.avulsol);
+      Dom.setValue("txt_acessoriosavulsosq", item.avulsoq);
+      Dom.setChecked("chk_cabide", item.cabide);
+      Dom.setValue("txt_cabidel", item.cabidel);
+      Dom.setValue("txt_cabideq", item.cabideq);
+      Dom.setChecked("chk_paineis", item.paineis);
+      Dom.setValue("txt_paineisl", item.paineisl);
+      Dom.setValue("txt_paineisq", item.paineisq);
+      Dom.setChecked("chk_pecapintura", item.pecaspintadas);
+      Dom.setValue("txt_pecapintural", item.pecaspintadasl);
+      Dom.setValue("txt_pecapinturaq", item.pecaspintadasq);
+      Dom.setChecked("chk_portaaluminio", item.portaaluminio);
+      Dom.setValue("txt_portaaluminiol", item.portaaluminiol);
+      Dom.setValue("txt_portaaluminioq", item.portaaluminioq);
+      Dom.setChecked("chk_serralheria", item.serralheria);
+      Dom.setValue("txt_serralherial", item.serralherial);
+      Dom.setValue("txt_serralheriaq", item.serralheriaq);
+      Dom.setChecked("chk_tapecaria", item.tapecaria);
+      Dom.setValue("txt_tapecarial", item.tapecarial);
+      Dom.setValue("txt_tapecariaq", item.tapecariaq);
+      Dom.setChecked("chk_trilhos", item.trilho);
+      Dom.setValue("txt_trilhosl", item.trilhol);
+      Dom.setValue("txt_trilhosq", item.trilhoq);
+      Dom.setChecked("chk_vidroespelho", item.vidros);
+      Dom.setValue("txt_vidroespelhol", item.vidrosl);
+      Dom.setValue("txt_vidroespelhoq", item.vidrosq);
+      Dom.setChecked("chk_volumesmodulacao", item.volmod);
+      Dom.setValue("txt_volumesmodulacaol", item.modulosl);
+      Dom.setValue("txt_volumesmodulacaoq", item.modulosq);
+      Dom.setValue("txt_volmod", item.totalvolumes);
+      Dom.setValue("txt_tamanho", item.tamanho);
+      Dom.setValue("txt_observacoes", item.observacoes);
+      Dom.setChecked("chk_embalageminicio", false);
+      Dom.setChecked("chk_embalagemfim", false);
     });
   }
 }
@@ -249,51 +248,51 @@ async function setDataExpedicao() {
   if (result.isConfirmed) {
     try {
       const data = {
-        p_ordemdecompra: getText("txt_numoc"),
-        p_pronto: getText("txt_pronto"),
-        p_entrega: getText("txt_entrega"),
-        p_pendencia: getChecked("chk_pendencia"),
-        p_parcial: getChecked("chk_parcial"),
-        p_separacao: getText("txt_separacao"),
-        p_conferido: getText("txt_prontoid"),
-        p_motorista: getText("txt_entregaid"),
-        p_embalageminicio: getText("txt_embalageminicio"),
-        p_embalagemfim: getText("txt_embalagemfim"),
-        p_embalagempausa: getChecked("chk_embalagem"),
-        p_embalagemresp: getText("txt_embalagemid"),
-        p_avulso: getChecked("chk_acessoriosavulsos"),
-        p_avulsol: getText("txt_acessoriosavulsosl"),
-        p_avulsoq: getText("txt_acessoriosavulsosq"),
-        p_cabide: getChecked("chk_cabide"),
-        p_cabidel: getText("txt_cabidel"),
-        p_cabideq: getText("txt_cabideq"),
-        p_paineis: getChecked("chk_paineis"),
-        p_paineisl: getText("txt_paineisl"),
-        p_paineisq: getText("txt_paineisq"),
-        p_pecaspintadas: getChecked("chk_pecapintura"),
-        p_pecaspintadasl: getText("txt_pecapintural"),
-        p_pecaspintadasq: getText("txt_pecapinturaq"),
-        p_portaaluminio: getChecked("chk_portaaluminio"),
-        p_portaaluminiol: getText("txt_portaaluminiol"),
-        p_portaaluminioq: getText("txt_portaaluminioq"),
-        p_serralheria: getChecked("chk_serralheria"),
-        p_serralherial: getText("txt_serralherial"),
-        p_serralheriaq: getText("txt_serralheriaq"),
-        p_tapecaria: getChecked("chk_tapecaria"),
-        p_tapecarial: getText("txt_tapecarial"),
-        p_tapecariaq: getText("txt_tapecariaq"),
-        p_trilho: getChecked("chk_trilhos"),
-        p_trilhol: getText("txt_trilhosl"),
-        p_trilhoq: getText("txt_trilhosq"),
-        p_vidros: getChecked("chk_vidroespelho"),
-        p_vidrosl: getText("txt_vidroespelhol"),
-        p_vidrosq: getText("txt_vidroespelhoq"),
-        p_volmod: getChecked("chk_volumesmodulacao"),
-        p_modulosl: getText("txt_volumesmodulacaol"),
-        p_modulosq: getText("txt_volumesmodulacaoq"),
-        p_totalvolumes: getText("txt_volmod"),
-        p_tamanho: getText("txt_tamanho"),
-        p_observacoes: getText("txt_observacoes"),
+        p_ordemdecompra: Dom.getValue("txt_numoc"),
+        p_pronto: Dom.getValue("txt_pronto"),
+        p_entrega: Dom.getValue("txt_entrega"),
+        p_pendencia: Dom.getChecked("chk_pendencia"),
+        p_parcial: Dom.getChecked("chk_parcial"),
+        p_separacao: Dom.getValue("txt_separacao"),
+        p_conferido: Dom.getValue("txt_prontoid"),
+        p_motorista: Dom.getValue("txt_entregaid"),
+        p_embalageminicio: Dom.getValue("txt_embalageminicio"),
+        p_embalagemfim: Dom.getValue("txt_embalagemfim"),
+        p_embalagempausa: Dom.getChecked("chk_embalagem"),
+        p_embalagemresp: Dom.getValue("txt_embalagemid"),
+        p_avulso: Dom.getChecked("chk_acessoriosavulsos"),
+        p_avulsol: Dom.getValue("txt_acessoriosavulsosl"),
+        p_avulsoq: Dom.getValue("txt_acessoriosavulsosq"),
+        p_cabide: Dom.getChecked("chk_cabide"),
+        p_cabidel: Dom.getValue("txt_cabidel"),
+        p_cabideq: Dom.getValue("txt_cabideq"),
+        p_paineis: Dom.getChecked("chk_paineis"),
+        p_paineisl: Dom.getValue("txt_paineisl"),
+        p_paineisq: Dom.getValue("txt_paineisq"),
+        p_pecaspintadas: Dom.getChecked("chk_pecapintura"),
+        p_pecaspintadasl: Dom.getValue("txt_pecapintural"),
+        p_pecaspintadasq: Dom.getValue("txt_pecapinturaq"),
+        p_portaaluminio: Dom.getChecked("chk_portaaluminio"),
+        p_portaaluminiol: Dom.getValue("txt_portaaluminiol"),
+        p_portaaluminioq: Dom.getValue("txt_portaaluminioq"),
+        p_serralheria: Dom.getChecked("chk_serralheria"),
+        p_serralherial: Dom.getValue("txt_serralherial"),
+        p_serralheriaq: Dom.getValue("txt_serralheriaq"),
+        p_tapecaria: Dom.getChecked("chk_tapecaria"),
+        p_tapecarial: Dom.getValue("txt_tapecarial"),
+        p_tapecariaq: Dom.getValue("txt_tapecariaq"),
+        p_trilho: Dom.getChecked("chk_trilhos"),
+        p_trilhol: Dom.getValue("txt_trilhosl"),
+        p_trilhoq: Dom.getValue("txt_trilhosq"),
+        p_vidros: Dom.getChecked("chk_vidroespelho"),
+        p_vidrosl: Dom.getValue("txt_vidroespelhol"),
+        p_vidrosq: Dom.getValue("txt_vidroespelhoq"),
+        p_volmod: Dom.getChecked("chk_volumesmodulacao"),
+        p_modulosl: Dom.getValue("txt_volumesmodulacaol"),
+        p_modulosq: Dom.getValue("txt_volumesmodulacaoq"),
+        p_totalvolumes: Dom.getValue("txt_volmod"),
+        p_tamanho: Dom.getValue("txt_tamanho"),
+        p_observacoes: Dom.getValue("txt_observacoes"),
       };
 
       const response = await fetch("/setDataExpedicao", {
@@ -328,14 +327,14 @@ async function setDataExpedicao() {
 
 async function getDataFilterExp() {
   const data = await getConfig(1);
-  setText("txt_datafilter", data[0].p_data);
+  Dom.setValue("txt_datafilter", data[0].p_data);
   fillTable();
 }
 
 async function setDataFilterExp() {
   const data = {
     p_id: 1,
-    p_date: getText("txt_datafilter"),
+    p_date: Dom.getValue("txt_datafilter"),
   };
   await setConfig(data);
 }
@@ -348,11 +347,11 @@ function handleClickCheckbox() {
   const operation = ["embalagem"];
 
   operation.forEach((item) => {
-    addEventBySelector(`#chk_${item}inicio`, "click", () =>
+    Dom.addEventBySelector(`#chk_${item}inicio`, "click", () =>
       setarDataHora(`#chk_${item}inicio`, `txt_${item}inicio`)
     );
 
-    addEventBySelector(`#chk_${item}fim`, "click", () =>
+    Dom.addEventBySelector(`#chk_${item}fim`, "click", () =>
       setarDataHora(`#chk_${item}fim`, `txt_${item}fim`)
     );
   });
@@ -391,33 +390,33 @@ document.addEventListener("DOMContentLoaded", (event) => {
   filltableUsuarios();
 });
 
-addEventBySelector("#table", "dblclick", handleClick);
-addEventBySelector("#txt_datafilter", "blur", fillTable);
-addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
-addEventBySelector("#bt_salvar", "click", setDataExpedicao);
+Dom.addEventBySelector("#table", "dblclick", handleClick);
+Dom.addEventBySelector("#txt_datafilter", "blur", fillTable);
+Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
+Dom.addEventBySelector("#bt_salvar", "click", setDataExpedicao);
 
-addEventBySelector("#txt_embalagemid", "blur", () =>
-  getUsuario(getText("txt_embalagemid"), "txt_embalagemresp")
+Dom.addEventBySelector("#txt_embalagemid", "blur", () =>
+  getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp")
 );
 
-addEventBySelector("#txt_prontoid", "blur", () =>
-  getUsuario(getText("txt_prontoid"), "txt_prontoresp")
+Dom.addEventBySelector("#txt_prontoid", "blur", () =>
+  getUsuario(Dom.getValue("txt_prontoid"), "txt_prontoresp")
 );
 
-addEventBySelector("#txt_entregaid", "blur", () =>
-  getUsuario(getText("txt_entregaid"), "txt_entregaresp")
+Dom.addEventBySelector("#txt_entregaid", "blur", () =>
+  getUsuario(Dom.getValue("txt_entregaid"), "txt_entregaresp")
 );
 
-addEventBySelector(`#chk_pronto`, "click", () =>
+Dom.addEventBySelector(`#chk_pronto`, "click", () =>
   setDate(`#chk_pronto`, `txt_pronto`)
 );
 
-addEventBySelector(`#chk_entrega`, "click", () =>
+Dom.addEventBySelector(`#chk_entrega`, "click", () =>
   setDate(`#chk_entrega`, `txt_entrega`)
 );
 
-addEventBySelector(`#chk_separacao`, "click", () =>
+Dom.addEventBySelector(`#chk_separacao`, "click", () =>
   setDateTime(`#chk_separacao`, `txt_separacao`)
 );
 
-addEventBySelector("#bt_funcionarios", "click", getUsuarios);
+Dom.addEventBySelector("#bt_funcionarios", "click", getUsuarios);

@@ -1,20 +1,17 @@
 import {
-  setText,
-  getText,
-  setFocus,
+  Dom,
   formatValueDecimal,
   getGroupedData,
   loadPage,
-  allUpperCase,
   enableEnterAsTab,
   changeFormatCurrency,
-  addEventBySelector,
   messageInformation,
   messageQuestion,
+  applyDateMask,
 } from "./utils.js";
 
 async function getContrato() {
-  const contrato_value = document.getElementById("txt_contrato").value;
+  const contrato_value = Dom.getValue("txt_contrato");
   if (!contrato_value) {
     return;
   }
@@ -28,16 +25,16 @@ async function getContrato() {
     } else {
       const data = await response.json();
       data.forEach((item) => {
-        setText("txt_cliente", item.p_cliente);
-        setText("txt_vendedor", item.p_vendedor);
-        setText("txt_liberador", item.p_liberador);
-        setText("txt_datacontrato", item.p_datacontrato);
-        setText("txt_dataassinatura", item.p_dataassinatura);
-        setText("txt_chegoufabrica", item.p_chegoufabrica);
-        setText("txt_dataentrega", item.p_dataentrega);
-        setText("txt_loja", item.p_loja);
-        setText("txt_tipocliente", item.p_tipocliente);
-        setText("txt_etapa", item.p_etapa);
+        Dom.setValue("txt_cliente", item.p_cliente);
+        Dom.setValue("txt_vendedor", item.p_vendedor);
+        Dom.setValue("txt_liberador", item.p_liberador);
+        Dom.setValue("txt_datacontrato", item.p_datacontrato);
+        Dom.setValue("txt_dataassinatura", item.p_dataassinatura);
+        Dom.setValue("txt_chegoufabrica", item.p_chegoufabrica);
+        Dom.setValue("txt_dataentrega", item.p_dataentrega);
+        Dom.setValue("txt_loja", item.p_loja);
+        Dom.setValue("txt_tipocliente", item.p_tipocliente);
+        Dom.setValue("txt_etapa", item.p_etapa);
       });
     }
   }
@@ -47,26 +44,30 @@ async function insertProject() {
   const result = await messageQuestion(null, "Deseja incluir novo Projeto ?");
 
   if (result.isConfirmed) {
-    const contrato = getText("txt_contrato");
-    const numoc = getText("txt_numoc");
-    const cliente = getText("txt_cliente");
-    const tipoambiente = getText("txt_tipoambiente");
-    const ambiente = getText("txt_ambiente");
-    const numproj = getText("txt_numproj");
-    const vendedor = getText("txt_vendedor");
-    const liberador = getText("txt_liberador");
-    const datacontrato = getText("txt_datacontrato");
-    const dataassinatura = getText("txt_dataassinatura");
-    const chegoufabrica = getText("txt_chegoufabrica");
-    const dataentrega = getText("txt_dataentrega");
-    const loja = getText("txt_loja");
-    const tipocliente = getText("txt_tipocliente");
-    const etapa = getText("txt_etapa");
-    const tipocontrato = getText("txt_tipocontrato");
-    const valorbruto = formatValueDecimal(getText("txt_valorbruto"));
-    const valornegociado = formatValueDecimal(getText("txt_valornegociado"));
-    const customaterial = formatValueDecimal(getText("txt_customaterial"));
-    const custoadicional = formatValueDecimal(getText("txt_custoadicional"));
+    const contrato = Dom.getValue("txt_contrato");
+    const numoc = Dom.getValue("txt_numoc");
+    const cliente = Dom.getValue("txt_cliente");
+    const tipoambiente = Dom.getValue("txt_tipoambiente");
+    const ambiente = Dom.getValue("txt_ambiente");
+    const numproj = Dom.getValue("txt_numproj");
+    const vendedor = Dom.getValue("txt_vendedor");
+    const liberador = Dom.getValue("txt_liberador");
+    const datacontrato = Dom.getValue("txt_datacontrato");
+    const dataassinatura = Dom.getValue("txt_dataassinatura");
+    const chegoufabrica = Dom.getValue("txt_chegoufabrica");
+    const dataentrega = Dom.getValue("txt_dataentrega");
+    const loja = Dom.getValue("txt_loja");
+    const tipocliente = Dom.getValue("txt_tipocliente");
+    const etapa = Dom.getValue("txt_etapa");
+    const tipocontrato = Dom.getValue("txt_tipocontrato");
+    const valorbruto = formatValueDecimal(Dom.getValue("txt_valorbruto"));
+    const valornegociado = formatValueDecimal(
+      Dom.getValue("txt_valornegociado")
+    );
+    const customaterial = formatValueDecimal(Dom.getValue("txt_customaterial"));
+    const custoadicional = formatValueDecimal(
+      Dom.getValue("txt_custoadicional")
+    );
 
     const data = {
       p_contrato: contrato,
@@ -105,7 +106,10 @@ async function insertProject() {
         "success",
         "Sucesso",
         "Projeto inserido com Sucesso !!!"
-      );
+      ).then(() => {
+        Dom.clearInputFields(["txt_contrato"]);
+        Dom.setFocus("txt_contrato");
+      });
     }
   }
 }
@@ -116,13 +120,14 @@ window.formatarMoeda = function (e) {
 
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("adicionar_projetos", "add_projetos.html");
-  setFocus("txt_contrato");
+  Dom.setFocus("txt_contrato");
   getGroupedData("getGroupedAmbiente", "txt_tipoambiente", "tipo_ambiente");
   getGroupedData("getGroupedLiberador", "liberadores", "p_liberador");
   getGroupedData("getGroupedVendedor", "vendedores", "p_vendedor");
-  allUpperCase();
+  Dom.allUpperCase();
   enableEnterAsTab();
 });
 
-addEventBySelector("#txt_contrato", "blur", getContrato);
-addEventBySelector("#bt_salvar", "click", insertProject);
+Dom.addEventBySelector("#txt_contrato", "blur", getContrato);
+Dom.addEventBySelector("#bt_salvar", "click", insertProject);
+Dom.addEventBySelector("#txt_numproj", "input", applyDateMask);
