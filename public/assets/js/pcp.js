@@ -224,7 +224,7 @@ async function gerarLote() {
           entrega,
           lote,
         });
-        // await setLote(numOC, lote);
+        await setLote(numOC, lote);
       }
       exportarParaExcel(lista, "ConfolhaLote.xlsx", "ConfolhaLote");
 
