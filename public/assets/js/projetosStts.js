@@ -42,6 +42,7 @@ async function fillTable() {
         const tr = document.createElement("tr");
 
         tr.classList.add("open-modal-row");
+        tr.classList.add("fw-bold");
 
         const cor_status = colorStatus(item.status);
         const cor_a = colorAcessorios(item.total);

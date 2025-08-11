@@ -20,6 +20,7 @@ import {
   checkPrevisao,
   getOperadores,
   getIndexColumnValue,
+  getCookie,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -42,6 +43,7 @@ async function fillTable() {
     data.forEach((item) => {
       const tr = document.createElement("tr");
       tr.classList.add("open-modal-row");
+      tr.classList.add("fw-bold");
 
       const corStatus = colorStatus(item.status);
       const corA = colorAcessorios(item.total);
@@ -66,7 +68,9 @@ async function fillTable() {
           checkValue(item.dataentrega)
         )}</td>
         <td style="text-align: center;">${checkValue(item.lote)}</td>
-        <td style="text-align: center; ${corStatus}">${item.status}</td>
+        <td class="fw-bold" style="text-align: center; ${corStatus}">${
+        item.status
+      }</td>
         <td style="text-align: center;">${convertDataBr(
           checkValue(item.iniciado)
         )}</td>
@@ -417,8 +421,18 @@ async function filltableUsuarios() {
   });
 }
 
+async function checkCookie() {
+  const teste = await getCookie("id");
+  if (!teste) {
+    window.location.href = "index.html";
+  } else {
+    console.log(`valor ${teste}`);
+  }
+}
+
 document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
+  checkCookie();
   loadPage("producao", "projetos_prd.html");
   fillTable();
   filltableUsuarios();

@@ -41,6 +41,7 @@ async function fillTable() {
       const tr = document.createElement("tr");
 
       tr.classList.add("open-modal-row");
+      tr.classList.add("fw-bold");
 
       var cor_corte = checkText(item.scorte);
       var cor_custom = checkText(item.scustom);

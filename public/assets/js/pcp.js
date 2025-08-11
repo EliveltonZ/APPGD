@@ -1,4 +1,3 @@
-import Swal from "./sweetalert2.esm.all.min.js";
 import {
   Dom,
   loadPage,
@@ -8,6 +7,7 @@ import {
   exportarParaExcel,
   messageQuestion,
   messageInformation,
+  convertDataBr,
 } from "./utils.js";
 
 function convertDate(date) {
@@ -157,6 +157,7 @@ async function getProjetosLote() {
             <td ${config}>${item.p_codcc}</td>
             <td>${item.p_cliente}</td>
             <td>${item.p_ambiente}</td>
+            <td ${config}>${convertDataBr(item.p_dataentrega)}</td>
             <td ${config}><input type='checkbox'/></td>
             `;
       tbody.appendChild(tr);
@@ -204,10 +205,29 @@ async function gerarLote() {
     }
 
     try {
+      const lista = [];
+      const lote = Dom.getValue("txt_gerar_lote");
       for (const linha of checkboxesMarcados) {
-        const numOC = linha.querySelector("td:first-child").textContent;
-        await setLote(numOC, lote);
+        const colunas = linha.querySelectorAll("td");
+
+        const numOC = colunas[0]?.textContent.trim();
+        const codCC = colunas[2]?.textContent.trim();
+        const pedido = colunas[1]?.textContent.trim();
+        const ambiente = colunas[4]?.textContent.trim();
+        const cliente = colunas[3]?.textContent.trim();
+        const entrega = colunas[5]?.textContent.trim();
+        lista.push({
+          codCC,
+          pedido,
+          ambiente,
+          cliente,
+          entrega,
+          lote,
+        });
+        // await setLote(numOC, lote);
       }
+      exportarParaExcel(lista, "ConfolhaLote.xlsx", "ConfolhaLote");
+
       messageInformation("success", "Sucesso", "Lote gerado com sucesso!");
     } catch (err) {
       messageInformation(

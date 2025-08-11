@@ -110,6 +110,7 @@ route.put("/alterarSenha", senhaController.alterarSenha);
 
 // rotas acessos pagina
 route.post("/setPermission", usuariosController.setPermissions);
+route.post("/clearPermissions", usuariosController.clearPermissions);
 route.get("/checkPermission", usuariosController.checkPermissao);
 
 route.get("/user-data", (req, res) => {

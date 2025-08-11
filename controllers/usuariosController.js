@@ -30,7 +30,21 @@ function checkPermissao(req, res) {
   }
 }
 
+// Ex.: POST /clearPermission
+function clearPermissions(req, res) {
+  res.clearCookie("dadosUsuario", {
+    // assinado: não é obrigatório aqui, mas pode manter por organização
+    signed: true,
+    // se você tiver usado path/domain ao setar, repita-os aqui:
+    // path: "/",
+    // domain: "seu-dominio.com",
+  });
+
+  return res.status(200).json({ mensagem: "Cookie removido com sucesso" });
+}
+
 module.exports = {
   setPermissions,
   checkPermissao,
+  clearPermissions,
 };

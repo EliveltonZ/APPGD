@@ -325,17 +325,24 @@ export async function loadPage(accessKey, page) {
     if (!response.ok) throw new Error("Não autenticado");
 
     const permissoes = await response.json();
-    const temAcesso = Boolean(permissoes[accessKey]);
+    const valorPermissao = permissoes[accessKey];
+
     const currentPage = window.location.pathname.split("/").pop();
 
-    if (temAcesso && currentPage !== page) {
-      window.location.href = `/${page}`;
-    } else if (!temAcesso && currentPage !== "error.html") {
-      window.location.href = "error.html";
+    if (typeof valorPermissao === "boolean") {
+      if (valorPermissao && currentPage !== page) {
+        window.location.href = `/${page}`;
+      } else if (!valorPermissao && currentPage !== "error.html") {
+        window.location.href = "erro.html";
+      }
+    } else {
+      if (currentPage !== "index.html") {
+        window.location.href = "index.html";
+      }
     }
   } catch (err) {
     console.error("Erro ao verificar permissão:", err);
-    window.location.href = "error.html";
+    window.location.href = "index.html";
   }
 }
 
