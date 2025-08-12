@@ -309,35 +309,35 @@ async function buttonReadCodeBar() {
 }
 
 Dom.addEventBySelector("#bt_salvar", "click", setDataProducao);
-Dom.addEventBySelector("#txt_corteid", "blur", () =>
+Dom.addEventBySelector("#txt_corteid", "change", () =>
   getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp")
 );
 
-Dom.addEventBySelector("#txt_customizacaoid", "blur", () =>
+Dom.addEventBySelector("#txt_customizacaoid", "change", () =>
   getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp")
 );
 
-Dom.addEventBySelector("#txt_coladeiraid", "blur", () =>
+Dom.addEventBySelector("#txt_coladeiraid", "change", () =>
   getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp")
 );
 
-Dom.addEventBySelector("#txt_usinagemid", "blur", () =>
+Dom.addEventBySelector("#txt_usinagemid", "change", () =>
   getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp")
 );
 
-Dom.addEventBySelector("#txt_montagemid", "blur", () =>
+Dom.addEventBySelector("#txt_montagemid", "change", () =>
   getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp")
 );
 
-Dom.addEventBySelector("#txt_paineisid", "blur", () =>
+Dom.addEventBySelector("#txt_paineisid", "change", () =>
   getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp")
 );
 
-Dom.addEventBySelector("#txt_acabamentoid", "blur", () =>
+Dom.addEventBySelector("#txt_acabamentoid", "change", () =>
   getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp")
 );
 
-Dom.addEventBySelector("#txt_embalagemid", "blur", () =>
+Dom.addEventBySelector("#txt_embalagemid", "change", () =>
   getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp")
 );
 

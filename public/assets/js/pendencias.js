@@ -88,7 +88,7 @@ async function fillTableAcessorios() {
   }
 }
 
-function Dom.getValueLowCase(element) {
+function getTextLowCase(element) {
   let value = document.getElementById(element).value;
   return value === "" ? null : value;
 }

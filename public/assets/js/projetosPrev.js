@@ -20,9 +20,9 @@ import { enableTableFilterSort } from "./filtertable.js";
 
 function checkText(item) {
   if (item === "FINALIZADO") {
-    return "color: green;";
+    return "color: rgb(70, 136, 0);";
   } else if (item === "INICIADO") {
-    return "color: yellow";
+    return "color:rgb(194, 184, 6)";
   }
 }
 

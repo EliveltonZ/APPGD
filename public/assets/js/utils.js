@@ -469,7 +469,7 @@ export function checkPrevisao(firtItem, secondItem) {
 
 export function colorAcessorios(item) {
   if (item > 0) {
-    return "color:rgb(255, 242, 0)";
+    return "color:rgb(194, 184, 6)";
   } else {
     return "color: rgb(70, 136, 0)";
   }
