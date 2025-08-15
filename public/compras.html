@@ -7,8 +7,7 @@
     <title>Compras</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=83067ddc06eab0bef8476bd58bc08874">
-    <link rel="stylesheet" href="assets/css/animate.min.min.css?h=5512c3e92e3931978c9ddcc7dbeed22b">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=608cf4d0e0c0bc646cb6ca0b486ae85b">
     <link rel="stylesheet" href="assets/css/compras.min.css?h=b898cc0bc6c845895d37634858e7eba7">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=64b5582ae63e835f5a4449eec1bc0391">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
@@ -18,6 +17,7 @@
 
 <body style="font-family: 'Nunito Sans', sans-serif;">
     <div style="display: flex; flex-direction: column; height:100vh">
+        <div class="d-flex justify-content-end align-items-center" style="margin: initial;margin-top: 10px;margin-right: 10px;margin-left: 10px;"><label class="form-label" style="margin: 0px;">Entrega Maior que:&nbsp;</label><input id="txt_datafilter" type="date" style="width: 140px;text-align: center;"></div>
         <h1 class="text-center text-primary" style="margin: 20px;text-shadow: 0px 0px 7px;">RELATÓRIO DE COMPRAS</h1>
         <div class="table-responsive">
             <table class="table" id="table">

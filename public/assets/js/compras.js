@@ -11,82 +11,157 @@ import {
   createModal,
   messageInformation,
   messageQuestion,
+  getConfig,
+  setConfig,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
 
 async function getAcessoriosCompras() {
-  const response = await fetch("/getAcessoriosCompras");
+  const tbody = document.querySelector("tbody"); // ajuste para um seletor mais específico se houver várias tabelas
+  if (!tbody) return;
 
-  if (!response.ok) {
-    messageInformation(
-      "error",
-      `Não foi possível carregar dados ${error.message}`
+  // Estado de carregamento
+  tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Carregando…</td></tr>`;
+
+  // ===== Helpers =====
+  const collator = new Intl.Collator("pt-BR", {
+    sensitivity: "base",
+    numeric: true,
+  });
+
+  // Converte nulos/undefined para string; garante tipo string
+  const s = (v) => (v ?? "").toString();
+
+  // Escape simples para evitar XSS ao usar innerHTML
+  const esc = (str) =>
+    s(str).replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }[c])
     );
-    return;
-  } else {
+
+  // Converte para Date confiável; retorna null se inválida
+  const toDate = (v) => {
+    if (!v) return null;
+    const d = new Date(v);
+    return Number.isNaN(d.getTime()) ? null : d;
+  };
+
+  // Formata data BR (vazio se inválida)
+  const fmtDateBR = (v) => {
+    const d = toDate(v);
+    return d ? d.toLocaleDateString("pt-BR") : "";
+  };
+
+  // Comparadores
+  const compareDate = (a, b) => {
+    const da = toDate(a);
+    const db = toDate(b);
+    if (da && db) return da - db; // mais antiga primeiro
+    if (da && !db) return -1; // com data vem antes de sem data
+    if (!da && db) return 1;
+    return 0;
+  };
+
+  const compareStr = (a, b) => collator.compare(s(a), s(b));
+
+  const compareItem = (a, b) => {
+    // 1) dataentrega
+    const byDate = compareDate(a.dataentrega, b.dataentrega);
+    if (byDate !== 0) return byDate;
+
+    // 2) cliente
+    const byCliente = compareStr(a.cliente, b.cliente);
+    if (byCliente !== 0) return byCliente;
+
+    // 3) ambiente
+    const byAmbiente = compareStr(a.ambiente, b.ambiente);
+    if (byAmbiente !== 0) return byAmbiente;
+
+    // 4) categoria
+    const byCategoria = compareStr(a.categoria, b.categoria);
+    if (byCategoria !== 0) return byCategoria;
+
+    // 5) descricao
+    return compareStr(a.descricao, b.descricao);
+  };
+  // ===== Fim helpers =====
+
+  try {
+    const response = await fetch(
+      `/getAcessoriosCompras?p_dataentrega=${Dom.getValue("txt_datafilter")}`
+    );
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
     const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Formato de resposta inválido");
 
-    const sorted = data.sort((a, b) => {
-      const dateA = new Date(a.dataentrega);
-      const dateB = new Date(b.dataentrega);
-      if (dateA - dateB !== 0) return dateA - dateB;
+    const sorted = data.slice().sort(compareItem);
 
-      const clienteComp = a.cliente.localeCompare(b.cliente);
-      if (clienteComp !== 0) return clienteComp;
+    if (sorted.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Sem registros</td></tr>`;
+      return;
+    }
 
-      const ambienteComp = a.ambiente.localeCompare(b.ambiente);
-      if (ambienteComp !== 0) return ambienteComp;
+    const rowsHtml = sorted
+      .map((item) => {
+        // Mantém compatibilidade: se seu colorStatus devolve CSS inline, preservamos o uso em style
+        const cor_status =
+          typeof colorStatus === "function" ? colorStatus(item.status) : "";
 
-      const categoriaComp = a.categoria.localeCompare(b.categoria);
-      if (categoriaComp !== 0) return categoriaComp;
-
-      return a.descricao.localeCompare(b.descricao);
-    });
-
-    const tbody = document.querySelector("tbody");
-    tbody.innerHTML = "";
-
-    sorted.forEach((item) => {
-      const tr = document.createElement("tr");
-
-      tr.classList.add("open-modal-row");
-
-      const cor_status = colorStatus(item.status);
-
-      tr.innerHTML = `
-          <td style="text-align: center;">${checkValue(item.contrato)}</td>
-          <td>${checkValue(item.cliente)}</td>
-          <td>${checkValue(item.ambiente)}</td>
-          <td>${checkValue(item.descricao)}</td>
-          <td style="text-align: center;">${checkValue(item.medida)}</td>
-          <td style="text-align: center;">${checkValue(item.parcelamento)}</td>
-          <td style="text-align: center;">${checkValue(item.numcard)}</td>
-          <td style="text-align: center;">${checkValue(item.qtd)}</td>
-          <td>${checkValue(item.fornecedor)}</td>
-          <td style="text-align: center;">${convertDataBr(
-            checkValue(item.dataentrega)
+        return `
+        <tr class="open-modal-row">
+          <td style="text-align:center">${esc(item.contrato)}</td>
+          <td>${esc(item.cliente)}</td>
+          <td>${esc(item.ambiente)}</td>
+          <td>${esc(item.descricao)}</td>
+          <td style="text-align:center">${checkValue(esc(item.medida))}</td>
+          <td style="text-align:center">${checkValue(
+            esc(item.parcelamento)
           )}</td>
-          <td style="text-align: center;">${convertDataBr(
-            checkValue(item.datacompra)
+          <td style="text-align:center">${checkValue(esc(item.numcard))}</td>
+          <td style="text-align:center">${esc(item.qtd)}</td>
+          <td>${checkValue(esc(item.fornecedor))}</td>
+          <td style="text-align:center">${checkValue(
+            fmtDateBR(item.dataentrega)
           )}</td>
-          <td style="text-align: center;">${convertDataBr(
-            checkValue(item.previsao)
+          <td style="text-align:center">${checkValue(
+            fmtDateBR(item.datacompra)
           )}</td>
-          <td style="text-align: center;">${convertDataBr(
-            checkValue(item.recebido)
-          )}</td>      
-          <td style="text-align: center; ${cor_status};">${checkValue(
-        item.status
-      )}</td>  
-          <td>${checkValue(item.categoria)}</td>
-          <td style="text-align: center; display: none">${checkValue(
-            item.id
+          <td style="text-align:center">${checkValue(
+            fmtDateBR(item.previsao)
           )}</td>
-        `;
+          <td style="text-align:center">${checkValue(
+            fmtDateBR(item.recebido)
+          )}</td>
+          <td style="text-align:center; ${esc(cor_status)}">${esc(
+          item.status
+        )}</td>
+          <td>${esc(item.categoria)}</td>
+          <td style="text-align:center; display:none">${esc(item.id)}</td>
+        </tr>
+      `;
+      })
+      .join("");
 
-      tbody.appendChild(tr);
-    });
+    tbody.innerHTML = rowsHtml;
+  } catch (error) {
+    tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Erro ao carregar</td></tr>`;
+    if (typeof messageInformation === "function") {
+      messageInformation(
+        "error",
+        `Não foi possível carregar dados: ${error.message}`
+      );
+    } else {
+      console.error(error);
+    }
   }
 }
 
@@ -163,13 +238,32 @@ async function setAcessorios() {
   }
 }
 
+async function getDataFilterBuy() {
+  const data = await getConfig(3);
+  Dom.setValue("txt_datafilter", data[0].p_data);
+  getAcessoriosCompras();
+}
+
+async function setDataFilterExp() {
+  const data = {
+    p_id: 3,
+    p_date: Dom.getValue("txt_datafilter"),
+  };
+  await setConfig(data);
+}
+
+function setarDataHora(checkbox, text) {
+  setDateTime(checkbox, text);
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("compras", "compras.html");
-  getAcessoriosCompras();
+  getDataFilterBuy();
   onmouseover("table");
   onclickHighlightRow("table");
   enableTableFilterSort("table");
   Dom.allUpperCase();
 });
-
+Dom.addEventBySelector("#txt_datafilter", "blur", getAcessoriosCompras);
+Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
 Dom.addEventBySelector("#bt_update", "click", setAcessorios);
