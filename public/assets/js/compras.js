@@ -21,9 +21,6 @@ async function getAcessoriosCompras() {
   const tbody = document.querySelector("tbody"); // ajuste para um seletor mais específico se houver várias tabelas
   if (!tbody) return;
 
-  // Estado de carregamento
-  tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Carregando…</td></tr>`;
-
   // ===== Helpers =====
   const collator = new Intl.Collator("pt-BR", {
     sensitivity: "base",

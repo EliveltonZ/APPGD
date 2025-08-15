@@ -8,6 +8,7 @@ import {
   messageQuestion,
   messageInformation,
   convertDataBr,
+  formatValueDecimal,
 } from "./utils.js";
 
 function convertDate(date) {
@@ -78,17 +79,24 @@ async function getProjetoPcp() {
           Dom.setValue("txt_ambiente", element.p_ambiente),
           Dom.setValue("txt_numproj", element.p_numproj),
           Dom.setValue("txt_lote", element.p_lote),
-          Dom.setValue("txt_pedido", element.p_pedido),
+          Dom.setValue("txt_pedido", ifZero(element.p_pedido)),
           Dom.setValue("txt_chegada", convertDate(element.p_chegoufabrica)),
           Dom.setValue("txt_entrega", convertDate(element.p_dataentrega)),
           Dom.setValue("txt_tipo", element.p_tipo),
-          Dom.setValue("txt_pecas", element.p_peças),
-          Dom.setValue("txt_area", element.p_area);
+          Dom.setValue("txt_pecas", ifZero(element.p_peças)),
+          Dom.setValue("txt_area", ifZero(element.p_area));
       });
     }
   } else {
     Dom.clearInputFields();
   }
+}
+
+function ifZero(value) {
+  if (value == 0) {
+    return null;
+  }
+  return value;
 }
 
 async function setProjetoPcp() {
@@ -103,7 +111,7 @@ async function setProjetoPcp() {
       p_pedido: Dom.getValue("txt_pedido"),
       p_tipo: Dom.getValue("txt_tipo"),
       p_pecas: Dom.getValue("txt_pecas"),
-      p_area: Dom.getValue("txt_area"),
+      p_area: formatValueDecimal(Dom.getValue("txt_area")),
     };
 
     const response = await fetch("/setProjetoPcp", {
