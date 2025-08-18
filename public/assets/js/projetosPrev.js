@@ -254,7 +254,7 @@ async function filltableUsuarios() {
 document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("previsao", "projetos_prev.html");
+  loadPage("previsao", "previsoes.html");
   fillTable();
   onmouseover("table");
   enableTableFilterSort("table");

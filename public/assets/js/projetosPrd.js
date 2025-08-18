@@ -433,7 +433,7 @@ async function checkCookie() {
 document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
   checkCookie();
-  loadPage("producao", "projetos_prd.html");
+  loadPage("producao", "producao.html");
   fillTable();
   filltableUsuarios();
   enableTableFilterSort("table");

@@ -45,7 +45,11 @@ async function getDeleteProjetos() {
         );
       });
     } else {
-      messageInformation("error", "Erro", "Ordem de Compra Invalida");
+      messageInformation("error", "Erro", "Ordem de Compra Invalida").then(
+        () => {
+          Dom.setFocus("txt_numoc");
+        }
+      );
     }
   }
 }
@@ -63,22 +67,21 @@ async function setDeleteProjeto() {
     if (!response.ok) {
       messageInformation("error", "Erro", "Digite a ordem de compra");
     } else {
-      messageInformation(
+      await messageInformation(
         "success",
         "Sucesso",
         "Projeto excluido com Sucesso !!!"
       );
-      Dom.clearInputFields();
-      Dom.setFocus("txt_numoc");
+      document.location.href = "/excluir.html";
     }
   }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("adicionar_projetos", "delete_projetos.html");
+  loadPage("adicionar_projetos", "excluir.html");
   Dom.setFocus("txt_numoc");
   enableEnterAsTab();
 });
 
-Dom.addEventBySelector("#txt_numoc", "blur", getDeleteProjetos);
+Dom.addEventBySelector("#txt_numoc", "change", getDeleteProjetos);
 Dom.addEventBySelector("#bt_delete", "click", setDeleteProjeto);

@@ -1,0 +1,132 @@
+id,login,senha,setor,adicionar_projetos,producao,expedicao,adicionar_usuarios,acesso,definicoes,pcp,previsao,compras,ativo,producao_assistencia,solicitar_assistencia,valores,logistica,camiseta,calca,sapato,local
+-1,ADMINISTRADOR,090894,DESENVOLVEDOR,true,true,true,true,true,true,true,true,true,true,true,true,true,true,,,,DESENVOLVEDOR
+0," -",,,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,
+1,ELIVELTON GONZAGA,090894,PCP,true,true,true,true,true,true,true,true,true,true,true,true,true,true,M,40,42,FABRICA
+2,MATHEUS ROSSINI,123456,DIREÇÃO,true,true,true,true,true,true,true,true,true,true,true,true,true,true,,,,LOGISTICA
+3,ALDACIR DUARTE,GERA5500,GERENCIA,true,true,true,false,false,true,false,true,true,true,false,false,false,false,,,,FABRICA
+4,UMBERTO ANDRADE,716425,COMPRAS,true,true,true,true,true,true,true,true,true,true,true,true,true,true,G,G,41,FABRICA
+5,LEANDRO GUIMARÃES,123456,PCP,true,true,false,false,false,true,true,false,false,true,false,false,false,false,G,44,42,FABRICA
+6,ADAILTON FIGUEIRA,123456,COLADEIRA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,M,P,38,FABRICA
+7,CELSO PINHEIRO,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+8,DANIEL RODRIGUES,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,true,false,false,false,false,XG,XG,45,FABRICA
+9,DENILSON PEDROSO,123456,COLADEIRA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,G,42,38,FABRICA
+10,EDUARDO HANNA,123456,AJUDANTE,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+11,ELDER NOLASCO,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,40,41,FABRICA
+12,VALDEMAR BARROS,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+13,ERIC ROBERTO,160420,MONTAGEM,false,true,true,false,false,true,false,true,false,true,true,true,false,false,GG,46,42,FABRICA
+14,EVARISTO LIMA,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,G,42,42,FABRICA
+15,IRISVALDO SOUZA,123456,MOTORISTA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+16,JEFF BETSHON,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+17,JEFFERSON BARBOSA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+18,JONATHAN RIBEIRO,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+19,JOSE BONIFACIO,2003,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,true,false,true,true,true,false,false,GG,G,41,FABRICA
+20,JOSE MARCOS,123456,ALMOXARIFADO,true,true,false,false,false,true,false,false,false,true,false,false,false,false,G,M,39,FABRICA
+21,JOSE NILTON,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,44,42,FABRICA
+22,JOSIVALDO SANTINO,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,M,42,38,FABRICA
+23,LAILTON JONATHAN,123456,USINAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+24,LEANDRO SANTOS,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+25,LEANDRO MARTINS,190605,LIDER PRODUÇÃO,true,true,true,false,false,true,false,true,true,true,true,false,false,false,GG,50,44,FABRICA
+26,LUCIANO NOGUEIRA,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+27,MARCELO SCATOLIN,123456,MANUTENÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,GG,XG,41,FABRICA
+28,MARCOS ROCHA,101418,LIDER QUALIDADE,true,true,true,false,false,true,true,true,false,true,true,true,false,false,M,M,41,FABRICA
+29,MURILO COSTA,123456,CNC,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,G,44,FABRICA
+30,ODAIR DUARTE,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,G,44,41,FABRICA
+31,PAULO HENRIQUE,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+32,RAFAEL ALMEIDA,123456,CNC,true,false,false,false,false,true,false,false,false,true,false,false,false,false,M,42,40,FABRICA
+33,REUTON GONÇALVES,0609,ASSISTÊNCIAS,false,false,true,false,false,false,false,true,false,true,true,true,false,false,XG,XG,42,FABRICA
+34,THIAGO VICENTE,101323,ALMOXARIFADO,false,false,false,false,false,false,false,false,false,false,true,false,false,false,GG,P,40,FABRICA
+35,MAGNO BARBOSA,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,50,41,FABRICA
+36,WESLEY DA COSTA,123456,CNC,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+37,EVERTON DO VALE,123456,EMBALAGEM,false,false,true,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+38,RODRIGO ALBERONE,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+39,ANTONIO JOVIANO,123456,MOTORISTA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+40,MIGUEL SOUZA,123456,MONTADOR,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+41,TAVINO DE JESUS,123456,MONTADOR,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+42,LARISSA BIANCA,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOGISTICA
+43,ANA SOUZA,01062021,LOGISTICA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,LOGISTICA
+44,EDNEI MORE,220397,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+45,MARCOS VINICIUS,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,P,42,FABRICA
+46,MATHEUS FILIPE,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+47,ADAILTON PEREIRA,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+48,ROBSON NASCIMENTO,123456,PRODUCAO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+49,NICOLAS DA SILVA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+50,WILLIAM CARDEAL,258025,PCP,true,true,true,true,true,true,true,true,false,false,true,true,false,true,,,,FABRICA
+51,JOHNATAN VAZ,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,40,39,FABRICA
+52,WALLACE SANTOS,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+53,JOSE GOMES,123456,PRODUCÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+54,NATAN SILVA,960249552,PCP,false,false,false,false,false,false,false,true,false,false,false,false,false,false,M,P,41,FABRICA
+55,JOSE ALEXANDRE,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+56,THIAGO NASCIMENTO,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+57,DANIEL MESQUITA,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+58,GABRIEL OLIVEIRA,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,G,40,40,FABRICA
+59,BRENER RODRIGUES,123456,ESCRITORIO,true,true,false,false,false,true,true,false,false,false,false,false,false,false,,,,FABRICA
+60,VAGNER ALVEZ,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,46,40,FABRICA
+61,DAVI DE OLIVEIRA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,XG,XG,45,FABRICA
+62,LEONARDO OLIVEIRA,123456,EMBALAGEM,false,false,true,false,false,false,false,false,false,true,false,false,false,false,M,M,41,FABRICA
+63,ROSE ROSSINI,123456,GERENCIA,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOGISTICA
+64,CARLOS HENRIQUE,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+65,JOSE LEONARDO,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,G,41,FABRICA
+66,MARCOS GABRIEL,123456,EXPEDIÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+67,HENRIQUE SALGADO,123456,EXPEDIÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+68,CRISTIANO DA SILVA,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,48,42,FABRICA
+69,NILDETE RODRIGUES,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+70,EUDES BASTISTA,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+71,DAVID LUIZ,123456,CNC,false,false,false,false,false,false,false,false,false,true,false,false,false,false,M,42,39,FABRICA
+72,PAULO MACIEL,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+73,DIEGO SILVA,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+74,JEFFERSON SIMOES,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+75,CHRISTIAN RODRIGUES,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,GG,44,42,FABRICA
+76,GILMAR EVANGELISTA,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+77,AUSTER LOPES,123456,LOGISTICA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,LOGISTICA
+78,ANDERSON SIQUEIRA,123456,MONTAGEM,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOGISTICA
+79,DIEGO APARECIDO,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+80,HIGOR SOUZA,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+81,ANDERSON OLIVEIRA,123456,EXPEDIÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,LOGISTICA
+82,KAIO CASTRO,123456,PCP,true,true,true,false,false,true,true,true,false,false,true,false,false,false,,,,FABRICA
+83,GABRIEL MEDEIROS,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,true,false,false,false,false,M,42,42,FABRICA
+84,JOSEMAR OLIVEIRA,798481,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+85,HIGOR SANTOS,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+86,PEREIRA DEPOSITO,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,LOGISTICA
+87,HENRY LEANDRO,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,46,42,FABRICA
+88,RENAN FERREIRA,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+89,JOSE LUCIANO,123456,PRODUÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,M,40,38,FABRICA
+90,GLADSTONE DA SILVA,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,40,39,FABRICA
+91,JOSE LUCIANO,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,,,,FABRICA
+92,CAIO VINICIUS,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,XG,XG,44,FABRICA
+93,LEANDRO DA SILVA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,40,41,FABRICA
+94,JESSICA DA SILVA,123456,LIBERAÇÃO,true,false,false,false,false,true,false,true,true,true,false,false,false,false,,,,FABRICA
+95,PEDRO BATISTA,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOGISTICA
+96,KAIQUE DA SILVA,123456,EMBALAGEM,false,false,true,false,false,false,false,true,false,true,false,false,false,false,M,G,41,FABRICA
+97,RAFAEL MIRANDA,123456,CUSTOMIZAÇÃO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,XG,54,42,FABRICA
+98,PEDRO HENRIQUE,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,GG,41,FABRICA
+99,LUIZ GUSTAVO,123456,MONTADOR,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,40,43,FABRICA
+100,MATHEUS ALVES,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,M,M,40,FABRICA
+101,JACKSON ROGERIO,,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,G,41,FABRICA
+102,VANDERSON ANJOS,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,G,G,42,FABRICA
+103,ALICE REGINA,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+104,ROSELI TONELI,590520,GERENTE PROJETO,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOJA
+105,EDUARDO MEDEIROS,123456,COLADEIRA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,M,42,39,FABRICA
+106,ALEX SANDRO MARQUES,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,G,G,42,FABRICA
+107,FRANCISCO VIANNA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,40,G,41,FABRICA
+108,VICTOR CORREA,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,false,false,false,false,false,GG,G,42,FABRICA
+109,STEFAN GABRIEL,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,false,false,false,false,false,42,G,40,FABRICA
+110,HERBERT CANIETTO,123456,SECCIONADORA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,GG,G,42,FABRICA
+111,NOBOX,123456,,true,true,true,true,false,true,true,true,false,true,true,true,false,true,,,,
+112,PAULA,123456,CONSULTORIA,true,true,true,true,true,true,true,true,false,true,false,true,false,false,,,,LOGISTICA
+113,LUIZ CARLOS,123456,MONTAGEM,false,false,false,false,false,false,true,false,false,true,false,false,false,false,GG,48,39,FABRICA
+114,ISABELLY AMORIM,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+115,VICTOR NASCIMENTO,123456,TI,true,true,true,true,true,true,true,true,false,true,true,true,true,true,,,,TI
+116,IARA SOARES,123456,ASSIST. LOGISTICA,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,
+117,ANSELMO CAIQUE,123456,CUSTOMIZACAO,false,false,false,false,false,false,false,false,false,false,false,false,false,false,M,M,39,FABRICA
+118,MAICON SOUZA,123456,EMBALAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,FABRICA
+119,LEONARDO MUNIZ,123456,MONTAGEM,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,FABRICA
+120,IARA SOARES,123456,LOGISTICA,false,false,true,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+121,VITOR PROCOPIO,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+122,SOLANGE CORREA,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+123,HENRIQUE COSTA,123456,MARCENEIRO,true,true,false,false,false,false,false,false,false,true,true,false,false,false,XG,GG,40,FABRICA
+124,JORDY ISRAEL,123456,PRODUCAO,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,FABRICA
+125,ANTONIO SANTOS,123456,MONTADOR,false,false,false,false,false,false,false,false,false,true,false,false,false,false,,,,FABRICA
+126,ALVARO CAVALCANTE,123456,SUPERVISOR,true,false,false,false,true,false,false,true,false,true,false,true,false,false,,,,LOGISTICA
+127,JAMERSON CESAR,123456,QUALIDADE,true,true,true,false,false,true,true,true,false,true,false,false,false,false,,,,FABRICA
+128,VALQUIRIA ALVES,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,true,,,,LOGISTICA
+129,BEATRIZ REIS,123456,LOGISTICA,false,false,false,false,false,false,false,true,false,true,false,true,false,false,,,,LOGISTICA

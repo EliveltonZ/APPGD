@@ -494,6 +494,7 @@ export function messageInformation(icon, title, message) {
     icon: icon,
     title: title,
     html: message,
+    returnFocus: false,
   });
   return dialog;
 }
@@ -511,6 +512,7 @@ export async function messageQuestion(
     showDenyButton: true,
     denyButtonText: cancelButtonText,
     confirmButtonText: confirmButtonText,
+    returnFocus: false,
   });
   return result;
 }

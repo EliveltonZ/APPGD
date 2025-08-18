@@ -122,7 +122,7 @@ window.formatarMoeda = function (e) {
 };
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("adicionar_projetos", "edit_projetos.html");
+  loadPage("adicionar_projetos", "editar.html");
   Dom.setFocus("txt_numoc");
   getGroupedData("getGroupedAmbiente", "txt_tipoambiente", "tipo_ambiente");
   getGroupedData("getGroupedLiberador", "liberadores", "p_liberador");

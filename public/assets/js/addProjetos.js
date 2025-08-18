@@ -102,14 +102,13 @@ async function insertProject() {
       const errText = await response.text();
       messageInformation("error", "Erro", "Erro ao inserir dados: " + errText);
     } else {
-      messageInformation(
+      await messageInformation(
         "success",
         "Sucesso",
         "Projeto inserido com Sucesso !!!"
-      ).then(() => {
-        Dom.clearInputFields(["txt_contrato"]);
-        Dom.setFocus("txt_contrato");
-      });
+      );
+      Dom.clearInputFields(["txt_contrato"]);
+      Dom.setFocus("txt_contrato");
     }
   }
 }
@@ -119,7 +118,7 @@ window.formatarMoeda = function (e) {
 };
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("adicionar_projetos", "add_projetos.html");
+  loadPage("adicionar_projetos", "adicionar.html");
   Dom.setFocus("txt_contrato");
   getGroupedData("getGroupedAmbiente", "txt_tipoambiente", "tipo_ambiente");
   getGroupedData("getGroupedLiberador", "liberadores", "p_liberador");

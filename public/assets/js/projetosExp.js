@@ -381,7 +381,7 @@ async function filltableUsuarios() {
 document.addEventListener("resize", ajustarTamanhoModal);
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("expedicao", "projetos_exp.html");
+  loadPage("expedicao", "expedicao.html");
   enableEnterAsTab();
   getDataFilterExp();
   onmouseover("table");

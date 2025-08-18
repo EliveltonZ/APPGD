@@ -64,7 +64,7 @@ async function insertUser() {
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("adicionar_usuarios", "add_users.html");
+  loadPage("adicionar_usuarios", "usuarios.html");
   Dom.allUpperCase();
   getMaxId();
   Dom.setFocus("txt_login");
