@@ -226,7 +226,6 @@ async function setAcessorios() {
     const errText = await response.text();
     messageInformation("error", "ERRO", `erro ao salvar alterações ${errText}`);
   } else {
-    await getAcessoriosCompras();
     messageInformation(
       "success",
       "Sucesso",
