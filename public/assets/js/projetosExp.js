@@ -240,13 +240,24 @@ async function getExpedicao(ordemdecompra) {
       Dom.setValue("txt_observacoes", item.observacoes);
       Dom.setChecked("chk_embalageminicio", false);
       Dom.setChecked("chk_embalagemfim", false);
+      Dom.setChecked("chk_etapas", item.etapa);
+      Dom.setInnerHtml("txt_etapas", setEtapa(item.etapa, "txt_etapas"));
     });
   }
 }
 
+function setEtapa(value, element) {
+  const item = document.getElementById(element);
+  if (value) {
+    item.style.color = "green";
+    return "CONCLUIDO";
+  }
+  item.style.color = "red";
+  return "EM ABERTO";
+}
+
 async function setDataExpedicao() {
   const result = await messageQuestion(null, "Deseja confirmar Alterações?");
-
   if (result.isConfirmed) {
     try {
       const data = {
@@ -296,6 +307,17 @@ async function setDataExpedicao() {
         p_tamanho: Dom.getValue("txt_tamanho"),
         p_observacoes: Dom.getValue("txt_observacoes"),
       };
+
+      if (!Dom.getChecked("chk_etapas")) {
+        if (Dom.getValue("txt_pronto") || Dom.getValue("txt_entrega")) {
+          messageInformation(
+            "warning",
+            "ATENÇÃO",
+            "Projeto com etapas em ABERTO"
+          );
+          return;
+        }
+      }
 
       const response = await fetch("/setDataExpedicao", {
         method: "PUT",

@@ -421,18 +421,8 @@ async function filltableUsuarios() {
   });
 }
 
-async function checkCookie() {
-  const teste = await getCookie("id");
-  if (!teste) {
-    window.location.href = "index.html";
-  } else {
-    console.log(`valor ${teste}`);
-  }
-}
-
 document.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
-  checkCookie();
   loadPage("producao", "producao.html");
   fillTable();
   filltableUsuarios();

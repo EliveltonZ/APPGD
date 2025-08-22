@@ -154,6 +154,7 @@ async function getAcessoriosCompras() {
     if (typeof messageInformation === "function") {
       messageInformation(
         "error",
+        "ERRO",
         `Não foi possível carregar dados: ${error.message}`
       );
     } else {
@@ -260,6 +261,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   enableTableFilterSort("table");
   Dom.allUpperCase();
 });
+
 Dom.addEventBySelector("#txt_datafilter", "blur", getAcessoriosCompras);
 Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
 Dom.addEventBySelector("#bt_update", "click", setAcessorios);

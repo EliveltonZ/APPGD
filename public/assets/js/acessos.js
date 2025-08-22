@@ -24,7 +24,7 @@ async function getUserAccess() {
 
     const u = await response.json();
     const item = u[0];
-
+    console.log(item);
     if (!item) {
       throw new Error("Nenhum dado recebido");
     }
@@ -48,7 +48,7 @@ async function getUserAccess() {
     Dom.setChecked("chk_solicitacao", item.solicitacao);
     Dom.setChecked("chk_prodass", item.prodass);
     Dom.setChecked("chk_valores", item.valores);
-    Dom.setChecked("chk_logistica", item.logistica);
+    Dom.setChecked("chk_dashboard", item.dashboard);
   } catch (err) {
     messageInformation(
       "error",
@@ -88,7 +88,7 @@ async function setUserAccess() {
       p_solicitacao: Dom.getChecked("chk_solicitacao"),
       p_prodass: Dom.getChecked("chk_prodass"),
       p_valores: Dom.getChecked("chk_valores"),
-      p_logistica: Dom.getChecked("chk_logistica"),
+      p_dashboard: Dom.getChecked("chk_dashboard"),
     };
 
     const response = await fetch("/setUserAccess", {
