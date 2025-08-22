@@ -68,6 +68,7 @@ async function passwordValidation(event) {
 
   if (hasData) {
     setDataUsuario(data[0]);
+    localStorage.setItem("teste", "concluido");
     window.location.href = "/menu.html";
   } else {
     const pwdInput = document.getElementById("password");
@@ -96,7 +97,7 @@ async function setDataUsuario(user) {
       producao_assistencia: user.producao_assistencia,
       solicitar_assistencia: user.solicitar_assistencia,
       valores: user.valores,
-      logistica: user.logistica,
+      dashboard: user.dashboard,
     };
 
     const response = await fetch("/setPermission", {

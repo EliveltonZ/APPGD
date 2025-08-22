@@ -135,7 +135,7 @@ async function clearDataUsuario() {
       producao_assistencia: null,
       solicitar_assistencia: null,
       valores: null,
-      logistica: null,
+      dashboard: null,
     };
 
     const response = await fetch("/setPermission", {
@@ -165,6 +165,26 @@ async function setType(p_ordemdecompra, p_tipo, p_urgente) {
   }
 }
 
+async function dashboardPermission() {
+  const element = document.getElementById("dashboard");
+  try {
+    const response = await fetch("/checkPermission", {
+      credentials: "include",
+    });
+
+    if (!response.ok) throw new Error("Não autenticado");
+
+    const permissoes = await response.json();
+    const valorPermissao = permissoes["dashboard"];
+
+    if (valorPermissao) {
+      window.location.href = "https://dashboardgd.streamlit.app/";
+    } else {
+      messageInformation("error", "ERRO", "Usuario sem Permissão");
+    }
+  } catch {}
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
   Dom.setData("txt_data");
   exibirNome();
@@ -173,3 +193,4 @@ document.addEventListener("DOMContentLoaded", (event) => {
 Dom.addEventBySelector("#link_logout", "click", logout);
 Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
 Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
+Dom.addEventBySelector("#dashboard", "click", dashboardPermission);
