@@ -182,7 +182,9 @@ async function dashboardPermission() {
     } else {
       messageInformation("error", "ERRO", "Usuario sem Permissão");
     }
-  } catch {}
+  } catch (erro) {
+    messageInformation("error", "ERRO", `ERRO: ${erro.message}`);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
