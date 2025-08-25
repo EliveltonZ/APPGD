@@ -8,7 +8,7 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=a9b21c13d520cd7e7d1c3f07c96922f7">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=1c674a732a2697eaa76bc12ea2762b03">
     <link rel="stylesheet" href="assets/css/menu.min.css?h=07e18addde8961c8bf5c55a9f2e52359">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
 <link rel="icon" href="/assets/img/icone.png">
@@ -50,8 +50,8 @@
                                 <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="senha.html"><i class="fas fa-lock fs-5 me-2"></i><span>Senha</span></a></li>
                                 <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="usuarios.html"><i class="fas fa-user-plus fs-5 me-2"></i><span>Novo Usuário</span></a></li>
                                 <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="acessos.html"><i class="fas fa-key fs-5 me-2"></i><span>Acessos</span></a></li>
-                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="#" id="dashboard-1"><i class="fas fa-chart-line fs-5 me-2"></i><span>Dashboards</span></a></li>
-                                <li class="nav-item mt-4"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 small menu-link" data-bss-hover-animate="pulse" href="#" id="link_logout-1"><i class="fas fa-power-off me-2"></i><span id="txt_usuario-1">Usuário</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" id="dashboard" href="#"><i class="fas fa-chart-line fs-5 me-2"></i><span>Dashboards</span></a></li>
+                                <li class="nav-item mt-4"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 small menu-link" data-bss-hover-animate="pulse" id="link_logout" href="#"><i class="fas fa-power-off me-2"></i><span class="text-nowrap" id="txt_usuario" style="font-size: 13px;">Usuário</span></a></li>
                             </ul>
                         </div>
                     </nav>
