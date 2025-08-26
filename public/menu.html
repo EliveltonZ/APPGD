@@ -8,8 +8,8 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=368be9d2bbb5fd22e01756741ecebe57">
-    <link rel="stylesheet" href="assets/css/menu.min.css?h=1dc56c42f4147d9e3e6714fb20ff25a9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=05f15be95a9820c97577d3981ec6e2fb">
+    <link rel="stylesheet" href="assets/css/menu.min.css?h=fbbad05c71c3b82ab38119ed479d490d">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
 <link rel="icon" href="/assets/img/icone.png">
     <script type="module" src="assets/js/menu.js"></script>
@@ -20,7 +20,7 @@
         <nav class="navbar align-items-start" id="navbar">
             <div class="container-fluid d-flex">
                 <div class="d-flex w-100">
-                    <nav class="navbar" id="menu" style="width: 100%;">
+                    <nav class="navbar" id="menu">
                         <div class="container-fluid">
                             <ul class="navbar-nav" id="accordionSidebar" style="width: 100%;">
                                 <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="adicionar.html"><i class="fas fa-plus-circle fs-5 me-2"></i><span>Novo Projeto</span></a></li>
