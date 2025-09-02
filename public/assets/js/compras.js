@@ -1,8 +1,8 @@
 import {
   Dom,
   checkValue,
-  convertDataBr,
-  convertDataISO,
+  convertDataBr, // continua disponível se você usar em outro lugar
+  convertDataISO, // idem (não usamos abaixo para evitar timezone)
   getColumnValue,
   onmouseover,
   onclickHighlightRow,
@@ -22,6 +22,7 @@ async function getAcessoriosCompras() {
   if (!tbody) return;
 
   // ===== Helpers =====
+
   const collator = new Intl.Collator("pt-BR", {
     sensitivity: "base",
     numeric: true,
@@ -44,26 +45,64 @@ async function getAcessoriosCompras() {
         }[c])
     );
 
-  // Converte para Date confiável; retorna null se inválida
-  const toDate = (v) => {
-    if (!v) return null;
-    const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? null : d;
+  // ======== PARSERS/FORMATADORES "TIMEZONE-SAFE" PARA DATAS PURAS ========
+
+  // tenta "YYYY-MM-DD"
+  const parseYMD = (str) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(str || "").trim());
+    if (!m) return null;
+    const y = +m[1],
+      mo = +m[2],
+      d = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    return { y, mo, d };
   };
 
-  // Formata data BR (vazio se inválida)
+  // tenta "DD/MM/YYYY"
+  const parseDMY = (str) => {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(str || "").trim());
+    if (!m) return null;
+    const d = +m[1],
+      mo = +m[2],
+      y = +m[3];
+    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+    return { y, mo, d };
+  };
+
+  // aceita DMY ou YMD
+  const parseDateParts = (v) => parseYMD(v) || parseDMY(v) || null;
+
+  // chave numérica YYYYMMDD para ordenar sem usar Date
+  const dateKey = (v) => {
+    const p = parseDateParts(v);
+    return p ? p.y * 10000 + p.mo * 100 + p.d : null;
+  };
+
+  // formata em pt-BR (DD/MM/YYYY) sem converter fuso
   const fmtDateBR = (v) => {
-    const d = toDate(v);
-    return d ? d.toLocaleDateString("pt-BR") : "";
+    const p = parseDateParts(v);
+    if (!p) return "";
+    const dd = String(p.d).padStart(2, "0");
+    const mm = String(p.mo).padStart(2, "0");
+    return `${dd}/${mm}/${p.y}`;
   };
 
-  // Comparadores
+  // converte DD/MM/YYYY -> YYYY-MM-DD (para <input type="date">) sem usar Date
+  const toISOFromBR = (dmy) => {
+    const p = parseDMY(dmy);
+    if (!p) return ""; // mantém vazio se inválido
+    const dd = String(p.d).padStart(2, "0");
+    const mm = String(p.mo).padStart(2, "0");
+    return `${p.y}-${mm}-${dd}`;
+  };
+
+  // ===== Comparadores =====
   const compareDate = (a, b) => {
-    const da = toDate(a);
-    const db = toDate(b);
-    if (da && db) return da - db; // mais antiga primeiro
-    if (da && !db) return -1; // com data vem antes de sem data
-    if (!da && db) return 1;
+    const ka = dateKey(a);
+    const kb = dateKey(b);
+    if (ka != null && kb != null) return ka - kb; // mais antiga primeiro
+    if (ka != null && kb == null) return -1; // com data vem antes de sem data
+    if (ka == null && kb != null) return 1;
     return 0;
   };
 
@@ -109,7 +148,6 @@ async function getAcessoriosCompras() {
 
     const rowsHtml = sorted
       .map((item) => {
-        // Mantém compatibilidade: se seu colorStatus devolve CSS inline, preservamos o uso em style
         const cor_status =
           typeof colorStatus === "function" ? colorStatus(item.status) : "";
 
@@ -161,9 +199,28 @@ async function getAcessoriosCompras() {
       console.error(error);
     }
   }
+
+  // ==== funções internas expostas para outros trechos (fillElement) ====
+  // Tornamos helpers acessíveis fora deste escopo, caso o bundler não "suba" os escopos.
+  getAcessoriosCompras._fmtDateBR = fmtDateBR;
+  getAcessoriosCompras._toISOFromBR = toISOFromBR;
 }
 
+// Atualiza os campos do modal com os valores da linha clicada
 function fillElement(element) {
+  // se os helpers foram anexados em getAcessoriosCompras(), usamos daqui
+  const toISOFromBR =
+    (getAcessoriosCompras && getAcessoriosCompras._toISOFromBR) ||
+    ((d) => {
+      // fallback local (repete a lógica caso ainda não exista)
+      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(d || "").trim());
+      if (!m) return "";
+      const dd = m[1],
+        mm = m[2],
+        y = m[3];
+      return `${y}-${mm}-${dd}`;
+    });
+
   const id = getColumnValue(element, 15);
   const contrato = getColumnValue(element, 0);
   const cliente = getColumnValue(element, 1);
@@ -174,9 +231,12 @@ function fillElement(element) {
   const cartao = getColumnValue(element, 6);
   const quantidade = getColumnValue(element, 7);
   const fornecedor = getColumnValue(element, 8);
-  const compra = convertDataISO(getColumnValue(element, 10));
-  const previsao = convertDataISO(getColumnValue(element, 11));
-  const recebido = convertDataISO(getColumnValue(element, 12));
+
+  // as colunas 10, 11, 12 são exibidas como DD/MM/YYYY
+  const compra = toISOFromBR(getColumnValue(element, 10));
+  const previsao = toISOFromBR(getColumnValue(element, 11));
+  const recebido = toISOFromBR(getColumnValue(element, 12));
+
   Dom.setValue("txt_id", id);
   Dom.setValue("txt_contrato", contrato);
   Dom.setValue("txt_cliente", cliente);
@@ -212,6 +272,7 @@ async function setAcessorios() {
     p_numcard: Dom.getValue("txt_cartao"),
     p_qtd: Dom.getValue("txt_quantidade"),
     p_fornecedor: Dom.getValue("txt_fornecedor"),
+    // IMPORTANTE: inputs type="date" devem estar em YYYY-MM-DD
     p_datacompra: Dom.getValue("txt_compra"),
     p_previsao: Dom.getValue("txt_previsao"),
     p_recebido: Dom.getValue("txt_recebido"),
@@ -262,6 +323,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
   Dom.allUpperCase();
 });
 
+// atualiza lista e salva filtro ao sair do campo de data
 Dom.addEventBySelector("#txt_datafilter", "blur", getAcessoriosCompras);
 Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
 Dom.addEventBySelector("#bt_update", "click", setAcessorios);
