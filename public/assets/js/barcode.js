@@ -303,9 +303,15 @@ function setDateTimeSetor(barcode) {
 }
 
 async function buttonReadCodeBar() {
-  const returns = await modalBarCode();
-  setDateTimeSetor(returns);
-  Dom.setValue("txt_scan", "");
+  try {
+    const result = await modalBarCode();
+    const pedido = Number(result.slice(0, 6));
+    Dom.setValue("txt_pedido", pedido);
+    await getProducaoPedido(result);
+    await setDateTimeSetor(result);
+  } catch (erro) {
+    messageInformation("error", "ERRO", `ERRO: ${erro.message}`);
+  }
 }
 
 Dom.addEventBySelector("#bt_salvar", "click", setDataProducao);

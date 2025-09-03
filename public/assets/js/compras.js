@@ -1,8 +1,6 @@
 import {
   Dom,
   checkValue,
-  convertDataBr, // continua disponível se você usar em outro lugar
-  convertDataISO, // idem (não usamos abaixo para evitar timezone)
   getColumnValue,
   onmouseover,
   onclickHighlightRow,
