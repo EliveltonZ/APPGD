@@ -270,7 +270,6 @@ async function setAcessorios() {
     p_numcard: Dom.getValue("txt_cartao"),
     p_qtd: Dom.getValue("txt_quantidade"),
     p_fornecedor: Dom.getValue("txt_fornecedor"),
-    // IMPORTANTE: inputs type="date" devem estar em YYYY-MM-DD
     p_datacompra: Dom.getValue("txt_compra"),
     p_previsao: Dom.getValue("txt_previsao"),
     p_recebido: Dom.getValue("txt_recebido"),

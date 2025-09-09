@@ -319,31 +319,48 @@ export function createModal(modal) {
 export async function loadPage(accessKey, page) {
   try {
     const response = await fetch("/checkPermission", {
-      credentials: "include",
+      credentials: "same-origin", // se for mesmo domínio, prefira same-origin
+      cache: "no-store", // Safari às vezes cacheia agressivamente
     });
 
     if (!response.ok) throw new Error("Não autenticado");
 
     const permissoes = await response.json();
-    const valorPermissao = permissoes[accessKey];
+    const valorPermissao = permissoes?.[accessKey];
 
-    const currentPage = window.location.pathname.split("/").pop();
+    const current = normalizePage(window.location.pathname);
+    const targetAllowed = "/" + normalizeFile(page); // ex.: "/previsoes.html"
+    const targetDenied = "/erro.html";
+    const targetIndex = "/index.html";
 
     if (typeof valorPermissao === "boolean") {
-      if (valorPermissao && currentPage !== page) {
-        window.location.href = `/${page}`;
-      } else if (!valorPermissao && currentPage !== "error.html") {
-        window.location.href = "erro.html";
+      if (valorPermissao) {
+        if (current !== targetAllowed) location.replace(targetAllowed);
+      } else {
+        if (current !== targetDenied) location.replace(targetDenied);
       }
     } else {
-      if (currentPage !== "index.html") {
-        window.location.href = "index.html";
-      }
+      if (current !== targetIndex) location.replace(targetIndex);
     }
   } catch (err) {
     console.error("Erro ao verificar permissão:", err);
-    window.location.href = "index.html";
+    const current = normalizePage(window.location.pathname);
+    const targetIndex = "/index.html";
+    if (current !== targetIndex) location.replace(targetIndex);
   }
+}
+
+function normalizePage(pathname) {
+  // garante leading slash, e que "/" e "/foo/" virem "/index.html" e "/foo/index.html"
+  let p = pathname || "/";
+  if (!p.startsWith("/")) p = "/" + p;
+  if (p === "/" || p.endsWith("/")) p = p + "index.html";
+  return p.toLowerCase();
+}
+
+function normalizeFile(file) {
+  // só baixa pra comparar sem erros de maiúsculas
+  return (file || "").replace(/^\//, "").toLowerCase();
 }
 
 export function convertDecimal(num) {

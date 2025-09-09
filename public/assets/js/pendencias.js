@@ -213,13 +213,37 @@ async function insertAcessorios() {
   }
 }
 
+function checkCategory() {
+  const categoria = Dom.getValue("txt_categoria").toLowerCase();
+
+  if (categoria == "porta de aluminio" || categoria == "serralheria") {
+    const compra = new Date(Dom.getValue("txt_compra"));
+
+    if (isNaN(compra.getTime())) {
+      console.error("Data de compra inválida");
+      return;
+    }
+
+    let previsao = new Date(compra);
+
+    if (categoria == "porta de aluminio") {
+      previsao.setDate(compra.getDate() + 15);
+    } else if (categoria == "serralheria") {
+      previsao.setDate(compra.getDate() + 30);
+    }
+
+    const formattedDate = previsao.toISOString().split("T")[0];
+
+    Dom.setValue("txt_previsao", formattedDate);
+  }
+  return;
+}
+
 document.addEventListener("DOMContentLoaded", (event) => {
   Dom.setFocus("txt_contrato");
   loadPage("compras", "pendencias.html");
   enableEnterAsTab();
   onmouseover("table");
-  onmouseover("table-1");
-  onmouseover("");
   getGroupedData("getGroupedAcessorios", "txt_categoria", "p_categoria");
 });
 
@@ -228,3 +252,4 @@ Dom.addEventBySelector("#bt_adicionar", "click", insertAcessorios);
 Dom.addEventBySelector("#table", "click", handleTableClick);
 Dom.addEventBySelector("#table-1", "dblclick", getLineItens);
 Dom.addEventBySelector("#table-1", "click", handleDeleteButtonClick);
+Dom.addEventBySelector("#txt_compra", "blur", checkCategory);

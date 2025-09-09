@@ -7,8 +7,8 @@
     <title>Pendências</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=6894083681ff4220683718a4e86cf274">
-    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=64b5582ae63e835f5a4449eec1bc0391">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=0aa1462b2b68c10839574f1703e1f3c3">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=dae17248a715ac0019a1b4144c0ff9a7">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
 <link rel="icon" href="assets/img/icone.png">
     <script type="module" src="assets/js/pendencias.js"></script>
@@ -25,8 +25,8 @@
                 </div>
             </div>
             <div><label class="form-label text-center" style="display: block;margin-top: 10px;">Ambiente:</label>
-                <div class="table-responsive text-nowrap" id="table" style="font-size: 12px;max-height: 400px;">
-                    <table class="table table-sm">
+                <div class="table-responsive text-nowrap" style="font-size: 12px;max-height: 400px;">
+                    <table class="table table-sm" id="table">
                         <thead>
                             <tr>
                                 <th>OrdemdeCompra</th>
@@ -54,8 +54,8 @@
                     </div>
                 </div>
                 <div class="modal-body" style="font-size: 14px;">
-                    <div class="table-responsive text-nowrap" id="table-1" style="font-size: 12px;">
-                        <table class="table table-sm">
+                    <div class="table-responsive text-nowrap" style="font-size: 12px;">
+                        <table class="table table-sm" id="table-1">
                             <thead style="text-align: center;">
                                 <tr>
                                     <th>id</th>
@@ -92,7 +92,6 @@
         </div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
-    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
 
 </html>
