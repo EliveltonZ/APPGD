@@ -115,10 +115,10 @@ async function fillTableAcessorios(ordemdecompra) {
           item.qtd
         )}</td>
         <td style="font-size: 9px; text-align: center;">${convertDataBr(
-          checkValue(item.previsao)
+          checkValue(item.datacompra)
         )}</td>
         <td style="font-size: 9px; text-align: center;">${convertDataBr(
-          checkValue(item.datacompra)
+          checkValue(item.previsao)
         )}</td>
         <td style="font-size: 9px; text-align: center;">${convertDataBr(
           checkValue(item.recebido)

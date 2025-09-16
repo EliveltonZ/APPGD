@@ -30,12 +30,10 @@ function createRpcHandler(
       return res.json(payload);
     } catch (err) {
       console.error(`Erro interno [${remoteFunction}]:`, err);
-      return res
-        .status(500)
-        .json({
-          message: `Erro interno em ${remoteFunction}`,
-          error: err.message,
-        });
+      return res.status(500).json({
+        message: `Erro interno em ${remoteFunction}`,
+        error: err.message,
+      });
     }
   };
 }

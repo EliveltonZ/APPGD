@@ -230,7 +230,6 @@ function fillElement(element) {
   const quantidade = getColumnValue(element, 7);
   const fornecedor = getColumnValue(element, 8);
 
-  // as colunas 10, 11, 12 são exibidas como DD/MM/YYYY
   const compra = toISOFromBR(getColumnValue(element, 10));
   const previsao = toISOFromBR(getColumnValue(element, 11));
   const recebido = toISOFromBR(getColumnValue(element, 12));
