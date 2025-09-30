@@ -19,6 +19,7 @@ async function getContrato() {
   const response = await fetch(`/getContrato?p_contrato=${contrato_value}`);
 
   if (contrato_value != "") {
+    Dom.setValue("txt_loja", shopId());
     if (!response.ok) {
       const errText = await response.text();
       messageInformation("error", `erro ao executar consulta ${errText}`);
@@ -38,6 +39,10 @@ async function getContrato() {
       });
     }
   }
+}
+function shopId() {
+  const value = Dom.getValue("txt_contrato").slice(0, 3);
+  return value;
 }
 
 async function insertProject() {
