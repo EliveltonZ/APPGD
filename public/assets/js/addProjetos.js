@@ -45,7 +45,21 @@ function shopId() {
   return value;
 }
 
+function checkOrder() {
+  const value = Dom.getValue("txt_numoc").length;
+  return value;
+}
+
 async function insertProject() {
+  if (checkOrder() < 10) {
+    messageInformation(
+      "warning",
+      "Atenção",
+      `Ordem de compra invalida: caracteres ${checkOrder()}`
+    );
+    return;
+  }
+
   const result = await messageQuestion(null, "Deseja incluir novo Projeto ?");
 
   if (result.isConfirmed) {
@@ -135,3 +149,4 @@ document.addEventListener("DOMContentLoaded", (event) => {
 Dom.addEventBySelector("#txt_contrato", "blur", getContrato);
 Dom.addEventBySelector("#bt_salvar", "click", insertProject);
 Dom.addEventBySelector("#txt_numproj", "input", applyDateMask);
+Dom.addEventBySelector("#txt_numoc", "blur", checkOrder);
