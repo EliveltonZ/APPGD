@@ -40,6 +40,7 @@ async function getContrato() {
     }
   }
 }
+
 function shopId() {
   const value = Dom.getValue("txt_contrato").slice(0, 3);
   return value;
