@@ -58,6 +58,14 @@ async function getEditProjetos() {
   }
 }
 
+async function validForm(e) {
+  const form = document.querySelector("form");
+  if (form.checkValidity()) {
+    e.preventDefault();
+    await setEditProjetos();
+  }
+}
+
 async function setEditProjetos() {
   const result = await messageQuestion(null, "Deseja salvar edições ?");
 
@@ -132,4 +140,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 Dom.addEventBySelector("#txt_numoc", "blur", getEditProjetos);
-Dom.addEventBySelector("#bt_update", "click", setEditProjetos);
+Dom.addEventBySelector("#bt_salvar", "click", async (e) => {
+  validForm(e);
+});

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html data-bs-theme="auto" lang="pt-br" style="font-size: 12px;">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>APP GD</title>
+    <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=28dc1321f401b6dc7974f44e5226bfcc">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=dae17248a715ac0019a1b4144c0ff9a7">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
+    <link rel="stylesheet" href="assets/css/assistencias_prd.min.css?h=ecdb2fbe5aae5e0a85ed79940f872b66">
+<script type="module" src="./assets/js/assistencias.js"></script>
+</head>
+
+<body>
+    <div class="d-flex justify-content-end"><label class="form-label">Prazo maior que:&nbsp;</label><input type="date" style="text-align: center;"></div>
+    <h1 class="margin-0" style="text-align: center;height: 70px;width: 100%;">CONTROLE DE ASSISTÊNCIAS - PRODUÇÃO</h1>
+    <div class="table-responsive" style="height: calc(100vh - 96px);">
+        <table class="table" id="table">
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th class="text-center">Solicitação</th>
+                    <th class="text-center">Corte</th>
+                    <th class="text-center">Contrato</th>
+                    <th>Cliente</th>
+                    <th>Ambiente</th>
+                    <th class="text-center">Data</th>
+                    <th class="text-center">Prazo</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Iniciado</th>
+                    <th class="text-center">Previsão</th>
+                    <th class="text-center">Pronto</th>
+                    <th class="text-center">Entregue</th>
+                    <th class="text-nowrap text-center">Urgente</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">ASSISTÊNCIAS - PRODUÇÃO</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding-top: 0;padding-bottom: 0;padding-right: 30px;padding-left: 30px;">
+                    <form disabled="" style="padding: 0;border-style: none;">
+                        <div class="d-flex justify-content-between gap-3 margin-0">
+                            <div><label class="form-label text-center" style="width: 100%;">N° SOLICITAÇÃO:</label><input class="form-control text-center" type="text" id="txt_solicitacao" disabled=""></div>
+                            <div><label class="form-label text-center w-100">N° CONTRATO:</label><input class="form-control text-center" type="text" id="txt_contrato" disabled=""></div>
+                            <div style="min-width: 30%;"><label class="form-label text-center w-100">SOLICITANTE:</label><input class="form-control text-center" type="text" id="txt_solicitante" disabled=""></div>
+                            <div><label class="form-label text-center w-100">DATA E HORA:</label><input class="form-control text-center" type="text" id="txt_datasolicitacao" disabled=""></div>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3 margin-0">
+                            <div style="width: 90%;"><label class="form-label">CLIENTE:</label><input class="form-control" type="text" id="txt_cliente" disabled=""></div>
+                            <div><label class="form-label">PEDIDO:</label><input class="form-control text-center" type="text" id="txt_pedido"></div>
+                            <div><label class="form-label">CORTE:</label><input class="form-control text-center" type="text" id="txt_corte"></div>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3 margin-0">
+                            <div class="d-flex gap-3" style="width: 90%;"><label class="form-label">AMBIENTE:</label><input class="form-control" type="text" id="txt_ambiente" disabled=""></div>
+                            <div class="d-flex gap-3"><label class="form-label">SITUAÇÃO:</label><input class="form-control text-center" type="text" id="txt_situacao" disabled=""></div>
+                        </div>
+                        <div class="d-flex justify-content-between gap-3 margin-0">
+                            <div class="d-flex gap-3" style="width: 90%;"><label class="form-label">RESPONSÁVEL:</label><input class="form-control" type="text" id="txt_responsavel" disabled=""></div>
+                            <div class="d-flex gap-3"><label class="form-label">URGENTE:</label><input class="form-control text-center" type="text" id="txt_urgente" disabled=""></div>
+                        </div>
+                        <div><label class="form-label text-center w-100">OBSERVAÇÕES FABRICA:</label><textarea class="form-control" id="txt_obs_fabrica" style="height: 30px;"></textarea></div>
+                        <div><label class="form-label text-center w-100">OBSERVAÇÕES LOGISTICA:</label><textarea class="form-control" id="txt_obs_logistica" disabled="" style="height: 30px;"></textarea></div>
+                        <div class="d-flex justify-content-between margin-0">
+                            <div class="margin-0" style="min-width: 33%;">
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">INICIADO</label><input class="form-control" id="txt_iniciado" type="date" style="text-align: center;"></div>
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">PRONTO</label><input class="form-control" id="txt_pronto" type="date" style="text-align: center;"></div>
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">CONFERENTE</label><input class="form-control text-center" type="text" id="txt_conferente"></div>
+                            </div>
+                            <div class="margin-0" style="min-width: 33%;padding-left: 60px;">
+                                <div class="form-check" style="height: 29.66px;"><input class="form-check-input" type="checkbox" id="chk_escritorio"><label class="form-check-label" for="chk_escritorio">ESCRITORIO</label></div>
+                                <div class="form-check" style="height: 29.66px;"><input class="form-check-input" type="checkbox" id="chk_producao"><label class="form-check-label" for="chk_producao">PRODUÇÃO</label></div>
+                                <div class="form-check" style="height: 29.66px;"><input class="form-check-input" type="checkbox" id="chk_sem_material"><label class="form-check-label" for="chk_sem_material">SEM MATERIAL</label></div>
+                            </div>
+                            <div class="margin-0" style="min-width: 33%;">
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">LIBERADOR</label><input class="form-control text-center" id="txt_liberador"></div>
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">MOTORISTA</label><input class="form-control text-center" id="txt_motorista"></div>
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">ENTREGUE</label><input class="form-control" id="txt_entregue" type="date" style="text-align: center;"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3" style="padding-bottom: 20px;"><button class="btn btn-primary" id="bt_imprimir" type="button">Imprimir</button><button class="btn btn-primary" id="bt_salvar" type="button">Salvar</button><button class="btn btn-primary" id="bt_pdf" type="button">PDF</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div><iframe id="iframeImpressao" src="capa_assist.html" style="display:none;"></iframe>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+</body>
+
+</html>

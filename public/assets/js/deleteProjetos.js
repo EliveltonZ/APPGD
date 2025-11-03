@@ -54,6 +54,14 @@ async function getDeleteProjetos() {
   }
 }
 
+async function validForm(e) {
+  const form = document.querySelector("form");
+  if (form.checkValidity()) {
+    e.preventDefault();
+    await setDeleteProjeto();
+  }
+}
+
 async function setDeleteProjeto() {
   const result = await messageQuestion(null, "Deseja excluir Projeto ?");
 
@@ -84,4 +92,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 Dom.addEventBySelector("#txt_numoc", "change", getDeleteProjetos);
-Dom.addEventBySelector("#bt_delete", "click", setDeleteProjeto);
+Dom.addEventBySelector("#bt_salvar", "click", async (e) => {
+  validForm(e);
+});

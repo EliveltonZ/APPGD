@@ -1,0 +1,88 @@
+[data-bs-theme="dark"] .table-hover-row td {
+  background-color: rgba(0,0,0,.50) !important;
+}
+
+[data-bs-theme="light"] .table-hover-row td, html:not([data-bs-theme="dark"]) .table-hover-row td {
+  background-color: rgba(0,0,0,.20) !important;
+}
+
+[data-bs-theme="dark"] .table-click-row td {
+  background-color: rgba(0,0,0,.70) !important;
+}
+
+[data-bs-theme="light"] .table-click-row td, html:not([data-bs-theme="dark"]) .able-click-row td {
+  background-color: rgba(0,0,0,.35) !important;
+}
+
+[data-bs-theme="dark"] .bgcolor {
+  background: rgb(29,34,50);
+}
+
+[data-bs-theme="light"] .bgcolor {
+  background: #d0d0d0;
+}
+
+[data-bs-theme="dark"] .bgcolor-secundary {
+  background: #171b2b;
+}
+
+form div {
+  margin-top: 20px;
+}
+
+#div-form {
+  height: 100%;
+}
+
+.format-label {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.margin-0 {
+  margin: 0;
+}
+
+form {
+  padding: 30px;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 15px;
+}
+
+.table-responsive tbody {
+  max-height: 68px;
+  overflow-y: scroll;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+}
+
+body {
+  height: 100vh;
+}
+
+table {
+  overflow-y: scroll;
+}
+
+@media (max-width : 576px) {
+  .div-block {
+    display: block !important;
+  }
+}
+
+@media (max-width : 576px) {
+  #div-form {
+    display: block !important;
+  }
+}
+
+th {
+  font-size: 14px;
+}
+

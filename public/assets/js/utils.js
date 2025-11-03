@@ -3,8 +3,8 @@ import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 
 export class Dom {
   static getValue(element) {
-    const value = document.getElementById(element).value.toUpperCase();
-    return value === "" ? null : value;
+    const value = document.getElementById(element).value;
+    return value === "" ? null : value.toUpperCase();
   }
 
   static setValue(element, value) {
@@ -216,7 +216,7 @@ export async function getGroupedData(route, id_element, index_name) {
   } else {
     const data = await response.json();
     const element = document.getElementById(id_element);
-    element.innerHTML = '<option value="-">-</option>';
+    element.innerHTML = '<option value="">-</option>';
 
     data.forEach((item) => {
       const option = document.createElement("option");
@@ -782,7 +782,7 @@ export function criarSpinnerGlobal() {
     const style = document.createElement("style");
     style.id = "spinner-style";
     style.textContent = `
-      @keyframes spin {
+        @keyframes spin {
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
       }

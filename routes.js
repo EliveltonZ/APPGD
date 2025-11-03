@@ -20,6 +20,9 @@ const projetosSttsController = require("./controllers/projetosSttsController");
 const senhaController = require("./controllers/senhaController");
 const usuariosController = require("./controllers/usuariosController");
 const emailController = require("./controllers/emailController");
+const assistenciaController = require("./controllers/assistenciasController");
+const solicitacaoContgroller = require("./controllers/solicitacaoContgroller");
+const pecasController = require("./controllers/pecasController");
 
 // rota para envio de email
 route.post("/sendMail", emailController.sendMails);
@@ -112,6 +115,22 @@ route.put("/alterarSenha", senhaController.alterarSenha);
 route.post("/setPermission", usuariosController.setPermissions);
 route.post("/clearPermissions", usuariosController.clearPermissions);
 route.get("/checkPermission", usuariosController.checkPermissao);
+
+// rotas assistencias
+route.get("/getAssistencias", assistenciaController.getAssistencias);
+route.get("/getAssistencia", assistenciaController.getAssistencia);
+route.put("/setAssistencia", assistenciaController.setAssistencia);
+route.get("/getCapaAssistencia", assistenciaController.getCapaAssistencia);
+route.post("/setNewOrder", assistenciaController.setNewOrder);
+route.get("/getMontador", assistenciaController.getMontador);
+
+// rotas solicitacao
+route.get("/getConfig", solicitacaoContgroller.getConfig);
+
+// rotas pecas
+route.get("/getOcorrencia", pecasController.getOcorrencia);
+route.get("/getFalhas", pecasController.getFalhas);
+route.post("/setPecas", pecasController.setPecas);
 
 route.get("/user-data", (req, res) => {
   if (!req.session.user) {

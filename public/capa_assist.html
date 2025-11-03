@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="pt-br" data-bss-forced-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>APP GD</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=abc1dd562dbe540a4e6002770c6e1b47">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
+    <link rel="stylesheet" href="assets/css/stylesA.min.css?h=828b98500024455cdce4a5dd988b0bb5">
+<script type="module" src="./assets/js/capa_assist.js"></script>
+</head>
+
+<body class="d-flex justify-content-center" style="background: rgb(255,255,255);">
+    <div class="text-reset justify-content-center div-border-right div-border-top div-border-bottom div-border-left" id="impressao" style="width: 700px;font-size: 12px;background: #ffffff;">
+        <div class="d-flex justify-content-between div-border div-border-right div-border-left div-border-top div-border-bottom" style="width: 100%;margin-top: 4px;height: 48px;">
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-bottom div-border-top div-border-left" style="width: 18vh;"><img src="assets/img/Capturar.png?h=585181b55d7fbff25d723edd33ba6b19" style="width: 60%;height: 80%;"></div>
+            <div class="d-flex justify-content-center align-items-center" style="width: 88vh;background: #f78585;"><label class="form-label margin-0" style="color: var(--bs-gray-100);font-size: 26px;">CONTROLE DE ASSISTÊNCIAS TÉCNICAS</label></div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left" style="margin-top: 16px;">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center" style="width: 121px;"><label class="form-label fw-bold text-center margin-0">COD. CORTE CERTO:</label></div>
+                <div class="div-border-top" style="height: 35px;width: 121px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center div-border-left"><label class="form-label fw-bold text-center margin-0">CONTRATO:</label></div>
+                <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_contrato" style="margin-left: 5px;">...</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center div-border-left" style="background: var(--bs-yellow);"><label class="form-label fw-bold text-center margin-0">N° SOLICITAÇÃO:</label></div>
+                <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_solicitacao" style="margin-left: 5px;">...</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center div-border-left"><label class="form-label fw-bold text-center margin-0">DATA SOLICITAÇÃO:</label></div>
+                <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_datasolicitacao" style="margin-left: 5px;">...</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 70px;">
+                <div class="d-flex justify-content-center div-border-left"><label class="form-label fw-bold text-center margin-0">URGENTE</label></div>
+                <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" id="div-urgente" style="height: 35px;"><label class="form-label fw-bold margin-0" id="lb_urgente" style="margin-left: 5px;">...</label></div>
+            </div>
+        </div>
+        <div class="div-border-right div-border-top div-border-bottom div-border-left" style="margin-top: 10px;">
+            <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                    <div class="d-flex align-items-center" style="height: 35px;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">CLIENTE:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 348px;">
+                    <div class="d-flex align-items-center div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_cliente" style="margin-left: 5px;">...</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 15%;">
+                    <div class="d-flex align-items-center div-border-left" style="height: 35px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">PEDIDO:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 20%;">
+                    <div class="d-flex align-items-center div-border-left" style="height: 35px;width: 137.7px;"></div>
+                </div>
+            </div>
+            <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                    <div class="d-flex align-items-center div-border-top" style="height: 35px;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">AMBIENTE:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 348px;">
+                    <div class="d-flex align-items-center div-border-top div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_ambiente" style="margin-left: 5px;">...</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 15%;">
+                    <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">SOLICITANTE:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 20%;">
+                    <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" style="height: 35px;width: 137.7px;"><label class="form-label margin-0" id="lb_solicitante" style="margin-left: 5px;">...</label></div>
+                </div>
+            </div>
+            <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                    <div class="d-flex align-items-center div-border-top" style="height: 35px;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">MONTAGEM:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 348px;">
+                    <div class="d-flex align-items-center div-border-top div-border-left" style="height: 35px;"><label class="form-label margin-0" id="lb_montagem" style="margin-left: 5px;">...</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 15%;">
+                    <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">RESPONSÁVEL:</label></div>
+                </div>
+                <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 20%;">
+                    <div class="d-flex justify-content-center align-items-center div-border-top div-border-left" style="height: 35px;width: 137.7px;"><label class="form-label margin-0" id="lb_responsavel" style="margin-left: 5px;">...</label></div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-bottom" style="margin-top: 16px;">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex align-items-center" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold text-center w-100 margin-0">ETAPAS:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex align-items-center div-border-left" style="height: 35px;background: #BDD7EE;"><label class="form-label fw-bold text-center w-100 margin-0">INICIO:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex align-items-center div-border-left" style="height: 35px;background: #BDD7EE;"><label class="form-label fw-bold text-center w-100 margin-0">FIM:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 103px;">
+                <div class="d-flex align-items-center div-border-left" style="height: 35px;background: #BDD7EE;"><label class="form-label fw-bold text-center w-100 margin-0">RESPONSÁVEL</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 136px;">
+                <div class="d-flex align-items-center div-border-left" style="height: 35px;background: #BDD7EE;"><label class="form-label fw-bold text-center w-100 margin-0">PAUSA</label></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">CORTE:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">CUSTOMIZAÇÃO:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">COLADEIRA:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">USINAGEM:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">MONTAGEM:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">PAINEIS:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-top div-border-bottom div-border-left div-border-top">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #BDD7EE;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">EMBALAGEM:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 170px;">
+                <div class="d-flex justify-content-center align-items-end div-border-left div-border-top" style="height: 35px;"><label class="form-label margin-0" style="margin-left: 5px;">______/______/______ _____:_____</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 104px;">
+                <div class="d-flex align-items-center div-border-left div-border-top" style="height: 35px;"></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 22.3px;">
+                <div class="div-border-left div-border-top" style="height: 35px;width: 135px;"></div>
+            </div>
+        </div>
+        <div class="d-flex div-border-right div-border-bottom div-border-left" style="margin-top: 16px;">
+            <div class="div-border-right div-border-top div-border-bottom div-border-left">
+                <div class="d-flex justify-content-center align-items-center div-border-top" style="height: 35px;background: #F9ADAD;width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">ASTECA LIBERADA:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 247px;">
+                <div class="d-flex div-border-left div-border-top" style="height: 35px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">DATA:</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left"></div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 93px;">
+                <div class="d-flex justify-content-center align-items-center div-border-left div-border-top" style="height: 35px;background: #F9ADAD;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">SUPERVISOR</label></div>
+            </div>
+            <div class="div-border-right div-border-top div-border-bottom div-border-left" style="width: 20%;">
+                <div class="d-flex justify-content-center align-items-center div-border-left div-border-top" style="height: 35px;width: 239px;"><label class="form-label margin-0" id="lb_supervisor" style="margin-left: 5px;">...</label></div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center div-border-bottom" style="margin-top: 16px;height: 25px;background: #F9ADAD;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">EXPEDIÇÃO</label></div>
+        <div class="d-flex" style="height: 36px;">
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top div-border-left" style="height: 35px;width: 367px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES DE MODULAÇÃO / PEÇAS</label></div>
+            <div class="div-border-right div-border-top div-border-bottom" style="height: 35px;width: 91px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-right" style="height: 33px;width: 240px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">TOTAL DE VOLUMES:</label></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">ACESSORIOS AVULSO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 104px;"></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">PAINEIS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 104px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 11px;">DATA:</label></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">PORTA DE ALUMINIO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 104px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 11PX;">CONFERIDO POR:</label></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">VIDROS / ESPELHOS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left div-border-right" style="width: 238px;background: #C6E0B4;font-size: 11px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 11PX;">DATA DA RETIRADA:</label></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">PEÇAS C/ PINTURAS</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="div-border-top div-border-bottom div-border-left div-border-right" style="width: 238px;"></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">TAPEÇARIA</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left div-border-right" style="width: 238px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 11PX;">RESPONSAVEL RETIRADA:</label></div>
+        </div>
+        <div class="d-flex div-border-top" style="height: 35px;">
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 121px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">SERRALHERIA</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ SIM</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 85px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">□ NÃO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top div-border-bottom div-border-left" style="width: 76px;background: #BDD7EE;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">VOLUMES:</label></div>
+            <div class="div-border-top div-border-bottom div-border-left" style="width: 92px;"></div>
+            <div class="div-border-top div-border-bottom div-border-left div-border-right" style="width: 238px;"></div>
+        </div>
+        <div class="div-border-right div-border-left div-border-top" style="margin-top: 16px;border: 1px dashed var(--bs-secondary);"></div>
+        <div class="d-flex justify-content-center align-items-center" style="margin-top: 16px;height: 25px;background: #F9ADAD;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;">RETIRADA DE ASSISTÊNCIA TÉCNICA</label></div>
+        <div class="d-flex div-border-right div-border-left div-border-top div-border-bottom" style="height: 35px;margin-top: 8px;">
+            <div class="d-flex justify-content-center align-items-center" style="width: 121px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">CLIENTE:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-left" style="width: 341px;"><label class="form-label margin-0" id="lb_cliente1" style="margin-left: 5px;">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-left" style="width: 104px;background: #C6E0B4;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 10px;">N° SOLICITAÇÃO:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-left" style="width: 134px;"><label class="form-label margin-0" id="lb_solicitacao1" style="margin-left: 5px;">...</label></div>
+        </div>
+        <div class="d-flex div-border-right div-border-left div-border-top div-border-bottom div-border-top" style="height: 35px;">
+            <div class="d-flex div-border-top" style="width: 121px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 8px;">DATA RETIRADA:</label></div>
+            <div class="d-flex div-border-left div-border-top" style="width: 341px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 8px;">RESPONSÁVEL RETIRADA (NOME COMPLETO):</label></div>
+            <div class="d-flex div-border-left div-border-top" style="width: 238px;"><label class="form-label fw-bold margin-0" style="margin-left: 5px;font-size: 8px;">ENTREGUE POR:</label></div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+</body>
+
+</html>

@@ -51,6 +51,14 @@ function checkOrder() {
   return value;
 }
 
+async function validForm(e) {
+  const form = document.querySelector("form");
+  if (form.checkValidity()) {
+    e.preventDefault();
+    await insertProject();
+  }
+}
+
 async function insertProject() {
   if (checkOrder() < 10) {
     messageInformation(
@@ -148,6 +156,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
 });
 
 Dom.addEventBySelector("#txt_contrato", "blur", getContrato);
-Dom.addEventBySelector("#bt_salvar", "click", insertProject);
 Dom.addEventBySelector("#txt_numproj", "input", applyDateMask);
 Dom.addEventBySelector("#txt_numoc", "blur", checkOrder);
+Dom.addEventBySelector("#bt_salvar", "click", async (e) => {
+  validForm(e);
+});
