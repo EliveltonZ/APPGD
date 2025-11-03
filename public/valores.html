@@ -7,9 +7,8 @@
     <title>Valores</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=6894083681ff4220683718a4e86cf274">
-    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=64b5582ae63e835f5a4449eec1bc0391">
-    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=d8252eac2c1d9f0d30b703cf13e6110a">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=dae17248a715ac0019a1b4144c0ff9a7">
     <link rel="stylesheet" href="assets/css/valores.min.css?h=5b82b33aa2737e95d630a93587e38c3e">
 <link rel="stylesheet" href="/assets/css/valores.css">
     <script type="module" src="/assets/js/valores.js"></script>
@@ -28,6 +27,8 @@
                         <th class="text-center">Cliente</th>
                         <th class="text-center">N.P.</th>
                         <th class="text-center">Ambiente</th>
+                        <th class="text-center">Fabrica</th>
+                        <th class="text-center">Entrega</th>
                         <th class="text-center">Bruto</th>
                         <th class="text-center">Negociado</th>
                         <th class="text-center">Material</th>
@@ -41,7 +42,6 @@
         </div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
-    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
 
 </html>

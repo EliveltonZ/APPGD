@@ -19,11 +19,12 @@ export function enableTableFilterSort(tableId) {
   document.body.appendChild(popup);
 
   function detectType(val) {
-    const num = /^-?\d+(,\d{3})*(\.\d+)?$/;
+    const num = /^-?\d+(?:\.\d{3})*(?:,\d+)?$|^-?\d+(?:\.\d+)?$/; // pt-BR e padrão
     const dateBR = /^\d{2}\/\d{2}\/\d{4}$/;
     const dateISO = /^\d{4}-\d{2}-\d{2}$/;
 
-    if (num.test(val.replace(/\s/g, "").replace(",", "."))) return "number";
+    const cleaned = val.replace(/\s/g, "");
+    if (num.test(cleaned)) return "number";
     if (dateBR.test(val)) return "date-br";
     if (dateISO.test(val)) return "date-iso";
     return "text";
@@ -47,16 +48,16 @@ export function enableTableFilterSort(tableId) {
         A = parseFloat(A.replace(/\./g, "").replace(",", ".")) || 0;
         B = parseFloat(B.replace(/\./g, "").replace(",", ".")) || 0;
       } else if (type === "date-br") {
-        const [dA, mA, yA] = A.split("/");
-        const [dB, mB, yB] = B.split("/");
+        const [dA, mA, yA] = (A || "").split("/");
+        const [dB, mB, yB] = (B || "").split("/");
         A = new Date(`${yA}-${mA}-${dA}`);
         B = new Date(`${yB}-${mB}-${dB}`);
       } else if (type === "date-iso") {
         A = new Date(A);
         B = new Date(B);
       } else {
-        A = A.toLowerCase();
-        B = B.toLowerCase();
+        A = String(A).toLowerCase();
+        B = String(B).toLowerCase();
       }
       return A < B ? -1 : A > B ? 1 : 0;
     });
@@ -112,6 +113,7 @@ export function enableTableFilterSort(tableId) {
     table.tBodies[0].appendChild(fragment);
   }
 
+  // Fecha popup ao clicar fora
   document.addEventListener("click", (e) => {
     if (!popup.contains(e.target)) popup.style.display = "none";
   });
@@ -121,6 +123,7 @@ export function enableTableFilterSort(tableId) {
 
     th.addEventListener("click", (e) => {
       e.stopPropagation();
+
       const offset = th.getBoundingClientRect();
       const uniqueValues = getUniqueValues(colIndex);
       const currentOrder = sortStates[colIndex] || "asc";
@@ -129,29 +132,29 @@ export function enableTableFilterSort(tableId) {
         <div class="card-body p-3">
           <h6 class="card-title mb-2">Filtrar coluna</h6>
           <input type="text" id="searchInput" autocomplete="off" class="form-control form-control-sm mb-3" placeholder="Buscar...">
-          <button class="btn btn-sm btn-secondary mb-2" id="toggleSelectAll">Marcar/Desmarcar Todos</button>
+          <button class="btn btn-sm btn-secondary mb-2 w-100" id="toggleSelectAll">Marcar/Desmarcar Todos</button>
           <div class="overflow-auto mb-3" style="max-height:200px;">
             ${uniqueValues
               .map(
                 (val, i) => `
               <div class="form-check">
                 <input class="form-check-input filter-checkbox" type="checkbox" data-col="${colIndex}" value="${val}" id="chk_${colIndex}_${i}">
-                <label class="form-check-label" for="chk_${colIndex}_${i}">${val}</label>
+                <label class="form-check-label text-truncate" style="max-width: 380px;" for="chk_${colIndex}_${i}">${val}</label>
               </div>`
               )
               .join("")}
           </div>
-          <div class="d-flex justify-content-between">
-            <button class="btn btn-sm btn-secondary" id="sortAlpha" data-sort="${currentOrder}">
+          <div class="d-flex gap-2 justify-content-between">
+            <button class="btn btn-sm btn-secondary flex-fill" id="sortAlpha" data-sort="${currentOrder}">
               Ordenar ${currentOrder === "asc" ? "↓" : "↑"}
             </button>
-            <button class="btn btn-sm btn-primary" id="applyFilter">Aplicar</button>
-            <button class="btn btn-sm btn-danger" id="clearFilter">Limpar</button>
+            <button class="btn btn-sm btn-primary flex-fill" id="applyFilter">Aplicar</button>
+            <button class="btn btn-sm btn-danger flex-fill" id="clearFilter">Limpar</button>
           </div>
         </div>
       `;
 
-      // Posicionamento dinâmico e seguro do popup
+      // Posicionamento do popup
       popup.style.visibility = "hidden";
       popup.style.display = "block";
       popup.style.left = "0px";
@@ -159,7 +162,6 @@ export function enableTableFilterSort(tableId) {
       const popupWidth = popupRect.width;
       let left = offset.left + window.scrollX;
       let top = offset.bottom + window.scrollY;
-
       if (left + popupWidth > window.innerWidth) {
         left = window.innerWidth - popupWidth - 15;
       }
@@ -168,22 +170,51 @@ export function enableTableFilterSort(tableId) {
       popup.style.left = `${left}px`;
       popup.style.visibility = "";
 
-      popup
-        .querySelector("#searchInput")
-        .addEventListener("input", function () {
-          const val = this.value.toLowerCase();
-          popup.querySelectorAll(".form-check").forEach((div) => {
-            const label = div.querySelector("label").textContent.toLowerCase();
-            div.style.display = label.includes(val) ? "" : "none";
-          });
-        });
-
-      popup.querySelector("#toggleSelectAll").addEventListener("click", () => {
-        const checkboxes = popup.querySelectorAll(".filter-checkbox");
-        const allChecked = [...checkboxes].every((cb) => cb.checked);
-        checkboxes.forEach((cb) => (cb.checked = !allChecked));
+      // ======= INICIALIZAÇÃO DOS CHECKBOXES =======
+      const currentFilter = columnFilters[colIndex]; // array ou undefined
+      popup.querySelectorAll(".filter-checkbox").forEach((cb) => {
+        // Se houver filtro salvo, marca só os que pertencem ao filtro; caso contrário, todos começam DESMARCADOS
+        cb.checked = Array.isArray(currentFilter)
+          ? currentFilter.includes(cb.value)
+          : false;
       });
 
+      // Utilitários de visibilidade
+      const getVisibleCheckboxes = () =>
+        [...popup.querySelectorAll(".form-check")]
+          .filter((div) => div.style.display !== "none")
+          .map((div) => div.querySelector(".filter-checkbox"));
+
+      const toggleBtn = popup.querySelector("#toggleSelectAll");
+      function updateToggleLabel() {
+        const visibleChecks = getVisibleCheckboxes();
+        const allVisibleChecked =
+          visibleChecks.length > 0 && visibleChecks.every((cb) => cb.checked);
+        toggleBtn.textContent = allVisibleChecked
+          ? "Desmarcar Todos (visíveis)"
+          : "Marcar Todos (visíveis)";
+      }
+
+      const searchInput = popup.querySelector("#searchInput");
+      searchInput.addEventListener("input", function () {
+        const val = this.value.toLowerCase();
+        popup.querySelectorAll(".form-check").forEach((div) => {
+          const label = div.querySelector("label").textContent.toLowerCase();
+          div.style.display = label.includes(val) ? "" : "none";
+        });
+        updateToggleLabel();
+      });
+
+      // Toggle apenas itens visíveis
+      toggleBtn.addEventListener("click", () => {
+        const visibleChecks = getVisibleCheckboxes();
+        const allVisibleChecked =
+          visibleChecks.length > 0 && visibleChecks.every((cb) => cb.checked);
+        visibleChecks.forEach((cb) => (cb.checked = !allVisibleChecked));
+        updateToggleLabel();
+      });
+
+      // Aplicar filtro
       popup.querySelector("#applyFilter").addEventListener("click", () => {
         const selected = [...popup.querySelectorAll(".filter-checkbox")]
           .filter((cb) => cb.checked)
@@ -201,6 +232,7 @@ export function enableTableFilterSort(tableId) {
         popup.style.display = "none";
       });
 
+      // Limpar filtro
       popup.querySelector("#clearFilter").addEventListener("click", () => {
         delete columnFilters[colIndex];
         th.textContent = th.dataset.originalText;
@@ -208,6 +240,7 @@ export function enableTableFilterSort(tableId) {
         popup.style.display = "none";
       });
 
+      // Ordenação
       popup.querySelector("#sortAlpha").addEventListener("click", function () {
         const newOrder = this.dataset.sort === "asc" ? "desc" : "asc";
         sortStates[colIndex] = newOrder;
@@ -215,6 +248,9 @@ export function enableTableFilterSort(tableId) {
         this.dataset.sort = newOrder;
         popup.style.display = "none";
       });
+
+      // Inicializa rótulo com estado atual (todos desmarcados por padrão)
+      updateToggleLabel();
     });
   });
 }

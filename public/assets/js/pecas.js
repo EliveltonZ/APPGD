@@ -125,7 +125,7 @@ function insertButtonCellTable() {
 ==============================*/
 async function populateType() {
   const response = await api.fetchQuery("/getOcorrencia");
-  const select = q("#txt_tipo");
+  const select = q(SEL.TIPO);
   select.innerHTML = '<option value="">-</option>';
   response.forEach((element) => {
     const option = ce("option");
@@ -135,9 +135,9 @@ async function populateType() {
   });
 }
 
-async function populateFalhas(params) {
+async function populateFaills() {
   const response = await api.fetchQuery("/getFalhas");
-  const select = q("#txt_falha");
+  const select = q(SEL.FALHA);
   select.innerHTML = '<option value="">-</option>';
   response.forEach((element) => {
     const option = ce("option");
@@ -209,5 +209,5 @@ Dom.addEventBySelector("table tbody", "click", delRowTable);
 Dom.addEventBySelector("#bt_concluir", "click", confirmSolicitacion);
 document.addEventListener("DOMContentLoaded", (event) => {
   populateType();
-  populateFalhas();
+  populateFaills();
 });

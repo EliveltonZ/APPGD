@@ -7,8 +7,8 @@
     <title>Excluir Projetos</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=c90f616199cd6e16efb685d3f671b5b4">
-    <link rel="stylesheet" href="assets/css/deletar.min.css?h=3c29af2b602b85aca0e11e8a534baa6f">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=47fd43705096ea7c712c0d2d905f9ac7">
+    <link rel="stylesheet" href="assets/css/deletar.min.css?h=0cfb87e078a067643d5ccdb5d8456a1a">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
 <link rel="icon" href="/assets/img/icone.png">
     <script src="assets/js/deleteProjetos.js" type="module"></script>
@@ -19,50 +19,50 @@
         <div class="text-nowrap d-block align-content-center" id="modal-div" style="width: 90%;height: 100vh;max-width: 1000px;">
             <form><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DADOS DO CLIENTE</label>
                 <div class="display-div margin-0" style="display: flex;gap: 20px;">
-                    <div class="margin-0"><label class="form-label d-block">Contrato:</label><input class="form-control" type="text" id="txt_contrato" autocomplete="off" required=""></div>
                     <div class="margin-0"><label class="form-label d-block">Num. OC:</label><input class="form-control" type="text" id="txt_numoc" autocomplete="off" required=""></div>
-                    <div class="margin-0" style="min-width: 67%;"><label class="form-label d-block">Nome do Cliente:</label><input class="form-control d-block" type="text" id="txt_cliente" autocomplete="off" required=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Contrato:</label><input class="form-control" type="text" id="txt_contrato" autocomplete="off" required="" disabled=""></div>
+                    <div class="margin-0" style="min-width: 67%;"><label class="form-label d-block">Nome do Cliente:</label><input class="form-control d-block" type="text" id="txt_cliente" autocomplete="off" required="" disabled=""></div>
                 </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DADOS DO PROJETO</label>
                 <div class="display-div margin-0" style="display: flex;gap: 10px;">
-                    <div class="margin-0" style="min-width: 15%;"><label class="form-label">Tipo do Ambiente:</label><select class="form-select form-select-sm d-block" id="txt_tipoambiente" style="width: 100%;" required="">
+                    <div class="margin-0" style="min-width: 15%;"><label class="form-label">Tipo do Ambiente:</label><select class="form-select form-select-sm d-block" id="txt_tipoambiente" style="width: 100%;" required="" disabled="">
                             <option value=""></option>
                         </select></div>
-                    <div class="margin-0" style="min-width: 35%;"><label class="form-label">Ambiente:</label><input class="form-control d-block" type="text" id="txt_ambiente" style="width:100%;" autocomplete="off" required=""></div>
-                    <div class="margin-0" style="min-width: 10%;"><label class="form-label">N° Projeto:</label><input class="form-control d-block" type="text" id="txt_numproj" style="width:100%;" list="vendedores" autocomplete="off" required=""><datalist id="vendedores">
+                    <div class="margin-0" style="min-width: 35%;"><label class="form-label">Ambiente:</label><input class="form-control d-block" type="text" id="txt_ambiente" style="width:100%;" autocomplete="off" required="" disabled=""></div>
+                    <div class="margin-0" style="min-width: 10%;"><label class="form-label">N° Projeto:</label><input class="form-control d-block" type="text" id="txt_numproj" style="width:100%;" list="vendedores" autocomplete="off" required="" disabled=""><datalist id="vendedores">
     <option value="Ana Silva"></option>
     <option value="Carlos Souza"></option>
     <option value="Fernanda Lima">
 </option></datalist></div>
-                    <div class="margin-0" style="min-width: 18%;"><label class="form-label">Vendedor:</label><input class="form-control d-block" type="text" id="txt_vendedor" style="width:100%;" list="vendedores" autocomplete="off" required=""><datalist id="vendedores">
+                    <div class="margin-0" style="min-width: 18%;"><label class="form-label">Vendedor:</label><input class="form-control d-block" type="text" id="txt_vendedor" style="width:100%;" list="vendedores" autocomplete="off" required="" disabled=""><datalist id="vendedores">
     <option value="Ana Silva"></option>
     <option value="Carlos Souza"></option>
     <option value="Fernanda Lima">
 </option></datalist></div>
-                    <div class="margin-0" style="min-width: 18%;"><label class="form-label">Liberador:</label><input class="form-control d-block" type="text" id="txt_liberador" style="width:100%;" list="liberadores" autocomplete="off" required=""><datalist id="liberadores">
+                    <div class="margin-0" style="min-width: 18%;"><label class="form-label">Liberador:</label><input class="form-control d-block" type="text" id="txt_liberador" style="width:100%;" list="liberadores" autocomplete="off" required="" disabled=""><datalist id="liberadores">
     <option value="Ana Silva"></option>
     <option value="Carlos Souza"></option>
     <option value="Fernanda Lima">
 </option></datalist></div>
                 </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DATAS DO PROJETO</label>
                 <div class="display-div margin-0" style="display: flex;gap: 10px;">
-                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data do Contrato:</label><input class="form-control" id="txt_datacontrato" type="date"></div>
-                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data da Assinatura:</label><input class="form-control" id="txt_dataassinatura" type="date"></div>
-                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Chegou na Fabrica</label><input class="form-control" id="txt_chegoufabrica" type="date" required=""></div>
-                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data de Entrega:</label><input class="form-control" id="txt_dataentrega" type="date" required=""></div>
-                    <div class="margin-0"><label class="form-label d-block">Loja:</label><input class="form-control" type="text" id="txt_loja" autocomplete="off"></div>
-                    <div class="margin-0"><label class="form-label d-block">Tipo do Cliente:</label><select class="form-select form-select-sm d-block" id="txt_tipocliente" style="width:100%;" required="">
+                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data do Contrato:</label><input class="form-control" id="txt_datacontrato" type="date" disabled=""></div>
+                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data da Assinatura:</label><input class="form-control" id="txt_dataassinatura" type="date" disabled=""></div>
+                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Chegou na Fabrica</label><input class="form-control" id="txt_chegoufabrica" type="date" required="" disabled=""></div>
+                    <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data de Entrega:</label><input class="form-control" id="txt_dataentrega" type="date" required="" disabled=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Loja:</label><input class="form-control" type="text" id="txt_loja" autocomplete="off" disabled=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Tipo do Cliente:</label><select class="form-select form-select-sm d-block" id="txt_tipocliente" style="width:100%;" required="" disabled="">
                             <option value="" selected="">-</option>
                             <option value="PF">PF</option>
                             <option value="PJ">PJ</option>
                         </select></div>
-                    <div class="margin-0" style="min-width: 10%;"><label class="form-label d-block">Etapa:</label><select class="form-select form-select-sm d-block" id="txt_etapa" style="width:100%;">
+                    <div class="margin-0" style="min-width: 10%;"><label class="form-label d-block">Etapa:</label><select class="form-select form-select-sm d-block" id="txt_etapa" style="width:100%;" disabled="">
                             <option value="-">-</option>
                             <option value="1°E">1°E</option>
                             <option value="2°E">2°E</option>
                         </select></div>
                 </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">VALORES DO PROJETO</label>
                 <div class="display-div margin-0" style="display: flex;gap: 10px;">
-                    <div class="margin-0"><label class="form-label d-block">Tipo do Contrato:</label><select class="form-select form-select-sm d-block" id="txt_tipocontrato" style="width:100%;" required="">
+                    <div class="margin-0"><label class="form-label d-block">Tipo do Contrato:</label><select class="form-select form-select-sm d-block" id="txt_tipocontrato" style="width:100%;" required="" disabled="">
                             <option value="" selected="">-</option>
                             <option value="AMBIENTE">AMBIENTE</option>
                             <option value="ASSISTENCIA">ASSISTENCIA</option>
@@ -70,10 +70,10 @@
                             <option value="REFORMA">REFORMA</option>
                             <option value="PERMUTA">PERMUTA</option>
                         </select></div>
-                    <div class="margin-0"><label class="form-label d-block">Valor Bruto:</label><input class="form-control d-block" type="text" id="txt_valorbruto" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00"></div>
-                    <div class="margin-0"><label class="form-label d-block">Valor Negociado:</label><input class="form-control d-block" type="text" id="txt_valornegociado" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00"></div>
-                    <div class="margin-0"><label class="form-label d-block">Custo Material:</label><input class="form-control d-block" type="text" id="txt_customaterial" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00"></div>
-                    <div class="margin-0"><label class="form-label d-block">Custo Adicional:</label><input class="form-control d-block" type="text" id="txt_custoadicional" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00"></div>
+                    <div class="margin-0"><label class="form-label d-block">Valor Bruto:</label><input class="form-control d-block" type="text" id="txt_valorbruto" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00" disabled=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Valor Negociado:</label><input class="form-control d-block" type="text" id="txt_valornegociado" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00" disabled=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Custo Material:</label><input class="form-control d-block" type="text" id="txt_customaterial" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00" disabled=""></div>
+                    <div class="margin-0"><label class="form-label d-block">Custo Adicional:</label><input class="form-control d-block" type="text" id="txt_custoadicional" oninput="formatarMoeda(this)" autocomplete="off" style="width: 100%;" placeholder="R$ 0,00" disabled=""></div>
                 </div>
                 <div class="d-flex justify-content-center" style="margin-left: 20px;"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" id="bt_salvar" type="submit" style="margin: 20px;">Salvar</button></div>
             </form>

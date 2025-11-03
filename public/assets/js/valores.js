@@ -5,6 +5,7 @@ import {
   onmouseover,
   loadPage,
   onclickHighlightRow,
+  convertDataBr,
 } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
@@ -30,6 +31,8 @@ window.fillTable = async function name() {
                 <td>${item.p_cliente}</td>
                 <td ${config}>${item.p_numproj}</td>
                 <td>${item.p_ambiente}</td>
+                <td ${config}>${convertDataBr(item.p_chegoufabrica)}</td>
+                <td ${config}>${convertDataBr(item.p_dataentrega)}</td>
                 <td ${config}>${formatCurrency(item.p_valorbruto)}</td>
                 <td ${config}>${formatCurrency(item.p_valornegociado)}</td>
                 <td ${config}>${formatCurrency(item.p_customaterial)}</td>
