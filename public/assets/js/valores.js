@@ -26,20 +26,20 @@ window.fillTable = async function name() {
     data.forEach((item) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-                <td ${config}>${item.p_ordemdecompra}</td>
-                <td ${config}>${item.p_contrato}</td>
-                <td>${item.p_cliente}</td>
-                <td ${config}>${item.p_numproj}</td>
-                <td>${item.p_ambiente}</td>
-                <td ${config}>${convertDataBr(item.p_chegoufabrica)}</td>
-                <td ${config}>${convertDataBr(item.p_dataentrega)}</td>
-                <td ${config}>${formatCurrency(item.p_valorbruto)}</td>
-                <td ${config}>${formatCurrency(item.p_valornegociado)}</td>
-                <td ${config}>${formatCurrency(item.p_customaterial)}</td>
-                <td ${config}>${convertDecimal(item.p_desconto)}</td>
-                <td ${config}>${formatCurrency(item.p_lucrobruto)}</td>
-                <td ${config}>${convertDecimal(item.p_margem)}</td>
-            `;
+          <td ${config}>${item.p_ordemdecompra}</td>
+          <td ${config}>${item.p_contrato}</td>
+          <td>${item.p_cliente}</td>
+          <td ${config}>${item.p_numproj}</td>
+          <td>${item.p_ambiente}</td>
+          <td ${config}>${convertDataBr(item.p_chegoufabrica)}</td>
+          <td ${config}>${convertDataBr(item.p_dataentrega)}</td>
+          <td ${config}>${formatCurrency(item.p_valorbruto)}</td>
+          <td ${config}>${formatCurrency(item.p_valornegociado)}</td>
+          <td ${config}>${formatCurrency(item.p_customaterial)}</td>
+          <td ${config}>${convertDecimal(item.p_desconto)}</td>
+          <td ${config}>${formatCurrency(item.p_lucrobruto)}</td>
+          <td ${config}>${convertDecimal(item.p_margem)}</td>
+      `;
       tbody.appendChild(tr);
     });
   }
