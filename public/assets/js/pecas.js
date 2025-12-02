@@ -20,10 +20,16 @@ const ce = (element) => {
   return document.createElement(element);
 };
 
+const ls = function (key) {
+  return localStorage.getItem(key);
+};
+
 /* ==========================
   HELPERS id's
 =============================*/
 const SEL = {
+  // table
+  TSOLICITACOES: "#tab-2 table tbody",
   // form solicitacao
   SOLICITANTE: "#txt_solicitante",
   DATA: "#txt_data",
@@ -158,56 +164,154 @@ async function delRowTable(event) {
   }
 }
 
+async function populateTableSolicitacion() {
+  const id = Dom.getValue("txt_id");
+  const response = await api.fetchQuery(`/getSolicitacoes?p_id_montador=${id}`);
+  const tbody = q(SEL.TSOLICITACOES);
+  tbody.innerHTML = "";
+  response.forEach((item) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.p_codigo}</td>
+      <td>${item.p_qtd}</td>
+      <td>${item.p_cor}</td>
+      <td>${item.p_peca}</td>
+      <td>${item.p_dimensoes}</td>
+      <td>${item.p_cliente}</td>
+      <td>${item.p_ambiente}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
 async function confirmSolicitacion(event) {
   const form = q("form");
   const table = q("table tbody");
 
-  if (form.checkValidity()) {
-    event.preventDefault();
-    const result = await messageQuestion(
-      "CONCLUIR",
-      "Concluir Solicitação ?",
-      "Concluir",
-      "Cancelar"
-    );
+  if (!form.checkValidity()) return;
+  event.preventDefault();
 
-    if (result.isConfirmed) {
-      const rows = qa("table tbody tr");
-      rows.forEach((row) => {
-        const data = {
-          p_etiqueta: 0,
-          p_qtd: row.cells[0].innerHTML,
-          p_peca: row.cells[1].innerHTML,
-          p_dimensoes: row.cells[2].innerHTML,
-          p_cor: row.cells[3].innerHTML,
-          p_lado: row.cells[4].innerHTML,
-          p_ocorrencia: row.cells[5].innerHTML,
-          p_falha: row.cells[6].innerHTML,
-          p_observacoes: row.cells[8].innerHTML,
-          p_cliente: Dom.getValue("txt_cliente"),
-          p_ambiente: Dom.getValue("txt_ambiente"),
-        };
+  const result = await messageQuestion(
+    "CONCLUIR",
+    "Concluir Solicitação ?",
+    "Concluir",
+    "Cancelar"
+  );
 
-        try {
-          const response = api.fetchBody("/setPecas", "POST", data);
-          messageInformation(
-            "success",
-            "SUCESSO",
-            `Solicitação aberta com Sucesso !!!`
-          );
-        } catch (err) {
-          messageInformation("error", "ERRO", `ERRO: ${err.message}`);
-        }
-      });
-      table.innerHTML = "";
+  if (!result.isConfirmed) return;
+
+  const rows = qa("table tbody tr");
+  if (rows.length == 0) {
+    messageInformation("warning", "ATENÇÃO", "Insira ao menos uma peça !!!");
+    return;
+  }
+
+  let successes = 0;
+  const errors = [];
+
+  for (const row of rows) {
+    const data = {
+      p_etiqueta: 0,
+      p_qtd: row.cells[0].innerHTML,
+      p_peca: row.cells[1].innerHTML,
+      p_dimensoes: row.cells[2].innerHTML,
+      p_cor: row.cells[3].innerHTML,
+      p_lado: row.cells[4].innerHTML,
+      p_ocorrencia: row.cells[5].innerHTML,
+      p_falha: row.cells[6].innerHTML,
+      p_observacoes: row.cells[8].innerHTML,
+      p_cliente: Dom.getValue("txt_cliente"),
+      p_ambiente: Dom.getValue("txt_ambiente"),
+      p_id_montador: Dom.getValue("txt_id"),
+    };
+
+    try {
+      // Se api.fetchBody retorna um Response:
+      const resp = await api.fetchBody("/setPecas", "POST", data);
+
+      // Caso sua função já retorne JSON, troque as 3 linhas abaixo por: const json = resp;
+      const isResponse = typeof resp?.ok === "boolean";
+      const json = isResponse ? await resp.json() : resp;
+
+      // Padronize checagem de erro
+      if ((isResponse && !resp.ok) || json?.error || json?.code) {
+        const msg =
+          json?.message || json?.error || `HTTP ${resp?.status ?? "?"}`;
+        errors.push({ peca: data.p_peca, message: msg });
+      } else {
+        successes++;
+      }
+    } catch (err) {
+      errors.push({ peca: data.p_peca, message: err?.message || String(err) });
     }
   }
+
+  // Feedback final
+  if (errors.length === 0) {
+    messageInformation(
+      "success",
+      "SUCESSO",
+      "Solicitação aberta com sucesso!"
+    ).then((item) => {
+      window.location.href = "/pecas.html";
+    });
+    table.innerHTML = "";
+  } else if (successes > 0) {
+    messageInformation(
+      "warning",
+      "PARCIAL",
+      `Algumas linhas foram enviadas, mas ${errors.length} falharam:\n` +
+        errors.map((e) => `• ${e.peca}: ${e.message}`).join("\n")
+    );
+  } else {
+    messageInformation(
+      "error",
+      "ERRO",
+      `Nenhuma linha foi enviada. Detalhes:\n` +
+        errors.map((e) => `• ${e.peca}: ${e.message}`).join("\n")
+    );
+  }
+}
+
+function iniciarRelogio(el) {
+  const elemento = q(el);
+  // Função que formata o horário atual
+  function atualizar() {
+    const agora = new Date();
+
+    // Se for um input datetime-local, usamos o formato adequado
+    if (elemento.tagName === "INPUT" && elemento.type === "datetime-local") {
+      const pad = (n) => String(n).padStart(2, "0");
+      const valor = `${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(
+        agora.getDate()
+      )}T${pad(agora.getHours())}:${pad(agora.getMinutes())}:${pad(
+        agora.getSeconds()
+      )}`;
+      elemento.value = valor;
+    }
+
+    // Caso contrário, exibimos texto formatado
+    else {
+      elemento.textContent = agora.toLocaleString("pt-BR");
+    }
+  }
+
+  // Atualiza imediatamente e depois a cada segundo
+  atualizar();
+  const intervalo = setInterval(atualizar, 1000);
+
+  // Retorna uma função para parar o relógio, se necessário
+  return () => clearInterval(intervalo);
 }
 
 Dom.addEventBySelector("#bt_inserir", "click", insertTableRow);
 Dom.addEventBySelector("table tbody", "click", delRowTable);
 Dom.addEventBySelector("#bt_concluir", "click", confirmSolicitacion);
+Dom.addEventBySelector("#asd", "click", populateTableSolicitacion);
 document.addEventListener("DOMContentLoaded", (event) => {
   populateType();
   populateFaills();
+  Dom.setValue("txt_id", ls("id_montador"));
+  Dom.setValue("txt_solicitante", ls("montador"));
+  iniciarRelogio("#txt_data");
 });

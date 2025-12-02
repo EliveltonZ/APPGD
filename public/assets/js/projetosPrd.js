@@ -1,92 +1,180 @@
-import {
-  Dom,
-  checkValue,
-  convertDataBr,
-  ajustarTamanhoModal,
-  onmouseover,
-  loadPage,
-  setDateTime,
-  enableEnterAsTab,
-  colorStatus,
-  colorAcessorios,
-  onclickHighlightRow,
-  createModal,
-  modalBarCode,
-  messageInformation,
-  messageQuestion,
-  getUsuario,
-  sendMail,
-  getConfig,
-  checkPrevisao,
-  getOperadores,
-  getIndexColumnValue,
-  getCookie,
-} from "./utils.js";
+import { ajustarTamanhoModal, loadPage, getCookie } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
+import { Dom, Style, Table, q, ce, qa } from "./UI/interface.js";
+import { API, Service } from "./service/api.js";
+import { DateTimer } from "./utils/time.js";
+import { Modal } from "./utils/modal.js";
+import { Email } from "./utils/email.js";
+import { MyNumber } from "./utils/number.js";
+
+const EL = {
+  // PROJETO
+  NUM_OC: "#txt_numoc",
+  CLIENTE: "#txt_cliente",
+  CONTRATO: "#txt_contrato",
+  CORTE_CERTO: "#txt_codcc",
+  AMBIENTE: "#txt_ambiente",
+  NUM_PROJ: "#txt_numproj",
+  LOTE: "#txt_lote",
+  CHEGOU_FABRICA: "#txt_chegoufabrica",
+  DATA_ENTREGA: "#txt_dataentrega",
+  PREVISAO: "#txt_previsao",
+  OBSERVACOES: "#txt_observacoes",
+
+  // CORTE
+  CORTE_INICIO: "#txt_corteinicio",
+  CORTE_FIM: "#txt_cortefim",
+  CORTE_PAUSA: "#chk_corte",
+  CORTE_ID: "#txt_corteid",
+  CORTE_C_INICIO: "#chk_corteinicio",
+  CORTE_C_FIM: "#chk_cortefim",
+  CORTE_RESP: "#txt_corteresp",
+
+  // CUSTOMIZACAO
+  CUSTOM_INICIO: "#txt_customizacaoinicio",
+  CUSTOM_FIM: "#txt_customizacaofim",
+  CUSTOM_PAUSA: "#chk_customizacao",
+  CUSTOM_ID: "#txt_customizacaoid",
+  CUSTOM_C_INICIO: "#chk_customizacaoinicio",
+  CUSTOM_C_FIM: "#chk_customizacaofim",
+  CUSTOM_RESP: "#txt_customizacaoresp",
+
+  // COLADEIRA
+  COLADEIRA_INICIO: "#txt_coladeirainicio",
+  COLADEIRA_FIM: "#txt_coladeirafim",
+  COLADEIRA_PAUSA: "#chk_coladeira",
+  COLADEIRA_ID: "#txt_coladeiraid",
+  COLADEIRA_C_INICIO: "#chk_coladeirainicio",
+  COLADEIRA_C_FIM: "#chk_coladeirafim",
+  COLADEIRA_RESP: "#txt_coladeiraresp",
+
+  // USINAGEM
+  USINAGEM_INICIO: "#txt_usinageminicio",
+  USINAGEM_FIM: "#txt_usinagemfim",
+  USINAGEM_PAUSA: "#chk_usinagem",
+  USINAGEM_ID: "#txt_usinagemid",
+  USINAGEM_C_INICIO: "#chk_usinageminicio",
+  USINAGEM_C_FIM: "#chk_usinagemfim",
+  USINAGEM_RESP: "#txt_usinagemresp",
+
+  // MONTAGEM
+  MONTAGEM_INICIO: "#txt_montageminicio",
+  MONTAGEM_FIM: "#txt_montagemfim",
+  MONTAGEM_PAUSA: "#chk_montagem",
+  MONTAGEM_ID: "#txt_montagemid",
+  MONTAGEM_C_INICIO: "#chk_montageminicio",
+  MONTAGEM_C_FIM: "#chk_montagemfim",
+  MONTAGEM_RESP: "#txt_montagemresp",
+
+  // PAINEIS
+  PAINEIS_INICIO: "#txt_paineisinicio",
+  PAINEIS_FIM: "#txt_paineisfim",
+  PAINEIS_PAUSA: "#chk_paineis",
+  PAINEIS_ID: "#txt_paineisid",
+  PAINEIS_C_INICIO: "#chk_paineisinicio",
+  PAINEIS_C_FIM: "#chk_paineisfim",
+  PAINEIS_RESP: "#txt_paineisresp",
+
+  // ACABAMENTOS
+  ACABAMENTOS_INICIO: "#txt_acabamentoinicio",
+  ACABAMENTOS_FIM: "#txt_acabamentofim",
+  ACABAMENTOS_PAUSA: "#chk_acabamento",
+  ACABAMENTOS_ID: "#txt_acabamentoid",
+  ACABAMENTOS_C_INICIO: "#chk_acabamentoinicio",
+  ACABAMENTOS_C_FIM: "#chk_acabamentofim",
+  ACABAMENTOS_RESP: "#txt_acabamentoresp",
+
+  // EMBALAGEM
+  EMBALAGEM_INICIO: "#txt_embalageminicio",
+  EMBALAGEM_FIM: "#txt_embalagemfim",
+  EMBALAGEM_PAUSA: "#chk_embalagem",
+  EMBALAGEM_ID: "#txt_embalagemid",
+  EMBALAGEM_C_INICIO: "#chk_embalageminicio",
+  EMBALAGEM_C_FIM: "#chk_embalagemfim",
+  EMBALAGEM_RESP: "#txt_embalagemresp",
+
+  //ELEMENTS UI
+  BT_FUNCIONARIOS: "#bt_funcionarios",
+  TABLE: "#table",
+  BT_SALVAR: "#bt_salvar",
+  TABLE_MODAL: "#modal-1 tbody",
+  MODAL: "#modal-1",
+};
+
+/*====================================
+HEPERS de API
+====================================*/
+
+const BASE = {
+  getProjects: async function () {
+    const response = await API.fetchQuery("/fillTablePrd");
+    return response;
+  },
+
+  getAcessorios: async function (ordemdecompra) {
+    const url = `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`;
+    const response = await API.fetchQuery(url);
+    return response;
+  },
+
+  getProject: async function (ordemdecompra) {
+    const url = `/getProducao?p_ordemdecompra=${ordemdecompra}`;
+    const response = await API.fetchQuery(url);
+    return response;
+  },
+};
 
 async function fillTable() {
   try {
-    const response = await fetch("/fillTablePrd");
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar os dados");
+    const response = await BASE.getProjects();
+    if (response.status !== 200) {
+      throw new Error(`Erro ao buscar os dados ${response.data}`);
     }
 
-    const data = await response.json();
-
-    const tbody = document.querySelector("tbody");
+    const tbody = q("tbody");
     tbody.innerHTML = "";
 
     let num = 1;
+    const td = "td";
+    const tCenter = "text-align: center; ";
 
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
+    response.data.forEach((item) => {
+      const tr = ce("tr");
       tr.classList.add("open-modal-row");
       tr.classList.add("fw-bold");
 
-      const corStatus = colorStatus(item.status);
-      const corA = colorAcessorios(item.total);
-      const corPrev = checkPrevisao(item.previsao, item.dataentrega);
+      const corStatus = Style.colorStatus(item.status);
+      const corA = Style.colorAcessorios(item.total);
+      const corPrev = Style.checkPrevisao(item.previsao, item.dataentrega);
 
-      tr.innerHTML = `
-        <td style="text-align: center;">${num}</td>
-        <td class="hover-col" style="text-align: center; ${corA}">${item.a}</td>
-        <td style="text-align: center;">${item.ordemdecompra}</td>
-        <td style="text-align: center;">${checkValue(item.pedido)}</td>
-        <td style="text-align: center;">${checkValue(item.etapa)}</td>
-        <td style="text-align: center;">${checkValue(item.codcc)}</td>
-        <td>${item.cliente}</td>
-        <td style="text-align: center;">${checkValue(item.contrato)}</td>
-        <td style="text-align: center;">${checkValue(item.numproj)}</td>
-        <td>${item.ambiente}</td>
-        <td style="text-align: center;">${checkValue(item.tipo)}</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.chegoufabrica)
-        )}</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.dataentrega)
-        )}</td>
-        <td style="text-align: center;">${checkValue(item.lote)}</td>
-        <td class="fw-bold" style="text-align: center; ${corStatus}">${
-        item.status
-      }</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.iniciado)
-        )}</td>
-        <td style="text-align: center; ${corPrev}">${convertDataBr(
-        checkValue(item.previsao)
-      )}</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.pronto)
-        )}</td>
-        <td style="text-align: center;">${convertDataBr(
-          checkValue(item.entrega)
-        )}</td>
-        <td class="info-col" style="display:none;">${checkValue(
-          item.observacoes
-        )}</td>
-      `;
+      tr.append(Dom.createElement(td, num, tCenter));
+      tr.append(Dom.createElement(td, item.a, tCenter + corA, "hover-col"));
+      tr.append(Dom.createElement(td, item.ordemdecompra, tCenter));
+      tr.append(Dom.createElement(td, item.pedido, tCenter));
+      tr.append(Dom.createElement(td, item.etapa, tCenter));
+      tr.append(Dom.createElement(td, item.codcc, tCenter));
+      tr.append(Dom.createElement(td, item.cliente));
+      tr.append(Dom.createElement(td, item.contrato, tCenter));
+      tr.append(Dom.createElement(td, item.numproj, tCenter));
+      tr.append(Dom.createElement(td, item.ambiente));
+      tr.append(Dom.createElement(td, item.tipo, tCenter));
+      tr.append(
+        Dom.createElement(td, DateTimer.forBr(item.chegoufabrica), tCenter)
+      );
+      tr.append(
+        Dom.createElement(td, DateTimer.forBr(item.dataentrega), tCenter)
+      );
+      tr.append(Dom.createElement(td, item.lote, tCenter));
+      tr.append(Dom.createElement(td, item.status, tCenter + corStatus));
+      tr.append(Dom.createElement(td, DateTimer.forBr(item.iniciado), tCenter));
+      tr.append(Dom.createElement(td, DateTimer.forBr(item.previsao), tCenter));
+      tr.append(Dom.createElement(td, DateTimer.forBr(item.pronto), tCenter));
+      tr.append(Dom.createElement(td, DateTimer.forBr(item.entrega), tCenter));
+      tr.append(
+        Dom.createElement(td, item.observacoes, "display:none", "info-col")
+      );
+
       num++;
       tbody.appendChild(tr);
     });
@@ -94,52 +182,35 @@ async function fillTable() {
     Dom.addEventBySelector(".hover-col", "mouseover", showToolTip);
     Dom.addEventBySelector(".hover-col", "mouseleave", hideToolTip);
   } catch (error) {
-    messageInformation("error", "Erro", "Não foi possível carregar os dados.");
+    Modal.showInfo("error", "Erro", "Não foi possível carregar os dados.");
     console.error("Erro ao preencher tabela:", error);
   }
 }
 
 async function fillTableAcessorios(ordemdecompra) {
-  const response = await fetch(
-    `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
-  );
-
+  const response = await BASE.getAcessorios(ordemdecompra);
   try {
-    const data = await response.json();
-
-    const tbody = document.querySelectorAll("table tbody")[1];
+    const tbody = qa("table tbody")[1];
     tbody.innerHTML = "";
+    const td = "td";
+    const tCenter = "text-align: center;";
+    const fontSize = "font-size: 9px;";
+    const d = DateTimer.forBr;
+    response.data.forEach((item) => {
+      const tr = ce("tr");
 
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
+      tr.append(Dom.createElement(td, item.id, fontSize + " display: none"));
+      tr.append(Dom.createElement(td, item.descricao, fontSize));
+      tr.append(Dom.createElement(td, item.medida, fontSize + tCenter));
+      tr.append(Dom.createElement(td, item.qtd, fontSize));
+      tr.append(Dom.createElement(td, d(item.datacompra), fontSize + tCenter));
+      tr.append(Dom.createElement(td, d(item.previsao), fontSize + tCenter));
+      tr.append(Dom.createElement(td, d(item.recebido), fontSize + tCenter));
 
-      tr.innerHTML = `
-            <td style="font-size: 9px; display: none">${item.id}</td>
-            <td style="font-size: 9px;">${item.descricao}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.medida
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.qtd
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.datacompra)
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.previsao)
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.recebido)
-            )}</td>
-            `;
       tbody.appendChild(tr);
     });
   } catch (err) {
-    messageInformation(
-      "error",
-      "ERRO",
-      `Não foi possível carregar os dados. ${err.message}`
-    );
+    Modal.showInfo("error", "ERRO", `ERRO:. ${err.message}`);
   }
 }
 
@@ -147,19 +218,20 @@ async function handleClikedTable(event) {
   const td = event.target;
   const tr = td.closest(".open-modal-row");
   if (!tr || td.tagName !== "TD") return;
-  const firstColumnValue = getIndexColumnValue(td, 2);
-  const secondColumnValue = getIndexColumnValue(td, 5);
+  const firstColumnValue = Table.getIndexColumnValue(td, 2);
+  const secondColumnValue = Table.getIndexColumnValue(td, 5);
   if (secondColumnValue != "-") {
     await getProducao(firstColumnValue);
     await fillTableAcessorios(firstColumnValue);
-    createModal("modal");
+    Modal.show("modal");
   } else {
-    messageInformation("warning", "ATENÇÃO", "Projeto não Calculado");
+    Modal.showInfo("warning", "ATENÇÃO", "Projeto não Calculado");
   }
+  validatedData();
 }
 
 function showToolTip(event) {
-  const tooltip = document.getElementById("tooltips");
+  const tooltip = q("#tooltips");
   if (event) {
     const text =
       event.target.parentElement.querySelector(".info-col").textContent;
@@ -172,178 +244,262 @@ function showToolTip(event) {
 }
 
 function hideToolTip() {
-  const tooltip = document.getElementById("tooltips");
+  const tooltip = q("#tooltips");
   tooltip.style.display = "none";
 }
 
 async function getProducao(ordemdecompra) {
   try {
-    const response = await fetch(
-      `/getProducao?p_ordemdecompra=${ordemdecompra}`
-    );
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar os dados");
+    const response = await BASE.getProject(ordemdecompra);
+    if (response.status !== 200) {
+      throw new Error(`Erro ao buscar os dados ${response.data}`);
     }
-    const data = await response.json();
 
-    data.forEach((item) => {
-      Dom.setValue("txt_numoc", item.ordemdecompra);
-      Dom.setValue("txt_cliente", item.cliente);
-      Dom.setValue("txt_contrato", item.contrato);
-      Dom.setValue("txt_codcc", item.codcc);
-      Dom.setValue("txt_ambiente", item.ambiente);
-      Dom.setValue("txt_numproj", item.numproj);
-      Dom.setValue("txt_lote", item.lote);
-      Dom.setValue("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
-      Dom.setValue("txt_dataentrega", convertDataBr(item.dataentrega));
-      Dom.setValue("txt_previsao", item.previsao);
+    response.data.forEach((item) => {
+      Dom.setValue(EL.NUM_OC, item.ordemdecompra);
+      Dom.setValue(EL.CLIENTE, item.cliente);
+      Dom.setValue(EL.CONTRATO, item.contrato);
+      Dom.setValue(EL.CORTE_CERTO, item.codcc);
+      Dom.setValue(EL.AMBIENTE, item.ambiente);
+      Dom.setValue(EL.NUM_PROJ, item.numproj);
+      Dom.setValue(EL.LOTE, item.lote);
+      Dom.setValue(EL.CHEGOU_FABRICA, DateTimer.forBr(item.chegoufabrica));
+      Dom.setValue(EL.DATA_ENTREGA, DateTimer.forBr(item.dataentrega));
+      Dom.setValue(EL.PREVISAO, item.previsao);
 
-      Dom.setValue("txt_corteinicio", item.corteinicio);
-      Dom.setValue("txt_cortefim", item.cortefim);
-      Dom.setChecked("chk_corte", item.cortepausa);
-      Dom.setValue("txt_corteid", item.corteresp);
-      getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp");
-      Dom.setChecked("chk_corteinicio", false);
-      Dom.setChecked("chk_cortefim", false);
+      Dom.setValue(EL.CORTE_INICIO, item.corteinicio);
+      Dom.setValue(EL.CORTE_FIM, item.cortefim);
+      Dom.setChecked(EL.CORTE_PAUSA, item.cortepausa);
+      Dom.setValue(EL.CORTE_ID, item.corteresp);
+      getUsuario(Dom.getValue(EL.CORTE_ID), EL.CORTE_RESP);
+      Dom.setChecked(EL.CORTE_C_INICIO, false);
+      Dom.setChecked(EL.CORTE_C_FIM, false);
 
-      Dom.setValue("txt_customizacaoinicio", item.customizacaoinicio);
-      Dom.setValue("txt_customizacaofim", item.customizacaofim);
-      Dom.setChecked("chk_customizacao", item.customizacaopausa);
-      Dom.setValue("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp");
-      Dom.setChecked("chk_customizacaoinicio", false);
-      Dom.setChecked("chk_customizacaofim", false);
+      Dom.setValue(EL.CUSTOM_INICIO, item.customizacaoinicio);
+      Dom.setValue(EL.CUSTOM_FIM, item.customizacaofim);
+      Dom.setChecked(EL.CUSTOM_PAUSA, item.customizacaopausa);
+      Dom.setValue(EL.CUSTOM_ID, item.customizacaoresp);
+      getUsuario(Dom.getValue(EL.CUSTOM_ID), EL.CUSTOM_RESP);
+      Dom.setChecked(EL.CUSTOM_C_INICIO, false);
+      Dom.setChecked(EL.CUSTOM_C_FIM, false);
 
-      Dom.setValue("txt_coladeirainicio", item.coladeirainicio);
-      Dom.setValue("txt_coladeirafim", item.coladeirafim);
-      Dom.setChecked("chk_coladeira", item.coladeirapausa);
-      Dom.setValue("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp");
-      Dom.setChecked("chk_coladeirainicio", false);
-      Dom.setChecked("chk_coladeirafim", false);
+      Dom.setValue(EL.COLADEIRA_INICIO, item.coladeirainicio);
+      Dom.setValue(EL.COLADEIRA_FIM, item.coladeirafim);
+      Dom.setChecked(EL.COLADEIRA_PAUSA, item.coladeirapausa);
+      Dom.setValue(EL.COLADEIRA_ID, item.coladeiraresp);
+      getUsuario(Dom.getValue(EL.COLADEIRA_ID), EL.COLADEIRA_RESP);
+      Dom.setChecked(EL.COLADEIRA_C_INICIO, false);
+      Dom.setChecked(EL.COLADEIRA_C_FIM, false);
 
-      Dom.setValue("txt_usinageminicio", item.usinageminicio);
-      Dom.setValue("txt_usinagemfim", item.usinagemfim);
-      Dom.setChecked("chk_usinagem", item.usinagempausa);
-      Dom.setValue("txt_usinagemid", item.usinagemresp);
-      getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp");
-      Dom.setChecked("chk_usinageminicio", false);
-      Dom.setChecked("chk_usinagemfim", false);
+      Dom.setValue(EL.USINAGEM_INICIO, item.usinageminicio);
+      Dom.setValue(EL.USINAGEM_FIM, item.usinagemfim);
+      Dom.setChecked(EL.USINAGEM_PAUSA, item.usinagempausa);
+      Dom.setValue(EL.USINAGEM_ID, item.usinagemresp);
+      getUsuario(Dom.getValue(EL.USINAGEM_ID), EL.USINAGEM_RESP);
+      Dom.setChecked(EL.USINAGEM_C_INICIO, false);
+      Dom.setChecked(EL.USINAGEM_C_FIM, false);
 
-      Dom.setValue("txt_montageminicio", item.montageminicio);
-      Dom.setValue("txt_montagemfim", item.montagemfim);
-      Dom.setChecked("chk_montagem", item.montagempausa);
-      Dom.setValue("txt_montagemid", item.montagemresp);
-      getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp");
-      Dom.setChecked("chk_montageminicio", false);
-      Dom.setChecked("chk_montagemfim", false);
+      Dom.setValue(EL.MONTAGEM_INICIO, item.montageminicio);
+      Dom.setValue(EL.MONTAGEM_FIM, item.montagemfim);
+      Dom.setChecked(EL.MONTAGEM_PAUSA, item.montagempausa);
+      Dom.setValue(EL.MONTAGEM_ID, item.montagemresp);
+      getUsuario(Dom.getValue(EL.MONTAGEM_ID), EL.MONTAGEM_RESP);
+      Dom.setChecked(EL.MONTAGEM_C_INICIO, false);
+      Dom.setChecked(EL.MONTAGEM_C_FIM, false);
 
-      Dom.setValue("txt_paineisinicio", item.paineisinicio);
-      Dom.setValue("txt_paineisfim", item.paineisfim);
-      Dom.setChecked("chk_paineis", item.paineispausa);
-      Dom.setValue("txt_paineisid", item.paineisresp);
-      getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp");
-      Dom.setChecked("chk_paineisinicio", false);
-      Dom.setChecked("chk_paineisfim", false);
+      Dom.setValue(EL.PAINEIS_INICIO, item.paineisinicio);
+      Dom.setValue(EL.PAINEIS_FIM, item.paineisfim);
+      Dom.setChecked(EL.PAINEIS_PAUSA, item.paineispausa);
+      Dom.setValue(EL.PAINEIS_ID, item.paineisresp);
+      getUsuario(Dom.getValue(EL.PAINEIS_ID), EL.PAINEIS_RESP);
+      Dom.setChecked(EL.PAINEIS_C_INICIO, false);
+      Dom.setChecked(EL.PAINEIS_C_FIM, false);
 
-      Dom.setValue("txt_acabamentoinicio", item.acabamentoinicio);
-      Dom.setValue("txt_acabamentofim", item.acabamentofim);
-      Dom.setChecked("chk_acabamento", item.acabamentopausa);
-      Dom.setValue("txt_acabamentoid", item.acabamentoresp);
-      getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp");
-      Dom.setChecked("chk_acabamentoinicio", false);
-      Dom.setChecked("chk_acabamentofim", false);
+      Dom.setValue(EL.ACABAMENTOS_INICIO, item.acabamentoinicio);
+      Dom.setValue(EL.ACABAMENTOS_FIM, item.acabamentofim);
+      Dom.setChecked(EL.ACABAMENTOS_PAUSA, item.acabamentopausa);
+      Dom.setValue(EL.ACABAMENTOS_ID, item.acabamentoresp);
+      getUsuario(Dom.getValue(EL.ACABAMENTOS_ID), EL.ACABAMENTOS_RESP);
+      Dom.setChecked(EL.ACABAMENTOS_C_INICIO, false);
+      Dom.setChecked(EL.ACABAMENTOS_C_FIM, false);
 
-      Dom.setValue("txt_embalageminicio", item.embalageminicio);
-      Dom.setValue("txt_embalagemfim", item.embalagemfim);
-      Dom.setChecked("chk_embalagem", item.embalagempausa);
-      Dom.setValue("txt_embalagemid", item.embalagemresp);
-      getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp");
-      Dom.setChecked("chk_embalageminicio", false);
-      Dom.setChecked("chk_embalagemfim", false);
+      Dom.setValue(EL.EMBALAGEM_INICIO, item.embalageminicio);
+      Dom.setValue(EL.EMBALAGEM_FIM, item.embalagemfim);
+      Dom.setChecked(EL.EMBALAGEM_PAUSA, item.embalagempausa);
+      Dom.setValue(EL.EMBALAGEM_ID, item.embalagemresp);
+      getUsuario(Dom.getValue(EL.EMBALAGEM_ID), EL.EMBALAGEM_RESP);
+      Dom.setChecked(EL.EMBALAGEM_C_INICIO, false);
+      Dom.setChecked(EL.EMBALAGEM_C_FIM, false);
 
-      Dom.setValue("txt_observacoes", item.observacoes);
+      Dom.setValue(EL.OBSERVACOES, item.observacoes);
     });
     localStorage.setItem(
       "previsao",
-      convertDataBr(Dom.getValue("txt_previsao"))
+      DateTimer.forBr(Dom.getValue(EL.PREVISAO))
     );
   } catch (err) {
     alert(err.message);
   }
 }
 
-function setarDataHora(checkbox, text) {
-  setDateTime(checkbox, text);
+async function confirmDateInsertion(checkbox, element) {
+  const response = await Modal.showConfirmation(null, "Preencher data ?");
+  if (!response.isConfirmed) return;
+  const cb = checkIsTrue(checkbox);
+  if (!cb) q(checkbox).checked = false;
+  setDateElement(element);
+}
+
+function checkIsTrue(checkbox) {
+  const cb = q(checkbox);
+  if (cb.checked) return true;
+  return false;
+}
+
+function setDateElement(campoDataHora) {
+  const el = q(campoDataHora);
+  el.value = DateTimer.dateTimeNow();
+}
+
+function getElementsValues() {
+  const data = {
+    p_ordemdecompra: Dom.getValue(EL.NUM_OC),
+    p_corteinicio: Dom.getValue(EL.CORTE_INICIO),
+    p_cortefim: Dom.getValue(EL.CORTE_FIM),
+    p_corteresp: Dom.getValue(EL.CORTE_ID),
+    p_cortepausa: Dom.getChecked(EL.CORTE_PAUSA),
+
+    p_customizacaoinicio: Dom.getValue(EL.CUSTOM_INICIO),
+    p_customizacaofim: Dom.getValue(EL.CUSTOM_FIM),
+    p_customizacaoresp: Dom.getValue(EL.CUSTOM_ID),
+    p_customizacaopausa: Dom.getChecked(EL.CUSTOM_PAUSA),
+
+    p_coladeirainicio: Dom.getValue(EL.COLADEIRA_INICIO),
+    p_coladeirafim: Dom.getValue(EL.COLADEIRA_FIM),
+    p_coladeiraresp: Dom.getValue(EL.COLADEIRA_ID),
+    p_coladeirapausa: Dom.getChecked(EL.COLADEIRA_PAUSA),
+
+    p_usinageminicio: Dom.getValue(EL.USINAGEM_INICIO),
+    p_usinagemfim: Dom.getValue(EL.USINAGEM_FIM),
+    p_usinagemresp: Dom.getValue(EL.USINAGEM_ID),
+    p_usinagempausa: Dom.getChecked(EL.USINAGEM_PAUSA),
+
+    p_montageminicio: Dom.getValue(EL.MONTAGEM_INICIO),
+    p_montagemfim: Dom.getValue(EL.MONTAGEM_FIM),
+    p_montagemresp: Dom.getValue(EL.MONTAGEM_ID),
+    p_montagempausa: Dom.getChecked(EL.MONTAGEM_PAUSA),
+
+    p_paineisinicio: Dom.getValue(EL.PAINEIS_INICIO),
+    p_paineisfim: Dom.getValue(EL.PAINEIS_FIM),
+    p_paineisresp: Dom.getValue(EL.PAINEIS_ID),
+    p_paineispausa: Dom.getChecked(EL.PAINEIS_PAUSA),
+
+    p_acabamentoinicio: Dom.getValue(EL.ACABAMENTOS_INICIO),
+    p_acabamentofim: Dom.getValue(EL.ACABAMENTOS_FIM),
+    p_acabamentoresp: Dom.getValue(EL.ACABAMENTOS_ID),
+    p_acabamentopausa: Dom.getChecked(EL.ACABAMENTOS_PAUSA),
+
+    p_embalageminicio: Dom.getValue(EL.EMBALAGEM_INICIO),
+    p_embalagemfim: Dom.getValue(EL.EMBALAGEM_FIM),
+    p_embalagemresp: Dom.getValue(EL.EMBALAGEM_ID),
+    p_embalagempausa: Dom.getChecked(EL.EMBALAGEM_PAUSA),
+
+    p_observacoes: Dom.getValue(EL.OBSERVACOES),
+    p_previsao: Dom.getValue(EL.PREVISAO),
+  };
+  return data;
+}
+
+function validatedData() {
+  const data = getElementsValues();
+  const steps = [
+    {
+      etapa: "Corte",
+      start: data.p_corteinicio,
+      end: data.p_cortefim,
+    },
+    {
+      etapa: "Customização",
+      start: data.p_customizacaoinicio,
+      end: data.p_customizacaofim,
+    },
+    {
+      etapa: "Coladeira",
+      start: data.p_coladeirainicio,
+      end: data.p_coladeirafim,
+    },
+    {
+      etapa: "Usinagem",
+      start: data.p_usinageminicio,
+      end: data.p_usinagemfim,
+    },
+    {
+      etapa: "Montagem",
+      start: data.p_montageminicio,
+      end: data.p_montagemfim,
+    },
+    {
+      etapa: "Paineis",
+      start: data.p_paineisinicio,
+      end: data.p_paineisfim,
+    },
+    {
+      etapa: "Acabamentos",
+      start: data.p_acabamentoinicio,
+      end: data.p_acabamentofim,
+    },
+    {
+      etapa: "Embalagem",
+      start: data.p_embalageminicio,
+      end: data.p_embalagemfim,
+    },
+  ];
+
+  for (let i = 0; i < steps.length; i++) {
+    const step = steps[i];
+    // Se fim estiver preenchido, o início também deve estar
+    if (step.end && !step.start) {
+      return `A data de início da etapa "${step.etapa}" não foi preenchida.`;
+    }
+
+    if (
+      step.start &&
+      step.end &&
+      DateTimer.isEndBeforeStart(step.start, step.end)
+    ) {
+      return `A data de fim da etapa "${step.etapa}" não pode ser anterior à data de início.`;
+    }
+
+    // Verificar se as datas não são superiores à data de hoje
+    if (step.start && DateTimer.isDateInFuture(step.start)) {
+      return `A data de início da etapa "${step.etapa}" não pode ser maior que a data de hoje.`;
+    }
+
+    if (step.end && DateTimer.isDateInFuture(step.end)) {
+      return `A data de fim da etapa "${step.etapa}" não pode ser maior que a data de hoje.`;
+    }
+  }
+  return data;
 }
 
 async function setDataProducao() {
-  const result = await messageQuestion(null, "Deseja confirmar Alterações?");
-
+  const data = validatedData();
+  if (typeof data == "string") {
+    Modal.showInfo("warning", "ATENÇÃO", data);
+    return;
+  }
+  const result = await Modal.showConfirmation(
+    null,
+    "Deseja confirmar Alterações?"
+  );
   if (result.isConfirmed) {
     try {
-      const data = {
-        p_ordemdecompra: Dom.getValue("txt_numoc"),
-        p_corteinicio: Dom.getValue("txt_corteinicio"),
-        p_cortefim: Dom.getValue("txt_cortefim"),
-        p_corteresp: Dom.getValue("txt_corteid"),
-        p_cortepausa: Dom.getChecked("chk_corte"),
+      const response = await API.fetchBody("/setDataProducao", "PUT", data);
 
-        p_customizacaoinicio: Dom.getValue("txt_customizacaoinicio"),
-        p_customizacaofim: Dom.getValue("txt_customizacaofim"),
-        p_customizacaoresp: Dom.getValue("txt_customizacaoid"),
-        p_customizacaopausa: Dom.getChecked("chk_customizacao"),
-
-        p_coladeirainicio: Dom.getValue("txt_coladeirainicio"),
-        p_coladeirafim: Dom.getValue("txt_coladeirafim"),
-        p_coladeiraresp: Dom.getValue("txt_coladeiraid"),
-        p_coladeirapausa: Dom.getChecked("chk_coladeira"),
-
-        p_usinageminicio: Dom.getValue("txt_usinageminicio"),
-        p_usinagemfim: Dom.getValue("txt_usinagemfim"),
-        p_usinagemresp: Dom.getValue("txt_usinagemid"),
-        p_usinagempausa: Dom.getChecked("chk_usinagem"),
-
-        p_montageminicio: Dom.getValue("txt_montageminicio"),
-        p_montagemfim: Dom.getValue("txt_montagemfim"),
-        p_montagemresp: Dom.getValue("txt_montagemid"),
-        p_montagempausa: Dom.getChecked("chk_montagem"),
-
-        p_paineisinicio: Dom.getValue("txt_paineisinicio"),
-        p_paineisfim: Dom.getValue("txt_paineisfim"),
-        p_paineisresp: Dom.getValue("txt_paineisid"),
-        p_paineispausa: Dom.getChecked("chk_paineis"),
-
-        p_acabamentoinicio: Dom.getValue("txt_acabamentoinicio"),
-        p_acabamentofim: Dom.getValue("txt_acabamentofim"),
-        p_acabamentoresp: Dom.getValue("txt_acabamentoid"),
-        p_acabamentopausa: Dom.getChecked("chk_acabamento"),
-
-        p_embalageminicio: Dom.getValue("txt_embalageminicio"),
-        p_embalagemfim: Dom.getValue("txt_embalagemfim"),
-        p_embalagemresp: Dom.getValue("txt_embalagemid"),
-        p_embalagempausa: Dom.getChecked("chk_embalagem"),
-
-        p_observacoes: Dom.getValue("txt_observacoes"),
-        p_previsao: Dom.getValue("txt_previsao"),
-      };
-
-      const response = await fetch("/setDataProducao", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        messageInformation(
-          "error",
-          "ERRO",
-          "Ocorreu um erro ao salvar os dados!"
-        );
+      if (response.status !== 200) {
+        Modal.showInfo("error", "ERRO", "Ocorreu um erro ao salvar os dados!");
       } else {
-        messageInformation(
+        Modal.showInfo(
           "success",
           "Sucesso",
           "Alterações confirmadas com sucesso!"
@@ -351,7 +507,7 @@ async function setDataProducao() {
         await sendEmail();
       }
     } catch (err) {
-      messageInformation(
+      Modal.showInfo(
         "error",
         "ERRO",
         "Falha na comunicação com o servidor!" + err.message
@@ -362,20 +518,20 @@ async function setDataProducao() {
 
 async function sendEmail() {
   const prevOld = localStorage.getItem("previsao");
-  const contrato = Dom.getValue("txt_contrato");
-  const cliente = Dom.getValue("txt_cliente");
-  const ambiente = Dom.getValue("txt_ambiente");
-  const previsao = convertDataBr(Dom.getValue("txt_previsao"));
+  const contrato = Dom.getValue(EL.CONTRATO);
+  const cliente = Dom.getValue(EL.CLIENTE);
+  const ambiente = Dom.getValue(EL.AMBIENTE);
+  const previsao = MyNumber.formatCoin(Dom.getValue(EL.PREVISAO));
   if (prevOld != previsao) {
-    const email = await getConfig(1);
+    const email = await Service.getConfig(1);
     const text = `*** ${contrato} - ${cliente} - ${ambiente} - PREV: ${previsao} ***`;
     const data = {
       destination: email[0].p_email,
+      // destination: "fabrica@gd.ind.br",
       title: text,
-
       body: "Previsão Alterada",
     };
-    await sendMail(data);
+    await Email.send(data);
   }
 }
 
@@ -393,26 +549,26 @@ function handleClickCheckbox() {
 
   operation.forEach((item) => {
     Dom.addEventBySelector(`#chk_${item}inicio`, "click", () =>
-      setarDataHora(`#chk_${item}inicio`, `txt_${item}inicio`)
+      confirmDateInsertion(`#chk_${item}inicio`, `#txt_${item}inicio`)
     );
 
     Dom.addEventBySelector(`#chk_${item}fim`, "click", () =>
-      setarDataHora(`#chk_${item}fim`, `txt_${item}fim`)
+      confirmDateInsertion(`#chk_${item}fim`, `#txt_${item}fim`)
     );
   });
 }
 
 function getUsuarios() {
-  const meuHTML = document.getElementById("modal-1").innerHTML;
-  messageInformation(null, null, meuHTML);
+  const meuHTML = q(EL.MODAL).innerHTML;
+  Modal.showInfo(null, null, meuHTML);
 }
 
 async function filltableUsuarios() {
-  const data = await getOperadores();
-  const tbody = document.querySelector("#modal-1 tbody");
+  const data = await Service.getOperadores();
+  const tbody = q(EL.TABLE_MODAL);
   tbody.innerHTML = "";
   data.forEach((element) => {
-    const tr = document.createElement("tr");
+    const tr = ce("tr");
     tr.innerHTML = `
       <td>${element.p_id}</td>
       <td>${element.p_nome}</td>
@@ -421,53 +577,53 @@ async function filltableUsuarios() {
   });
 }
 
-document.addEventListener("resize", ajustarTamanhoModal);
-document.addEventListener("DOMContentLoaded", (event) => {
+function listElementsUsers() {
+  return [
+    [EL.CORTE_ID, EL.CORTE_RESP],
+    [EL.CUSTOM_ID, EL.CUSTOM_RESP],
+    [EL.COLADEIRA_ID, EL.COLADEIRA_RESP],
+    [EL.USINAGEM_ID, EL.USINAGEM_RESP],
+    [EL.MONTAGEM_ID, EL.MONTAGEM_RESP],
+    [EL.PAINEIS_ID, EL.PAINEIS_RESP],
+    [EL.ACABAMENTOS_ID, EL.ACABAMENTOS_RESP],
+    [EL.EMBALAGEM_ID, EL.EMBALAGEM_RESP],
+  ];
+}
+
+async function handleElementsUser() {
+  const elements = listElementsUsers();
+  elements.forEach((item) => {
+    Dom.addEventBySelector(item[0], "blur", async () =>
+      Dom.setValue(item[1], await getName(item[0]))
+    );
+  });
+}
+
+async function getName(param) {
+  const id = q(param).value;
+  const res = await Service.getUser(id);
+  const name = res.nome;
+  return name;
+}
+
+function init() {
   loadPage("producao", "producao.html");
   fillTable();
   filltableUsuarios();
-  enableTableFilterSort("table");
-  onmouseover("table");
-  enableEnterAsTab();
+  enableTableFilterSort(EL.TABLE.slice(1));
+  Dom.onmouseover(EL.TABLE);
+  Dom.enableEnterAsTab();
   ajustarTamanhoModal();
-  onclickHighlightRow("table");
-  window.addEventListener("resize", ajustarTamanhoModal);
+  Dom.rowClick(EL.TABLE);
   handleClickCheckbox();
+  handleElementsUser();
+  Dom.addEventBySelector(EL.BT_SALVAR, "click", setDataProducao);
+  Dom.addEventBySelector(EL.TABLE, "dblclick", handleClikedTable);
+  Dom.addEventBySelector(EL.BT_FUNCIONARIOS, "click", getUsuarios);
+  document.addEventListener("resize", ajustarTamanhoModal);
+}
+
+document.addEventListener("resize", ajustarTamanhoModal);
+document.addEventListener("DOMContentLoaded", (event) => {
+  init();
 });
-
-Dom.addEventBySelector("#bt_salvar", "click", setDataProducao);
-Dom.addEventBySelector("#table", "dblclick", handleClikedTable);
-
-Dom.addEventBySelector("#txt_corteid", "blur", () =>
-  getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp")
-);
-
-Dom.addEventBySelector("#txt_customizacaoid", "blur", () =>
-  getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp")
-);
-
-Dom.addEventBySelector("#txt_coladeiraid", "blur", () =>
-  getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp")
-);
-
-Dom.addEventBySelector("#txt_usinagemid", "blur", () =>
-  getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp")
-);
-
-Dom.addEventBySelector("#txt_montagemid", "blur", () =>
-  getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp")
-);
-
-Dom.addEventBySelector("#txt_paineisid", "blur", () =>
-  getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp")
-);
-
-Dom.addEventBySelector("#txt_acabamentoid", "blur", () =>
-  getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp")
-);
-
-Dom.addEventBySelector("#txt_embalagemid", "blur", () =>
-  getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp")
-);
-
-Dom.addEventBySelector("#bt_funcionarios", "click", getUsuarios);

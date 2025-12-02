@@ -1,16 +1,21 @@
-import Swal from "./sweetalert2.esm.all.min.js";
-import {
-  Dom,
-  enableEnterAsTab,
-  messageInformation,
-  messageQuestion,
-  criarSpinnerGlobal,
-  getCookie,
-} from "./utils.js";
+import { criarSpinnerGlobal, getCookie } from "./utils.js";
+
+import { API } from "./service/api.js";
+import { q, Dom, Modal } from "./UI/interface.js";
+
+/*===========================
+HELPER DE ELEMENTS
+===========================*/
+
+const EL = {
+  ID: "#txt_id",
+  LOGIN: "#txt_login",
+  PASSWORD: "#password",
+};
 
 async function find_id() {
-  const txtId = document.getElementById("txt_id");
-  const txtLogin = document.getElementById("txt_login");
+  const txtId = q(EL.ID);
+  const txtLogin = q(EL.LOGIN);
   const id_user = txtId.value.trim();
 
   if (!id_user) {
@@ -33,11 +38,7 @@ async function find_id() {
     txtLogin.value = data[0].login;
   } catch (err) {
     txtLogin.value = "";
-    messageInformation(
-      "error",
-      "Erro",
-      "Número de ID não encontrado na base de dados!"
-    ).then(() => {
+    Modal.showInfo("error", "Erro", "Número de ID não encontrado ").then(() => {
       txtId.value = "";
       txtId.focus();
     });
@@ -46,82 +47,71 @@ async function find_id() {
 
 async function passwordValidation(event) {
   const dict = {
-    p_id: Dom.getValue("txt_id"),
-    p_senha: Dom.getValue("password"),
+    p_id: Dom.getValue(EL.ID),
+    p_senha: Dom.getValue(EL.PASSWORD),
   };
+  const response = await API.fetchBody("/passwordValidation", "POST", dict);
 
-  const response = await fetch("/passwordValidation", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dict),
-  });
-
-  if (!response.ok) {
+  if (response.status !== 200) {
     throw new Error(`Erro na requisição: ${response.status}`);
   }
 
-  const data = await response.json();
+  const data = await response.data;
 
-  const hasData = Array.isArray(data)
-    ? data.length > 0
-    : data && Object.keys(data).length > 0;
-
-  if (hasData) {
+  if (response.data.length) {
     setDataUsuario(data[0]);
-    localStorage.setItem("teste", "concluido");
     window.location.href = "/menu.html";
   } else {
-    const pwdInput = document.getElementById("password");
+    const pwdInput = q(EL.PASSWORD);
     pwdInput.value = "";
     pwdInput.focus();
-    messageInformation("error", "Erro", "Senha digitada é inválida !");
+    Modal.showInfo("error", "Erro", "Senha digitada é inválida !").then(() => {
+      q(EL.PASSWORD).focus();
+    });
   }
+}
+
+function setPayload(user) {
+  const payload = {
+    id: user.id,
+    permissoes: user.permissoes,
+    login: user.login,
+    adicionar_projetos: user.adicionar_projetos,
+    producao: user.producao,
+    expedicao: user.expedicao,
+    adicionar_usuarios: user.adicionar_usuarios,
+    acesso: user.acesso,
+    definicoes: user.definicoes,
+    pcp: user.pcp,
+    previsao: user.previsao,
+    compras: user.compras,
+    ativo: user.ativo,
+    producao_assistencia: user.producao_assistencia,
+    solicitar_assistencia: user.solicitar_assistencia,
+    valores: user.valores,
+    dashboard: user.dashboard,
+  };
+  return payload;
 }
 
 async function setDataUsuario(user) {
   try {
-    const payload = {
-      id: user.id,
-      permissoes: user.permissoes,
-      login: user.login,
-      adicionar_projetos: user.adicionar_projetos,
-      producao: user.producao,
-      expedicao: user.expedicao,
-      adicionar_usuarios: user.adicionar_usuarios,
-      acesso: user.acesso,
-      definicoes: user.definicoes,
-      pcp: user.pcp,
-      previsao: user.previsao,
-      compras: user.compras,
-      ativo: user.ativo,
-      producao_assistencia: user.producao_assistencia,
-      solicitar_assistencia: user.solicitar_assistencia,
-      valores: user.valores,
-      dashboard: user.dashboard,
-    };
+    const payload = setPayload(user);
+    const response = await API.fetchBody("/setPermission", "POST", payload);
 
-    const response = await fetch("/setPermission", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error("Erro ao salvar permissões no backend");
+    if (response.status !== 200) {
+      throw new Error(`Erro ao salvar permissões ${response.data}`);
     }
-
-    console.log("Dados de usuário enviados com sucesso!");
   } catch (error) {
     console.error("Erro ao enviar dados:", error);
   }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-  Dom.setFocus("txt_id");
-  document.getElementById("txt_id").value = "";
-  enableEnterAsTab();
+  Dom.setFocus(EL.ID);
+  q(EL.ID).value = "";
+  Dom.enableEnterAsTab();
   criarSpinnerGlobal();
+  Dom.addEventBySelector("#bt_login", "click", passwordValidation);
+  Dom.addEventBySelector("#txt_id", "blur", find_id);
 });
-
-Dom.addEventBySelector("#bt_login", "click", passwordValidation);
-Dom.addEventBySelector("#txt_id", "blur", find_id);

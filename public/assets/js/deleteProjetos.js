@@ -1,61 +1,93 @@
-import {
-  Dom,
-  formatCurrency,
-  loadPage,
-  enableEnterAsTab,
-  messageInformation,
-  messageQuestion,
-} from "./utils.js";
+import { loadPage } from "./utils.js";
+import { Dom, Modal, q, qa } from "./UI/interface.js";
+import { API } from "./service/api.js";
+import { MyNumber } from "./utils/time.js";
+
+const EL = {
+  // Inputs
+  OC: "#txt_numoc",
+  AMBIENTE: "#txt_ambiente",
+  CONTRATO: "#txt_contrato",
+  CLIENTE: "#txt_cliente",
+  VENDEDOR: "#txt_vendedor",
+  LIBERADOR: "#txt_liberador",
+  DATA_CONTRATO: "#txt_datacontrato",
+  DATA_ASSINATURA: "#txt_dataassinatura",
+  DATA_ENTREGA: "#txt_dataentrega",
+  CHEGOU_FABRICA: "#txt_chegoufabrica",
+  LOJA: "#txt_loja",
+  TIPO_CLIENTE: "#txt_tipocliente",
+  ETAPA: "#txt_etapa",
+  TIPO_AMBIENTE: "#txt_tipoambiente",
+  NUM_PROJ: "#txt_numproj",
+  TIPO_CONTRATO: "#txt_tipocontrato",
+  TIPO_CLIENTE: "#txt_tipocliente",
+  VALOR_BRUTO: "#txt_valorbruto",
+  VALOR_NEGOCIADO: "#txt_valornegociado",
+  CUSTO_MATERIAL: "#txt_customaterial",
+  CUSTO_ADICIONAL: "#txt_custoadicional",
+
+  // Buttons
+  SALVAR: "#bt_salvar",
+
+  //Data List
+  DL_VENDEDORES: "#vendedores",
+  DL_LIBERADORES: "#liberadores",
+};
 
 async function getDeleteProjetos() {
-  const ordemdecompra = Number(Dom.getValue("txt_numoc"));
+  const ordemdecompra = Number(Dom.getValue(EL.OC));
   if (!Number.isInteger(ordemdecompra)) return;
 
-  const response = await fetch(
-    `/getDeleteProjetos?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
+  const response = await API.fetchQuery(
+    `/getDeleteProjetos?p_ordemdecompra=${Dom.getValue(EL.OC)}`
   );
 
-  if (!response.ok) {
-    messageInformation("error", "Erro", "Digite a ordem de compra");
+  if (response.status !== 200) {
+    Modal.showInfo("error", "Erro", `${response.data}`);
   } else {
     const data = await response.json();
     if (data && data.length > 0) {
       data.forEach((item) => {
-        Dom.setValue("txt_contrato", item.contrato);
-        Dom.setValue("txt_cliente", item.cliente);
-        Dom.setValue("txt_tipoambiente", item.tipoambiente);
-        Dom.setValue("txt_ambiente", item.ambiente);
-        Dom.setValue("txt_numproj", item.numproj);
-        Dom.setValue("txt_vendedor", item.vendedor);
-        Dom.setValue("txt_liberador", item.liberador);
-        Dom.setValue("txt_datacontrato", item.datacontrato);
-        Dom.setValue("txt_dataassinatura", item.dataassinatura);
-        Dom.setValue("txt_chegoufabrica", item.chegoufabrica);
-        Dom.setValue("txt_dataentrega", item.dataentrega);
-        Dom.setValue("txt_loja", item.loja);
-        Dom.setValue("txt_tipocliente", item.tipocliente);
-        Dom.setValue("txt_etapa", item.etapa);
-        Dom.setValue("txt_tipocontrato", item.tipocontrato);
-        Dom.setValue("txt_valorbruto", formatCurrency(item.valorbruto));
-        Dom.setValue("txt_valornegociado", formatCurrency(item.valornegociado));
-        Dom.setValue("txt_customaterial", formatCurrency(item.customaterial));
+        Dom.setValue(EL.CONTRATO, item.contrato);
+        Dom.setValue(EL.CLIENTE, item.cliente);
+        Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
+        Dom.setValue(EL.AMBIENTE, item.ambiente);
+        Dom.setValue(EL.NUM_PROJ, item.numproj);
+        Dom.setValue(EL.VENDEDOR, item.vendedor);
+        Dom.setValue(EL.LIBERADOR, item.liberador);
+        Dom.setValue(EL.DATA_CONTRATO, item.datacontrato);
+        Dom.setValue(EL.DATA_ASSINATURA, item.dataassinatura);
+        Dom.setValue(EL.CHEGOU_FABRICA, item.chegoufabrica);
+        Dom.setValue(EL.DATA_ENTREGA, item.dataentrega);
+        Dom.setValue(EL.LOJA, item.loja);
+        Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
+        Dom.setValue(EL.ETAPA, item.etapa);
+        Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
+        Dom.setValue(EL.VALOR_BRUTO, MyNumber.formatCoin(item.valorbruto));
         Dom.setValue(
-          "txt_custoadicional",
-          formatCurrency(item.customaterialadicional)
+          EL.VALOR_NEGOCIADO,
+          MyNumber.formatCoin(item.valornegociado)
+        );
+        Dom.setValue(
+          EL.CUSTO_MATERIAL,
+          MyNumber.formatCoin(item.customaterial)
+        );
+        Dom.setValue(
+          EL.CUSTO_ADICIONAL,
+          MyNumber.formatCoin(item.customaterialadicional)
         );
       });
     } else {
-      messageInformation("error", "Erro", "Ordem de Compra Invalida").then(
-        () => {
-          Dom.setFocus("txt_numoc");
-        }
-      );
+      Modal.showInfo("error", "Erro", "Ordem de Compra Invalida").then(() => {
+        Dom.setFocus(EL.OC);
+      });
     }
   }
 }
 
 async function validForm(e) {
-  const form = document.querySelector("form");
+  const form = q("form");
   if (form.checkValidity()) {
     e.preventDefault();
     await setDeleteProjeto();
@@ -63,35 +95,31 @@ async function validForm(e) {
 }
 
 async function setDeleteProjeto() {
-  const result = await messageQuestion(null, "Deseja excluir Projeto ?");
+  const result = await Modal.ShowQuestion(null, "Deseja excluir Projeto ?");
 
   if (result.isConfirmed) {
-    const response = await fetch("/setDeleteProjeto", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ p_ordemdecompra: Dom.getValue("txt_numoc") }),
-    });
+    const data = { p_ordemdecompra: Dom.getValue(EL.OC) };
+    const response = await API.fetchBody("/setDeleteProjeto", "DELETE", data);
 
-    if (!response.ok) {
-      messageInformation("error", "Erro", "Digite a ordem de compra");
+    if (response.status !== 200) {
+      Modal.show("error", "Erro", `ERRO: ${response.data}`);
     } else {
-      await messageInformation(
-        "success",
-        "Sucesso",
-        "Projeto excluido com Sucesso !!!"
-      );
+      await Modal.show("success", "Sucesso", "Excluido com Sucesso !!!");
       document.location.href = "/excluir.html";
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
+function init() {
   loadPage("adicionar_projetos", "excluir.html");
-  Dom.setFocus("txt_numoc");
-  enableEnterAsTab();
-});
+  Dom.setFocus(EL.OC);
+  Dom.enableEnterAsTab();
+  Dom.addEventBySelector(EL.OC, "change", getDeleteProjetos);
+  Dom.addEventBySelector(EL.SALVAR, "click", async (e) => {
+    validForm(e);
+  });
+}
 
-Dom.addEventBySelector("#txt_numoc", "change", getDeleteProjetos);
-Dom.addEventBySelector("#bt_salvar", "click", async (e) => {
-  validForm(e);
+document.addEventListener("DOMContentLoaded", (event) => {
+  init();
 });

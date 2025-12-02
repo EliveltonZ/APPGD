@@ -1,56 +1,77 @@
-import {
-  Dom,
-  loadPage,
-  enableEnterAsTab,
-  messageQuestion,
-  messageInformation,
-} from "./utils.js";
+import { loadPage } from "./utils.js";
+import { Dom, q, Modal } from "./UI/interface.js";
+import { API } from "./service/api.js";
+
+/*==============================
+ HELPER elementos
+==============================*/
+
+const SELECTORS = {
+  // inputs
+  ID: "#txt_id",
+  LOGIN: "#txt_login",
+  SETOR: "#txt_setor",
+  CAMISETA: "#txt_camiseta",
+  CALCA: "#txt_calca",
+  SAPATO: "#txt_sapato",
+  LOCAL: "#txt_local",
+  ATIVO: "#chk_ativo",
+  PROJETOS: "#chk_projetos",
+  PRODUCAO: "#chk_producao",
+  EXPEDICAO: "#chk_expedicao",
+  ACESSOS: "#chk_acessos",
+  USUARIOS: "#chk_usuarios",
+  DEFINICOES: "#chk_definicoes",
+  CALCULAR: "#chk_calcular",
+  PREVISOES: "#chk_previsoes",
+  COMPRAS: "#chk_compras",
+  SOLICITACAO: "#chk_solicitacao",
+  PROD_ASS: "#chk_prodass",
+  VALORES: "#chk_valores",
+  DASHBOARDS: "#chk_dashboard",
+  // buttons
+  SALVAR: "#bt_salvar",
+};
 
 async function getUserAccess() {
-  const id = document.getElementById("txt_id").value.trim();
+  const id = q(SELECTORS.ID).value.trim();
   if (!id || id <= 0) {
-    messageInformation("error", "ERRO", "ID precisa ser numero maior que 0");
+    Modal.showInfo("error", "ERRO", "ID precisa ser numero maior que 0").then(
+      () => {
+        q(SELECTORS.ID).focus();
+      }
+    );
     return;
   }
 
   try {
-    const response = await fetch(
+    const response = await API.fetchQuery(
       `/getUserAccess?p_id=${encodeURIComponent(id)}`
     );
+    const item = response.data[0];
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const u = await response.json();
-    const item = u[0];
-    console.log(item);
-    if (!item) {
-      throw new Error("Nenhum dado recebido");
-    }
-
-    Dom.setValue("txt_login", item.login);
-    Dom.setValue("txt_setor", item.setor);
-    Dom.setValue("txt_camiseta", item.camiseta);
-    Dom.setValue("txt_calca", item.calca);
-    Dom.setValue("txt_sapato", item.sapato);
-    Dom.setValue("txt_local", item.local);
-    Dom.setChecked("chk_ativo", item.ativo);
-    Dom.setChecked("chk_projetos", item.projetos);
-    Dom.setChecked("chk_producao", item.producao);
-    Dom.setChecked("chk_expedicao", item.expedicao);
-    Dom.setChecked("chk_usuarios", item.usuarios);
-    Dom.setChecked("chk_acessos", item.acessos);
-    Dom.setChecked("chk_definicoes", item.definicoes);
-    Dom.setChecked("chk_calcular", item.pcp);
-    Dom.setChecked("chk_previsoes", item.previsao);
-    Dom.setChecked("chk_compras", item.compras);
-    Dom.setChecked("chk_solicitacao", item.solicitacao);
-    Dom.setChecked("chk_prodass", item.prodass);
-    Dom.setChecked("chk_valores", item.valores);
-    Dom.setChecked("chk_dashboard", item.dashboard);
+    Dom.setValue(SELECTORS.LOGIN, item.login);
+    Dom.setValue(SELECTORS.SETOR, item.setor);
+    Dom.setValue(SELECTORS.CAMISETA, item.camiseta);
+    Dom.setValue(SELECTORS.CALCA, item.calca);
+    Dom.setValue(SELECTORS.SAPATO, item.sapato);
+    Dom.setValue(SELECTORS.LOCAL, item.local);
+    Dom.setChecked(SELECTORS.ATIVO, item.ativo);
+    Dom.setChecked(SELECTORS.PROJETOS, item.projetos);
+    Dom.setChecked(SELECTORS.PRODUCAO, item.producao);
+    Dom.setChecked(SELECTORS.EXPEDICAO, item.expedicao);
+    Dom.setChecked(SELECTORS.USUARIOS, item.usuarios);
+    Dom.setChecked(SELECTORS.ACESSOS, item.acessos);
+    Dom.setChecked(SELECTORS.DEFINICOES, item.definicoes);
+    Dom.setChecked(SELECTORS.CALCULAR, item.pcp);
+    Dom.setChecked(SELECTORS.PREVISOES, item.previsao);
+    Dom.setChecked(SELECTORS.COMPRAS, item.compras);
+    Dom.setChecked(SELECTORS.SOLICITACAO, item.solicitacao);
+    Dom.setChecked(SELECTORS.PROD_ASS, item.prodass);
+    Dom.setChecked(SELECTORS.VALORES, item.valores);
+    Dom.setChecked(SELECTORS.DASHBOARDS, item.dashboard);
   } catch (err) {
-    messageInformation(
+    Modal.showInfo(
       "error",
       "Erro",
       `Ocorreu um erro ao buscar dados: ${err.message}`
@@ -59,52 +80,56 @@ async function getUserAccess() {
 }
 
 function senhaFocus() {
-  document.getElementById("txt_id").focus();
+  q(SELECTORS.ID).focus();
 }
 
 async function setUserAccess() {
-  if (Dom.getValue("txt_id") <= 0) return;
-  const result = await messageQuestion(null, "Deseja confirmar alterações?");
+  if (Dom.getValue(SELECTORS.ID) <= 0) return;
+  const result = await Modal.ShowQuestion(null, "Deseja confirmar alterações?");
 
   if (result.isConfirmed) {
-    const data = {
-      p_id: Dom.getValue("txt_id"),
-      p_login: Dom.getValue("txt_login"),
-      p_setor: Dom.getValue("txt_setor"),
-      p_camiseta: Dom.getValue("txt_camiseta"),
-      p_calca: Dom.getValue("txt_calca"),
-      p_sapato: Dom.getValue("txt_sapato"),
-      p_local: Dom.getValue("txt_local"),
-      p_ativo: Dom.getChecked("chk_ativo"),
-      p_projetos: Dom.getChecked("chk_projetos"),
-      p_producao: Dom.getChecked("chk_producao"),
-      p_expedicao: Dom.getChecked("chk_expedicao"),
-      p_usuarios: Dom.getChecked("chk_usuarios"),
-      p_acessos: Dom.getChecked("chk_acessos"),
-      p_definicoes: Dom.getChecked("chk_definicoes"),
-      p_calcular: Dom.getChecked("chk_calcular"),
-      p_previsoes: Dom.getChecked("chk_previsoes"),
-      p_compras: Dom.getChecked("chk_compras"),
-      p_solicitacao: Dom.getChecked("chk_solicitacao"),
-      p_prodass: Dom.getChecked("chk_prodass"),
-      p_valores: Dom.getChecked("chk_valores"),
-      p_dashboard: Dom.getChecked("chk_dashboard"),
+    const payload = {
+      p_id: Dom.getValue(SELECTORS.ID),
+      p_login: Dom.getValue(SELECTORS.LOGIN),
+      p_setor: Dom.getValue(SELECTORS.SETOR),
+      p_camiseta: Dom.getValue(SELECTORS.CAMISETA),
+      p_calca: Dom.getValue(SELECTORS.CALCA),
+      p_sapato: Dom.getValue(SELECTORS.SAPATO),
+      p_local: Dom.getValue(SELECTORS.LOCAL),
+      p_ativo: Dom.getChecked(SELECTORS.ATIVO),
+      p_projetos: Dom.getChecked(SELECTORS.PROJETOS),
+      p_producao: Dom.getChecked(SELECTORS.PRODUCAO),
+      p_expedicao: Dom.getChecked(SELECTORS.EXPEDICAO),
+      p_usuarios: Dom.getChecked(SELECTORS.USUARIOS),
+      p_acessos: Dom.getChecked(SELECTORS.ACESSOS),
+      p_definicoes: Dom.getChecked(SELECTORS.DEFINICOES),
+      p_calcular: Dom.getChecked(SELECTORS.CALCULAR),
+      p_previsoes: Dom.getChecked(SELECTORS.PREVISOES),
+      p_compras: Dom.getChecked(SELECTORS.COMPRAS),
+      p_solicitacao: Dom.getChecked(SELECTORS.SOLICITACAO),
+      p_prodass: Dom.getChecked(SELECTORS.PROD_ASS),
+      p_valores: Dom.getChecked(SELECTORS.VALORES),
+      p_dashboard: Dom.getChecked(SELECTORS.DASHBOARDS),
     };
 
-    const response = await fetch("/setUserAccess", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    messageInformation("success", "Sucesso", "Dados atualizados com sucesso!");
+    const response = await API.fetchBody("/setUserAccess", "PUT", payload);
+    if (response.status == 200) {
+      Modal.showInfo("success", "Sucesso", "Salvo com sucesso!");
+    } else {
+      Modal.showInfo("error", "ERRO", `ERRO: HTTP ${response.status}`);
+    }
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+function init() {
   loadPage("acesso", "acessos.html");
-  enableEnterAsTab();
+  Dom.enableEnterAsTab();
   senhaFocus();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  init();
 });
 
-Dom.addEventBySelector("#bt_salvar", "click", setUserAccess);
-Dom.addEventBySelector("#txt_id", "blur", getUserAccess);
+Dom.addEventBySelector(SELECTORS.SALVAR, "click", setUserAccess);
+Dom.addEventBySelector(SELECTORS.ID, "blur", getUserAccess);

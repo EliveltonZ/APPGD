@@ -7,16 +7,16 @@
     <title>Adicionar Projetos</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=3cbcecda7e1a3c08858257d15c1ffacb">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=702f6339950f97a946eb13973273d6d4">
     <link rel="stylesheet" href="assets/css/adicionar.min.css?h=26a489f08c21ce871b16950574f7ce3b">
-    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
 <link rel="icon" href="/assets/img/icone.png">
     <script src="assets/js/addProjetos.js" type="module"></script>
 </head>
 
 <body class="figure-caption">
     <div class="d-flex justify-content-center" style="position: static;overflow: auto;align-content: center;font-family: 'Nunito Sans', sans-serif;">
-        <div class="text-nowrap d-block align-content-center" id="modal-div" style="width: 90%;max-width: 1000px;height: 100vh;">
+        <div class="text-nowrap d-block align-content-center" id="modal-div" style="width: 95%;height: 100vh;max-width: 1200px;">
             <form><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DADOS DO CLIENTE</label>
                 <div class="display-div margin-0" style="display: flex;gap: 20px;">
                     <div class="margin-0"><label class="form-label d-block">Contrato:</label><input class="form-control" type="text" id="txt_contrato" autocomplete="off" required=""></div>
@@ -28,21 +28,11 @@
                             <option value=""></option>
                         </select></div>
                     <div class="margin-0" style="min-width: 35%;"><label class="form-label">Ambiente:</label><input class="form-control d-block" type="text" id="txt_ambiente" style="width:100%;" autocomplete="off" required=""></div>
-                    <div class="margin-0" style="min-width: 10%;"><label class="form-label">N° Projeto:</label><input class="form-control d-block" type="text" id="txt_numproj" style="width:100%;" list="vendedores" autocomplete="off" required=""><datalist id="vendedores">
-    <option value="Ana Silva"></option>
-    <option value="Carlos Souza"></option>
-    <option value="Fernanda Lima">
-</option></datalist></div>
+                    <div class="margin-0" style="min-width: 10%;"><label class="form-label">N° Projeto:</label><input class="form-control d-block" type="text" id="txt_numproj" style="width:100%;" list="vendedores" autocomplete="off" required=""></div>
                     <div class="margin-0" style="min-width: 18%;"><label class="form-label">Vendedor:</label><input class="form-control d-block" type="text" id="txt_vendedor" style="width:100%;" list="vendedores" autocomplete="off" required=""><datalist id="vendedores">
-    <option value="Ana Silva"></option>
-    <option value="Carlos Souza"></option>
-    <option value="Fernanda Lima">
-</option></datalist></div>
+</datalist></div>
                     <div class="margin-0" style="min-width: 18%;"><label class="form-label">Liberador:</label><input class="form-control d-block" type="text" id="txt_liberador" style="width:100%;" list="liberadores" autocomplete="off" required=""><datalist id="liberadores">
-    <option value="Ana Silva"></option>
-    <option value="Carlos Souza"></option>
-    <option value="Fernanda Lima">
-</option></datalist></div>
+</datalist></div>
                 </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">DATAS DO PROJETO</label>
                 <div class="display-div margin-0" style="display: flex;gap: 10px;">
                     <div class="margin-0" style="min-width: 16%;"><label class="form-label d-block">Data do Contrato:</label><input class="form-control" id="txt_datacontrato" type="date"></div>
@@ -61,8 +51,8 @@
                             <option value="2°E">2°E</option>
                         </select></div>
                 </div><label class="form-label" style="font-weight: bold;font-size: 20px;margin-top: 5vh;">VALORES DO PROJETO</label>
-                <div class="display-div margin-0" style="display: flex;gap: 10px;">
-                    <div class="margin-0"><label class="form-label d-block">Tipo do Contrato:</label><select class="form-select form-select-sm d-block" id="txt_tipocontrato" style="width:100%;" required="">
+                <div class="d-flex justify-content-between display-div margin-0 gap-3">
+                    <div class="margin-0" style="min-width: 30%;"><label class="form-label d-block">Tipo do Contrato:</label><select class="form-select form-select-sm d-block" id="txt_tipocontrato" style="width:100%;" required="">
                             <option value="" selected="">-</option>
                             <option value="AMBIENTE">AMBIENTE</option>
                             <option value="ASSISTENCIA">ASSISTENCIA</option>

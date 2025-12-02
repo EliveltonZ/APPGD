@@ -1,59 +1,79 @@
-import { convertDataBr, checkValue, messageInformation, Dom } from "./utils.js";
+import { convertDataBr, checkValue, messageInformation } from "./utils.js";
+import { Dom, qa, ce, Modal } from "./UI/interface.js";
+import { Date } from "./utils/time.js";
 
-function getLocalStorageItem(item) {
+/*================== 
+HELPERS ELEMENTS ID
+==================*/
+
+const SELECTORS = {
+  CONTRATO: "#lb_contrato",
+  Q_PROJ: "#lb_qproj",
+  NUM_PROJ: "#lb_qproj",
+  CLIENTE: "#lb_cliente",
+  AMBIENTE: "#lb_ambiente",
+  VENDEDOR: "#lb_vendedor",
+  DATA_ENTREGA: "#lb_dataentrega",
+  LIBERADOR: "#lb_liberador",
+  NUM_OC: "#lb_numoc",
+  RESPONSAVEL: "#lb_responsavel",
+  DATA: "#lb_data",
+  TIPO: "#lb_tipo",
+  URGENTE: "#lb_urgente",
+  DIV_URGENTE: "#div_urgente",
+};
+
+function getLsItem(item) {
   return localStorage.getItem(item);
 }
 
 function colorUrgente(value) {
   if (value === "SIM") {
-    const div = document.getElementById("div_urgente");
+    const div = Dom.getElement(SELECTORS.DIV_URGENTE);
+    const label = Dom.getElement(SELECTORS.URGENTE);
     div.style.background = "red";
-    const label = document.getElementById("lb_urgente");
     label.style.color = "white";
   }
 }
+
 function fillElements(ordemdecompra) {
   const data = JSON.parse(localStorage.getItem("project"));
   const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
-  Dom.setInnerHtml("lb_contrato", data.p_contrato);
-  Dom.setInnerHtml("lb_qproj", Number(data.p_numproj.slice(-2)));
-  Dom.setInnerHtml("lb_numproj", data.p_numproj);
-  Dom.setInnerHtml("lb_cliente", data.p_cliente);
-  Dom.setInnerHtml("lb_ambiente", data.p_ambiente);
-  Dom.setInnerHtml("lb_vendedor", data.p_vendedor);
-  Dom.setInnerHtml("lb_dataentrega", convertDataBr(data.p_dataentrega));
-  Dom.setInnerHtml("lb_liberador", data.p_liberador);
-  Dom.setInnerHtml("lb_numoc", numoc);
-  Dom.setInnerHtml("lb_responsavel", getLocalStorageItem("resp"));
-  Dom.setInnerHtml("lb_data", convertDataBr(getLocalStorageItem("data")));
-  Dom.setInnerHtml("lb_tipo", getLocalStorageItem("tipo"));
-  Dom.setInnerHtml("lb_urgente", getLocalStorageItem("urgente"));
-  colorUrgente(getLocalStorageItem("urgente"));
+  Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
+  Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
+  Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
+  Dom.setInnerHtml(SELECTORS.CLIENTE, data.p_cliente);
+  Dom.setInnerHtml(SELECTORS.AMBIENTE, data.p_ambiente);
+  Dom.setInnerHtml(SELECTORS.VENDEDOR, data.p_vendedor);
+  Dom.setInnerHtml(SELECTORS.DATA_ENTREGA, Date.forBr(data.p_dataentrega));
+  Dom.setInnerHtml(SELECTORS.LIBERADOR, data.p_liberador);
+  Dom.setInnerHtml(SELECTORS.NUM_OC, numoc);
+  Dom.setInnerHtml(SELECTORS.RESPONSAVEL, getLsItem("resp"));
+  Dom.setInnerHtml(SELECTORS.DATA, Date.forBr(getLsItem("data")));
+  Dom.setInnerHtml(SELECTORS.TIPO, getLsItem("tipo"));
+  Dom.setInnerHtml(SELECTORS.URGENTE, getLsItem("urgente"));
+  colorUrgente(getLsItem("urgente"));
 }
 
 function fillTableAcessorios(ordemdecompra) {
   try {
-    const data = JSON.parse(localStorage.getItem("acessorios"));
-    const tbody = document.querySelectorAll("table tbody")[0];
+    const td = "td";
+    const data = JSON.parse(getLsItem("acessorios"));
+    const tbody = qa("table tbody")[0];
     tbody.innerHTML = "";
+    const font = "font-size: 9px;";
+    const center = "text-align: center";
 
     data.forEach((item) => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-            <td style="font-size: 9px; ">${item.categoria}</td>
-            <td style="font-size: 9px;">${item.descricao}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.medida
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.qtd
-            )}</td>
-            `;
+      const tr = ce("tr");
+      tr.appendChild(Dom.createElement(td, item.categoria, font));
+      tr.appendChild(Dom.createElement(td, item.descricao, font));
+      tr.appendChild(Dom.createElement(td, item.medida, font + center));
+      tr.appendChild(Dom.createElement(td, item.qtd, font + center));
       tbody.appendChild(tr);
     });
   } catch (err) {
-    messageInformation(
+    Modal.showInfo(
       "error",
       "Erro",
       `Não foi possível carregar os dados. ${err.message}`

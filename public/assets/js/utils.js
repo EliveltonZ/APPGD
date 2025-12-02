@@ -215,7 +215,7 @@ export async function getGroupedData(route, id_element, index_name) {
     console.log(errText);
   } else {
     const data = await response.json();
-    const element = document.getElementById(id_element);
+    const element = document.querySelector(id_element);
     element.innerHTML = '<option value="">-</option>';
 
     data.forEach((item) => {
@@ -384,14 +384,7 @@ export function setDateTime(checkbox, text) {
       denyButtonText: "Não",
     }).then((result) => {
       if (result.isConfirmed) {
-        var dataAtual = new Date();
-        var ano = dataAtual.getFullYear();
-        var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
-        var dia = String(dataAtual.getDate()).padStart(2, "0");
-        var hora = String(dataAtual.getHours()).padStart(2, "0");
-        var minuto = String(dataAtual.getMinutes()).padStart(2, "0");
-        var dataHoraFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-        campoDataHora.value = dataHoraFormatada;
+        campoDataHora.value = dateTimeNow();
       } else {
         document.getElementById(element.id).checked = false;
       }
@@ -542,7 +535,7 @@ export async function getUsuario(id, campo) {
   }
   const data = await response.json();
   const nome = data[0].nome;
-  document.getElementById(campo).value = nome;
+  document.querySelector(campo).value = nome;
 }
 
 export async function getOperadores() {

@@ -20,6 +20,7 @@ import { enableTableFilterSort } from "./filtertable.js";
 /* =========================
    SERVICES (API calls)
    ========================= */
+
 const orderService = {
   async createOrder(payload) {
     const res = await fetch("/setNewOrder", {
@@ -255,14 +256,15 @@ async function loadOrderTypes() {
 async function loadInstallers() {
   try {
     const items = await orderService.fetchInstallers();
+    console.log(items);
     const select = document.querySelector("#txt_categoria");
     ui.renderSelectOptions(select, items, {
       valueKey: "p_codigo",
       labelKey: "p_nome",
       includeEmpty: true,
     });
-  } catch {
-    messageInformation("error", "ERROR", "Unable to load installers.");
+  } catch (err) {
+    messageInformation("error", "ERROR", `${err.message}`);
   }
 }
 
@@ -285,9 +287,6 @@ function insertButtonCellTable() {
   `;
 }
 
-/* =========================
-   BOOTSTRAP
-   ========================= */
 function initApp() {
   ui.focusFirstField();
   Dom.addEventBySelector("#txt_contrato", "blur", handleContractBlur);

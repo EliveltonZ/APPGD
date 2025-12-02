@@ -7,37 +7,65 @@
     <title>APP GD</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=9177552a7f82bf691610fbec1df79269">
-    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
-    <link rel="stylesheet" href="assets/css/assistencias_prd.min.css?h=ecdb2fbe5aae5e0a85ed79940f872b66">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=57fb43c4b50877a4665e688c11e4dc4f">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
+    <link rel="stylesheet" href="assets/css/pecas.min.css?h=8209d89fec1df106f22e10defc81ed48">
 <script type="module" src="assets/js/pecas.js"></script>
 </head>
 
 <body>
-    <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <form style="max-width: 1000px;width: 90%;">
-            <div class="d-flex div-block gap-2"><label class="form-label d-flex align-items-center margin-0">Solicitante:</label><input class="form-control text-center" type="text" id="txt_solicitante"><label class="form-label d-flex align-items-center margin-0">Data:</label><input class="form-control text-center" id="txt_data" type="datetime-local"><label class="form-label d-flex align-items-center margin-0">Contrato:</label><input class="form-control text-center" type="text" id="txt_contrato"></div>
-            <div class="d-flex gap-2 div-block"><label class="form-label d-flex align-items-center margin-0">Cliente:</label><input class="form-control" type="text" id="txt_cliente" required="" style="min-width: 50%;"><label class="form-label d-flex align-items-center margin-0">Ambiente:</label><input class="form-control" type="text" id="txt_ambiente" required=""></div>
-            <div class="table-responsive" style="height: 250px;">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Qtd</th>
-                            <th>Peça</th>
-                            <th>Dimessões</th>
-                            <th>Cor</th>
-                            <th>Lado</th>
-                            <th class="text-center">Tipo</th>
-                            <th class="text-center">Falha</th>
-                            <th class="text-center">X</th>
-                            <th class="text-center" style="display: none">Obs</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+    <div>
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item" role="presentation"><a class="nav-link active" role="tab" data-bs-toggle="tab" href="#tab-1">Nova Solicitação</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" role="tab" data-bs-toggle="tab" id="asd" href="#tab-2">Minhas Solicitações</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" role="tabpanel" id="tab-1">
+                <div class="d-flex justify-content-center align-items-center" style="height: calc(100vh - 38.16px);">
+                    <form style="max-width: 1000px;width: 90%;">
+                        <div class="d-flex div-block gap-2"><label class="form-label d-flex align-items-center margin-0"><input class="form-control d-none text-center" type="text" id="txt_id" disabled="">Solicitante:</label><input class="form-control text-center" type="text" id="txt_solicitante" disabled=""><label class="form-label d-flex align-items-center margin-0">Data:</label><input class="form-control text-center" id="txt_data" type="datetime-local" disabled=""><label class="form-label d-flex align-items-center margin-0">Contrato:</label><input class="form-control text-center" type="text" id="txt_contrato"></div>
+                        <div class="d-flex gap-2 div-block"><label class="form-label d-flex align-items-center margin-0">Cliente:</label><input class="form-control" type="text" id="txt_cliente" required="" style="min-width: 50%;"><label class="form-label d-flex align-items-center margin-0">Ambiente:</label><input class="form-control" type="text" id="txt_ambiente" required=""></div>
+                        <div class="table-responsive" style="height: 200px;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Qtd</th>
+                                        <th>Peça</th>
+                                        <th>Dimessões</th>
+                                        <th>Cor</th>
+                                        <th>Lado</th>
+                                        <th class="text-center">Tipo</th>
+                                        <th class="text-center">Falha</th>
+                                        <th class="text-center">X</th>
+                                        <th class="text-center" style="display: none">Obs</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-center gap-3"><button class="btn btn-primary" id="bt_concluir" type="submit">Concluir</button><button class="btn btn-primary" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">Peças</button></div>
+                    </form>
+                </div>
             </div>
-            <div class="d-flex justify-content-center gap-3"><button class="btn btn-primary" id="bt_concluir" type="submit">Concluir</button><button class="btn btn-primary" type="button" data-bs-target="#modal-1" data-bs-toggle="modal">Peças</button></div>
-        </form>
+            <div class="tab-pane" role="tabpanel" id="tab-2">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Qtd</th>
+                                <th>Cor</th>
+                                <th>Peças</th>
+                                <th>Dimensões</th>
+                                <th>Cliente</th>
+                                <th>Ambiente</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
         <div class="modal-dialog modal-lg" role="document">

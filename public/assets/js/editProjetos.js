@@ -1,57 +1,85 @@
-import {
-  Dom,
-  formatValueDecimal,
-  formatCurrency,
-  getGroupedData,
-  allUpperCase,
-  loadPage,
-  enableEnterAsTab,
-  changeFormatCurrency,
-  messageInformation,
-  messageQuestion,
-} from "./utils.js";
+import { getGroupedData, loadPage } from "./utils.js";
+
+import { Dom, Modal, q } from "./UI/interface.js";
+import { MyNumber } from "./utils/time.js";
+import { API } from "./service/api.js";
+
+const EL = {
+  // Inputs
+  OC: "#txt_numoc",
+  AMBIENTE: "#txt_ambiente",
+  CONTRATO: "#txt_contrato",
+  CLIENTE: "#txt_cliente",
+  VENDEDOR: "#txt_vendedor",
+  LIBERADOR: "#txt_liberador",
+  DATA_CONTRATO: "#txt_datacontrato",
+  DATA_ASSINATURA: "#txt_dataassinatura",
+  DATA_ENTREGA: "#txt_dataentrega",
+  CHEGOU_FABRICA: "#txt_chegoufabrica",
+  LOJA: "#txt_loja",
+  TIPO_CLIENTE: "#txt_tipocliente",
+  ETAPA: "#txt_etapa",
+  TIPO_AMBIENTE: "#txt_tipoambiente",
+  NUM_PROJ: "#txt_numproj",
+  TIPO_CONTRATO: "#txt_tipocontrato",
+  TIPO_CLIENTE: "#txt_tipocliente",
+  VALOR_BRUTO: "#txt_valorbruto",
+  VALOR_NEGOCIADO: "#txt_valornegociado",
+  CUSTO_MATERIAL: "#txt_customaterial",
+  CUSTO_ADICIONAL: "#txt_custoadicional",
+
+  // Buttons
+  SALVAR: "#bt_salvar",
+
+  //Data List
+  DL_VENDEDORES: "#vendedores",
+  DL_LIBERADORES: "#liberadores",
+};
 
 async function getEditProjetos() {
-  const ordemdecompra = Dom.getValue("txt_numoc");
+  const ordemdecompra = Dom.getValue(EL.OC);
   if (ordemdecompra) {
     const response = await fetch(
       `/getEditProjetos?p_ordemdecompra=${ordemdecompra}`
     );
 
     if (!response.ok) {
-      messageInformation("error", "Erro", "Digite a ordem de compra");
+      Modal.showInfo("error", "Erro", "Digite a ordem de compra");
     } else {
       const data = await response.json();
       if (data && data.length > 0) {
         data.forEach((item) => {
-          Dom.setValue("txt_contrato", item.contrato);
-          Dom.setValue("txt_cliente", item.cliente);
-          Dom.setValue("txt_tipoambiente", item.tipoambiente);
-          Dom.setValue("txt_ambiente", item.ambiente);
-          Dom.setValue("txt_numproj", item.numproj);
-          Dom.setValue("txt_vendedor", item.vendedor);
-          Dom.setValue("txt_liberador", item.liberador);
-          Dom.setValue("txt_datacontrato", item.datacontrato);
-          Dom.setValue("txt_dataassinatura", item.dataassinatura);
-          Dom.setValue("txt_chegoufabrica", item.chegoufabrica);
-          Dom.setValue("txt_dataentrega", item.dataentrega);
-          Dom.setValue("txt_loja", item.loja);
-          Dom.setValue("txt_tipocliente", item.tipocliente);
-          Dom.setValue("txt_etapa", item.etapa);
-          Dom.setValue("txt_tipocontrato", item.tipocontrato);
-          Dom.setValue("txt_valorbruto", formatCurrency(item.valorbruto));
+          Dom.setValue(EL.CONTRATO, item.contrato);
+          Dom.setValue(EL.CLIENTE, item.cliente);
+          Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
+          Dom.setValue(EL.AMBIENTE, item.ambiente);
+          Dom.setValue(EL.NUM_PROJ, item.numproj);
+          Dom.setValue(EL.VENDEDOR, item.vendedor);
+          Dom.setValue(EL.LIBERADOR, item.liberador);
+          Dom.setValue(EL.DATA_CONTRATO, item.datacontrato);
+          Dom.setValue(EL.DATA_ASSINATURA, item.dataassinatura);
+          Dom.setValue(EL.CHEGOU_FABRICA, item.chegoufabrica);
+          Dom.setValue(EL.DATA_ENTREGA, item.dataentrega);
+          Dom.setValue(EL.LOJA, item.loja);
+          Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
+          Dom.setValue(EL.ETAPA, item.etapa);
+          Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
+          Dom.setValue(EL.VALOR_BRUTO, MyNumber.formatCoin(item.valorbruto));
           Dom.setValue(
-            "txt_valornegociado",
-            formatCurrency(item.valornegociado)
+            EL.VALOR_NEGOCIADO,
+            MyNumber.formatCoin(item.valornegociado)
           );
-          Dom.setValue("txt_customaterial", formatCurrency(item.customaterial));
           Dom.setValue(
-            "txt_custoadicional",
-            formatCurrency(item.customaterialadicional)
+            EL.CUSTO_MATERIAL,
+            MyNumber.formatCoin(item.customaterial)
+          );
+          Dom.setValue(
+            EL.CUSTO_ADICIONAL,
+            MyNumber.formatCoin(item.customaterialadicional)
           );
         });
       } else {
-        messageInformation("error", "ERRO", "Ordem de Compra Invalida");
+        Modal.showInfo("error", "ERRO", "Ordem de Compra Invalida");
         Dom.clearInputFields();
       }
     }
@@ -66,80 +94,83 @@ async function validForm(e) {
   }
 }
 
+function getElementsValues() {
+  const data = {
+    p_ordemdecompra: Dom.getValue(EL.OC),
+    p_contrato: Dom.getValue(EL.CONTRATO),
+    p_cliente: Dom.getValue(EL.CLIENTE),
+    p_tipoambiente: Dom.getValue(EL.TIPO_AMBIENTE),
+    p_ambiente: Dom.getValue(EL.AMBIENTE),
+    p_numproj: Dom.getValue(EL.NUM_PROJ),
+    p_vendedor: Dom.getValue(EL.VENDEDOR),
+    p_liberador: Dom.getValue(EL.LIBERADOR),
+    p_datacontrato: Dom.getValue(EL.DATA_CONTRATO),
+    p_dataassinatura: Dom.getValue(EL.DATA_ASSINATURA),
+    p_chegoufabrica: Dom.getValue(EL.CHEGOU_FABRICA),
+    p_dataentrega: Dom.getValue(EL.DATA_ENTREGA),
+    p_loja: Dom.getValue(EL.LOJA),
+    p_tipocliente: Dom.getValue(EL.TIPO_CLIENTE),
+    p_etapa: Dom.getValue(EL.ETAPA),
+    p_tipocontrato: Dom.getValue(EL.TIPO_CONTRATO),
+    p_valorbruto: MyNumber.formatValueDecimal(Dom.getValue(EL.VALOR_BRUTO)),
+    p_valornegociado: MyNumber.formatValueDecimal(
+      Dom.getValue(EL.VALOR_NEGOCIADO)
+    ),
+    p_customaterial: MyNumber.formatValueDecimal(
+      Dom.getValue(EL.CUSTO_MATERIAL)
+    ),
+    p_customaterialadicional: MyNumber.formatValueDecimal(
+      Dom.getValue(EL.CUSTO_ADICIONAL)
+    ),
+  };
+  return data;
+}
+
 async function setEditProjetos() {
-  const result = await messageQuestion(null, "Deseja salvar edições ?");
+  const result = await Modal.ShowQuestion(null, "Deseja salvar edições ?");
 
   if (result.isConfirmed) {
-    const data = {
-      p_ordemdecompra: Dom.getValue("txt_numoc"),
-      p_contrato: Dom.getValue("txt_contrato"),
-      p_cliente: Dom.getValue("txt_cliente"),
-      p_tipoambiente: Dom.getValue("txt_tipoambiente"),
-      p_ambiente: Dom.getValue("txt_ambiente"),
-      p_numproj: Dom.getValue("txt_numproj"),
-      p_vendedor: Dom.getValue("txt_vendedor"),
-      p_liberador: Dom.getValue("txt_liberador"),
-      p_datacontrato: Dom.getValue("txt_datacontrato"),
-      p_dataassinatura: Dom.getValue("txt_dataassinatura"),
-      p_chegoufabrica: Dom.getValue("txt_chegoufabrica"),
-      p_dataentrega: Dom.getValue("txt_dataentrega"),
-      p_loja: Dom.getValue("txt_loja"),
-      p_tipocliente: Dom.getValue("txt_tipocliente"),
-      p_etapa: Dom.getValue("txt_etapa"),
-      p_tipocontrato: Dom.getValue("txt_tipocontrato"),
-      p_valorbruto: formatValueDecimal(Dom.getValue("txt_valorbruto")),
-      p_valornegociado: formatValueDecimal(Dom.getValue("txt_valornegociado")),
-      p_customaterial: formatValueDecimal(Dom.getValue("txt_customaterial")),
-      p_customaterialadicional: formatValueDecimal(
-        Dom.getValue("txt_custoadicional")
-      ),
-    };
-
     try {
-      const response = await fetch("/setEditProjetos", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const data = getElementsValues();
+      const response = await API.fetchBody("/setEditProjetos", "PUT", data);
 
-      if (!response.ok) {
-        messageInformation(
+      if (response.status !== 200) {
+        Modal.showInfo(
           "error",
           "Erro",
           "Não foi possível carregar os dados !!!"
         );
       } else {
-        messageInformation(
+        Modal.showInfo(
           "success",
           "Sucesso",
           "Alterações salvas com Sucesso !!!"
         );
       }
     } catch (error) {
-      messageInformation(
-        "error",
-        "Erro",
-        "Erro na requisição: " + error.message
-      );
+      Modal.showInfo("error", "Erro", "Erro na requisição: " + error.message);
     }
   }
 }
 
 window.formatarMoeda = function (e) {
-  changeFormatCurrency(e);
+  MyNumber.changeFormatCurrency(e);
 };
 
-document.addEventListener("DOMContentLoaded", (event) => {
+function init() {
   loadPage("adicionar_projetos", "editar.html");
-  Dom.setFocus("txt_numoc");
-  getGroupedData("getGroupedAmbiente", "txt_tipoambiente", "tipo_ambiente");
-  getGroupedData("getGroupedLiberador", "liberadores", "p_liberador");
-  getGroupedData("getGroupedVendedor", "vendedores", "p_vendedor");
-  allUpperCase();
-  enableEnterAsTab();
-});
+  Dom.setFocus(EL.OC);
+  getGroupedData("getGroupedAmbiente", EL.TIPO_AMBIENTE, "tipo_ambiente");
+  getGroupedData("getGroupedLiberador", EL.DL_LIBERADORES, "p_liberador");
+  getGroupedData("getGroupedVendedor", EL.DL_VENDEDORES, "p_vendedor");
+  Dom.allUpperCase();
+  Dom.enableEnterAsTab();
+  Dom.addEventBySelector(EL.OC, "blur", getEditProjetos);
+  Dom.addEventBySelector(EL.SALVAR, "click", async (e) => {
+    validForm(e);
+  });
+}
 
-Dom.addEventBySelector("#txt_numoc", "blur", getEditProjetos);
-Dom.addEventBySelector("#bt_salvar", "click", async (e) => {
-  validForm(e);
+document.addEventListener("DOMContentLoaded", (event) => {
+  init();
 });

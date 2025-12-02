@@ -40,6 +40,10 @@ route.put("/setEtapa", ultilsController.setEtapa);
 route.get("/getCodigoBarras", ultilsController.getCodigoBarras);
 route.get("/getOperadores", ultilsController.getOperadores);
 route.get("/setTipo", ultilsController.setTipo);
+route.get("/getMontador", ultilsController.getMontador);
+route.get("/validateLogin", ultilsController.validateLogin);
+route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
+route.get("/getPecas", ultilsController.getPecas);
 
 // rotas index.js
 route.post("/passwordValidation", indexController.passwordValidation);
