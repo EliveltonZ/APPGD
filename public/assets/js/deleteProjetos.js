@@ -1,7 +1,8 @@
 import { loadPage } from "./utils.js";
-import { Dom, Modal, q, qa } from "./UI/interface.js";
+import { Dom, q, qa } from "./UI/interface.js";
 import { API } from "./service/api.js";
-import { MyNumber } from "./utils/time.js";
+import { Numbers } from "./utils/number.js";
+import { Modal } from "./utils/modal.js";
 
 const EL = {
   // Inputs
@@ -35,20 +36,25 @@ const EL = {
   DL_LIBERADORES: "#liberadores",
 };
 
+const DB = {
+  getDataOrderBy: async function (orderBy) {
+    const url = `/getDeleteProjetos?p_ordemdecompra=${orderBy}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+};
+
 async function getDeleteProjetos() {
-  const ordemdecompra = Number(Dom.getValue(EL.OC));
-  if (!Number.isInteger(ordemdecompra)) return;
+  const orderBy = Number(Dom.getValue(EL.OC));
+  if (!Number.isInteger(orderBy)) return;
 
-  const response = await API.fetchQuery(
-    `/getDeleteProjetos?p_ordemdecompra=${Dom.getValue(EL.OC)}`
-  );
+  const res = await DB.fetchQuery(orderBy);
 
-  if (response.status !== 200) {
-    Modal.showInfo("error", "Erro", `${response.data}`);
+  if (res.status !== 200) {
+    Modal.showInfo("error", "Erro", `${res.data}`);
   } else {
-    const data = await response.json();
-    if (data && data.length > 0) {
-      data.forEach((item) => {
+    if (res.data && res.data.length > 0) {
+      res.data.forEach((item) => {
         Dom.setValue(EL.CONTRATO, item.contrato);
         Dom.setValue(EL.CLIENTE, item.cliente);
         Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
@@ -64,18 +70,12 @@ async function getDeleteProjetos() {
         Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
         Dom.setValue(EL.ETAPA, item.etapa);
         Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
-        Dom.setValue(EL.VALOR_BRUTO, MyNumber.formatCoin(item.valorbruto));
-        Dom.setValue(
-          EL.VALOR_NEGOCIADO,
-          MyNumber.formatCoin(item.valornegociado)
-        );
-        Dom.setValue(
-          EL.CUSTO_MATERIAL,
-          MyNumber.formatCoin(item.customaterial)
-        );
+        Dom.setValue(EL.VALOR_BRUTO, Numbers.currency(item.valorbruto));
+        Dom.setValue(EL.VALOR_NEGOCIADO, Numbers.currency(item.valornegociado));
+        Dom.setValue(EL.CUSTO_MATERIAL, Numbers.currency(item.customaterial));
         Dom.setValue(
           EL.CUSTO_ADICIONAL,
-          MyNumber.formatCoin(item.customaterialadicional)
+          Numbers.currency(item.customaterialadicional)
         );
       });
     } else {

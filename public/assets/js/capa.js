@@ -1,4 +1,3 @@
-import { convertDataBr, checkValue, messageInformation } from "./utils.js";
 import { Dom, qa, ce, Modal } from "./UI/interface.js";
 import { Date } from "./utils/time.js";
 
@@ -36,7 +35,7 @@ function colorUrgente(value) {
   }
 }
 
-function fillElements(ordemdecompra) {
+function populateElements(ordemdecompra) {
   const data = JSON.parse(localStorage.getItem("project"));
   const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
   Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
@@ -83,7 +82,7 @@ function fillTableAcessorios(ordemdecompra) {
 
 function loadData() {
   const ordemdecompra = localStorage.getItem("numoc");
-  fillElements(ordemdecompra);
+  populateElements(ordemdecompra);
   fillTableAcessorios(ordemdecompra);
 }
 

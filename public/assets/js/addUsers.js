@@ -26,7 +26,7 @@ const SELECTORS = {
   HELPERS API
 ================================ */
 
-const userApi = {
+const DB = {
   async createUser(userData) {
     return API.fetchBody("/insertUser", "POST", userData);
   },
@@ -40,17 +40,23 @@ const userApi = {
   CORE FUNCTIONS
 ================================ */
 
+function showModalError(response) {
+  if (response.status !== 200) {
+    Modal.showInfo(
+      "error",
+      "Não foi possível buscar o próximo ID. HTTP: " + response.status
+    );
+    return false;
+  } else {
+    return true;
+  }
+}
+
 async function setNextUserIdField() {
   try {
-    const response = await userApi.fetchMaxUserId();
+    const response = await DB.fetchMaxUserId();
 
-    if (response.status !== 200) {
-      Modal.showInfo(
-        "error",
-        "Não foi possível buscar o próximo ID. HTTP: " + response.status
-      );
-      return;
-    }
+    if (showModalError(response)) return;
 
     const data = response.data;
     const maxId = data?.[0]?.max_id;
@@ -99,7 +105,7 @@ async function handleAddUserClick(event) {
   if (!result.isConfirmed) return;
 
   try {
-    const response = await userApi.createUser(userData);
+    const response = await DB.createUser(userData);
 
     if (response.status !== 200) {
       Modal.showInfo(

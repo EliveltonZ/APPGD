@@ -65,26 +65,6 @@ export class Dom {
     }
   }
 
-  static onmouseover(tableId) {
-    const table = q(tableId);
-    if (!table) {
-      console.warn(`Tabela com ID "${tableId}" não encontrada.`);
-      return;
-    }
-
-    table.addEventListener("mouseover", (event) => {
-      if (event.target.tagName === "TD") {
-        event.target.parentElement.classList.add("table-hover-row");
-      }
-    });
-
-    table.addEventListener("mouseout", (event) => {
-      if (event.target.tagName === "TD") {
-        event.target.parentElement.classList.remove("table-hover-row");
-      }
-    });
-  }
-
   static clearInputFields(exceptionsIds = []) {
     // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
     const allFields = qa(
@@ -226,41 +206,54 @@ export class Table {
     const row = td.parentNode;
     return row.cells[index].innerText;
   }
-}
 
-export class Modal {
-  static create(modal) {
-    const modalEl = document.getElementById(modal);
-    const _modal = new bootstrap.Modal(modalEl);
-    _modal.show();
+  static onclickHighlightRow(tableId) {
+    const table = q(tableId);
+    if (!table) {
+      console.warn(`Tabela com ID "${tableId}" não encontrada.`);
+      return;
+    }
+
+    let selectedRow = null;
+
+    table.addEventListener("click", (event) => {
+      if (event.target.tagName === "TD") {
+        var clickedRow = event.target.parentElement;
+
+        if (selectedRow && selectedRow !== clickedRow) {
+          selectedRow.classList.remove("table-click-row");
+        }
+
+        if (selectedRow !== clickedRow) {
+          clickedRow.classList.add("table-click-row");
+          selectedRow = clickedRow;
+        } else {
+          clickedRow.classList.remove("table-click-row");
+          selectedRow = null;
+        }
+      } else {
+      }
+    });
   }
 
-  static showInfo(icon, title, message) {
-    const dialog = Swal.fire({
-      icon: icon,
-      title: title,
-      html: message,
-      returnFocus: false,
-    });
-    return dialog;
-  }
+  static onmouseover(selector) {
+    const table = q(selector);
+    if (!table) {
+      console.warn(`Tabela com ID "${selector}" não encontrada.`);
+      return;
+    }
 
-  static async ShowQuestion(
-    title,
-    message,
-    confirmButtonText = "Confirmar",
-    cancelButtonText = "Cancelar"
-  ) {
-    const result = await Swal.fire({
-      icon: "question",
-      title: title,
-      html: message,
-      showDenyButton: true,
-      denyButtonText: cancelButtonText,
-      confirmButtonText: confirmButtonText,
-      returnFocus: false,
+    table.addEventListener("mouseover", (event) => {
+      if (event.target.tagName === "TD") {
+        event.target.parentElement.classList.add("table-hover-row");
+      }
     });
-    return result;
+
+    table.addEventListener("mouseout", (event) => {
+      if (event.target.tagName === "TD") {
+        event.target.parentElement.classList.remove("table-hover-row");
+      }
+    });
   }
 }
 
@@ -279,9 +272,9 @@ export class Style {
     return colors[item] || "";
   }
 
-  static colorAcessorios(item) {
-    if (item > 0) {
-      return "color:rgb(194, 184, 6)";
+  static setColorBool(int) {
+    if (int > 0) {
+      return "color: rgb(194, 184, 6)";
     } else {
       return "color: rgb(70, 136, 0)";
     }

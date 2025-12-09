@@ -1,116 +1,11 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-
-export class Dom {
-  static getValue(element) {
-    const value = document.getElementById(element).value;
-    return value === "" ? null : value.toUpperCase();
-  }
-
-  static setValue(element, value) {
-    document.getElementById(element).value = value;
-  }
-
-  static setInnerHtml(element, value) {
-    document.getElementById(element).innerHTML = value;
-  }
-
-  static getChecked(element) {
-    let value = document.getElementById(element).checked;
-    return value === "" ? null : value;
-  }
-
-  static setChecked(element, boolean) {
-    document.getElementById(element).checked = boolean;
-  }
-
-  static setFocus(elememt) {
-    document.getElementById(elememt).focus();
-  }
-
-  static setData(elememt) {
-    var campoDataHora = document.getElementById(elememt);
-    var dataAtual = new Date();
-    var ano = dataAtual.getFullYear();
-    var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
-    var dia = String(dataAtual.getDate()).padStart(2, "0");
-    var dataHoraFormatada = `${ano}-${mes}-${dia}`;
-    campoDataHora.value = dataHoraFormatada;
-  }
-
-  static clearInputFields(exceptionsIds = []) {
-    // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
-    const allFields = document.querySelectorAll(
-      'input[type="text"], input[type="checkbox"], select, input[type="date"]'
-    );
-
-    allFields.forEach((field) => {
-      // Verificar se o campo não está na lista de exceções pelos IDs
-      if (!exceptionsIds.includes(field.id)) {
-        if (field.type === "text") {
-          field.value = "";
-        } else if (field.type === "checkbox") {
-          field.checked = false;
-        } else if (field.tagName.toLowerCase() === "select") {
-          field.value = "";
-        } else if (field.type === "date") {
-          field.value = "";
-        }
-      }
-    });
-  }
-
-  static addEventBySelector(element, event, _function) {
-    const elements = document.querySelectorAll(element);
-    if (elements.length) {
-      elements.forEach((el) => {
-        el.addEventListener(event, _function);
-      });
-    } else {
-      console.warn(
-        `Nenhum elemento com o seletor "${element}" foi encontrado.`
-      );
-    }
-  }
-
-  static handleClass(element, nameClass, type) {
-    // Obtém o elemento pelo ID
-    const item = document.getElementById(element);
-
-    // Verifica se o item existe
-    if (!item) {
-      console.error(`Elemento com ID "${element}" não encontrado.`);
-      return;
-    }
-
-    // Verifica se o nome da classe é válido
-    if (!nameClass || typeof nameClass !== "string") {
-      console.error("O nome da classe não é válido.");
-      return;
-    }
-
-    // Verifica o tipo de operação e executa
-    if (type.toLowerCase() === "add") {
-      item.classList.add(nameClass);
-      return;
-    }
-    if (type.toLowerCase() === "remove") {
-      item.classList.remove(nameClass);
-      return;
-    }
-
-    // Caso o tipo não seja reconhecido
-    console.error(`Tipo de operação "${type}" não identificado.`);
-  }
-
-  static allUpperCase() {
-    document.querySelectorAll('input[type="text"]').forEach((input) => {
-      input.addEventListener("input", function () {
-        setUpperCase(input);
-      });
-    });
-  }
-}
+import { Service } from "./service/api.js";
+import { q } from "./UI/interface.js";
+import { DateTime } from "./utils/time.js";
+import { Modal } from "./utils/modal.js";
+import { Dom } from "./UI/interface.js";
+import { Numbers } from "./utils/number.js";
 
 export function formatValueDecimal(valorInput) {
   if (valorInput) {
@@ -404,7 +299,7 @@ export function dateTimeNow() {
 }
 
 export function setDate(checkbox, text) {
-  var campoDataHora = document.getElementById(text);
+  var campoDataHora = q(text);
   const element = document.querySelector(checkbox);
   if (element.checked) {
     Swal.fire({
@@ -485,18 +380,9 @@ export function colorAcessorios(item) {
   }
 }
 
-export function applyDateMask(event) {
-  let input = event.target;
-  let value = input.value.replace(/\D/g, ""); // Remove qualquer caractere não numérico
-
-  // Aplica a máscara MM/YY
-  if (value.length <= 2) {
-    input.value = value.replace(/(\d{2})/, "$1");
-  } else if (value.length <= 4) {
-    input.value = value.replace(/(\d{2})(\d{2})/, "$1/$2");
-  } else {
-    input.value = value.substring(0, 4).replace(/(\d{2})(\d{2})/, "$1/$2");
-  }
+export function applyDateMask(e) {
+  const input = e.target;
+  input.value = Numbers.formatDateMask(input.value);
 }
 
 export function messageInformation(icon, title, message) {
@@ -838,4 +724,37 @@ export function detectarDispositivo() {
   }
 
   return "Desconhecido";
+}
+
+export async function getName(element) {
+  const id = q(element).value;
+  const res = await Service.getUser(id);
+  return res;
+}
+
+export async function confirmDateInsertion(checkbox, element) {
+  const response = await Modal.showConfirmation(null, "Preencher data ?");
+  if (!response.isConfirmed) return;
+  const cb = checkIsTrue(checkbox);
+  if (!cb) q(checkbox).checked = false;
+  setDateElement(element);
+}
+
+function checkIsTrue(checkbox) {
+  const cb = q(checkbox);
+  if (cb.checked) return true;
+  return false;
+}
+
+function setDateElement(campoDataHora) {
+  const el = q(campoDataHora);
+  el.value = DateTime.Now();
+}
+
+export async function handleElementsUser(elements) {
+  elements.forEach((item) => {
+    Dom.addEventBySelector(item[0], "blur", async () =>
+      Dom.setValue(item[1], await getName(item[0]))
+    );
+  });
 }

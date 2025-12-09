@@ -1,136 +1,123 @@
-import {
-  Dom,
-  loadPage,
-  onmouseover,
-  convertDataBr,
-  convertDataISO,
-  getGroupedData,
-  enableEnterAsTab,
-  checkValue,
-  messageInformation,
-  messageQuestion,
-  createModal,
-} from "./utils.js";
+import { loadPage, getGroupedData } from "./utils.js";
+import { Modal } from "./utils/modal.js";
+import { Dom, Table, q, qa, ce } from "./UI/interface.js";
+import { DateTime } from "./utils/time.js";
+import { API } from "./service/api.js";
 
-async function getContrato() {
-  if (!Dom.getValue("txt_contrato") || !Number(Dom.getValue("txt_contrato"))) {
-    messageInformation("error", "ERRO", "Contrato Invalido");
-    Dom.setValue("txt_contrato", "");
-    return;
-  }
+/*===========================
+  ELEMENT SELECTORS
+===========================*/
 
-  const response = await fetch(
-    `/getContratoPendencias?p_contrato=${Dom.getValue("txt_contrato")}`
-  );
+const EL = {
+  NUM_OC: "#txt_numoc",
+  CLIENTE: "#txt_cliente",
+  CATEGORIA: "#txt_categoria",
+  DESCRICAO: "#txt_descricao",
+  AMBIENTE: "#txt_ambiente",
+  MEDIDA: "#txt_medida",
+  QTD: "#txt_qtd",
+  FORNECEDOR: "#txt_fornecedor",
+  COMPRA: "#txt_compra",
+  PREVISAO: "#txt_previsao",
+  RECEBIDO: "#txt_recebido",
+  ENTREGA: "#txt_entrega",
+  CONTRATO: "#txt_contrato",
+  BTN_ADICIONAR: "#bt_adicionar",
+  TABLE_CONTRATOS: "#table",
+  TABLE_ACESSORIOS: "#table-1",
+};
 
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Contrato não localizado");
-  } else {
-    const data = await response.json();
-    Dom.setValue("txt_entrega", convertDataBr(data[0].p_dataentrega));
-    const tbody = document.querySelector("tbody");
-    tbody.innerHTML = "";
+/*===========================
+  API LAYER
+===========================*/
 
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
+const DB = {
+  getContractPendencies: async function (contractNumber) {
+    const url = `/getContratoPendencias?p_contrato=${contractNumber}`;
+    return await API.fetchQuery(url);
+  },
 
-      tr.classList.add("open-modal-row");
+  getAccessoriesByOrder: async function (orderNumber) {
+    const url = `/fillTableAPendencia?p_ordemdecompra=${orderNumber}`;
+    return await API.fetchQuery(url);
+  },
 
-      tr.innerHTML = `
-                <td>${item.p_ordemdecompra}</td>
-                <td>${item.p_cliente}</td>
-                <td>${item.p_ambiente}</td>
-                `;
-      tbody.appendChild(tr);
-    });
-  }
+  deleteAccessoryById: async function (data) {
+    return await API.fetchBody("/delAcessorios", "DELETE", data);
+  },
+
+  insertAccessory: async function (data) {
+    return await API.fetchBody("/insertAcessorios", "POST", data);
+  },
+};
+
+/*===========================
+  VALIDATION HELPERS
+===========================*/
+
+function isValidContractValue(value) {
+  return !!value && !isNaN(Number(value));
 }
 
-function getFirstColumnValue(td, index) {
-  const row = td.parentNode;
-  return row.cells[index].innerText;
+async function showInvalidContractModal() {
+  await Modal.showInfo("error", "ERRO", "Contrato inválido");
+  Dom.setFocus(EL.CONTRATO);
+  Dom.setValue(EL.CONTRATO, "");
 }
 
-async function fillTableAcessorios() {
-  const response = await fetch(
-    `/fillTableAPendencia?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
-  );
-
-  if (!response.ok) {
-    messageInformation(
-      "error",
-      "ERRO",
-      "Não foi possivel buscar dados na base"
-    );
-  } else {
-    const config = 'style="text-align: center;"';
-    const tbody = document.querySelectorAll("table tbody")[1];
-    tbody.innerHTML = "";
-
-    const data = await response.json();
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${item.p_id}</td>
-        <td>${checkValue(item.p_categoria)}</td>
-        <td>${checkValue(item.p_descricao)}</td>
-        <td ${config}>${checkValue(item.p_medida)}</td>
-        <td ${config}>${checkValue(item.p_qtd)}</td>
-        <td ${config}>${checkValue(item.p_fornecedor)}</td>
-        <td ${config}>${convertDataBr(checkValue(item.p_datacompra))}</td>
-        <td ${config}>${convertDataBr(checkValue(item.p_previsao))}</td>
-        <td ${config}>${convertDataBr(checkValue(item.p_recebido))}</td>
-        ${insertButtonCellTable()}
-        `;
-      tbody.appendChild(tr);
-      clear();
-    });
-  }
+function isValidResponse(res) {
+  return res && res.status === 200;
 }
 
-function getTextLowCase(element) {
-  let value = document.getElementById(element).value;
-  return value === "" ? null : value;
+/*===========================
+  TABLE HELPERS (CONTRATOS)
+===========================*/
+
+function getContractsTableBody() {
+  return q(`${EL.TABLE_CONTRATOS} tbody`);
 }
 
-function clear() {
-  Dom.setValue("txt_categoria", "");
-  Dom.setValue("txt_descricao", "");
-  Dom.setValue("txt_medida", "");
-  Dom.setValue("txt_qtd", "");
-  Dom.setValue("txt_fornecedor", "");
-  Dom.setValue("txt_compra", "");
-  Dom.setValue("txt_previsao", "");
-  Dom.setValue("txt_recebido", "");
+function clearContractsTable() {
+  const tbody = getContractsTableBody();
+  if (tbody) tbody.innerHTML = "";
 }
 
-async function deleteRow(button) {
-  try {
-    const row = button.closest("tr");
-    const firstCell = row.querySelector("td");
+function createContractRow(item) {
+  const tr = ce("tr");
+  tr.classList.add("open-modal-row");
+  tr.append(Dom.createElement("td", item.p_ordemdecompra));
+  tr.append(Dom.createElement("td", item.p_cliente));
+  tr.append(Dom.createElement("td", item.p_ambiente));
+  return tr;
+}
 
-    if (firstCell.textContent.trim()) {
-      const result = await messageQuestion(
-        "REMOVER ITEM",
-        "Deseja remover o item selecionado ?"
-      );
+function renderContractsTable(data) {
+  const tbody = getContractsTableBody();
+  if (!tbody) return;
 
-      if (result.isConfirmed) {
-        const data = {
-          p_id: firstCell.textContent.trim(),
-        };
+  clearContractsTable();
 
-        const response = await fetch("/delAcessorios", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        row.remove();
-      }
-    }
-  } catch {
-    messageInformation("error", "ERRO", "Não foi possivel remover item...");
-  }
+  data.forEach((item) => {
+    const tr = createContractRow(item);
+    tbody.appendChild(tr);
+  });
+}
+
+/*===========================
+  TABLE HELPERS (ACESSÓRIOS)
+===========================*/
+
+function getAccessoriesTableBody() {
+  return q(`${EL.TABLE_ACESSORIOS} tbody`);
+}
+
+function clearAccessoriesTable() {
+  const tbody = getAccessoriesTableBody();
+  if (tbody) tbody.innerHTML = "";
+}
+
+function createTableCell(content, style = "") {
+  return Dom.createElement("td", content, style);
 }
 
 function insertButtonCellTable() {
@@ -145,111 +132,298 @@ function insertButtonCellTable() {
   `;
 }
 
-function handleDeleteButtonClick(event) {
+function createAccessoryRow(item) {
+  const tr = document.createElement("tr");
+
+  tr.append(createTableCell(item.p_id));
+  tr.append(createTableCell(item.p_categoria));
+  tr.append(createTableCell(item.p_descricao));
+  tr.append(createTableCell(item.p_medida, "text-align: center;"));
+  tr.append(createTableCell(item.p_qtd, "text-align: center;"));
+  tr.append(createTableCell(item.p_fornecedor, "text-align: center;"));
+  tr.append(
+    createTableCell(DateTime.forBr(item.p_datacompra), "text-align: center;")
+  );
+  tr.append(
+    createTableCell(DateTime.forBr(item.p_previsao), "text-align: center;")
+  );
+  tr.append(
+    createTableCell(DateTime.forBr(item.p_recebido), "text-align: center;")
+  );
+
+  tr.innerHTML += insertButtonCellTable();
+  return tr;
+}
+
+function renderAccessoriesTable(data) {
+  const tbody = getAccessoriesTableBody();
+  if (!tbody) return;
+
+  clearAccessoriesTable();
+
+  data.forEach((item) => {
+    const tr = createAccessoryRow(item);
+    tbody.appendChild(tr);
+  });
+
+  clearAccessoriesFormFields();
+}
+
+/*===========================
+  FORM HELPERS
+===========================*/
+
+function clearAccessoriesFormFields() {
+  const elements = [
+    EL.CATEGORIA,
+    EL.DESCRICAO,
+    EL.MEDIDA,
+    EL.QTD,
+    EL.FORNECEDOR,
+    EL.COMPRA,
+    EL.PREVISAO,
+    EL.RECEBIDO,
+  ];
+  elements.forEach((selector) => Dom.setValue(selector, ""));
+}
+
+function fillAccessoriesFormFromRow(row) {
+  const cells = row.querySelectorAll("td");
+  if (cells.length < 9) return;
+
+  Dom.setValue(EL.CATEGORIA, cells[1].textContent);
+  Dom.setValue(EL.DESCRICAO, cells[2].textContent);
+  Dom.setValue(EL.MEDIDA, cells[3].textContent);
+  Dom.setValue(EL.QTD, cells[4].textContent);
+  Dom.setValue(EL.FORNECEDOR, cells[5].textContent);
+  Dom.setValue(EL.COMPRA, DateTime.forISO(cells[6].textContent));
+  Dom.setValue(EL.PREVISAO, DateTime.forISO(cells[7].textContent));
+  Dom.setValue(EL.RECEBIDO, DateTime.forISO(cells[8].textContent));
+}
+
+/*===========================
+  ACCESSORY DELETE HELPERS
+===========================*/
+
+function getRowFromButton(button) {
+  return button.closest("tr");
+}
+
+function getFirstCell(row) {
+  return row.querySelector("td");
+}
+
+function isCellNotEmpty(cell) {
+  return !!cell && !!cell.textContent.trim();
+}
+
+async function showDeleteConfirmation() {
+  const result = await Modal.showConfirmation(
+    "REMOVER ITEM",
+    "Deseja remover o item selecionado ?"
+  );
+  return result.isConfirmed;
+}
+
+function extractItemId(cell) {
+  return cell.textContent.trim();
+}
+
+async function removeAccessory(itemId, row) {
+  const data = { p_id: itemId };
+  await DB.deleteAccessoryById(data);
+  row.remove();
+}
+
+/*===========================
+  DOMAIN: CONTRATO
+===========================*/
+
+async function fetchAndRenderContractPendencies() {
+  const contractValue = Dom.getValue(EL.CONTRATO);
+
+  if (!isValidContractValue(contractValue)) {
+    await showInvalidContractModal();
+    return;
+  }
+
+  const res = await DB.getContractPendencies(contractValue);
+
+  if (!isValidResponse(res) || !Array.isArray(res.data) || !res.data.length) {
+    await Modal.showInfo("error", "ERRO", "Contrato não localizado");
+    return;
+  }
+
+  const first = res.data[0];
+  if (first && first.p_dataentrega) {
+    Dom.setValue(EL.ENTREGA, DateTime.forBr(first.p_dataentrega));
+  }
+
+  renderContractsTable(res.data);
+}
+
+/*===========================
+  DOMAIN: ACESSÓRIOS
+===========================*/
+
+async function loadAccessoriesTable(orderNumberParam) {
+  const orderNumber = orderNumberParam || Dom.getValue(EL.NUM_OC);
+  if (!orderNumber) return;
+
+  const res = await DB.getAccessoriesByOrder(orderNumber);
+
+  if (!isValidResponse(res)) {
+    await Modal.showInfo(
+      "error",
+      "ERRO",
+      "Não foi possível buscar dados na base"
+    );
+    return;
+  }
+
+  renderAccessoriesTable(res.data || []);
+}
+
+function buildAccessoryPayload() {
+  return {
+    p_ordemdecompra: Dom.getValue(EL.NUM_OC),
+    p_categoria: Dom.getValue(EL.CATEGORIA),
+    p_descricao: Dom.getValue(EL.DESCRICAO),
+    p_medida: Dom.getValue(EL.MEDIDA),
+    p_quantidade: Dom.getValue(EL.QTD),
+    p_fornecedor: Dom.getValue(EL.FORNECEDOR),
+    p_compra: Dom.getValue(EL.COMPRA),
+    p_previsao: Dom.getValue(EL.PREVISAO),
+    p_recebido: Dom.getValue(EL.RECEBIDO),
+  };
+}
+
+async function insertAccessory() {
+  const result = await Modal.showConfirmation(
+    null,
+    "Deseja inserir novo acessório ?"
+  );
+
+  if (!result.isConfirmed) return;
+
+  try {
+    const payload = buildAccessoryPayload();
+    await DB.insertAccessory(payload);
+    await loadAccessoriesTable(Dom.getValue(EL.NUM_OC));
+  } catch {
+    Modal.showInfo("error", "ERRO", "Não foi possível inserir acessório");
+  }
+}
+
+/*===========================
+  DOMAIN: CATEGORY / DATES
+===========================*/
+
+function computeExpectedDateByCategory(category, purchaseDate) {
+  const categoria = (category || "").toLowerCase();
+  const compra = new Date(purchaseDate);
+
+  if (isNaN(compra.getTime())) return null;
+
+  const previsao = new Date(compra);
+
+  if (categoria === "porta de aluminio") {
+    previsao.setDate(compra.getDate() + 15);
+  } else if (categoria === "serralheria") {
+    previsao.setDate(compra.getDate() + 30);
+  } else {
+    return null;
+  }
+
+  return previsao.toISOString().split("T")[0];
+}
+
+function updateExpectedDateByCategory() {
+  const categoria = Dom.getValue(EL.CATEGORIA);
+  const compra = Dom.getValue(EL.COMPRA);
+
+  const expected = computeExpectedDateByCategory(categoria, compra);
+  if (expected) {
+    Dom.setValue(EL.PREVISAO, expected);
+  }
+}
+
+/*===========================
+  EVENT HANDLERS
+===========================*/
+
+function handleContractsTableClick(event) {
+  if (event.target.tagName !== "TD") return;
+
+  const firstColumnValue = Table.getIndexColumnValue(event.target, 0);
+  const secondColumnValue = Table.getIndexColumnValue(event.target, 1);
+  const thirdColumnValue = Table.getIndexColumnValue(event.target, 2);
+
+  Dom.setValue(EL.NUM_OC, firstColumnValue);
+  Dom.setValue(EL.CLIENTE, secondColumnValue);
+  Dom.setValue(EL.AMBIENTE, thirdColumnValue);
+
+  loadAccessoriesTable(firstColumnValue);
+  Modal.show("modal");
+}
+
+function handleAccessoriesTableDoubleClick(event) {
+  if (event.target.tagName !== "TD") return;
+
+  const row = event.target.closest("tr");
+  if (!row) return;
+
+  fillAccessoriesFormFromRow(row);
+}
+
+async function handleDeleteButtonClick(event) {
   const button = event.target.closest("button");
 
-  if (button && button.classList.contains("btn-delete")) {
-    deleteRow(button);
+  if (!button || !button.classList.contains("btn-delete")) return;
+
+  try {
+    const row = getRowFromButton(button);
+    const firstCell = getFirstCell(row);
+
+    if (!isCellNotEmpty(firstCell)) return;
+
+    const confirmed = await showDeleteConfirmation();
+    if (!confirmed) return;
+
+    const itemId = extractItemId(firstCell);
+    await removeAccessory(itemId, row);
+  } catch {
+    Modal.showInfo("error", "ERRO", "Não foi possível remover item...");
   }
 }
 
-function handleTableClick(event) {
-  if (event.target.tagName === "TD") {
-    const firstColumnValue = getFirstColumnValue(event.target, 0);
-    const secondColumnValue = getFirstColumnValue(event.target, 1);
-    const treeColumnValue = getFirstColumnValue(event.target, 2);
-    Dom.setValue("txt_numoc", firstColumnValue);
-    Dom.setValue("txt_cliente", secondColumnValue);
-    Dom.setValue("txt_ambiente", treeColumnValue);
-    fillTableAcessorios(firstColumnValue);
-    createModal("modal");
-  }
-}
+/*===========================
+  INIT
+===========================*/
 
-function getLineItens(event) {
-  if (event.target.tagName === "TD") {
-    const row = event.target.closest("tr");
-    const cellValues = [];
-    row.querySelectorAll("td").forEach(function (cell) {
-      cellValues.push(cell.textContent);
-    });
-    Dom.setValue("txt_categoria", cellValues[1]);
-    Dom.setValue("txt_descricao", cellValues[2]);
-    Dom.setValue("txt_medida", cellValues[3]);
-    Dom.setValue("txt_qtd", cellValues[4]);
-    Dom.setValue("txt_fornecedor", cellValues[5]);
-    Dom.setValue("txt_compra", convertDataISO(checkValue(cellValues[6])));
-    Dom.setValue("txt_previsao", convertDataISO(checkValue(cellValues[7])));
-    Dom.setValue("txt_recebido", convertDataISO(checkValue(cellValues[8])));
-  }
-}
-
-async function insertAcessorios() {
-  const result = await messageQuestion(null, "Deseja inserir novo acessorio ?");
-
-  if (result.isConfirmed) {
-    try {
-      const data = {
-        p_ordemdecompra: Dom.getValue("txt_numoc"),
-        p_categoria: document.getElementById("txt_categoria").value,
-        p_descricao: Dom.getValue("txt_descricao"),
-        p_medida: Dom.getValue("txt_medida"),
-        p_quantidade: Dom.getValue("txt_qtd"),
-        p_fornecedor: Dom.getValue("txt_fornecedor"),
-        p_compra: Dom.getValue("txt_compra"),
-        p_previsao: Dom.getValue("txt_previsao"),
-        p_recebido: Dom.getValue("txt_recebido"),
-      };
-
-      const response = await fetch("/insertAcessorios", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      fillTableAcessorios(Dom.getValue("txt_numoc"));
-    } catch {
-      messageInformation("error", "ERRO", "Não foi possível inserir acessório");
-    }
-  }
-}
-
-function checkCategory() {
-  const categoria = Dom.getValue("txt_categoria").toLowerCase();
-
-  if (categoria == "porta de aluminio" || categoria == "serralheria") {
-    const compra = new Date(Dom.getValue("txt_compra"));
-
-    if (isNaN(compra.getTime())) {
-      console.error("Data de compra inválida");
-      return;
-    }
-
-    let previsao = new Date(compra);
-
-    if (categoria == "porta de aluminio") {
-      previsao.setDate(compra.getDate() + 15);
-    } else if (categoria == "serralheria") {
-      previsao.setDate(compra.getDate() + 30);
-    }
-
-    const formattedDate = previsao.toISOString().split("T")[0];
-
-    Dom.setValue("txt_previsao", formattedDate);
-  }
-  return;
-}
-
-document.addEventListener("DOMContentLoaded", (event) => {
-  Dom.setFocus("txt_contrato");
+function initPendenciasPage() {
+  Dom.setFocus(EL.CONTRATO);
   loadPage("compras", "pendencias.html");
-  enableEnterAsTab();
-  onmouseover("table");
-  getGroupedData("getGroupedAcessorios", "txt_categoria", "p_categoria");
-});
+  Dom.enableEnterAsTab();
+  Table.onmouseover("table");
+  getGroupedData("getGroupedAcessorios", EL.CATEGORIA, "p_categoria");
 
-Dom.addEventBySelector("#txt_contrato", "blur", getContrato);
-Dom.addEventBySelector("#bt_adicionar", "click", insertAcessorios);
-Dom.addEventBySelector("#table", "click", handleTableClick);
-Dom.addEventBySelector("#table-1", "dblclick", getLineItens);
-Dom.addEventBySelector("#table-1", "click", handleDeleteButtonClick);
-Dom.addEventBySelector("#txt_compra", "blur", checkCategory);
+  Dom.addEventBySelector(EL.CONTRATO, "blur", fetchAndRenderContractPendencies);
+  Dom.addEventBySelector(EL.BTN_ADICIONAR, "click", insertAccessory);
+  Dom.addEventBySelector(
+    EL.TABLE_CONTRATOS,
+    "click",
+    handleContractsTableClick
+  );
+  Dom.addEventBySelector(
+    EL.TABLE_ACESSORIOS,
+    "dblclick",
+    handleAccessoriesTableDoubleClick
+  );
+  Dom.addEventBySelector(EL.TABLE_ACESSORIOS, "click", handleDeleteButtonClick);
+  Dom.addEventBySelector(EL.COMPRA, "blur", updateExpectedDateByCategory);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  initPendenciasPage();
+});

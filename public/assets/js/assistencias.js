@@ -1,16 +1,12 @@
-import {
-  onmouseover,
-  convertDataBr,
-  colorStatus,
-  onclickHighlightRow,
-} from "./utils.js";
+import { onclickHighlightRow } from "./utils.js";
 
-import { Dom, Modal, q } from "./UI/interface.js";
-import { Date } from "./utils/time.js";
+import { Dom, q, Table, Style } from "./UI/interface.js";
+import { DateTime } from "./utils/time.js";
 import { enableTableFilterSort } from "./filtertable.js";
 import { API } from "./service/api.js";
+import { Modal } from "./utils/modal.js";
 
-const SELECTORS = {
+const EL = {
   SOLICITACAO: "#txt_solicitacao",
   CONTRATO: "#txt_contrato",
   SOLICITANTE: "#txt_solicitante",
@@ -54,35 +50,35 @@ async function loadData(value) {
 }
 
 async function getContrato() {
-  const contrato_value = Dom.getValue(SELECTORS.CONTRATO);
+  const contrato_value = Dom.getValue(EL.CONTRATO);
   if (!contrato_value) return;
   const res = await API.fetchQuery(`/getContrato?p_contrato=${contrato_value}`);
   return res.data;
 }
 
 function populateElements(data) {
-  Dom.setValue(SELECTORS.SOLICITACAO, data.p_idsolicitacao);
-  Dom.setValue(SELECTORS.CONTRATO, data.p_contrato);
-  Dom.setValue(SELECTORS.SOLICITANTE, data.p_solicitante);
-  Dom.setValue(SELECTORS.DATA_SOLICITACAO, Date.forBr(data.p_datasolicitacao));
-  Dom.setValue(SELECTORS.CLIENTE, data.p_cliente);
-  Dom.setValue(SELECTORS.PEDIDO, data.p_pedido);
-  Dom.setValue(SELECTORS.CORTE, data.p_corte);
-  Dom.setValue(SELECTORS.AMBIENTE, data.p_ambiente);
-  Dom.setValue(SELECTORS.SITUACAO, data.p_situacao);
-  Dom.setValue(SELECTORS.URGENTE, data.p_urgente);
-  Dom.setValue(SELECTORS.OBS_FABRICA, data.p_observacao);
-  Dom.setValue(SELECTORS.OBS_LOGISTICA, data.p_observacao2);
-  Dom.setValue(SELECTORS.INICIADO, data.p_iniciado);
-  Dom.setValue(SELECTORS.PRONTO, data.p_pronto);
-  Dom.setValue(SELECTORS.CONFERENTE, data.p_conferente);
-  Dom.setValue(SELECTORS.LIBERADOR, data.p_liberacao);
-  Dom.setValue(SELECTORS.MOTORISTA, data.p_responsavel);
-  Dom.setValue(SELECTORS.ENTREGUE, data.p_dataentrega);
-  Dom.setValue(SELECTORS.RESPONSAVEL, data.p_montador);
-  Dom.setChecked(SELECTORS.ESCRITORIO, data.p_escritorio);
-  Dom.setChecked(SELECTORS.PRODUCAO, data.p_producao);
-  Dom.setChecked(SELECTORS.SEM_MATERIAL, data.p_sem_material);
+  Dom.setValue(EL.SOLICITACAO, data.p_idsolicitacao);
+  Dom.setValue(EL.CONTRATO, data.p_contrato);
+  Dom.setValue(EL.SOLICITANTE, data.p_solicitante);
+  Dom.setValue(EL.DATA_SOLICITACAO, DateTime.forBr(data.p_datasolicitacao));
+  Dom.setValue(EL.CLIENTE, data.p_cliente);
+  Dom.setValue(EL.PEDIDO, data.p_pedido);
+  Dom.setValue(EL.CORTE, data.p_corte);
+  Dom.setValue(EL.AMBIENTE, data.p_ambiente);
+  Dom.setValue(EL.SITUACAO, data.p_situacao);
+  Dom.setValue(EL.URGENTE, data.p_urgente);
+  Dom.setValue(EL.OBS_FABRICA, data.p_observacao);
+  Dom.setValue(EL.OBS_LOGISTICA, data.p_observacao2);
+  Dom.setValue(EL.INICIADO, data.p_iniciado);
+  Dom.setValue(EL.PRONTO, data.p_pronto);
+  Dom.setValue(EL.CONFERENTE, data.p_conferente);
+  Dom.setValue(EL.LIBERADOR, data.p_liberacao);
+  Dom.setValue(EL.MOTORISTA, data.p_responsavel);
+  Dom.setValue(EL.ENTREGUE, data.p_dataentrega);
+  Dom.setValue(EL.RESPONSAVEL, data.p_montador);
+  Dom.setChecked(EL.ESCRITORIO, data.p_escritorio);
+  Dom.setChecked(EL.PRODUCAO, data.p_producao);
+  Dom.setChecked(EL.SEM_MATERIAL, data.p_sem_material);
 }
 
 async function confirmSave() {
@@ -99,19 +95,19 @@ async function confirmSave() {
 
 function getElementsVAlues() {
   const data = {
-    p_solicitacao: Dom.getValue(SELECTORS.SOLICITACAO),
-    p_pedido: Dom.getValue(SELECTORS.PEDIDO),
-    p_corte: Dom.getValue(SELECTORS.CORTE),
-    p_observacao: Dom.getValue(SELECTORS.OBS_FABRICA),
-    p_iniciado: Dom.getValue(SELECTORS.INICIADO),
-    p_pronto: Dom.getValue(SELECTORS.PRONTO),
-    p_conferente: Dom.getValue(SELECTORS.CONFERENTE),
-    p_responsavel: Dom.getValue(SELECTORS.RESPONSAVEL),
-    p_liberacao: Dom.getValue(SELECTORS.LIBERADOR),
-    p_dataentrega: Dom.getValue(SELECTORS.ENTREGUE),
-    p_escritorio: Dom.getChecked(SELECTORS.ESCRITORIO),
-    p_producao: Dom.getChecked(SELECTORS.PRODUCAO),
-    p_sem_material: Dom.getChecked(SELECTORS.SEM_MATERIAL),
+    p_solicitacao: Dom.getValue(EL.SOLICITACAO),
+    p_pedido: Dom.getValue(EL.PEDIDO),
+    p_corte: Dom.getValue(EL.CORTE),
+    p_observacao: Dom.getValue(EL.OBS_FABRICA),
+    p_iniciado: Dom.getValue(EL.INICIADO),
+    p_pronto: Dom.getValue(EL.PRONTO),
+    p_conferente: Dom.getValue(EL.CONFERENTE),
+    p_responsavel: Dom.getValue(EL.RESPONSAVEL),
+    p_liberacao: Dom.getValue(EL.LIBERADOR),
+    p_dataentrega: Dom.getValue(EL.ENTREGUE),
+    p_escritorio: Dom.getChecked(EL.ESCRITORIO),
+    p_producao: Dom.getChecked(EL.PRODUCAO),
+    p_sem_material: Dom.getChecked(EL.SEM_MATERIAL),
   };
   return data;
 }
@@ -137,7 +133,7 @@ async function populateTable() {
   let num = 1;
   response.data.forEach((item) => {
     const tr = document.createElement("tr");
-    const color = colorStatus(item.p_status);
+    const color = Style.colorStatus(item.p_status);
     const urgent = isUrgent(item.p_urgente);
 
     tr.append(Dom.createElement(td, num));
@@ -147,14 +143,16 @@ async function populateTable() {
     tr.append(Dom.createElement(td, item.p_cliente));
     tr.append(Dom.createElement(td, item.p_ambiente));
     tr.append(
-      Dom.createElement(td, Date.forBr(item.p_datasolicitacao), center)
+      Dom.createElement(td, DateTime.forBr(item.p_datasolicitacao), center)
     );
     tr.append(Dom.createElement(td, item.p_prazo, center));
     tr.append(Dom.createElement(td, item.p_status, `${center}; ${color}`));
-    tr.append(Dom.createElement(td, Date.forBr(item.p_iniciado), center));
-    tr.append(Dom.createElement(td, Date.forBr(item.p_previsao), center));
-    tr.append(Dom.createElement(td, Date.forBr(item.p_pronto), center));
-    tr.append(Dom.createElement(td, Date.forBr(item.p_dataentrega), center));
+    tr.append(Dom.createElement(td, DateTime.forBr(item.p_iniciado), center));
+    tr.append(Dom.createElement(td, DateTime.forBr(item.p_previsao), center));
+    tr.append(Dom.createElement(td, DateTime.forBr(item.p_pronto), center));
+    tr.append(
+      Dom.createElement(td, DateTime.forBr(item.p_dataentrega), center)
+    );
     tr.append(Dom.createElement(td, item.p_urgente, `${center}; ${urgent}`));
     num += 1;
     tbody.appendChild(tr);
@@ -166,7 +164,7 @@ function setLocalStorageItem(value) {
 }
 
 function printPage() {
-  setLocalStorageItem(Dom.getValue(SELECTORS.CONTRATO));
+  setLocalStorageItem(Dom.getValue(EL.CONTRATO));
   const iframe = q("#iframeImpressao");
   iframe.contentWindow.location.reload();
   setTimeout(function () {
@@ -176,7 +174,7 @@ function printPage() {
 
 function init() {
   populateTable();
-  onmouseover("table");
+  Table.onmouseover("table");
   enableTableFilterSort("table");
   onclickHighlightRow("table");
   Dom.addEventBySelector("#table tbody", "dblclick", (e) =>

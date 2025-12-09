@@ -67,6 +67,6 @@ export class Service {
   static async getUser(id) {
     const url = `/getUsuario?p_id=${id}`;
     const response = await API.fetchQuery(url);
-    return response.data[0];
+    return response.data[0].nome;
   }
 }

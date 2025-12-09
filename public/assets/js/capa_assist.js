@@ -2,6 +2,14 @@ import { API } from "./service/api.js";
 import { Dom } from "./UI/interface.js";
 import { Date } from "./utils/time.js";
 
+const DB = {
+  getDataOrder: async function (orderBy) {
+    const url = `getCapaAssistencia?p_solicitacao=${orderBy}`;
+    const response = await API.fetchQuery(url);
+    return response;
+  },
+};
+
 const SELECTORS = {
   CONTRATO: "#lb_contrato",
   SOLICITACAO: "#lb_solicitacao",
@@ -14,6 +22,8 @@ const SELECTORS = {
   MONTADOR: "#lb_montagem",
   SOLICITANTE: "#lb_solicitante",
   SUPERVISOR: "#lb_supervisor",
+  DIV_URGENTE: "#div-urgente",
+  LB_URGENTE: "#lb_urgente",
 };
 
 function getLocalStorageItem() {
@@ -22,16 +32,16 @@ function getLocalStorageItem() {
 
 function colorUrgente(value) {
   if (value === "SIM") {
-    const div = Dom.getElement("#div_urgente");
+    const div = Dom.getElement(SELECTORS.DIV_URGENTE);
     div.style.background = "red";
-    const label = Dom.getElement("#lb_urgente");
+    const label = Dom.getElement(SELECTORS.LB_URGENTE);
     label.style.color = "white";
   }
 }
 
 function setBackgroudDivUrgent() {
-  const div = Dom.getElement("#div-urgente");
-  const label = Dom.getElement("#lb_urgente");
+  const div = Dom.getElement(SELECTORS.DIV_URGENTE);
+  const label = Dom.getElement(SELECTORS.LB_URGENTE);
 
   if (label.textContent.trim() == "sim".toUpperCase()) {
     label.style.color = "white";
@@ -48,10 +58,7 @@ async function fetchAndPopulateOrder() {
 async function getOrder() {
   const orderBy = getLocalStorageItem();
   if (!orderBy) return;
-  const response = await API.fetchQuery(
-    `getCapaAssistencia?p_solicitacao=${orderBy}`
-  );
-  return await response;
+  const res = await DB.getDataOrder(orderBy);
 }
 
 function populateElements(data) {

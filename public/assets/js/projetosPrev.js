@@ -1,22 +1,108 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import {
-  Dom,
-  checkValue,
-  convertDataBr,
   ajustarTamanhoModal,
-  onmouseover,
   loadPage,
-  colorStatus,
-  colorAcessorios,
   onclickHighlightRow,
-  createModal,
-  messageInformation,
-  messageQuestion,
   getUsuario,
   checkPrevisao,
+  getName,
 } from "./utils.js";
 
+import { Modal } from "./utils/modal.js";
+import { DateTime } from "./utils/time.js";
 import { enableTableFilterSort } from "./filtertable.js";
+import { Dom, Table, Style, q, ce, qa } from "./UI/interface.js";
+import { API } from "./service/api.js";
+
+const EL = {
+  // PROJETO
+  NUM_OC: "#txt_numoc",
+  CLIENTE: "#txt_cliente",
+  CONTRATO: "#txt_contrato",
+  CORTE_CERTO: "#txt_codcc",
+  AMBIENTE: "#txt_ambiente",
+  NUM_PROJ: "#txt_numproj",
+  LOTE: "#txt_lote",
+  CHEGOU_FABRICA: "#txt_chegoufabrica",
+  DATA_ENTREGA: "#txt_dataentrega",
+  OBSERVACOES: "#txt_observacoes",
+
+  // CORTE
+  CORTE_INICIO: "#txt_corteinicio",
+  CORTE_FIM: "#txt_cortefim",
+  CORTE_PAUSA: "#chk_corte",
+  CORTE_ID: "#txt_corteid",
+  CORTE_RESP: "#txt_corteresp",
+
+  // CUSTOMIZACAO
+  CUSTOM_INICIO: "#txt_customizacaoinicio",
+  CUSTOM_FIM: "#txt_customizacaofim",
+  CUSTOM_PAUSA: "#chk_customizacao",
+  CUSTOM_ID: "#txt_customizacaoid",
+  CUSTOM_RESP: "#txt_customizacaoresp",
+
+  // COLADEIRA
+  COLADEIRA_INICIO: "#txt_coladeirainicio",
+  COLADEIRA_FIM: "#txt_coladeirafim",
+  COLADEIRA_PAUSA: "#chk_coladeira",
+  COLADEIRA_ID: "#txt_coladeiraid",
+  COLADEIRA_RESP: "#txt_coladeiraresp",
+
+  // USINAGEM
+  USINAGEM_INICIO: "#txt_usinageminicio",
+  USINAGEM_FIM: "#txt_usinagemfim",
+  USINAGEM_PAUSA: "#chk_usinagem",
+  USINAGEM_ID: "#txt_usinagemid",
+  USINAGEM_RESP: "#txt_usinagemresp",
+
+  // MONTAGEM
+  MONTAGEM_INICIO: "#txt_montageminicio",
+  MONTAGEM_FIM: "#txt_montagemfim",
+  MONTAGEM_PAUSA: "#chk_montagem",
+  MONTAGEM_ID: "#txt_montagemid",
+  MONTAGEM_RESP: "#txt_montagemresp",
+
+  // PAINEIS
+  PAINEIS_INICIO: "#txt_paineisinicio",
+  PAINEIS_FIM: "#txt_paineisfim",
+  PAINEIS_PAUSA: "#chk_paineis",
+  PAINEIS_ID: "#txt_paineisid",
+  PAINEIS_RESP: "#txt_paineisresp",
+
+  // ACABAMENTOS
+  ACABAMENTOS_INICIO: "#txt_acabamentoinicio",
+  ACABAMENTOS_FIM: "#txt_acabamentofim",
+  ACABAMENTOS_PAUSA: "#chk_acabamento",
+  ACABAMENTOS_ID: "#txt_acabamentoid",
+  ACABAMENTOS_RESP: "#txt_acabamentoresp",
+
+  // EMBALAGEM
+  EMBALAGEM_INICIO: "#txt_embalageminicio",
+  EMBALAGEM_FIM: "#txt_embalagemfim",
+  EMBALAGEM_PAUSA: "#chk_embalagem",
+  EMBALAGEM_ID: "#txt_embalagemid",
+  EMBALAGEM_RESP: "#txt_embalagemresp",
+  TABLE: "#table",
+};
+
+const DB = {
+  getDataProjetcs: async function () {
+    const res = await API.fetchQuery("/fillTablePrevisao");
+    return res;
+  },
+
+  getDataProjetc: async function (orderBy) {
+    const url = `/getPrevisao?p_ordemdecompra=${orderBy}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+
+  getDataAcessories: async function (orderBy) {
+    const url = `/fillTableAcessorios?p_ordemdecompra=${orderBy}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+};
 
 function checkText(item) {
   if (item === "FINALIZADO") {
@@ -26,123 +112,91 @@ function checkText(item) {
   }
 }
 
-async function fillTable() {
-  const response = await fetch("/fillTablePrevisao");
-  const data = await response.json();
+async function populateTableProjects() {
+  const res = await DB.getDataProjetcs();
 
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Não foi possivel carregar os dados");
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", `${res.data}`);
   } else {
-    const tbody = document.querySelector("tbody");
+    const td = "td";
+    const tbody = q("tbody");
     tbody.innerHTML = "";
     let num = 1;
 
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-
+    res.data.forEach((item) => {
+      const tr = ce("tr");
       tr.classList.add("open-modal-row");
       tr.classList.add("fw-bold");
 
-      var cor_corte = checkText(item.scorte);
-      var cor_custom = checkText(item.scustom);
-      var cor_coladeira = checkText(item.scoladeira);
-      var cor_usinagem = checkText(item.susinagem);
-      var cor_paineis = checkText(item.spaineis);
-      var cor_montagem = checkText(item.smontagem);
-      var cor_embalagem = checkText(item.sembalagem);
-      var cor_separacao = checkText(item.sseparacao);
-
-      const cor_status = colorStatus(item.status);
-      const cor_a = colorAcessorios(item.total);
+      const cor_corte = checkText(item.scorte);
+      const cor_custom = checkText(item.scustom);
+      const cor_coladeira = checkText(item.scoladeira);
+      const cor_usinagem = checkText(item.susinagem);
+      const cor_paineis = checkText(item.spaineis);
+      const cor_montagem = checkText(item.smontagem);
+      const cor_embalagem = checkText(item.sembalagem);
+      const cor_separacao = checkText(item.sseparacao);
+      const cor_status = Style.colorStatus(item.status);
+      const cor_a = Style.setColorBool(item.total);
       const corPrev = checkPrevisao(item.previsao, item.dataentrega);
+      const dNone = "display: None;";
+      const leftText = "text-align: left;";
+      tr.append(Dom.createElement(td, num));
+      tr.append(Dom.createElement(td, item.a, cor_a));
+      tr.append(Dom.createElement(td, item.pedido));
+      tr.append(Dom.createElement(td, item.etapa));
+      tr.append(Dom.createElement(td, item.codcc));
+      tr.append(Dom.createElement(td, item.lote));
+      tr.append(Dom.createElement(td, item.cliente, leftText));
+      tr.append(Dom.createElement(td, item.contrato));
+      tr.append(Dom.createElement(td, item.ambiente, leftText));
+      tr.append(Dom.createElement(td, item.status, cor_status));
+      tr.append(Dom.createElement(td, item.dias_restantes));
+      tr.append(Dom.createElement(td, item.material));
+      tr.append(Dom.createElement(td, item.scorte, cor_corte));
+      tr.append(Dom.createElement(td, item.scustom, cor_custom));
+      tr.append(Dom.createElement(td, item.scoladeira, cor_coladeira));
+      tr.append(Dom.createElement(td, item.susinagem, cor_usinagem));
+      tr.append(Dom.createElement(td, item.spaineis, cor_paineis));
+      tr.append(Dom.createElement(td, item.smontagem, cor_montagem));
+      tr.append(Dom.createElement(td, item.sembalagem, cor_embalagem));
+      tr.append(Dom.createElement(td, item.sseparacao, cor_separacao));
+      tr.append(Dom.createElement(td, DateTime.forBr(item.dataentrega)));
+      tr.append(Dom.createElement(td, DateTime.forBr(item.previsao)));
+      tr.append(Dom.createElement(td, item.ordemdecompra, dNone));
 
-      tr.innerHTML = `
-            
-            <td style="text-align: center;">${num}</td>
-            <td style="text-align: center; ${cor_a}">${item.a}</td>
-            <td style="text-align: center;">${item.pedido}</td>
-            <td style="text-align: center;">${item.etapa}</td>
-            <td style="text-align: center;">${item.codcc}</td>
-            <td style="text-align: center;">${item.lote}</td>
-            <td style="text-align: left;">${item.cliente}</td>
-            <td style="text-align: center;">${item.contrato}</td>
-            <td style="text-align: left;">${item.ambiente}</td>
-            <td style="text-align: center; ${cor_status}">${item.status}</td>
-            <td style="text-align: center;">${item.dias_restantes}</td>
-            <td style="text-align: center;">${item.material}</td>
-            <td style="text-align: center; ${cor_corte}">${item.scorte}</td>
-            <td style="text-align: center; ${cor_custom}">${item.scustom}</td>
-            <td style="text-align: center; ${cor_coladeira}">${
-        item.scoladeira
-      }</td>
-            <td style="text-align: center; ${cor_usinagem}">${
-        item.susinagem
-      }</td>
-            <td style="text-align: center; ${cor_paineis}">${item.spaineis}</td>
-            <td style="text-align: center; ${cor_montagem}">${
-        item.smontagem
-      }</td>
-            <td style="text-align: center; ${cor_embalagem}">${
-        item.sembalagem
-      }</td>
-            <td style="text-align: center; ${cor_separacao}">${
-        item.sseparacao
-      }</td>
-            <td style="text-align: center; white-space: nowrap">${convertDataBr(
-              checkValue(item.dataentrega)
-            )}</td>
-            <td style="text-align: center; white-space: nowrap; ${corPrev}">${convertDataBr(
-        checkValue(item.previsao)
-      )}</td>
-            <td style="text-align: center; display:none">${
-              item.ordemdecompra
-            }</td>
-        `;
       tbody.appendChild(tr);
-
-      num = num + 1;
+      num++;
     });
   }
 }
 
-async function fillTableAcessorios(ordemdecompra) {
-  const response = await fetch(
-    `/fillTableAcessorios?p_ordemdecompra=${ordemdecompra}`
-  );
+async function populateTableAcessories(ordeBy) {
+  const res = await DB.getDataAcessories(ordeBy);
 
-  if (!response.ok) {
-    messageInformation(
+  if (res.status !== 200) {
+    Modal.showInfo(
       "error",
       "ERRO",
-      `não foi possivel carregar dados de acessorios !!! ${error.message}`
+      `Erro ao carregar acessorios !!! ${res.data}`
     );
   } else {
-    const tbody = document.querySelectorAll("table tbody")[1];
+    const tbody = qa("table tbody")[1];
     tbody.innerHTML = "";
-    const data = await response.json();
+    tbody.style.font = "9px";
+    const td = "td";
+    const dNone = "display: none;";
+    const textLeft = "text-align: left;";
+    res.data.forEach((item) => {
+      const tr = ce("tr");
 
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-            <td style="font-size: 9px; display: none">${item.id}</td>
-            <td style="font-size: 9px;">${item.descricao}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.medida
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${checkValue(
-              item.qtd
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.datacompra)
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.previsao)
-            )}</td>
-            <td style="font-size: 9px; text-align: center;">${convertDataBr(
-              checkValue(item.recebido)
-            )}</td>
-            `;
+      tr.append(Dom.createElement(td, item.id, dNone));
+      tr.append(Dom.createElement(td, item.descricao, textLeft));
+      tr.append(Dom.createElement(td, item.medida));
+      tr.append(Dom.createElement(td, item.qtd));
+      tr.append(Dom.createElement(td, DateTime.forBr(item.datacompra)));
+      tr.append(Dom.createElement(td, DateTime.forBr(item.previsao)));
+      tr.append(Dom.createElement(td, DateTime.forBr(item.recebido)));
       tbody.appendChild(tr);
     });
   }
@@ -157,109 +211,92 @@ async function handleTableClicked(event) {
   const td = event.target;
   const tr = td.closest(".open-modal-row");
   if (!tr || td.tagName !== "TD") return;
-  const firstColumnValue = getFirstColumnValue(td);
-  await getPrevisao(firstColumnValue);
-  await fillTableAcessorios(firstColumnValue);
-  createModal("modal");
+  const firstColumnValue = Table.getIndexColumnValue(td, 22);
+  await populateModalPrev(firstColumnValue);
+  await populateTableAcessories(firstColumnValue);
+  Modal.show("modal");
 }
 
-async function getPrevisao(ordemdecompra) {
-  const response = await fetch(`/getPrevisao?p_ordemdecompra=${ordemdecompra}`);
-  if (!response.ok) {
-    messageInformation("error", "ERRO", `Ocorreu um erro ${error.message}`);
+async function populateModalPrev(ordemdecompra) {
+  const res = await DB.getDataProjetc(ordemdecompra);
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", `Ocorreu um erro ${error.message}`);
   } else {
-    const data = await response.json();
-    data.forEach((item) => {
-      Dom.setValue("txt_numoc", item.ordemdecompra);
-      Dom.setValue("txt_cliente", item.cliente);
-      Dom.setValue("txt_contrato", item.contrato);
-      Dom.setValue("txt_codcc", item.codcc);
-      Dom.setValue("txt_ambiente", item.ambiente);
-      Dom.setValue("txt_numproj", item.numproj);
-      Dom.setValue("txt_lote", item.lote);
-      Dom.setValue("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
-      Dom.setValue("txt_dataentrega", convertDataBr(item.dataentrega));
+    for (const item of res.data) {
+      Dom.setValue(EL.NUM_OC, item.ordemdecompra);
+      Dom.setValue(EL.CLIENTE, item.cliente);
+      Dom.setValue(EL.CONTRATO, item.contrato);
+      Dom.setValue(EL.CORTE_CERTO, item.codcc);
+      Dom.setValue(EL.AMBIENTE, item.ambiente);
+      Dom.setValue(EL.NUM_PROJ, item.numproj);
+      Dom.setValue(EL.LOTE, item.lote);
+      Dom.setValue(EL.CHEGOU_FABRICA, DateTime.forBr(item.chegoufabrica));
+      Dom.setValue(EL.DATA_ENTREGA, DateTime.forBr(item.dataentrega));
 
-      Dom.setValue("txt_corteinicio", item.corteinicio);
-      Dom.setValue("txt_cortefim", item.cortefim);
-      Dom.setChecked("chk_corte", item.cortepausa);
-      Dom.setValue("txt_corteid", item.corteresp);
-      getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp");
+      Dom.setValue(EL.CORTE_INICIO, item.corteinicio);
+      Dom.setValue(EL.CORTE_FIM, item.cortefim);
+      Dom.setChecked(EL.CORTE_PAUSA, item.cortepausa);
+      Dom.setValue(EL.CORTE_ID, item.corteresp);
+      Dom.setValue(EL.CORTE_RESP, await getName(EL.CORTE_ID));
 
-      Dom.setValue("txt_customizacaoinicio", item.customizacaoinicio);
-      Dom.setValue("txt_customizacaofim", item.customizacaofim);
-      Dom.setChecked("chk_customizacao", item.customizacaopausa);
-      Dom.setValue("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp");
+      Dom.setValue(EL.CUSTOM_INICIO, item.customizacaoinicio);
+      Dom.setValue(EL.CUSTOM_FIM, item.customizacaofim);
+      Dom.setChecked(EL.CUSTOM_PAUSA, item.customizacaopausa);
+      Dom.setValue(EL.CUSTOM_ID, item.customizacaoresp);
+      Dom.setValue(EL.CUSTOM_RESP, await getName(EL.CUSTOM_ID));
 
-      Dom.setValue("txt_coladeirainicio", item.coladeirainicio);
-      Dom.setValue("txt_coladeirafim", item.coladeirafim);
-      Dom.setChecked("chk_coladeira", item.coladeirapausa);
-      Dom.setValue("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp");
+      Dom.setValue(EL.COLADEIRA_INICIO, item.coladeirainicio);
+      Dom.setValue(EL.COLADEIRA_FIM, item.coladeirafim);
+      Dom.setChecked(EL.COLADEIRA_PAUSA, item.coladeirapausa);
+      Dom.setValue(EL.COLADEIRA_ID, item.coladeiraresp);
+      Dom.setValue(EL.COLADEIRA_RESP, await getName(EL.COLADEIRA_ID));
 
-      Dom.setValue("txt_usinageminicio", item.usinageminicio);
-      Dom.setValue("txt_usinagemfim", item.usinagemfim);
-      Dom.setChecked("chk_usinagem", item.usinagempausa);
-      Dom.setValue("txt_usinagemid", item.usinagemresp);
-      getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp");
+      Dom.setValue(EL.USINAGEM_INICIO, item.usinageminicio);
+      Dom.setValue(EL.USINAGEM_FIM, item.usinagemfim);
+      Dom.setChecked(EL.USINAGEM_PAUSA, item.usinagempausa);
+      Dom.setValue(EL.USINAGEM_ID, item.usinagemresp);
+      Dom.setValue(EL.USINAGEM_RESP, await getName(EL.USINAGEM_ID));
 
-      Dom.setValue("txt_montageminicio", item.montageminicio);
-      Dom.setValue("txt_montagemfim", item.montagemfim);
-      Dom.setValue("txt_montagemfim", item.montagemfim);
-      Dom.setChecked("chk_montagem", item.montagempausa);
-      Dom.setValue("txt_montagemid", item.montagemresp);
-      getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp");
+      Dom.setValue(EL.MONTAGEM_INICIO, item.montageminicio);
+      Dom.setValue(EL.MONTAGEM_FIM, item.montagemfim);
+      Dom.setChecked(EL.MONTAGEM_PAUSA, item.montagempausa);
+      Dom.setValue(EL.MONTAGEM_ID, item.montagemresp);
+      Dom.setValue(EL.MONTAGEM_RESP, await getName(EL.MONTAGEM_ID));
 
-      Dom.setValue("txt_paineisinicio", item.paineisinicio);
-      Dom.setValue("txt_paineisfim", item.paineisfim);
-      Dom.setValue("txt_paineisfim", item.paineisfim);
-      Dom.setChecked("chk_paineis", item.paineispausa);
-      Dom.setValue("txt_paineisid", item.paineisresp);
-      getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp");
+      Dom.setValue(EL.PAINEIS_INICIO, item.paineisinicio);
+      Dom.setValue(EL.PAINEIS_FIM, item.paineisfim);
+      Dom.setChecked(EL.PAINEIS_PAUSA, item.paineispausa);
+      Dom.setValue(EL.PAINEIS_ID, item.paineisresp);
+      Dom.setValue(EL.PAINEIS_RESP, await getName(EL.PAINEIS_ID));
 
-      Dom.setValue("txt_acabamentoinicio", item.acabamentoinicio);
-      Dom.setValue("txt_acabamentofim", item.acabamentofim);
-      Dom.setValue("txt_acabamentofim", item.acabamentofim);
-      Dom.setChecked("chk_acabamento", item.acabamentopausa);
-      Dom.setValue("txt_acabamentoid", item.acabamentoresp);
-      getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp");
+      Dom.setValue(EL.ACABAMENTOS_INICIO, item.acabamentoinicio);
+      Dom.setValue(EL.ACABAMENTOS_FIM, item.acabamentofim);
+      Dom.setChecked(EL.ACABAMENTOS_PAUSA, item.acabamentopausa);
+      Dom.setValue(EL.ACABAMENTOS_ID, item.acabamentoresp);
+      Dom.setValue(EL.ACABAMENTOS_RESP, await getName(EL.ACABAMENTOS_ID));
 
-      Dom.setValue("txt_embalageminicio", item.embalageminicio);
-      Dom.setValue("txt_embalagemfim", item.embalagemfim);
-      Dom.setValue("txt_embalagemfim", item.embalagemfim);
-      Dom.setChecked("chk_embalagem", item.embalagempausa);
-      Dom.setValue("txt_embalagemid", item.embalagemresp);
-      getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp");
+      Dom.setValue(EL.EMBALAGEM_INICIO, item.embalageminicio);
+      Dom.setValue(EL.EMBALAGEM_FIM, item.embalagemfim);
+      Dom.setChecked(EL.EMBALAGEM_PAUSA, item.embalagempausa);
+      Dom.setValue(EL.EMBALAGEM_ID, item.embalagemresp);
+      Dom.setValue(EL.EMBALAGEM_RESP, await getName(EL.EMBALAGEM_ID));
 
-      Dom.setValue("txt_observacoes", item.observacoes);
-    });
+      Dom.setValue(EL.OBSERVACOES, item.observacoes);
+    }
   }
 }
 
-async function filltableUsuarios() {
-  const data = await getOperadores();
-  const tbody = document.querySelector("#modal-1 tbody");
-  tbody.innerHTML = "";
-  data.forEach((element) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${element.p_id}</td>
-      <td>${element.p_nome}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+function init() {
+  loadPage("previsao", "previsoes.html");
+  populateTableProjects();
+  Table.onmouseover(EL.TABLE.slice(1));
+  enableTableFilterSort(EL.TABLE.slice(1));
+  onclickHighlightRow(EL.TABLE.slice(1));
+  window.addEventListener("resize", ajustarTamanhoModal);
+  Dom.addEventBySelector(EL.TABLE, "dblclick", handleTableClicked);
 }
 
-document.addEventListener("resize", ajustarTamanhoModal);
-
+window.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("previsao", "previsoes.html");
-  fillTable();
-  onmouseover("table");
-  enableTableFilterSort("table");
-  onclickHighlightRow("table");
-  window.addEventListener("resize", ajustarTamanhoModal);
+  init();
 });
-
-Dom.addEventBySelector("#table", "dblclick", handleTableClicked);

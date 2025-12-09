@@ -1,6 +1,7 @@
 import { loadPage } from "./utils.js";
-import { Dom, q, Modal } from "./UI/interface.js";
+import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
+import { Modal } from "./utils/modal.js";
 
 /*==============================
  HELPER elementos

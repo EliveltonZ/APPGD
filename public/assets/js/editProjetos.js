@@ -1,8 +1,9 @@
-import { getGroupedData, loadPage } from "./utils.js";
+import { getGroupedData, loadPage, changeFormatCurrency } from "./utils.js";
 
-import { Dom, Modal, q } from "./UI/interface.js";
-import { MyNumber } from "./utils/time.js";
+import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
+import { Numbers } from "./utils/number.js";
+import { Modal } from "./utils/modal.js";
 
 const EL = {
   // Inputs
@@ -34,6 +35,7 @@ const EL = {
   //Data List
   DL_VENDEDORES: "#vendedores",
   DL_LIBERADORES: "#liberadores",
+  MOEDA: ".moeda",
 };
 
 async function getEditProjetos() {
@@ -64,18 +66,15 @@ async function getEditProjetos() {
           Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
           Dom.setValue(EL.ETAPA, item.etapa);
           Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
-          Dom.setValue(EL.VALOR_BRUTO, MyNumber.formatCoin(item.valorbruto));
+          Dom.setValue(EL.VALOR_BRUTO, Numbers.currency(item.valorbruto));
           Dom.setValue(
             EL.VALOR_NEGOCIADO,
-            MyNumber.formatCoin(item.valornegociado)
+            Numbers.currency(item.valornegociado)
           );
-          Dom.setValue(
-            EL.CUSTO_MATERIAL,
-            MyNumber.formatCoin(item.customaterial)
-          );
+          Dom.setValue(EL.CUSTO_MATERIAL, Numbers.currency(item.customaterial));
           Dom.setValue(
             EL.CUSTO_ADICIONAL,
-            MyNumber.formatCoin(item.customaterialadicional)
+            Numbers.currency(item.customaterialadicional)
           );
         });
       } else {
@@ -153,10 +152,6 @@ async function setEditProjetos() {
   }
 }
 
-window.formatarMoeda = function (e) {
-  MyNumber.changeFormatCurrency(e);
-};
-
 function init() {
   loadPage("adicionar_projetos", "editar.html");
   Dom.setFocus(EL.OC);
@@ -168,6 +163,9 @@ function init() {
   Dom.addEventBySelector(EL.OC, "blur", getEditProjetos);
   Dom.addEventBySelector(EL.SALVAR, "click", async (e) => {
     validForm(e);
+  });
+  Dom.addEventBySelector(EL.MOEDA, "input", (e) => {
+    changeFormatCurrency(e.target);
   });
 }
 

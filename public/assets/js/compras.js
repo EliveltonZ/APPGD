@@ -229,7 +229,6 @@ function fillElement(element) {
   const cartao = getColumnValue(element, 6);
   const quantidade = getColumnValue(element, 7);
   const fornecedor = getColumnValue(element, 8);
-
   const compra = toISOFromBR(getColumnValue(element, 10));
   const previsao = toISOFromBR(getColumnValue(element, 11));
   const recebido = toISOFromBR(getColumnValue(element, 12));
