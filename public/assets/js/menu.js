@@ -1,73 +1,125 @@
-import {
-  Dom,
-  messageInformation,
-  messageQuestion,
-  getCookie,
-} from "./utils.js";
+import { getCookie } from "./utils.js";
+import { Dom, q, ce, qa } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { API } from "./service/api.js";
+import { DateTime } from "./utils/time.js";
 
-async function exibirNome() {
+/*========================================
+  HELPERS DOM
+========================================*/
+const EL = {
+  LOGIN: "login",
+  USUARIO: "#txt_usuario",
+  RESP: "#txt_resp",
+  CHK_URGENTE: "#chk_urgente",
+  NUM_OC: "#txt_numoc",
+  TIPO: "#txt_tipo",
+  DATA: "#txt_data",
+  IFRAME_IMPRESSAO: "#iframeImpressao",
+  IFRAME_IMPRESSAO1: "#iframeImpressao1",
+  LB_CAPA: "#lb_capa",
+  SPINNER: "#spinner",
+  SPINNER1: "#spinner-1",
+  LB_PENDENCIA: "#lb_pendencias",
+};
+
+/*========================================
+  HELPERS API
+========================================*/
+const DB = {
+  getDataAcessories: async function (buyOrder) {
+    const url = `/fillTableAcessorios?p_ordemdecompra=${buyOrder}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+
+  getDataPendence: async function (buyOrder) {
+    const url = `/fillElements?p_ordemdecompra=${buyOrder}`;
+    const res = API.fetchQuery(url);
+    return res;
+  },
+
+  setPermissions: async function (payload) {
+    const res = API.fetchBody("/setPermission", "POST", payload);
+    return res;
+  },
+
+  setType: async function (orderBy, type, urgent) {
+    const url = `/setTipo?p_ordemdecompra=${orderBy}&p_tipo=${type}&p_urgente=${urgent}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+};
+
+async function populateElementsName() {
   const usuario = await getCookie("login");
-  document.getElementById("txt_usuario").innerText = usuario;
-  document.getElementById("txt_resp").value = usuario;
+  Dom.setInnerHtml(EL.USUARIO, usuario);
+  Dom.setValue(EL.RESP, usuario);
 }
 
-function checkUrgente() {
-  const checked = document.getElementById("chk_urgente").checked;
-  if (checked) {
-    return "SIM";
-  } else {
-    return "-";
-  }
+function isChecked() {
+  const checked = Dom.getChecked(EL.CHK_URGENTE);
+  if (checked) return "SIM";
+  return "-";
 }
 
-function findBuyOrder() {
-  localStorage.setItem("numoc", document.getElementById("txt_numoc").value);
-  localStorage.setItem("resp", document.getElementById("txt_resp").value);
-  localStorage.setItem("tipo", document.getElementById("txt_tipo").value);
-  localStorage.setItem("urgente", checkUrgente());
-  localStorage.setItem("data", document.getElementById("txt_data").value);
+function setLs(key, element) {
+  localStorage.setItem(key, Dom.getValue(element));
+}
+
+function setDataLocalStorage() {
+  setLs("numoc", EL.NUM_OC);
+  setLs("resp", EL.RESP);
+  setLs("tipo", EL.TIPO);
+  localStorage.setItem("urgente", isChecked());
+  setLs("data", EL.DATA);
 }
 
 async function printPageCapa() {
-  if (Dom.getValue("txt_tipo") == "-") {
-    messageInformation("warning", "Atenção", "Selecione o tipo do Projeto");
+  if (Dom.getValue(EL.TIPO) == "-") {
+    Modal.showInfo("warning", "Atenção", "Selecione o tipo do Projeto");
     return;
   }
 
-  Dom.handleClass("lb_capa", "d-none", "add");
-  Dom.handleClass("spinner", "d-none", "remove");
-  findBuyOrder();
+  Dom.handleClass(EL.LB_CAPA, "d-none", "add");
+  Dom.handleClass(EL.SPINNER, "d-none", "remove");
+  setDataLocalStorage();
   await loadData();
-  document.getElementById("iframeImpressao").contentWindow.location.reload();
-  var iframe = document.getElementById("iframeImpressao");
+  q(EL.IFRAME_IMPRESSAO).contentWindow.location.reload();
+  var iframe = q(EL.IFRAME_IMPRESSAO);
   setTimeout(async function () {
     iframe.contentWindow.print();
-    Dom.handleClass("lb_capa", "d-none", "remove");
-    Dom.handleClass("spinner", "d-none", "add");
+    Dom.handleClass(EL.LB_CAPA, "d-none", "remove");
+    Dom.handleClass(EL.SPINNER, "d-none", "add");
     await setType(
-      Dom.getValue("txt_numoc"),
-      Dom.getValue("txt_tipo"),
-      Dom.getChecked("chk_urgente")
+      Dom.getValue(EL.NUM_OC),
+      Dom.getValue(EL.TIPO),
+      Dom.getChecked(EL.CHK_URGENTE)
     );
   }, 500);
 }
 
 async function printPageCapaPendencia() {
-  Dom.handleClass("lb_pendencias", "d-none", "add");
-  Dom.handleClass("spinner-1", "d-none", "remove");
-  findBuyOrder();
+  Dom.handleClass(EL.LB_PENDENCIA, "d-none", "add");
+  Dom.handleClass(EL.SPINNER1, "d-none", "remove");
+  setDataLocalStorage();
   await loadData();
-  document.getElementById("iframeImpressao1").contentWindow.location.reload();
-  var iframe = document.getElementById("iframeImpressao1");
+  q(EL.IFRAME_IMPRESSAO1).contentWindow.location.reload();
+  var iframe = q(EL.IFRAME_IMPRESSAO1);
   setTimeout(function () {
     iframe.contentWindow.print();
-    Dom.handleClass("lb_pendencias", "d-none", "remove");
-    Dom.handleClass("spinner-1", "d-none", "add");
+    Dom.handleClass(EL.LB_PENDENCIA, "d-none", "remove");
+    Dom.handleClass(EL.SPINNER1, "d-none", "add");
   }, 500);
 }
 
+async function confirmLogout() {
+  const result = await Modal.showConfirmation(null, "Deseja sair do Sistema ?");
+  return result;
+}
+
 async function logout() {
-  const result = await messageQuestion(null, "Deseja sair do Sistema ?");
+  const result = confirmLogout();
   if (result.isConfirmed) {
     await clearDataUsuario();
     localStorage.clear();
@@ -76,7 +128,7 @@ async function logout() {
 }
 
 async function loadData() {
-  const buyOrder = Dom.getValue("txt_numoc");
+  const buyOrder = Dom.getValue(EL.NUM_OC);
   await fillElements(buyOrder);
   await fillTableAcessorios(buyOrder);
 }
@@ -86,29 +138,23 @@ async function fillElements(buyOrder) {
     console.warn("Ordem de compra inválida ou ausente. Cancelando fetch.");
     return;
   }
+  const res = await DB.getDataPendence(buyOrder);
 
-  const response = await fetch(`/fillElements?p_ordemdecompra=${buyOrder}`);
-
-  if (!response.ok) {
-    const errTExt = await response.text();
+  if (res.status !== 200) {
+    const errTExt = await res.data;
     console.error("Erro ao carregar os dados:", errTExt);
   } else {
-    const numoc = `${buyOrder.slice(0, 8)}-${buyOrder.slice(-2)}`;
-    const data = await response.json();
-    localStorage.setItem("project", JSON.stringify(data[0]));
+    localStorage.setItem("project", JSON.stringify(res.data));
   }
 }
 
 async function fillTableAcessorios(buyOrder) {
-  const response = await fetch(
-    `/fillTableAcessorios?p_ordemdecompra=${buyOrder}`
-  );
+  const res = await DB.getDataAcessories(buyOrder);
 
   try {
-    const data = await response.json();
-    localStorage.setItem("acessorios", JSON.stringify(data));
+    localStorage.setItem("acessorios", JSON.stringify(res.data));
   } catch (err) {
-    messageInformation(
+    Modal.showInfo(
       "error",
       "Erro",
       `Não foi possível carregar os dados. ${err.message}`
@@ -116,35 +162,35 @@ async function fillTableAcessorios(buyOrder) {
   }
 }
 
+function payloadClearUser() {
+  const payload = {
+    id: "",
+    permissoes: null,
+    login: "Não Logado",
+    adicionar_projetos: null,
+    producao: null,
+    expedicao: null,
+    adicionar_usuarios: null,
+    acesso: null,
+    definicoes: null,
+    pcp: null,
+    previsao: null,
+    compras: null,
+    ativo: null,
+    producao_assistencia: null,
+    solicitar_assistencia: null,
+    valores: null,
+    dashboard: null,
+  };
+  return payload;
+}
+
 async function clearDataUsuario() {
   try {
-    const payload = {
-      id: "",
-      permissoes: null,
-      login: "Não Logado",
-      adicionar_projetos: null,
-      producao: null,
-      expedicao: null,
-      adicionar_usuarios: null,
-      acesso: null,
-      definicoes: null,
-      pcp: null,
-      previsao: null,
-      compras: null,
-      ativo: null,
-      producao_assistencia: null,
-      solicitar_assistencia: null,
-      valores: null,
-      dashboard: null,
-    };
+    const payload = payloadClearUser();
+    const response = await API.fetchBody(payload);
 
-    const response = await fetch("/setPermission", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error("Erro ao salvar permissões no backend");
     }
 
@@ -154,14 +200,11 @@ async function clearDataUsuario() {
   }
 }
 
-async function setType(p_ordemdecompra, p_tipo, p_urgente) {
-  const response = await fetch(
-    `/setTipo?p_ordemdecompra=${p_ordemdecompra}&p_tipo=${p_tipo}&p_urgente=${p_urgente}`
-  );
+async function setType(orderBuy, type, urgent) {
+  const res = await DB.setType(orderBuy, type, urgent);
 
-  if (!response.ok) {
-    const result = await response.json();
-    messageInformation("error", "ERRO", `${result}`);
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", `${res.data}`);
   }
 }
 
@@ -180,19 +223,22 @@ async function dashboardPermission() {
     if (valorPermissao) {
       window.location.href = "https://dashboardgd.streamlit.app/";
     } else {
-      messageInformation("error", "ERRO", "Usuario sem Permissão");
+      Modal.showInfo("error", "ERRO", "Usuario sem Permissão");
     }
   } catch (erro) {
-    messageInformation("error", "ERRO", `ERRO: ${erro.message}`);
+    Modal.showInfo("error", "ERRO", `ERRO: ${erro.message}`);
   }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  Dom.setData("txt_data");
-  exibirNome();
-});
+function init() {
+  Dom.setValue(EL.DATA, DateTime.today());
+  populateElementsName();
+  Dom.addEventBySelector("#link_logout", "click", logout);
+  Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
+  Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
+  Dom.addEventBySelector("#dashboard", "click", dashboardPermission);
+}
 
-Dom.addEventBySelector("#link_logout", "click", logout);
-Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
-Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
-Dom.addEventBySelector("#dashboard", "click", dashboardPermission);
+document.addEventListener("DOMContentLoaded", (event) => {
+  init();
+});

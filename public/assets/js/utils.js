@@ -7,74 +7,6 @@ import { Modal } from "./utils/modal.js";
 import { Dom } from "./UI/interface.js";
 import { Numbers } from "./utils/number.js";
 
-export function formatValueDecimal(valorInput) {
-  if (valorInput) {
-    const valorFormatado = valorInput.replace(/[^0-9,]/g, "");
-    const resultado = valorFormatado.replace(",", ".");
-    return resultado;
-  } else {
-    return 0;
-  }
-}
-
-export function changeFormatCurrency(e) {
-  let r = e.value.replace(/\D/g, "");
-  (r = (r / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 2,
-  })),
-    (e.value = r);
-}
-
-export function formatCurrency(valor) {
-  if (valor) {
-    return valor.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  } else {
-    valor = 0;
-    return valor.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
-  }
-}
-
-export function checkValue(value) {
-  if (value) {
-    return value;
-  } else {
-    return "-";
-  }
-}
-
-export function convertDataBr(date) {
-  if (date === "-" || !date) {
-    return "-";
-  }
-
-  const [data, hora] = date.split("T");
-  const [ano, mes, dia] = data.split("-");
-
-  let dataFormatada = `${dia}/${mes}/${ano}`;
-  if (hora) {
-    dataFormatada += ` ${hora}`;
-  }
-  return dataFormatada;
-}
-
-export function convertDataISO(date) {
-  if (date == "-") {
-    return "-";
-  } else {
-    const parse_date = date.split("/");
-    const format_date = `${parse_date[2]}-${parse_date[1]}-${parse_date[0]}`;
-    return format_date;
-  }
-}
-
 export function ajustarTamanhoModal() {
   const modalDialog = document.querySelector(".modal-dialog");
 
@@ -84,21 +16,6 @@ export function ajustarTamanhoModal() {
 
   if (window.innerWidth >= 1200) {
     modalDialog.classList.add("modal-xl");
-  }
-}
-
-export function getFirstColumnValue(td, index) {
-  const row = td.parentNode;
-  return row.cells[index].innerText;
-}
-
-export function getColumnValue(td, columIndex) {
-  const row = td.parentNode;
-  const value = row.cells[columIndex].innerText;
-  if (value === "-") {
-    return "";
-  } else {
-    return value;
   }
 }
 
@@ -134,48 +51,6 @@ export function allUpperCase() {
   });
 }
 
-export function clearInputFields(exceptionsIds = []) {
-  // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
-  const allFields = document.querySelectorAll(
-    'input[type="text"], input[type="checkbox"], select, input[type="date"]'
-  );
-
-  allFields.forEach((field) => {
-    // Verificar se o campo não está na lista de exceções pelos IDs
-    if (!exceptionsIds.includes(field.id)) {
-      if (field.type === "text") {
-        field.value = "";
-      } else if (field.type === "checkbox") {
-        field.checked = false;
-      } else if (field.tagName.toLowerCase() === "select") {
-        field.value = "";
-      } else if (field.type === "date") {
-        field.value = "";
-      }
-    }
-  });
-}
-
-export function onmouseover(tableId) {
-  const table = document.getElementById(tableId);
-  if (!table) {
-    console.warn(`Tabela com ID "${tableId}" não encontrada.`);
-    return;
-  }
-
-  table.addEventListener("mouseover", (event) => {
-    if (event.target.tagName === "TD") {
-      event.target.parentElement.classList.add("table-hover-row");
-    }
-  });
-
-  table.addEventListener("mouseout", (event) => {
-    if (event.target.tagName === "TD") {
-      event.target.parentElement.classList.remove("table-hover-row");
-    }
-  });
-}
-
 export function onclickHighlightRow(tableId) {
   const table = document.getElementById(tableId);
   if (!table) {
@@ -203,12 +78,6 @@ export function onclickHighlightRow(tableId) {
     } else {
     }
   });
-}
-
-export function createModal(modal) {
-  const modalEl = document.getElementById(modal);
-  const _modal = new bootstrap.Modal(modalEl);
-  _modal.show();
 }
 
 export async function loadPage(accessKey, page) {
@@ -258,165 +127,21 @@ function normalizeFile(file) {
   return (file || "").replace(/^\//, "").toLowerCase();
 }
 
-export function convertDecimal(num) {
-  if (num) {
-    return `${parseFloat(num.toFixed(2))}%`;
-  } else {
-    num = 0;
-    return `${parseFloat(num.toFixed(2))}%`;
-  }
-}
-
-export function setDateTime(checkbox, text) {
-  var campoDataHora = document.getElementById(text);
-  const element = document.querySelector(checkbox);
-  if (element.checked) {
-    Swal.fire({
-      icon: "question",
-      confirmButtonText: "Sim",
-      showDenyButton: true,
-      text: "Preencher data automaticamente ?",
-      denyButtonText: "Não",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        campoDataHora.value = dateTimeNow();
-      } else {
-        document.getElementById(element.id).checked = false;
-      }
-    });
-  }
-}
-
-export function dateTimeNow() {
-  var dataAtual = new Date();
-  var ano = dataAtual.getFullYear();
-  var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
-  var dia = String(dataAtual.getDate()).padStart(2, "0");
-  var hora = String(dataAtual.getHours()).padStart(2, "0");
-  var minuto = String(dataAtual.getMinutes()).padStart(2, "0");
-  var dataHoraFormatada = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-  return dataHoraFormatada;
-}
-
-export function setDate(checkbox, text) {
-  var campoDataHora = q(text);
-  const element = document.querySelector(checkbox);
-  if (element.checked) {
-    Swal.fire({
-      icon: "question",
-      confirmButtonText: "Sim",
-      showDenyButton: true,
-      text: "Preencher data automaticamente ?",
-      denyButtonText: "Não",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        var dataAtual = new Date();
-        var ano = dataAtual.getFullYear();
-        var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
-        var dia = String(dataAtual.getDate()).padStart(2, "0");
-        var dataHoraFormatada = `${ano}-${mes}-${dia}`;
-        campoDataHora.value = dataHoraFormatada;
-      } else {
-        document.getElementById(element.id).checked = false;
-      }
-    });
-  }
-}
-
-export function enableEnterAsTab() {
-  const inputs = document.querySelectorAll("input, select, textarea, button");
-  inputs.forEach((input) => {
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-
-        if (input.tagName === "BUTTON") {
-          input.click();
-          return;
-        }
-
-        let index = Array.from(inputs).indexOf(input);
-        let nextElement = inputs[index + 1];
-
-        while (nextElement && nextElement.disabled) {
-          index++;
-          nextElement = inputs[index + 1];
-        }
-
-        if (nextElement) {
-          nextElement.focus();
-        }
-      }
-    });
-  });
-}
-
-export function colorStatus(item) {
-  const colors = {
-    ATRASADO: "color: rgb(255, 0, 0)",
-    INICIADO: "color: rgb(194, 184, 6)",
-    "A VENCER": "color: rgb(226, 109, 0)",
-    PENDENCIA: "color: rgb(186, 2, 227)",
-    URGENTE: "color: rgb(59, 186, 255)",
-    PRONTO: "color: rgb(81, 154, 2)",
-    ENTREGUE: "color: rgb(93, 90, 245)",
-    PARCEADO: "color: rgb(2, 188, 188)",
-  };
-
-  return colors[item] || "";
-}
-
 export function checkPrevisao(firtItem, secondItem) {
   if (firtItem != secondItem) {
     return "color: rgba(242, 164, 38, 1)";
   }
 }
 
-export function colorAcessorios(item) {
-  if (item > 0) {
-    return "color:rgb(194, 184, 6)";
-  } else {
-    return "color: rgb(70, 136, 0)";
-  }
-}
-
 export function applyDateMask(e) {
   const input = e.target;
-  input.value = Numbers.formatDateMask(input.value);
-}
-
-export function messageInformation(icon, title, message) {
-  const dialog = Swal.fire({
-    icon: icon,
-    title: title,
-    html: message,
-    returnFocus: false,
-  });
-  return dialog;
-}
-
-export async function messageQuestion(
-  title,
-  message,
-  confirmButtonText = "Confirmar",
-  cancelButtonText = "Cancelar"
-) {
-  const result = await Swal.fire({
-    icon: "question",
-    title: title,
-    html: message,
-    showDenyButton: true,
-    denyButtonText: cancelButtonText,
-    confirmButtonText: confirmButtonText,
-    returnFocus: false,
-  });
-  return result;
+  input.value = Numbers.dateMask(input.value);
 }
 
 export async function getUsuario(id, campo) {
   const response = await fetch(`/getUsuario?p_id=${id}`);
   if (!response.ok) {
-    messageInformation("error", "ERRO", "Não foi possivel buscar Usuario");
+    Modal.show("error", "ERRO", "Não foi possivel buscar Usuario");
     return;
   }
   const data = await response.json();
@@ -464,7 +189,7 @@ export async function sendMail(data) {
     });
 
     if (!response.ok) {
-      messageInformation("error", "ERRO", "Não foi possivel enviar o E-mail");
+      Modal.show("error", "ERRO", "Não foi possivel enviar o E-mail");
     }
 
     const result = await response.json();
@@ -472,11 +197,6 @@ export async function sendMail(data) {
   } catch (error) {
     throw error; // Opcional: relançar o erro para ser tratado em outro lugar
   }
-}
-
-export function getIndexColumnValue(td, index) {
-  const row = td.parentNode;
-  return row.cells[index].innerText;
 }
 
 export function exportarParaExcel(

@@ -82,109 +82,120 @@ const EL = {
 };
 
 function fillElements(ordemdecompra) {
-  const data = JSON.parse(localStorage.getItem("project"));
-  const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
-  Dom.setInnerHtml(EL.CONTRATO, data.p_contrato);
-  Dom.setInnerHtml(EL.Q_PROJ, Number(data.p_numproj.slice(-2)));
-  Dom.setInnerHtml(EL.NUM_PROJ, data.p_numproj);
-  Dom.setInnerHtml(EL.CLIENTE, data.p_cliente);
-  Dom.setInnerHtml(EL.AMBIENTE, data.p_ambiente);
-  Dom.setInnerHtml(EL.VENDEDOR, data.p_vendedor);
-  Dom.setInnerHtml(EL.DATA_ENTREGA, DateTime.forBr(data.p_dataentrega));
-  Dom.setInnerHtml(EL.ENTREGA, DateTime.forBr(data.p_entrega));
-  Dom.setInnerHtml(EL.PRONTO, DateTime.forBr(data.p_pronto));
-  Dom.setInnerHtml(EL.LIBERADOR, data.p_liberador);
-  Dom.setInnerHtml(EL.NUM_OC, numoc);
-  Dom.setInnerHtml(EL.OBSERVACOES, data.p_observacoes);
-  Dom.setInnerHtml(EL.CORTE, data.p_codcc);
-  Dom.setInnerHtml(EL.LOTE, data.p_lote);
-  Dom.setInnerHtml(EL.PEDIDO, data.p_pedido);
-  colorUrgente(getLocalStorageItem("urgente"));
+  if (ordemdecompra) {
+    const res = JSON.parse(localStorage.getItem("project"));
+    const data = res[0];
+    const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
+    Dom.setInnerHtml(EL.CONTRATO, data.p_contrato);
+    Dom.setInnerHtml(EL.Q_PROJ, Number(data.p_numproj.slice(-2)));
+    Dom.setInnerHtml(EL.NUM_PROJ, data.p_numproj);
+    Dom.setInnerHtml(EL.CLIENTE, data.p_cliente);
+    Dom.setInnerHtml(EL.AMBIENTE, data.p_ambiente);
+    Dom.setInnerHtml(EL.VENDEDOR, data.p_vendedor);
+    Dom.setInnerHtml(EL.DATA_ENTREGA, DateTime.forBr(data.p_dataentrega));
+    Dom.setInnerHtml(EL.ENTREGA, DateTime.forBr(data.p_entrega));
+    Dom.setInnerHtml(EL.PRONTO, DateTime.forBr(data.p_pronto));
+    Dom.setInnerHtml(EL.LIBERADOR, data.p_liberador);
+    Dom.setInnerHtml(EL.NUM_OC, numoc);
+    Dom.setInnerHtml(EL.OBSERVACOES, data.p_observacoes);
+    Dom.setInnerHtml(EL.CORTE, data.p_codcc);
+    Dom.setInnerHtml(EL.LOTE, data.p_lote);
+    Dom.setInnerHtml(EL.PEDIDO, data.p_pedido);
+    colorUrgente(getLocalStorageItem("urgente"));
 
-  Dom.setInnerHtml(EL.CORTE_INICIO, DateTime.forBr(data.p_corteinicio));
-  Dom.setInnerHtml(EL.CORTE_FIM, DateTime.forBr(data.p_cortefim));
-  Dom.setInnerHtml(EL.CORTE_RESP, data.p_corte_resp);
-  Dom.setInnerHtml(EL.CORTE_PAUSA, isBool(data.p_cortepausa));
+    Dom.setInnerHtml(EL.CORTE_INICIO, DateTime.forBr(data.p_corteinicio));
+    Dom.setInnerHtml(EL.CORTE_FIM, DateTime.forBr(data.p_cortefim));
+    Dom.setInnerHtml(EL.CORTE_RESP, data.p_corte_resp);
+    Dom.setInnerHtml(EL.CORTE_PAUSA, isBool(data.p_cortepausa));
 
-  Dom.setInnerHtml(EL.CUSTOM_INICIO, DateTime.forBr(data.p_customizacaoinicio));
-  Dom.setInnerHtml(EL.CUSTOM_FIM, DateTime.forBr(data.p_customizacaofim));
-  Dom.setInnerHtml(EL.CUSTOM_RESP, data.p_customizacao_resp);
-  Dom.setInnerHtml(EL.CUSTOM_PAUSA, isBool(data.p_customizacaopausa));
+    Dom.setInnerHtml(
+      EL.CUSTOM_INICIO,
+      DateTime.forBr(data.p_customizacaoinicio)
+    );
+    Dom.setInnerHtml(EL.CUSTOM_FIM, DateTime.forBr(data.p_customizacaofim));
+    Dom.setInnerHtml(EL.CUSTOM_RESP, data.p_customizacao_resp);
+    Dom.setInnerHtml(EL.CUSTOM_PAUSA, isBool(data.p_customizacaopausa));
 
-  Dom.setInnerHtml(EL.COLADEIRA_INCIO, DateTime.forBr(data.p_coladeirainicio));
-  Dom.setInnerHtml(EL.COLADEIRA_FIM, DateTime.forBr(data.p_coladeirafim));
-  Dom.setInnerHtml(EL.COLADEIRA_RESP, data.p_coladeira_resp);
-  Dom.setInnerHtml(EL.COLADEIRA_PAUSA, isBool(data.p_coladeirapausa));
+    Dom.setInnerHtml(
+      EL.COLADEIRA_INCIO,
+      DateTime.forBr(data.p_coladeirainicio)
+    );
+    Dom.setInnerHtml(EL.COLADEIRA_FIM, DateTime.forBr(data.p_coladeirafim));
+    Dom.setInnerHtml(EL.COLADEIRA_RESP, data.p_coladeira_resp);
+    Dom.setInnerHtml(EL.COLADEIRA_PAUSA, isBool(data.p_coladeirapausa));
 
-  Dom.setInnerHtml(EL.USINAGEM_INICIO, DateTime.forBr(data.p_usinageminicio));
-  Dom.setInnerHtml(EL.USINAGEM_FIM, DateTime.forBr(data.p_usinagemfim));
-  Dom.setInnerHtml(EL.USINAGEM_RESP, data.p_usinagem_resp);
-  Dom.setInnerHtml(EL.USINAGEM_PAUSA, isBool(data.p_usinagempausa));
+    Dom.setInnerHtml(EL.USINAGEM_INICIO, DateTime.forBr(data.p_usinageminicio));
+    Dom.setInnerHtml(EL.USINAGEM_FIM, DateTime.forBr(data.p_usinagemfim));
+    Dom.setInnerHtml(EL.USINAGEM_RESP, data.p_usinagem_resp);
+    Dom.setInnerHtml(EL.USINAGEM_PAUSA, isBool(data.p_usinagempausa));
 
-  Dom.setInnerHtml(EL.PAINEIS_INICIO, DateTime.forBr(data.p_paineisinicio));
-  Dom.setInnerHtml(EL.PAINEIS_FIM, DateTime.forBr(data.p_paineisfim));
-  Dom.setInnerHtml(EL.PAINEIS_RESP, data.p_paineis_resp);
-  Dom.setInnerHtml(EL.PAINEIS_PAUSA, isBool(data.p_paineispausa));
+    Dom.setInnerHtml(EL.PAINEIS_INICIO, DateTime.forBr(data.p_paineisinicio));
+    Dom.setInnerHtml(EL.PAINEIS_FIM, DateTime.forBr(data.p_paineisfim));
+    Dom.setInnerHtml(EL.PAINEIS_RESP, data.p_paineis_resp);
+    Dom.setInnerHtml(EL.PAINEIS_PAUSA, isBool(data.p_paineispausa));
 
-  Dom.setInnerHtml(EL.MONTAGEM_INICIO, DateTime.forBr(data.p_montageminicio));
-  Dom.setInnerHtml(EL.MONTAGEM_FIM, DateTime.forBr(data.p_montagemfim));
-  Dom.setInnerHtml(EL.MONTAGEM_RESP, data.p_montagem_resp);
-  Dom.setInnerHtml(EL.MONTAGEM_PAUSA, isBool(data.p_montagempausa));
+    Dom.setInnerHtml(EL.MONTAGEM_INICIO, DateTime.forBr(data.p_montageminicio));
+    Dom.setInnerHtml(EL.MONTAGEM_FIM, DateTime.forBr(data.p_montagemfim));
+    Dom.setInnerHtml(EL.MONTAGEM_RESP, data.p_montagem_resp);
+    Dom.setInnerHtml(EL.MONTAGEM_PAUSA, isBool(data.p_montagempausa));
 
-  Dom.setInnerHtml(
-    EL.ACABAMENTO_INICIO,
-    DateTime.forBr(data.p_acabamentoinicio)
-  );
-  Dom.setInnerHtml(EL.ACABAMENTO_FIM, DateTime.forBr(data.p_acabamentofim));
-  Dom.setInnerHtml(EL.ACABAMENTO_RESP, data.p_acabamento_resp);
-  Dom.setInnerHtml(EL.ACABAMENTO_PAUSA, isBool(data.p_acabamentopausa));
+    Dom.setInnerHtml(
+      EL.ACABAMENTO_INICIO,
+      DateTime.forBr(data.p_acabamentoinicio)
+    );
+    Dom.setInnerHtml(EL.ACABAMENTO_FIM, DateTime.forBr(data.p_acabamentofim));
+    Dom.setInnerHtml(EL.ACABAMENTO_RESP, data.p_acabamento_resp);
+    Dom.setInnerHtml(EL.ACABAMENTO_PAUSA, isBool(data.p_acabamentopausa));
 
-  Dom.setInnerHtml(EL.EMBALAGEM_INICIO, DateTime.forBr(data.p_embalageminicio));
-  Dom.setInnerHtml(EL.EMBALAGEM_FIM, DateTime.forBr(data.p_embalagemfim));
-  Dom.setInnerHtml(EL.EMBALAGEM_RESP, data.p_embalagem_resp);
-  Dom.setInnerHtml(EL.EMBALAGEM_PAUSA, isBool(data.p_embalagempausa));
+    Dom.setInnerHtml(
+      EL.EMBALAGEM_INICIO,
+      DateTime.forBr(data.p_embalageminicio)
+    );
+    Dom.setInnerHtml(EL.EMBALAGEM_FIM, DateTime.forBr(data.p_embalagemfim));
+    Dom.setInnerHtml(EL.EMBALAGEM_RESP, data.p_embalagem_resp);
+    Dom.setInnerHtml(EL.EMBALAGEM_PAUSA, isBool(data.p_embalagempausa));
 
-  Dom.setInnerHtml(EL.RESPONSAVEL, getLocalStorageItem("resp"));
-  Dom.setInnerHtml(EL.DATA, DateTime.forBr(getLocalStorageItem("data")));
-  Dom.setInnerHtml(EL.TIPO, getLocalStorageItem("tipo"));
-  Dom.setInnerHtml(EL.URGENTE, getLocalStorageItem("urgente"));
+    Dom.setInnerHtml(EL.RESPONSAVEL, getLocalStorageItem("resp"));
+    Dom.setInnerHtml(EL.DATA, DateTime.forBr(getLocalStorageItem("data")));
+    Dom.setInnerHtml(EL.TIPO, getLocalStorageItem("tipo"));
+    Dom.setInnerHtml(EL.URGENTE, getLocalStorageItem("urgente"));
 
-  Dom.setInnerHtml(EL.Q_AVULSO, data.p_avulsoq);
-  Dom.setInnerHtml(EL.L_AVULSO, data.p_avulsol);
+    Dom.setInnerHtml(EL.Q_AVULSO, data.p_avulsoq);
+    Dom.setInnerHtml(EL.L_AVULSO, data.p_avulsol);
 
-  Dom.setInnerHtml(EL.Q_PAINEIS, data.p_paineisq);
-  Dom.setInnerHtml(EL.L_PAINEIS, data.p_paineisl);
+    Dom.setInnerHtml(EL.Q_PAINEIS, data.p_paineisq);
+    Dom.setInnerHtml(EL.L_PAINEIS, data.p_paineisl);
 
-  Dom.setInnerHtml(EL.Q_PORTA_ALUMINIO, data.p_portaaluminioq);
-  Dom.setInnerHtml(EL.L_PORTA_ALUMINIO, data.p_portaaluminiol);
+    Dom.setInnerHtml(EL.Q_PORTA_ALUMINIO, data.p_portaaluminioq);
+    Dom.setInnerHtml(EL.L_PORTA_ALUMINIO, data.p_portaaluminiol);
 
-  Dom.setInnerHtml(EL.Q_VIDROS, data.p_vidrosq);
-  Dom.setInnerHtml(EL.L_VIDROS, data.p_vidrosl);
+    Dom.setInnerHtml(EL.Q_VIDROS, data.p_vidrosq);
+    Dom.setInnerHtml(EL.L_VIDROS, data.p_vidrosl);
 
-  Dom.setInnerHtml(EL.Q_PECAS_PINTADAS, data.p_pecaspintadasq);
-  Dom.setInnerHtml(EL.L_PECAS_PINTADAS, data.p_pecaspintadasl);
+    Dom.setInnerHtml(EL.Q_PECAS_PINTADAS, data.p_pecaspintadasq);
+    Dom.setInnerHtml(EL.L_PECAS_PINTADAS, data.p_pecaspintadasl);
 
-  Dom.setInnerHtml(EL.Q_TAPECARIA, data.p_tapecariaq);
-  Dom.setInnerHtml(EL.L_TAPECARIA, data.p_tapecarial);
+    Dom.setInnerHtml(EL.Q_TAPECARIA, data.p_tapecariaq);
+    Dom.setInnerHtml(EL.L_TAPECARIA, data.p_tapecarial);
 
-  Dom.setInnerHtml(EL.Q_SERRALHERIA, data.p_serralheriaq);
-  Dom.setInnerHtml(EL.L_SERRALHERIA, data.p_serralherial);
+    Dom.setInnerHtml(EL.Q_SERRALHERIA, data.p_serralheriaq);
+    Dom.setInnerHtml(EL.L_SERRALHERIA, data.p_serralherial);
 
-  Dom.setInnerHtml(EL.Q_CABIDE, data.p_cabideq);
-  Dom.setInnerHtml(EL.L_CABIDE, data.p_cabidel);
+    Dom.setInnerHtml(EL.Q_CABIDE, data.p_cabideq);
+    Dom.setInnerHtml(EL.L_CABIDE, data.p_cabidel);
 
-  Dom.setInnerHtml(EL.Q_TRILHO, data.p_trilhoq);
-  Dom.setInnerHtml(EL.L_TRILHO, data.p_trilhol);
+    Dom.setInnerHtml(EL.Q_TRILHO, data.p_trilhoq);
+    Dom.setInnerHtml(EL.L_TRILHO, data.p_trilhol);
 
-  Dom.setInnerHtml(EL.Q_MODULOS, data.p_modulosq);
-  Dom.setInnerHtml(EL.L_MODULOS, data.p_modulosl);
+    Dom.setInnerHtml(EL.Q_MODULOS, data.p_modulosq);
+    Dom.setInnerHtml(EL.L_MODULOS, data.p_modulosl);
 
-  Dom.setInnerHtml(EL.MOTORISTA, data.p_motorista_resp);
-  Dom.setInnerHtml(EL.CONFERIDO, data.p_conferido_resp);
+    Dom.setInnerHtml(EL.MOTORISTA, data.p_motorista_resp);
+    Dom.setInnerHtml(EL.CONFERIDO, data.p_conferido_resp);
 
-  Dom.setInnerHtml(EL.TOTAL_VOLUMES, data.p_totalvolumes);
+    Dom.setInnerHtml(EL.TOTAL_VOLUMES, data.p_totalvolumes);
+  }
 }
-
 function getLocalStorageItem(item) {
   return localStorage.getItem(item);
 }

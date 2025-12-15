@@ -42,6 +42,11 @@ const DB = {
     const res = await API.fetchQuery(url);
     return res;
   },
+
+  delProject: async function (data) {
+    const res = await API.fetchBody("/setDeleteProjeto", "DELETE", data);
+    return res;
+  },
 };
 
 async function getDeleteProjetos() {
@@ -94,12 +99,16 @@ async function validForm(e) {
   }
 }
 
+function payloadDelProjects() {
+  return { p_ordemdecompra: Dom.getValue(EL.OC) };
+}
+
 async function setDeleteProjeto() {
   const result = await Modal.ShowQuestion(null, "Deseja excluir Projeto ?");
 
   if (result.isConfirmed) {
-    const data = { p_ordemdecompra: Dom.getValue(EL.OC) };
-    const response = await API.fetchBody("/setDeleteProjeto", "DELETE", data);
+    const data = payloadDelProjects();
+    const response = await DB.delProject(data);
 
     if (response.status !== 200) {
       Modal.show("error", "Erro", `ERRO: ${response.data}`);

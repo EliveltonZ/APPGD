@@ -7,28 +7,20 @@ export class Numbers {
     }
   }
 
-  static changeFormatCurrency1(e) {
-    let r = e.value.replace(/\D/g, "");
-    (r = (r / 100).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-      minimumFractionDigits: 2,
-    })),
-      (e.value = r);
-  }
+  static currency(value) {
+    if (value === null || value === undefined) return;
 
-  static FormatCurrency(value) {
-    if (!value) return;
-    let r = value.replace(/\D/g, "");
+    let r = String(value).replace(/\D/g, "");
     r = (r / 100).toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
       minimumFractionDigits: 2,
     });
+
     return r;
   }
 
-  static formatValueDecimal(valorInput) {
+  static decimal(valorInput) {
     if (valorInput) {
       const valorFormatado = valorInput.replace(/[^0-9,]/g, "");
       const resultado = valorFormatado.replace(",", ".");
@@ -38,7 +30,13 @@ export class Numbers {
     }
   }
 
-  static formatDateMask(value) {
+  static percent(value) {
+    if (!value) return;
+    let r = Number(value).toFixed(2);
+    return String(r) + "%";
+  }
+
+  static dateMask(value) {
     // Remove qualquer caractere não numérico
     value = value.replace(/\D/g, "");
 

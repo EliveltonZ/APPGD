@@ -1,281 +1,388 @@
-import {
-  Dom,
-  loadPage,
-  onmouseover,
-  enableEnterAsTab,
-  createModal,
-  exportarParaExcel,
-  messageQuestion,
-  messageInformation,
-  convertDataBr,
-  formatValueDecimal,
-} from "./utils.js";
+import { loadPage } from "./utils.js";
+import { Dom, Table, Style, q, qa, ce } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { API } from "./service/api.js";
+import { DateTime } from "./utils/time.js";
+import { Numbers } from "./utils/number.js";
+import { Excel } from "./utils/excel.js";
 
-function convertDate(date) {
-  if (date != "") {
-    const parseData = date.split("-");
-    return `${parseData[2]}/${parseData[1]}/${parseData[0]}`;
-  }
+/*========================================
+  HELPERS DOM
+========================================*/
+const EL = {
+  CONTRATO: "#txt_contrato",
+  CLIENTE: "#txt_cliente",
+  CHK_URGENTE: "#chk_urgente",
+  COD_CC: "#txt_codcc",
+  AMBIENTE: "#txt_ambiente",
+  NUM_PROJ: "#txt_numproj",
+  LOTE: "#txt_lote",
+  PEDIDO: "#txt_pedido",
+  CHEGADA: "#txt_chegada",
+  ENTREGA: "#txt_entrega",
+  TIPO: "#txt_tipo",
+  PECAS: "#txt_pecas",
+  AREA: "#txt_area",
+  DATA: "#txt_data",
+  INICIAR_LOTE: "#txt_loteiniciar",
+  GERAR_LOTE: "#txt_gerar_lote",
+  NUM_OC: "#txt_numoc",
+  INCIO: "#txt_inicio",
+  FIM: "#txt_fim",
+  BT_SALVAR: "#bt_salvar",
+  BT_INICIAR_LOTE: "#bt_startlote",
+  BT_EXPORTAR: "#bt_export",
+  BT_GERAR_LOTE: "#bt_gerar_lote",
+  BT_MODAL_LOTE: "#bt_modal_lote",
+};
+
+/*========================================
+  HELPERS API
+========================================*/
+const DB = {
+  startLote: async function (payload) {
+    return await API.fetchBody("/setStartLote", "PUT", payload);
+  },
+
+  getProjetoByOc: async function (orderBy) {
+    const url = `/getProjetoPcp?p_ordemdecompra=${orderBy}`;
+    return await API.fetchQuery(url);
+  },
+
+  getProjetosParaLote: async function () {
+    return await API.fetchQuery("/getProjetosLote");
+  },
+
+  updateProjetoPcp: async function (payload) {
+    return await API.fetchBody("/setProjetoPcp", "PUT", payload);
+  },
+
+  getLastLoteNumber: async function () {
+    return await API.fetchQuery("/getLastLote");
+  },
+
+  exportLoteData: async function (start, end) {
+    const url = `/exportarDados?data_inicio=${start}&data_fim=${end}`;
+    return await API.fetchQuery(url);
+  },
+
+  setLoteForOc: async function (payload) {
+    return await API.fetchBody("/setLote", "PUT", payload);
+  },
+};
+
+/*========================================
+  PAYLOAD BUILDERS
+========================================*/
+function buildStartLotePayload() {
+  return {
+    p_iniciado: Dom.getValue(EL.DATA),
+    p_lote: Dom.getValue(EL.INICIAR_LOTE),
+  };
 }
 
-async function setStartLote() {
-  const result = await messageQuestion(
-    "Iniciar Lote",
-    "Deseja iniciar Lote ?",
-    "Sim",
-    "Não"
+function buildProjetoUpdatePayload() {
+  return {
+    p_ordemdecompra: Dom.getValue(EL.NUM_OC),
+    p_urgente: Dom.getChecked(EL.CHK_URGENTE),
+    p_codcc: Dom.getValue(EL.COD_CC),
+    p_lote: Dom.getValue(EL.LOTE),
+    p_pedido: Dom.getValue(EL.PEDIDO),
+    p_tipo: Dom.getValue(EL.TIPO),
+    p_pecas: Dom.getValue(EL.PECAS),
+    p_area: Numbers.decimal(Dom.getValue(EL.AREA)),
+  };
+}
+
+function buildLotePayload(ordemdecompra, lote) {
+  return {
+    p_ordemdecompra: ordemdecompra,
+    p_lote: lote,
+  };
+}
+
+/*========================================
+  UI HELPERS
+========================================*/
+function normalizeEmptyValue(value) {
+  if (!value) return null;
+  return value;
+}
+
+function fillProjectForm(element) {
+  Dom.setValue(EL.CONTRATO, element.p_contrato);
+  Dom.setValue(EL.CLIENTE, element.p_cliente);
+  Dom.setChecked(EL.CHK_URGENTE, element.p_urgente);
+  Dom.setValue(EL.COD_CC, element.p_codcc);
+  Dom.setValue(EL.AMBIENTE, element.p_ambiente);
+  Dom.setValue(EL.NUM_PROJ, element.p_numproj);
+  Dom.setValue(EL.LOTE, element.p_lote);
+  Dom.setValue(EL.PEDIDO, normalizeEmptyValue(element.p_pedido));
+  Dom.setValue(EL.CHEGADA, DateTime.forBr(element.p_chegoufabrica));
+  Dom.setValue(EL.ENTREGA, DateTime.forBr(element.p_dataentrega));
+  Dom.setValue(EL.TIPO, element.p_tipo);
+  Dom.setValue(EL.PECAS, normalizeEmptyValue(element.p_peças));
+  Dom.setValue(EL.AREA, normalizeEmptyValue(element.p_area));
+}
+
+function fillNextLoteNumber(res) {
+  q(EL.GERAR_LOTE).value = (res?.data?.[0]?.p_lote ?? 0) + 1;
+}
+
+/*========================================
+  ACTIONS
+========================================*/
+async function confirmAndStartLote() {
+  const result = await Modal.showConfirmation(
+    "question",
+    "LOTE",
+    "Iniciar Lote ?"
   );
 
   if (result.isConfirmed) {
-    const data = {
-      p_iniciado: Dom.getValue("txt_data"),
-      p_lote: Dom.getValue("txt_loteiniciar"),
-    };
+    const data = buildStartLotePayload();
+    const res = await DB.startLote(data);
 
-    const response = await fetch("/setStartLote", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      messageInformation(
+    if (res.status !== 200) {
+      const errText = await res.data;
+      Modal.showInfo(
         "error",
         "ERRO",
         `Não foi possivel iniciar o lote ${errText}`
       );
     } else {
-      messageInformation(
-        "success",
-        "Successo",
-        "Lote iniciado com sucesso !!!"
-      );
+      Modal.showInfo("success", "Successo", "Lote iniciado com sucesso !!!");
     }
   }
 }
 
-async function getProjetoPcp() {
-  if (Dom.getValue("txt_numoc")) {
-    const response = await fetch(
-      `/getProjetoPcp?p_ordemdecompra=${Dom.getValue("txt_numoc")}`
-    );
+async function fetchProjetoPcpByOc() {
+  const oc = Dom.getValue(EL.NUM_OC);
 
-    if (!response.ok) {
-      const errText = await response.text();
-      messageInformation(
-        "error",
-        "ERRO",
-        "Erro ao buscar ordem de compra" + errText
-      );
-      Dom.clearInputFields();
-    } else {
-      const data = await response.json();
-      data.forEach((element) => {
-        Dom.setValue("txt_contrato", element.p_contrato),
-          Dom.setValue("txt_cliente", element.p_cliente),
-          Dom.setChecked("chk_urgente", element.p_urgente),
-          Dom.setValue("txt_codcc", element.p_codcc),
-          Dom.setValue("txt_ambiente", element.p_ambiente),
-          Dom.setValue("txt_numproj", element.p_numproj),
-          Dom.setValue("txt_lote", element.p_lote),
-          Dom.setValue("txt_pedido", ifZero(element.p_pedido)),
-          Dom.setValue("txt_chegada", convertDate(element.p_chegoufabrica)),
-          Dom.setValue("txt_entrega", convertDate(element.p_dataentrega)),
-          Dom.setValue("txt_tipo", element.p_tipo),
-          Dom.setValue("txt_pecas", ifZero(element.p_peças)),
-          Dom.setValue("txt_area", ifZero(element.p_area));
-      });
-    }
-  } else {
+  if (!oc) {
     Dom.clearInputFields();
+    return;
   }
+
+  const res = await DB.getProjetoByOc(oc);
+
+  if (res.status !== 200) {
+    const errText = await res.data;
+    Modal.showInfo("error", "ERRO", "Erro ao buscar ordem de compra" + errText);
+    Dom.clearInputFields();
+    return;
+  }
+
+  res.data.forEach((element) => fillProjectForm(element));
 }
 
-function ifZero(value) {
-  if (value == 0) {
-    return null;
-  }
-  return value;
-}
+async function confirmAndUpdateProjetoPcp() {
+  const result = await Modal.showConfirmation(null, "Salvar alterações ?");
 
-async function setProjetoPcp() {
-  const result = await messageQuestion(null, "Deseja salvar alterações ?");
+  if (!result.isConfirmed) return;
 
-  if (result.isConfirmed) {
-    const data = {
-      p_ordemdecompra: Dom.getValue("txt_numoc"),
-      p_urgente: Dom.getChecked("chk_urgente"),
-      p_codcc: Dom.getValue("txt_codcc"),
-      p_lote: Dom.getValue("txt_lote"),
-      p_pedido: Dom.getValue("txt_pedido"),
-      p_tipo: Dom.getValue("txt_tipo"),
-      p_pecas: Dom.getValue("txt_pecas"),
-      p_area: formatValueDecimal(Dom.getValue("txt_area")),
-    };
+  const data = buildProjetoUpdatePayload();
+  const res = await DB.updateProjetoPcp(data);
 
-    const response = await fetch("/setProjetoPcp", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      messageInformation(
-        "error",
-        "Erro",
-        `Não foi possível salvar alterações: ${errText}`
-      );
-    } else {
-      messageInformation(
-        "success",
-        "Sucesso",
-        `Alterações salvas com sucesso !!!`
-      );
-    }
-  }
-}
-
-async function getLastLote() {
-  const response = await fetch("/getLastLote");
-  const data = await response.json();
-  if (!response.ok) {
-    messageInformation("error", "ERRO", "Erro ao buscar projetos na base");
+  if (res.status !== 200) {
+    const errText = await res.data;
+    Modal.showInfo(
+      "error",
+      "Erro",
+      `Não foi possível salvar alterações: ${errText}`
+    );
   } else {
-    document.getElementById("txt_gerar_lote").value = data[0].p_lote + 1;
+    Modal.showInfo("success", "Sucesso", `Alterações salvas com sucesso !!!`);
   }
 }
 
-async function getProjetosLote() {
+async function fetchLastLoteNumber() {
+  const res = await DB.getLastLoteNumber();
+
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", "Erro ao buscar projetos na base");
+    return;
+  }
+
+  fillNextLoteNumber(res);
+}
+
+function createTableRow(value, style) {
+  return Dom.createElement("td", value, style);
+}
+
+async function fetchProjetosForLoteModal() {
   const response = await fetch("/getProjetosLote");
 
   if (!response.ok) {
-    messageInformation("error", "ERRO", "Erro ao buscar projetos na base");
-  } else {
-    const config = 'style="text-align: center"';
-    const tbody = document.querySelector("tbody");
-    tbody.innerHTML = "";
-    const data = await response.json();
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-            <td ${config}>${item.p_ordemdecompra}</td>
-            <td ${config}>${item.p_pedido}</td>
-            <td ${config}>${item.p_codcc}</td>
-            <td>${item.p_cliente}</td>
-            <td>${item.p_ambiente}</td>
-            <td ${config}>${convertDataBr(item.p_dataentrega)}</td>
-            <td ${config}><input type='checkbox'/></td>
-            `;
-      tbody.appendChild(tr);
-    });
+    Modal.showInfo("error", "ERRO", "Erro ao buscar projetos na base");
+    return;
   }
-}
 
-async function openModalLote() {
-  await getLastLote();
-  await getProjetosLote();
-  createModal("modal-3");
-}
+  const config = "text-align: center;";
+  const tbody = q("tbody");
+  tbody.innerHTML = "";
 
-async function setLote(ordemdecompra, lote) {
-  const data = {
-    p_ordemdecompra: ordemdecompra,
-    p_lote: lote,
-  };
+  const data = await response.json();
 
-  const response = await fetch("/setLote", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+  data.forEach((item) => {
+    const tr = ce("tr");
+    tr.append(createTableRow(item.p_ordemdecompra, config));
+    tr.append(createTableRow(item.p_pedido, config));
+    tr.append(createTableRow(item.p_codcc, config));
+    tr.append(createTableRow(item.p_cliente));
+    tr.append(createTableRow(item.p_ambiente));
+    tr.append(createTableRow(DateTime.forBr(item.p_dataentrega), config));
+    tr.innerHTML += "<input type='checkbox'/>";
+    tbody.appendChild(tr);
   });
 }
 
-async function gerarLote() {
-  const lote = Dom.getValue("txt_gerar_lote");
-  const result = await messageQuestion(null, `Deseja gerar o Lote ${lote} ?`);
+async function openLoteModal() {
+  await fetchLastLoteNumber();
+  await fetchProjetosForLoteModal();
+  Modal.show("modal-3");
+}
 
-  if (result.isConfirmed) {
-    const linhas = document.querySelectorAll("tbody tr");
-    const checkboxesMarcados = Array.from(linhas).filter((linha) => {
-      const checkbox = linha.querySelector('input[type="checkbox"]');
-      return checkbox && checkbox.checked;
-    });
+async function assignLoteToOc(ordemdecompra, lote) {
+  const data = buildLotePayload(ordemdecompra, lote);
+  return await DB.setLoteForOc(data);
+}
 
-    if (checkboxesMarcados.length === 0) {
-      messageInformation(
-        "warning",
-        "Atenção",
-        "Nenhum item foi selecionado para gerar o lote."
-      );
-      return;
-    }
+function getCurrentLoteNumber() {
+  return Dom.getValue(EL.GERAR_LOTE);
+}
 
-    try {
-      const lista = [];
-      const lote = Dom.getValue("txt_gerar_lote");
-      for (const linha of checkboxesMarcados) {
-        const colunas = linha.querySelectorAll("td");
+async function confirmLoteGeneration(lote) {
+  const result = await Modal.confirmation(
+    null,
+    `Deseja gerar o Lote ${lote} ?`
+  );
+  return !!result?.isConfirmed;
+}
 
-        const numOC = colunas[0]?.textContent.trim();
-        const codCC = colunas[2]?.textContent.trim();
-        const pedido = colunas[1]?.textContent.trim();
-        const ambiente = colunas[4]?.textContent.trim();
-        const cliente = colunas[3]?.textContent.trim();
-        const entrega = colunas[5]?.textContent.trim();
-        lista.push({
-          codCC,
-          pedido,
-          ambiente,
-          cliente,
-          entrega,
-          lote,
-        });
-        await setLote(numOC, lote);
-      }
-      exportarParaExcel(lista, "ConfolhaLote.xlsx", "ConfolhaLote");
+function getSelectedRowsFromTableBody() {
+  const rows = qa("tbody tr");
+  return Array.from(rows).filter((row) => {
+    const checkbox = row.querySelector('input[type="checkbox"]');
+    return checkbox && checkbox.checked;
+  });
+}
 
-      messageInformation("success", "Sucesso", "Lote gerado com sucesso!");
-    } catch (err) {
-      messageInformation(
-        "error",
-        "Erro",
-        "Não foi possível gerar o lote: " + (err.message || err)
-      );
-    }
+function warnNoRowsSelected() {
+  Modal.showInfo(
+    "warning",
+    "Atenção",
+    "Nenhum item foi selecionado para gerar o lote."
+  );
+}
+
+function mapRowToLoteItem(row, lote) {
+  const cols = row.querySelectorAll("td");
+
+  const numOC = cols[0]?.textContent?.trim();
+  const pedido = cols[1]?.textContent?.trim();
+  const codCC = cols[2]?.textContent?.trim();
+  const cliente = cols[3]?.textContent?.trim();
+  const ambiente = cols[4]?.textContent?.trim();
+  const entrega = cols[5]?.textContent?.trim();
+
+  return {
+    numOC,
+    item: { codCC, pedido, ambiente, cliente, entrega, lote },
+  };
+}
+
+async function persistSelectedRowsLote(rows, lote) {
+  const lista = [];
+
+  for (const row of rows) {
+    const { numOC, item } = mapRowToLoteItem(row, lote);
+    lista.push(item);
+    await assignLoteToOc(numOC, lote);
+  }
+
+  return lista;
+}
+
+function exportLoteSheet(data) {
+  Excel.export(data);
+}
+
+function showLoteSuccess() {
+  Modal.showInfo("success", "Sucesso", "Lote gerado com sucesso!");
+}
+
+function showLoteError(err) {
+  Modal.showInfo(
+    "error",
+    "Erro",
+    "Não foi possível gerar o lote: " + (err?.message || err)
+  );
+}
+
+async function confirmAndGenerateLote() {
+  const lote = getCurrentLoteNumber();
+
+  const confirmed = await confirmLoteGeneration(lote);
+  if (!confirmed) return;
+
+  const selectedRows = getSelectedRowsFromTableBody();
+  if (selectedRows.length === 0) {
+    warnNoRowsSelected();
+    return;
+  }
+
+  try {
+    const lista = await persistSelectedRowsLote(selectedRows, lote);
+    exportLoteSheet(lista);
+    showLoteSuccess();
+  } catch (err) {
+    showLoteError(err);
   }
 }
 
-async function exportarDados() {
-  const response = await fetch(
-    `/exportarDados?data_inicio=${Dom.getValue(
-      "txt_inicio"
-    )}&data_fim=${Dom.getValue("txt_fim")}`
-  );
-  if (!response.ok) {
-    const errtext = await response.text();
-    messageInformation(
+async function exportLoteData() {
+  const start = Dom.getValue(EL.INCIO);
+  const end = Dom.getValue(EL.FIM);
+
+  const res = await DB.exportLoteData(start, end);
+
+  if (res.status !== 200) {
+    Modal.showInfo(
       "error",
       "ERRO",
-      `Não foi possivel a conexão com banco de dados. ${errtext}`
+      `Não foi possivel a conexão com banco de dados. ${res.data}`
     );
-  } else {
-    const data = await response.json();
-    exportarParaExcel(data);
+    return;
   }
+
+  exportarParaExcel(res.data);
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  loadPage("pcp", "pcp.html");
-  Dom.setData("txt_data");
-  onmouseover("table");
-  enableEnterAsTab();
-});
+/*========================================
+  EVENTS
+========================================*/
 
-Dom.addEventBySelector("#txt_numoc", "blur", getProjetoPcp);
-Dom.addEventBySelector("#bt_salvar", "click", setProjetoPcp);
-Dom.addEventBySelector("#bt_startlote", "click", setStartLote);
-Dom.addEventBySelector("#bt_export", "click", exportarDados);
-Dom.addEventBySelector("#bt_gerar_lote", "click", gerarLote);
-Dom.addEventBySelector("#bt_modal_lote", "click", openModalLote);
+function events() {
+  Dom.addEventBySelector(EL.NUM_OC, "blur", fetchProjetoPcpByOc);
+  Dom.addEventBySelector(EL.BT_SALVAR, "click", confirmAndUpdateProjetoPcp);
+  Dom.addEventBySelector(EL.BT_INICIAR_LOTE, "click", confirmAndStartLote);
+  Dom.addEventBySelector(EL.BT_EXPORTAR, "click", exportLoteData);
+  Dom.addEventBySelector(EL.BT_GERAR_LOTE, "click", confirmAndGenerateLote);
+  Dom.addEventBySelector(EL.BT_MODAL_LOTE, "click", openLoteModal);
+}
+
+function init() {
+  loadPage("pcp", "pcp.html");
+  Table.onmouseover("table");
+  Dom.enableEnterAsTab();
+  events();
+}
+
+/*========================================
+  INIT
+========================================*/
+document.addEventListener("DOMContentLoaded", () => {
+  init();
+});

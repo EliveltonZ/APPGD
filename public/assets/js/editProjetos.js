@@ -1,4 +1,4 @@
-import { getGroupedData, loadPage, changeFormatCurrency } from "./utils.js";
+import { getGroupedData, loadPage } from "./utils.js";
 
 import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
@@ -38,19 +38,24 @@ const EL = {
   MOEDA: ".moeda",
 };
 
+const DB = {
+  getEditProjetos: async function (orderBy) {
+    const url = `/getEditProjetos?p_ordemdecompra=${orderBy}`;
+    const res = API.fetchQuery(url);
+    return res;
+  },
+};
+
 async function getEditProjetos() {
   const ordemdecompra = Dom.getValue(EL.OC);
   if (ordemdecompra) {
-    const response = await fetch(
-      `/getEditProjetos?p_ordemdecompra=${ordemdecompra}`
-    );
+    const res = DB.getEditProjetos(ordemdecompra);
 
-    if (!response.ok) {
+    if (res.status !== 200) {
       Modal.showInfo("error", "Erro", "Digite a ordem de compra");
     } else {
-      const data = await response.json();
-      if (data && data.length > 0) {
-        data.forEach((item) => {
+      if (res.data && res.data.length > 0) {
+        res.data.forEach((item) => {
           Dom.setValue(EL.CONTRATO, item.contrato);
           Dom.setValue(EL.CLIENTE, item.cliente);
           Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
@@ -89,7 +94,7 @@ async function validForm(e) {
   const form = document.querySelector("form");
   if (form.checkValidity()) {
     e.preventDefault();
-    await setEditProjetos();
+    await updateProject();
   }
 }
 
@@ -111,21 +116,21 @@ function getElementsValues() {
     p_tipocliente: Dom.getValue(EL.TIPO_CLIENTE),
     p_etapa: Dom.getValue(EL.ETAPA),
     p_tipocontrato: Dom.getValue(EL.TIPO_CONTRATO),
-    p_valorbruto: MyNumber.formatValueDecimal(Dom.getValue(EL.VALOR_BRUTO)),
-    p_valornegociado: MyNumber.formatValueDecimal(
+    p_valorbruto: Numbers.formatValueDecimal(Dom.getValue(EL.VALOR_BRUTO)),
+    p_valornegociado: Numbers.formatValueDecimal(
       Dom.getValue(EL.VALOR_NEGOCIADO)
     ),
-    p_customaterial: MyNumber.formatValueDecimal(
+    p_customaterial: Numbers.formatValueDecimal(
       Dom.getValue(EL.CUSTO_MATERIAL)
     ),
-    p_customaterialadicional: MyNumber.formatValueDecimal(
+    p_customaterialadicional: Numbers.formatValueDecimal(
       Dom.getValue(EL.CUSTO_ADICIONAL)
     ),
   };
   return data;
 }
 
-async function setEditProjetos() {
+async function updateProject() {
   const result = await Modal.ShowQuestion(null, "Deseja salvar edições ?");
 
   if (result.isConfirmed) {

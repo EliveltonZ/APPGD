@@ -1,306 +1,158 @@
-import {
-  Dom,
-  checkValue,
-  getColumnValue,
-  onmouseover,
-  onclickHighlightRow,
-  loadPage,
-  colorStatus,
-  createModal,
-  messageInformation,
-  messageQuestion,
-  getConfig,
-  setConfig,
-} from "./utils.js";
+import { loadPage, getConfig, setConfig } from "./utils.js";
 
 import { enableTableFilterSort } from "./filtertable.js";
+import { Dom, Style, Table, q, ce, qa } from "./UI/interface.js";
+import { DateTime } from "./utils/time.js";
+import { API } from "./service/api.js";
+import { Modal } from "./utils/modal.js";
+
+const EL = {
+  ID: "#txt_id",
+  DESCRICAO: "#txt_descricao",
+  MEDIDA: "#txt_medida",
+  PARCELAMENTO: "#txt_parcelamento",
+  CARTAO: "#txt_cartao",
+  QTD: "#txt_quantidade",
+  FORNECEDOR: "#txt_fornecedor",
+  COMPRA: "#txt_compra",
+  PREVISAO: "#txt_previsao",
+  RECEBIDO: "#txt_recebido",
+  FILTRO: "#txt_datafilter",
+  CONTRATO: "#txt_contrato",
+  CLIENTE: "#txt_cliente",
+  AMBIENTE: "#txt_ambiente",
+};
+
+const DB = {
+  getAcessoriosCompras: async function (dateFilter) {
+    const url = `/getAcessoriosCompras?p_dataentrega=${dateFilter}`;
+    const res = await API.fetchQuery(url);
+    return res;
+  },
+
+  setAcessorios: async function (data) {
+    const res = await API.fetchBody("/setAcessorios", "PUT", data);
+    return res;
+  },
+};
+
+function createRow(value, style) {
+  return Dom.createElement("td", value, style);
+}
 
 async function getAcessoriosCompras() {
-  const tbody = document.querySelector("tbody"); // ajuste para um seletor mais específico se houver várias tabelas
+  const tbody = q("tbody");
   if (!tbody) return;
+  tbody.innerHTML = "";
+  const textLeft = "text-align:left;";
+  const dataFilter = Dom.getValue(EL.FILTRO);
+  const res = await DB.getAcessoriosCompras(dataFilter);
 
-  // ===== Helpers =====
-
-  const collator = new Intl.Collator("pt-BR", {
-    sensitivity: "base",
-    numeric: true,
-  });
-
-  // Converte nulos/undefined para string; garante tipo string
-  const s = (v) => (v ?? "").toString();
-
-  // Escape simples para evitar XSS ao usar innerHTML
-  const esc = (str) =>
-    s(str).replace(
-      /[&<>"']/g,
-      (c) =>
-        ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;",
-        }[c])
-    );
-
-  // ======== PARSERS/FORMATADORES "TIMEZONE-SAFE" PARA DATAS PURAS ========
-
-  // tenta "YYYY-MM-DD"
-  const parseYMD = (str) => {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(str || "").trim());
-    if (!m) return null;
-    const y = +m[1],
-      mo = +m[2],
-      d = +m[3];
-    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
-    return { y, mo, d };
-  };
-
-  // tenta "DD/MM/YYYY"
-  const parseDMY = (str) => {
-    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(str || "").trim());
-    if (!m) return null;
-    const d = +m[1],
-      mo = +m[2],
-      y = +m[3];
-    if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
-    return { y, mo, d };
-  };
-
-  // aceita DMY ou YMD
-  const parseDateParts = (v) => parseYMD(v) || parseDMY(v) || null;
-
-  // chave numérica YYYYMMDD para ordenar sem usar Date
-  const dateKey = (v) => {
-    const p = parseDateParts(v);
-    return p ? p.y * 10000 + p.mo * 100 + p.d : null;
-  };
-
-  // formata em pt-BR (DD/MM/YYYY) sem converter fuso
-  const fmtDateBR = (v) => {
-    const p = parseDateParts(v);
-    if (!p) return "";
-    const dd = String(p.d).padStart(2, "0");
-    const mm = String(p.mo).padStart(2, "0");
-    return `${dd}/${mm}/${p.y}`;
-  };
-
-  // converte DD/MM/YYYY -> YYYY-MM-DD (para <input type="date">) sem usar Date
-  const toISOFromBR = (dmy) => {
-    const p = parseDMY(dmy);
-    if (!p) return ""; // mantém vazio se inválido
-    const dd = String(p.d).padStart(2, "0");
-    const mm = String(p.mo).padStart(2, "0");
-    return `${p.y}-${mm}-${dd}`;
-  };
-
-  // ===== Comparadores =====
-  const compareDate = (a, b) => {
-    const ka = dateKey(a);
-    const kb = dateKey(b);
-    if (ka != null && kb != null) return ka - kb; // mais antiga primeiro
-    if (ka != null && kb == null) return -1; // com data vem antes de sem data
-    if (ka == null && kb != null) return 1;
-    return 0;
-  };
-
-  const compareStr = (a, b) => collator.compare(s(a), s(b));
-
-  const compareItem = (a, b) => {
-    // 1) dataentrega
-    const byDate = compareDate(a.dataentrega, b.dataentrega);
-    if (byDate !== 0) return byDate;
-
-    // 2) cliente
-    const byCliente = compareStr(a.cliente, b.cliente);
-    if (byCliente !== 0) return byCliente;
-
-    // 3) ambiente
-    const byAmbiente = compareStr(a.ambiente, b.ambiente);
-    if (byAmbiente !== 0) return byAmbiente;
-
-    // 4) categoria
-    const byCategoria = compareStr(a.categoria, b.categoria);
-    if (byCategoria !== 0) return byCategoria;
-
-    // 5) descricao
-    return compareStr(a.descricao, b.descricao);
-  };
-  // ===== Fim helpers =====
-
-  try {
-    const response = await fetch(
-      `/getAcessoriosCompras?p_dataentrega=${Dom.getValue("txt_datafilter")}`
-    );
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-    if (!Array.isArray(data)) throw new Error("Formato de resposta inválido");
-
-    const sorted = data.slice().sort(compareItem);
-
-    if (sorted.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Sem registros</td></tr>`;
-      return;
-    }
-
-    const rowsHtml = sorted
-      .map((item) => {
-        const cor_status =
-          typeof colorStatus === "function" ? colorStatus(item.status) : "";
-
-        return `
-        <tr class="open-modal-row">
-          <td style="text-align:center">${esc(item.contrato)}</td>
-          <td>${esc(item.cliente)}</td>
-          <td>${esc(item.ambiente)}</td>
-          <td>${esc(item.descricao)}</td>
-          <td style="text-align:center">${checkValue(esc(item.medida))}</td>
-          <td style="text-align:center">${checkValue(
-            esc(item.parcelamento)
-          )}</td>
-          <td style="text-align:center">${checkValue(esc(item.numcard))}</td>
-          <td style="text-align:center">${esc(item.qtd)}</td>
-          <td>${checkValue(esc(item.fornecedor))}</td>
-          <td style="text-align:center">${checkValue(
-            fmtDateBR(item.dataentrega)
-          )}</td>
-          <td style="text-align:center">${checkValue(
-            fmtDateBR(item.datacompra)
-          )}</td>
-          <td style="text-align:center">${checkValue(
-            fmtDateBR(item.previsao)
-          )}</td>
-          <td style="text-align:center">${checkValue(
-            fmtDateBR(item.recebido)
-          )}</td>
-          <td style="text-align:center; ${esc(cor_status)}">${esc(
-          item.status
-        )}</td>
-          <td>${esc(item.categoria)}</td>
-          <td style="text-align:center; display:none">${esc(item.id)}</td>
-        </tr>
-      `;
-      })
-      .join("");
-
-    tbody.innerHTML = rowsHtml;
-  } catch (error) {
-    tbody.innerHTML = `<tr><td colspan="16" style="text-align:center">Erro ao carregar</td></tr>`;
-    if (typeof messageInformation === "function") {
-      messageInformation(
-        "error",
-        "ERRO",
-        `Não foi possível carregar dados: ${error.message}`
-      );
-    } else {
-      console.error(error);
-    }
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", "Erro ao buscar itens");
+    return;
   }
 
-  // ==== funções internas expostas para outros trechos (fillElement) ====
-  // Tornamos helpers acessíveis fora deste escopo, caso o bundler não "suba" os escopos.
-  getAcessoriosCompras._fmtDateBR = fmtDateBR;
-  getAcessoriosCompras._toISOFromBR = toISOFromBR;
-}
-
-// Atualiza os campos do modal com os valores da linha clicada
-function fillElement(element) {
-  // se os helpers foram anexados em getAcessoriosCompras(), usamos daqui
-  const toISOFromBR =
-    (getAcessoriosCompras && getAcessoriosCompras._toISOFromBR) ||
-    ((d) => {
-      // fallback local (repete a lógica caso ainda não exista)
-      const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(d || "").trim());
-      if (!m) return "";
-      const dd = m[1],
-        mm = m[2],
-        y = m[3];
-      return `${y}-${mm}-${dd}`;
-    });
-
-  const id = getColumnValue(element, 15);
-  const contrato = getColumnValue(element, 0);
-  const cliente = getColumnValue(element, 1);
-  const ambiente = getColumnValue(element, 2);
-  const descricao = getColumnValue(element, 3);
-  const medida = getColumnValue(element, 4);
-  const parcelamento = getColumnValue(element, 5);
-  const cartao = getColumnValue(element, 6);
-  const quantidade = getColumnValue(element, 7);
-  const fornecedor = getColumnValue(element, 8);
-  const compra = toISOFromBR(getColumnValue(element, 10));
-  const previsao = toISOFromBR(getColumnValue(element, 11));
-  const recebido = toISOFromBR(getColumnValue(element, 12));
-
-  Dom.setValue("txt_id", id);
-  Dom.setValue("txt_contrato", contrato);
-  Dom.setValue("txt_cliente", cliente);
-  Dom.setValue("txt_ambiente", ambiente);
-  Dom.setValue("txt_descricao", descricao);
-  Dom.setValue("txt_medida", medida);
-  Dom.setValue("txt_parcelamento", parcelamento);
-  Dom.setValue("txt_cartao", cartao);
-  Dom.setValue("txt_quantidade", quantidade);
-  Dom.setValue("txt_fornecedor", fornecedor);
-  Dom.setValue("txt_compra", compra);
-  Dom.setValue("txt_previsao", previsao);
-  Dom.setValue("txt_recebido", recebido);
-}
-
-document
-  .getElementById("table")
-  .addEventListener("dblclick", async function (event) {
-    const td = event.target;
-    const tr = td.closest(".open-modal-row");
-
-    if (!tr || td.tagName !== "TD") return;
-    fillElement(td);
-    createModal("modal");
+  res.data.forEach((item) => {
+    const tr = ce("tr");
+    const statusColor = Style.colorStatus(item.status);
+    tr.classList.add("open-modal-row");
+    tr.append(createRow(item.contrato));
+    tr.append(createRow(item.cliente, textLeft));
+    tr.append(createRow(item.ambiente, textLeft));
+    tr.append(createRow(item.descricao, textLeft));
+    tr.append(createRow(item.medida));
+    tr.append(createRow(item.parcelamento));
+    tr.append(createRow(item.numcard));
+    tr.append(createRow(item.qtd));
+    tr.append(createRow(item.fornecedor));
+    tr.append(createRow(DateTime.forBr(item.dataentrega)));
+    tr.append(createRow(DateTime.forBr(item.datacompra)));
+    tr.append(createRow(DateTime.forBr(item.previsao)));
+    tr.append(createRow(DateTime.forBr(item.recebido)));
+    tr.append(createRow(item.status, statusColor));
+    tr.append(createRow(item.categoria));
+    tr.append(createRow(item.id, "display: none;"));
+    tbody.appendChild(tr);
   });
+}
 
-async function setAcessorios() {
-  const data = {
-    p_id: Dom.getValue("txt_id"),
-    p_descricao: Dom.getValue("txt_descricao"),
-    p_medida: Dom.getValue("txt_medida"),
-    p_parcelamento: Dom.getValue("txt_parcelamento"),
-    p_numcard: Dom.getValue("txt_cartao"),
-    p_qtd: Dom.getValue("txt_quantidade"),
-    p_fornecedor: Dom.getValue("txt_fornecedor"),
-    p_datacompra: Dom.getValue("txt_compra"),
-    p_previsao: Dom.getValue("txt_previsao"),
-    p_recebido: Dom.getValue("txt_recebido"),
+function populateElements(element) {
+  const columnMap = {
+    15: EL.ID,
+    0: EL.CONTRATO,
+    1: EL.CLIENTE,
+    2: EL.AMBIENTE,
+    3: EL.DESCRICAO,
+    4: EL.MEDIDA,
+    5: EL.PARCELAMENTO,
+    6: EL.CARTAO,
+    7: EL.QTD,
+    8: EL.FORNECEDOR,
+    10: EL.COMPRA,
+    11: EL.PREVISAO,
+    12: EL.RECEBIDO,
   };
 
-  const response = await fetch("/setAcessorios", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  for (const index in columnMap) {
+    const value = Table.getIndexColumnValue(element, index);
+    if (index > 9 && index < 13) {
+      Dom.setValue(columnMap[index], DateTime.forISO(value));
+    } else {
+      Dom.setValue(columnMap[index], value);
+    }
+  }
+}
 
-  if (!response.ok) {
-    const errText = await response.text();
-    messageInformation("error", "ERRO", `erro ao salvar alterações ${errText}`);
+async function populateAndShowModal(event) {
+  const td = event.target;
+  if (td.tagName !== "TD") return;
+  populateElements(td);
+  Modal.show("modal");
+}
+
+function cNumber(value) {
+  const result = Number(value);
+  if (!result) return 0;
+  return result;
+}
+
+function payloadAcess() {
+  const data = {
+    p_id: Dom.getValue(EL.ID),
+    p_descricao: Dom.getValue(EL.DESCRICAO),
+    p_medida: Dom.getValue(EL.MEDIDA),
+    p_parcelamento: cNumber(Dom.getValue(EL.PARCELAMENTO)),
+    p_numcard: cNumber(Dom.getValue(EL.CARTAO)),
+    p_qtd: cNumber(Dom.getValue(EL.QTD)),
+    p_fornecedor: Dom.getValue(EL.FORNECEDOR),
+    p_datacompra: Dom.getValue(EL.COMPRA),
+    p_previsao: Dom.getValue(EL.PREVISAO),
+    p_recebido: Dom.getValue(EL.RECEBIDO),
+  };
+  return data;
+}
+
+async function setAcessorios() {
+  const data = payloadAcess();
+  const res = await DB.setAcessorios(data);
+  if (res.status !== 200) {
+    Modal.showInfo("error", "ERRO", `erro ao salvar alterações ${res.status}`);
   } else {
-    messageInformation(
-      "success",
-      "Sucesso",
-      "alterações salvas com Sucesso !!!"
-    );
+    Modal.showInfo("success", "Sucesso", "alterações salvas com Sucesso !!!");
   }
 }
 
 async function getDataFilterBuy() {
   const data = await getConfig(3);
-  Dom.setValue("txt_datafilter", data[0].p_data);
+  Dom.setValue(EL.FILTRO, data[0].p_data);
   getAcessoriosCompras();
 }
 
 async function setDataFilterExp() {
   const data = {
     p_id: 3,
-    p_date: Dom.getValue("txt_datafilter"),
+    p_date: Dom.getValue(EL.FILTRO),
   };
   await setConfig(data);
 }
@@ -312,13 +164,14 @@ function setarDataHora(checkbox, text) {
 document.addEventListener("DOMContentLoaded", (event) => {
   loadPage("compras", "compras.html");
   getDataFilterBuy();
-  onmouseover("table");
-  onclickHighlightRow("table");
+  Table.onmouseover("table");
+  Table.onclickHighlightRow("table");
   enableTableFilterSort("table");
   Dom.allUpperCase();
+  Dom.addEventBySelector("#table", "dblclick", (e) => populateAndShowModal(e));
 });
 
 // atualiza lista e salva filtro ao sair do campo de data
-Dom.addEventBySelector("#txt_datafilter", "blur", getAcessoriosCompras);
-Dom.addEventBySelector("#txt_datafilter", "blur", setDataFilterExp);
+Dom.addEventBySelector(EL.FILTRO, "blur", getAcessoriosCompras);
+Dom.addEventBySelector(EL.FILTRO, "blur", setDataFilterExp);
 Dom.addEventBySelector("#bt_update", "click", setAcessorios);

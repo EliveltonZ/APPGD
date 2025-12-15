@@ -1,5 +1,3 @@
-import { onclickHighlightRow } from "./utils.js";
-
 import { Dom, q, Table, Style } from "./UI/interface.js";
 import { DateTime } from "./utils/time.js";
 import { enableTableFilterSort } from "./filtertable.js";
@@ -176,7 +174,7 @@ function init() {
   populateTable();
   Table.onmouseover("table");
   enableTableFilterSort("table");
-  onclickHighlightRow("table");
+  Table.onclickHighlightRow("table");
   Dom.addEventBySelector("#table tbody", "dblclick", (e) =>
     handleRowClickedTable(e)
   );

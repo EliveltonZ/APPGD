@@ -1,5 +1,6 @@
-import { Dom, qa, ce, Modal } from "./UI/interface.js";
-import { Date } from "./utils/time.js";
+import { Dom, qa, ce } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { DateTime } from "./utils/time.js";
 
 /*================== 
 HELPERS ELEMENTS ID
@@ -36,22 +37,28 @@ function colorUrgente(value) {
 }
 
 function populateElements(ordemdecompra) {
-  const data = JSON.parse(localStorage.getItem("project"));
-  const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
-  Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
-  Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
-  Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
-  Dom.setInnerHtml(SELECTORS.CLIENTE, data.p_cliente);
-  Dom.setInnerHtml(SELECTORS.AMBIENTE, data.p_ambiente);
-  Dom.setInnerHtml(SELECTORS.VENDEDOR, data.p_vendedor);
-  Dom.setInnerHtml(SELECTORS.DATA_ENTREGA, Date.forBr(data.p_dataentrega));
-  Dom.setInnerHtml(SELECTORS.LIBERADOR, data.p_liberador);
-  Dom.setInnerHtml(SELECTORS.NUM_OC, numoc);
-  Dom.setInnerHtml(SELECTORS.RESPONSAVEL, getLsItem("resp"));
-  Dom.setInnerHtml(SELECTORS.DATA, Date.forBr(getLsItem("data")));
-  Dom.setInnerHtml(SELECTORS.TIPO, getLsItem("tipo"));
-  Dom.setInnerHtml(SELECTORS.URGENTE, getLsItem("urgente"));
-  colorUrgente(getLsItem("urgente"));
+  if (ordemdecompra) {
+    const res = JSON.parse(localStorage.getItem("project"));
+    const data = res[0];
+    const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
+    Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
+    Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
+    Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
+    Dom.setInnerHtml(SELECTORS.CLIENTE, data.p_cliente);
+    Dom.setInnerHtml(SELECTORS.AMBIENTE, data.p_ambiente);
+    Dom.setInnerHtml(SELECTORS.VENDEDOR, data.p_vendedor);
+    Dom.setInnerHtml(
+      SELECTORS.DATA_ENTREGA,
+      DateTime.forBr(data.p_dataentrega)
+    );
+    Dom.setInnerHtml(SELECTORS.LIBERADOR, data.p_liberador);
+    Dom.setInnerHtml(SELECTORS.NUM_OC, numoc);
+    Dom.setInnerHtml(SELECTORS.RESPONSAVEL, getLsItem("resp"));
+    Dom.setInnerHtml(SELECTORS.DATA, DateTime.forBr(getLsItem("data")));
+    Dom.setInnerHtml(SELECTORS.TIPO, getLsItem("tipo"));
+    Dom.setInnerHtml(SELECTORS.URGENTE, getLsItem("urgente"));
+    colorUrgente(getLsItem("urgente"));
+  }
 }
 
 function fillTableAcessorios(ordemdecompra) {

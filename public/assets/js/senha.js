@@ -1,63 +1,85 @@
-import {
-  Dom,
-  messageInformation,
-  getCookie,
-  enableEnterAsTab,
-} from "./utils.js";
+import { getCookie } from "./utils.js";
+import { Dom } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { API } from "./service/api.js";
 
-function setTextEmpty(element) {
-  document.getElementById(element).value = "";
-}
+/*===========================
+  HELPER ELEMENTS
+===========================*/
+const EL = {
+  ID: "#txt_id",
+  SENHA_ATUAL: "#txt_senhaatual",
+  NOVA_SENHA: "#txt_novasenha",
+  CONFIRMAR_SENHA: "#txt_confirmsenha",
+  NOME: "#txt_nome",
+  BT_SENHA: "#bt_senha",
+};
 
-async function checkPassword() {
-  const dict = {
-    p_id: Dom.getValue("txt_id"),
-    p_senha: Dom.getValue("txt_senhaatual"),
+const DB = {
+  validatePassword: async function (payload) {
+    const res = await API.fetchBody("/passwordValidation", "POST", payload);
+    return res;
+  },
+};
+
+function buildPasswordValidationPayload() {
+  return {
+    p_id: Dom.getValue(EL.ID),
+    p_senha: Dom.getValue(EL.SENHA_ATUAL),
   };
-
-  const response = await fetch("/passwordValidation", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dict),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Status ${response.status}`);
-  }
-  const data = await response.json();
-  return data;
 }
 
-async function setPassword() {
-  try {
-    const _dict = {
-      p_id: Dom.getValue("txt_id"),
-      p_senha: Dom.getValue("txt_novasenha"),
-    };
+async function validateCurrentPassword() {
+  const payload = buildPasswordValidationPayload();
+  const res = await DB.validatePassword(payload);
 
-    if (!_dict.p_id || !_dict.p_senha) {
-      messageInformation("error", "ERRO", "ID ou senha não podem ser vazios.");
+  if (res.status !== 200) {
+    throw new Error(`Status ${res.status}`);
+  }
+
+  return res.data;
+}
+
+function hasValidPasswordData(data) {
+  return Array.isArray(data)
+    ? data.length > 0
+    : data && Object.keys(data).length > 0;
+}
+
+function isNewPasswordConfirmed() {
+  return Dom.getValue(EL.NOVA_SENHA) === Dom.getValue(EL.CONFIRMAR_SENHA);
+}
+
+function buildPasswordUpdatePayload() {
+  return {
+    p_id: Dom.getValue(EL.ID),
+    p_senha: Dom.getValue(EL.NOVA_SENHA),
+  };
+}
+
+async function updateUserPassword() {
+  try {
+    const payload = buildPasswordUpdatePayload();
+
+    if (!payload.p_id || !payload.p_senha) {
+      Modal.showInfo("error", "ERRO", "ID ou senha não podem ser vazios.");
       return;
     }
 
     const resp = await fetch("/alterarSenha", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(_dict),
+      body: JSON.stringify(payload),
     });
 
     if (!resp.ok) {
       throw new Error(`Erro HTTP: ${resp.status}`);
     }
 
-    messageInformation(
-      "success",
-      "Sucesso",
-      "Nova senha definida com Sucesso!!!"
-    );
+    Modal.showInfo("success", "Sucesso", "Nova senha definida com Sucesso!!!");
   } catch (error) {
     console.error(error);
-    messageInformation(
+    Modal.showInfo(
       "error",
       "ERRO",
       "Houve um erro ao executar alteração de senha"
@@ -65,29 +87,31 @@ async function setPassword() {
   }
 }
 
-async function alterarSenha() {
-  const data = await checkPassword();
-  const hasData = Array.isArray(data)
-    ? data.length > 0
-    : data && Object.keys(data).length > 0;
+async function handlePasswordUpdate() {
+  const data = await validateCurrentPassword();
+  const isValid = hasValidPasswordData(data);
 
-  if (hasData) {
-    if (Dom.getValue("txt_novasenha") == Dom.getValue("txt_confirmsenha")) {
-      await setPassword();
-    } else {
-      messageInformation("warning", "Atenção", "Senhas nao conferem!!!");
-    }
-  } else {
-    messageInformation("error", "Erro", "Senha digitada é inválida!");
+  if (!isValid) {
+    Modal.showInfo("error", "Erro", "Senha digitada é inválida!");
+    return;
   }
+
+  if (!isNewPasswordConfirmed()) {
+    Modal.showInfo("warning", "Atenção", "Senhas não conferem!!!");
+    return;
+  }
+
+  await updateUserPassword();
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  Dom.setFocus("txt_senhaatual");
-  enableEnterAsTab();
+document.addEventListener("DOMContentLoaded", () => {
+  Dom.setFocus(EL.SENHA_ATUAL);
+  Dom.enableEnterAsTab();
 });
 
-Dom.setValue("txt_id", await getCookie("id"));
-Dom.setValue("txt_nome", await getCookie("login"));
+// Preenche campos com cookies
+Dom.setValue(EL.ID, await getCookie("id"));
+Dom.setValue(EL.NOME, await getCookie("login"));
 
-Dom.addEventBySelector("#bt_senha", "click", alterarSenha);
+// Evento do botão
+Dom.addEventBySelector(EL.BT_SENHA, "click", handlePasswordUpdate);
