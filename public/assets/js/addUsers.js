@@ -3,140 +3,184 @@ import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
 import { Modal } from "./utils/modal.js";
 
-/*================================
-  SELECTORS / DOM HELPERS
-================================ */
-
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
 const SELECTORS = {
-  // Inputs
-  ID: "#txt_id",
-  LOGIN: "#txt_login",
-  SENHA: "#txt_Senha",
-  SETOR: "#txt_setor",
-  CAMISA: "#txt_camiseta",
-  CALCA: "#txt_calca",
-  SAPATO: "#txt_sapato",
-  LOCAL: "#txt_local",
-
-  // Buttons
-  ADICIONAR: "#bt_adicionar",
+  inputs: {
+    id: "#txt_id",
+    login: "#txt_login",
+    senha: "#txt_Senha",
+    setor: "#txt_setor",
+    camisa: "#txt_camiseta",
+    calca: "#txt_calca",
+    sapato: "#txt_sapato",
+    local: "#txt_local",
+  },
+  buttons: {
+    adicionar: "#bt_adicionar",
+  },
 };
 
-/*================================
-  HELPERS API
-================================ */
-
-const DB = {
-  async createUser(userData) {
-    return API.fetchBody("/insertUser", "POST", userData);
+/* =========================================================
+   API LAYER
+========================================================= */
+const UserAPI = {
+  createUser(payload) {
+    return API.fetchBody("/insertUser", "POST", payload);
   },
 
-  async fetchMaxUserId() {
+  fetchMaxUserId() {
     return API.fetchQuery("/getMaxId");
   },
 };
 
-/*================================
-  CORE FUNCTIONS
-================================ */
+/* =========================================================
+   FIELD ACCESS (READ/WRITE)
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value);
+  },
+  focus(selector) {
+    Dom.setFocus(selector);
+  },
+};
 
-function showModalError(response) {
-  if (response.status !== 200) {
-    Modal.showInfo(
-      "error",
-      "Não foi possível buscar o próximo ID. HTTP: " + response.status
-    );
-    return false;
-  } else {
-    return true;
-  }
+/* =========================================================
+   VALIDATORS
+========================================================= */
+function isFormValid() {
+  const form = q("form");
+  if (!form?.checkValidity?.()) return false;
+
+  const valid = form.checkValidity();
+  if (!valid && typeof form.reportValidity === "function")
+    form.reportValidity();
+  return valid;
 }
 
-async function setNextUserIdField() {
-  try {
-    const response = await DB.fetchMaxUserId();
-
-    if (showModalError(response)) return;
-
-    const data = response.data;
-    const maxId = data?.[0]?.max_id;
-
-    if (maxId != null) {
-      q(SELECTORS.ID).value = maxId;
-    } else {
-      Modal.showInfo("error", "Retorno inválido do ultimo ID.");
-    }
-  } catch (error) {
-    Modal.showInfo("error", "Erro ao buscar ID: " + error.message);
-  }
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showHttpError(title, status, details) {
+  return Modal.showInfo(
+    "error",
+    title,
+    `HTTP: ${status}${details ? ` - ${details}` : ""}`
+  );
 }
 
-function collectUserFormData() {
+function showGenericError(title, err) {
+  return Modal.showInfo("error", title, `${err?.message || err}`);
+}
+
+function showSuccess(title, message) {
+  return Modal.showInfo("success", title, message);
+}
+
+/* =========================================================
+   MAPPERS (UI -> API)
+========================================================= */
+function buildUserPayloadFromForm() {
   return {
-    p_id: Dom.getValue(SELECTORS.ID),
-    p_login: Dom.getValue(SELECTORS.LOGIN),
+    p_id: Fields.get(SELECTORS.inputs.id),
+    p_login: Fields.get(SELECTORS.inputs.login),
+    // mantendo o comportamento original (senha fixa)
     p_senha: "123456",
-    p_setor: Dom.getValue(SELECTORS.SETOR),
-    p_camiseta: Dom.getValue(SELECTORS.CAMISA),
-    p_calca: Dom.getValue(SELECTORS.CALCA),
-    p_sapato: Dom.getValue(SELECTORS.SAPATO),
-    p_local: Dom.getValue(SELECTORS.LOCAL),
+    p_setor: Fields.get(SELECTORS.inputs.setor),
+    p_camiseta: Fields.get(SELECTORS.inputs.camisa),
+    p_calca: Fields.get(SELECTORS.inputs.calca),
+    p_sapato: Fields.get(SELECTORS.inputs.sapato),
+    p_local: Fields.get(SELECTORS.inputs.local),
   };
 }
 
-async function handleAddUserClick(event) {
-  event.preventDefault();
-
-  const form = q("form");
-  if (!form.checkValidity()) {
-    if (typeof form.reportValidity === "function") {
-      form.reportValidity();
-    }
-    return;
-  }
-
-  const userData = collectUserFormData();
-
-  const result = await Modal.showConfirmation(
-    "Confirmar",
-    `Deseja adicionar ${userData.p_login}?`
-  );
-
-  if (!result.isConfirmed) return;
-
+/* =========================================================
+   USE CASES / HANDLERS
+========================================================= */
+async function loadNextUserIdIntoForm() {
   try {
-    const response = await DB.createUser(userData);
+    const response = await UserAPI.fetchMaxUserId();
 
     if (response.status !== 200) {
-      Modal.showInfo(
-        "error",
-        "Erro ao salvar usuário",
-        `HTTP: ${response.status}`
+      await showHttpError(
+        "Não foi possível buscar o próximo ID.",
+        response.status
       );
       return;
     }
 
-    Modal.showInfo(
-      "success",
-      "Sucesso",
-      `Usuário ${userData.p_login} salvo com sucesso!`
-    );
-  } catch (error) {
-    Modal.showInfo("error", "Erro ao salvar usuário", error.message);
+    const maxId = response?.data?.[0]?.max_id;
+
+    if (maxId == null) {
+      await Modal.showInfo("error", "ERRO", "Retorno inválido do ultimo ID.");
+      return;
+    }
+
+    Fields.set(SELECTORS.inputs.id, maxId);
+  } catch (err) {
+    await showGenericError("Erro ao buscar ID", err);
   }
 }
 
-/*================================
-  INIT / BOOTSTRAP
-================================ */
+async function handleAddUserClick(event) {
+  event.preventDefault();
+  if (!isFormValid()) return;
+
+  const payload = buildUserPayloadFromForm();
+
+  const result = await Modal.showConfirmation(
+    "Confirmar",
+    `Deseja adicionar ${payload.p_login}?`
+  );
+  if (!result.isConfirmed) return;
+
+  try {
+    const response = await UserAPI.createUser(payload);
+
+    if (response.status !== 200) {
+      await showHttpError("Erro ao salvar usuário", response.status);
+      return;
+    }
+
+    await showSuccess(
+      "Sucesso",
+      `Usuário ${payload.p_login} salvo com sucesso!`
+    );
+  } catch (err) {
+    await showGenericError("Erro ao salvar usuário", err);
+  }
+}
+
+/* =========================================================
+   PAGE SETUP (INIT)
+========================================================= */
+function loadView() {
+  loadPage("adicionar_usuarios", "usuarios.html");
+}
+
+function configureUiDefaults() {
+  Dom.allUpperCase();
+  Fields.focus(SELECTORS.inputs.login);
+}
+
+function bindEvents() {
+  Dom.addEventBySelector(
+    SELECTORS.buttons.adicionar,
+    "click",
+    handleAddUserClick
+  );
+}
 
 function initUserFormPage() {
-  loadPage("adicionar_usuarios", "usuarios.html");
-  Dom.allUpperCase();
-  setNextUserIdField();
-  Dom.setFocus(SELECTORS.LOGIN);
-
-  Dom.addEventBySelector(SELECTORS.ADICIONAR, "click", handleAddUserClick);
+  loadView();
+  configureUiDefaults();
+  bindEvents();
+  loadNextUserIdIntoForm();
 }
 
 document.addEventListener("DOMContentLoaded", initUserFormPage);
