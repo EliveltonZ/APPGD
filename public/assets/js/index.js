@@ -1,71 +1,77 @@
-import { criarSpinnerGlobal, getCookie } from "./utils.js";
+import { criarSpinnerGlobal } from "./utils.js";
 import { API } from "./service/api.js";
 import { q, Dom } from "./UI/interface.js";
 import { Modal } from "./utils/modal.js";
 
-/*===========================
-  HELPER ELEMENTS
-===========================*/
-
-const EL = {
-  ID: "#txt_id",
-  LOGIN: "#txt_login",
-  PASSWORD: "#password",
-  BTN_LOGIN: "#bt_login",
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  inputs: {
+    id: "#txt_id",
+    login: "#txt_login",
+    password: "#password",
+  },
+  buttons: {
+    login: "#bt_login",
+  },
 };
 
-/*===========================
-  HELPER API
-===========================*/
-
-const DB = {
-  getUserById: async function (userId) {
+/* =========================================================
+   API LAYER
+========================================================= */
+const AuthAPI = {
+  fetchUserAccessById(userId) {
     const url = `/getUserAccess?p_id=${encodeURIComponent(userId)}`;
-    return await API.fetchQuery(url);
+    return API.fetchQuery(url);
   },
-
-  validateUserPassword: async function (payload) {
-    return await API.fetchBody("/passwordValidation", "POST", payload);
+  validatePassword(payload) {
+    return API.fetchBody("/passwordValidation", "POST", payload);
   },
-
-  setUserPermissions: async function (payload) {
-    return await API.fetchBody("/setPermission", "POST", payload);
+  setPermissions(payload) {
+    return API.fetchBody("/setPermission", "POST", payload);
   },
 };
 
-/*===========================
-  UI HELPERS
-===========================*/
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value);
+  },
+  focus(selector) {
+    Dom.setFocus(selector);
+  },
+  clearAndFocus(selector) {
+    Fields.set(selector, "");
+    Fields.focus(selector);
+  },
+};
 
-function getUserIdInputValue() {
-  return q(EL.ID).value.trim();
-}
-
-function clearLoginAndFocusId() {
-  const idInput = q(EL.ID);
-  const loginInput = q(EL.LOGIN);
-
-  loginInput.value = "";
-  idInput.focus();
-}
-
-function setLoginField(login) {
-  q(EL.LOGIN).value = login;
-}
-
-function clearAndFocusPasswordInput() {
-  const pwdInput = q(EL.PASSWORD);
-  pwdInput.value = "";
-  pwdInput.focus();
-}
-
+/* =========================================================
+   UI HELPERS
+========================================================= */
 function redirectToMenu() {
   window.location.href = "/menu.html";
 }
 
-/*===========================
-  DOMAIN: USER / PERMISSIONS
-===========================*/
+function showError(message) {
+  return Modal.showInfo("error", "Erro", message);
+}
+
+/* =========================================================
+   MAPPERS (DOMAIN -> API)
+========================================================= */
+function buildLoginPayload() {
+  return {
+    p_id: Fields.get(SELECTORS.inputs.id),
+    p_senha: Fields.get(SELECTORS.inputs.password),
+  };
+}
 
 function buildPermissionPayload(user) {
   return {
@@ -89,128 +95,121 @@ function buildPermissionPayload(user) {
   };
 }
 
+/* =========================================================
+   VALIDATORS
+========================================================= */
+function isEmpty(value) {
+  return value === null || value === undefined || String(value).trim() === "";
+}
+
+function hasValidPasswordResponse(response) {
+  return Array.isArray(response?.data) && response.data.length > 0;
+}
+
+/* =========================================================
+   USE CASES / FLOWS
+========================================================= */
+async function fetchUserLoginById(userId) {
+  const res = await AuthAPI.fetchUserAccessById(userId);
+  if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+
+  const user = res?.data?.[0];
+  if (!user) return null;
+
+  return user.login || "";
+}
+
 async function saveUserPermissions(user) {
   const payload = buildPermissionPayload(user);
-  const response = await DB.setUserPermissions(payload);
+  const res = await AuthAPI.setPermissions(payload);
 
-  if (response.status !== 200) {
-    throw new Error(`Erro ao salvar permissões ${response.data}`);
+  if (res.status !== 200) {
+    throw new Error(`Erro ao salvar permissões: ${res.status}`);
   }
-}
-
-/*===========================
-  DOMAIN: FIND USER BY ID
-===========================*/
-
-function isEmptyUserId(userId) {
-  return !userId;
-}
-
-async function fetchUserDataById(userId) {
-  const response = await DB.getUserById(userId);
-
-  if (response.status !== 200) {
-    throw new Error(`Status ${response.status}`);
-  }
-
-  return response.data;
-}
-
-function handleUserNotFound() {
-  Modal.showInfo("error", "Erro", "Número de ID não encontrado").then(() => {
-    const idInput = q(EL.ID);
-    const loginInput = q(EL.LOGIN);
-    loginInput.value = "";
-    idInput.value = "";
-    idInput.focus();
-  });
-}
-
-async function handleIdBlur() {
-  const userId = getUserIdInputValue();
-
-  if (isEmptyUserId(userId)) {
-    clearLoginAndFocusId();
-    return;
-  }
-
-  try {
-    const data = await fetchUserDataById(userId);
-
-    if (!Array.isArray(data) || !data.length) {
-      throw new Error("Usuário não encontrado");
-    }
-
-    setLoginField(data[0].login);
-  } catch (error) {
-    handleUserNotFound();
-  }
-}
-
-/*===========================
-  DOMAIN: LOGIN / PASSWORD
-===========================*/
-
-function buildLoginPayload() {
-  return {
-    p_id: Dom.getValue(EL.ID),
-    p_senha: Dom.getValue(EL.PASSWORD),
-  };
-}
-
-function isValidPasswordResponse(response) {
-  return Array.isArray(response.data) && response.data.length > 0;
-}
-
-function handleInvalidPassword() {
-  clearAndFocusPasswordInput();
-  Modal.showInfo("error", "Erro", "Senha digitada é inválida!").then(() => {
-    clearAndFocusPasswordInput();
-  });
 }
 
 async function processLogin() {
   const payload = buildLoginPayload();
-  const response = await DB.validateUserPassword(payload);
+  const res = await AuthAPI.validatePassword(payload);
 
-  if (response.status !== 200) {
-    throw new Error(`Erro na requisição: ${response.status}`);
-  }
+  if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
+  if (!hasValidPasswordResponse(res)) return { ok: false };
 
-  if (!isValidPasswordResponse(response)) {
-    handleInvalidPassword();
+  const user = res.data[0];
+  await saveUserPermissions(user);
+
+  return { ok: true };
+}
+
+/* =========================================================
+   HANDLERS
+========================================================= */
+async function handleIdBlur() {
+  const userId = q(SELECTORS.inputs.id).value.trim();
+
+  if (isEmpty(userId)) {
+    Fields.set(SELECTORS.inputs.login, "");
+    Fields.focus(SELECTORS.inputs.id);
     return;
   }
 
-  const user = response.data[0];
-  await saveUserPermissions(user);
-  redirectToMenu();
+  try {
+    const login = await fetchUserLoginById(userId);
+
+    if (!login) {
+      await showError("Número de ID não encontrado");
+      Fields.set(SELECTORS.inputs.id, "");
+      Fields.set(SELECTORS.inputs.login, "");
+      Fields.focus(SELECTORS.inputs.id);
+      return;
+    }
+
+    Fields.set(SELECTORS.inputs.login, login);
+  } catch {
+    await showError("Número de ID não encontrado");
+    Fields.set(SELECTORS.inputs.id, "");
+    Fields.set(SELECTORS.inputs.login, "");
+    Fields.focus(SELECTORS.inputs.id);
+  }
 }
 
 async function handleLoginSubmit(event) {
   event.preventDefault();
 
   try {
-    await processLogin();
-  } catch (error) {
-    console.error("Erro na validação de senha:", error);
-    Modal.showInfo("error", "Erro", "Não foi possível validar o acesso.");
+    const result = await processLogin();
+
+    if (!result.ok) {
+      await showError("Senha digitada é inválida!");
+      Fields.clearAndFocus(SELECTORS.inputs.password);
+      return;
+    }
+
+    redirectToMenu();
+  } catch (err) {
+    console.error("Erro na validação de senha:", err);
+    await showError("Não foi possível validar o acesso.");
   }
 }
 
-/*===========================
-  INIT
-===========================*/
-
-function initLoginPage() {
-  Dom.setFocus(EL.ID);
-  q(EL.ID).value = "";
+/* =========================================================
+   INIT
+========================================================= */
+function configureUiDefaults() {
+  Fields.set(SELECTORS.inputs.id, "");
+  Fields.focus(SELECTORS.inputs.id);
   Dom.enableEnterAsTab();
   criarSpinnerGlobal();
-  Dom.addEventBySelector(EL.BTN_LOGIN, "click", handleLoginSubmit);
-  Dom.addEventBySelector(EL.ID, "blur", handleIdBlur);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  initLoginPage();
-});
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.buttons.login, "click", handleLoginSubmit);
+  Dom.addEventBySelector(SELECTORS.inputs.id, "blur", handleIdBlur);
+}
+
+function initLoginPage() {
+  configureUiDefaults();
+  bindEvents();
+}
+
+window.addEventListener("DOMContentLoaded", initLoginPage);
