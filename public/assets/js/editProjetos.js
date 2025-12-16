@@ -1,179 +1,292 @@
 import { getGroupedData, loadPage } from "./utils.js";
-
 import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
 import { Numbers } from "./utils/number.js";
 import { Modal } from "./utils/modal.js";
 
-const EL = {
-  // Inputs
-  OC: "#txt_numoc",
-  AMBIENTE: "#txt_ambiente",
-  CONTRATO: "#txt_contrato",
-  CLIENTE: "#txt_cliente",
-  VENDEDOR: "#txt_vendedor",
-  LIBERADOR: "#txt_liberador",
-  DATA_CONTRATO: "#txt_datacontrato",
-  DATA_ASSINATURA: "#txt_dataassinatura",
-  DATA_ENTREGA: "#txt_dataentrega",
-  CHEGOU_FABRICA: "#txt_chegoufabrica",
-  LOJA: "#txt_loja",
-  TIPO_CLIENTE: "#txt_tipocliente",
-  ETAPA: "#txt_etapa",
-  TIPO_AMBIENTE: "#txt_tipoambiente",
-  NUM_PROJ: "#txt_numproj",
-  TIPO_CONTRATO: "#txt_tipocontrato",
-  TIPO_CLIENTE: "#txt_tipocliente",
-  VALOR_BRUTO: "#txt_valorbruto",
-  VALOR_NEGOCIADO: "#txt_valornegociado",
-  CUSTO_MATERIAL: "#txt_customaterial",
-  CUSTO_ADICIONAL: "#txt_custoadicional",
-
-  // Buttons
-  SALVAR: "#bt_salvar",
-
-  //Data List
-  DL_VENDEDORES: "#vendedores",
-  DL_LIBERADORES: "#liberadores",
-  MOEDA: ".moeda",
-};
-
-const DB = {
-  getEditProjetos: async function (orderBy) {
-    const url = `/getEditProjetos?p_ordemdecompra=${orderBy}`;
-    const res = API.fetchQuery(url);
-    return res;
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  inputs: {
+    oc: "#txt_numoc",
+    ambiente: "#txt_ambiente",
+    contrato: "#txt_contrato",
+    cliente: "#txt_cliente",
+    vendedor: "#txt_vendedor",
+    liberador: "#txt_liberador",
+    dataContrato: "#txt_datacontrato",
+    dataAssinatura: "#txt_dataassinatura",
+    dataEntrega: "#txt_dataentrega",
+    chegouFabrica: "#txt_chegoufabrica",
+    loja: "#txt_loja",
+    tipoCliente: "#txt_tipocliente",
+    etapa: "#txt_etapa",
+    tipoAmbiente: "#txt_tipoambiente",
+    numProj: "#txt_numproj",
+    tipoContrato: "#txt_tipocontrato",
+    valorBruto: "#txt_valorbruto",
+    valorNegociado: "#txt_valornegociado",
+    custoMaterial: "#txt_customaterial",
+    custoAdicional: "#txt_custoadicional",
+  },
+  buttons: {
+    salvar: "#bt_salvar",
+  },
+  datalists: {
+    vendedores: "#vendedores",
+    liberadores: "#liberadores",
+  },
+  masks: {
+    moeda: ".moeda",
   },
 };
 
-async function getEditProjetos() {
-  const ordemdecompra = Dom.getValue(EL.OC);
-  if (ordemdecompra) {
-    const res = DB.getEditProjetos(ordemdecompra);
+/* =========================================================
+   API LAYER
+========================================================= */
+const ProjectsEditAPI = {
+  fetchProjectForEdit(orderNumber) {
+    const url = `/getEditProjetos?p_ordemdecompra=${orderNumber}`;
+    return API.fetchQuery(url);
+  },
+  updateProject(payload) {
+    return API.fetchBody("/setEditProjetos", "PUT", payload);
+  },
+};
 
-    if (res.status !== 200) {
-      Modal.showInfo("error", "Erro", "Digite a ordem de compra");
-    } else {
-      if (res.data && res.data.length > 0) {
-        res.data.forEach((item) => {
-          Dom.setValue(EL.CONTRATO, item.contrato);
-          Dom.setValue(EL.CLIENTE, item.cliente);
-          Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
-          Dom.setValue(EL.AMBIENTE, item.ambiente);
-          Dom.setValue(EL.NUM_PROJ, item.numproj);
-          Dom.setValue(EL.VENDEDOR, item.vendedor);
-          Dom.setValue(EL.LIBERADOR, item.liberador);
-          Dom.setValue(EL.DATA_CONTRATO, item.datacontrato);
-          Dom.setValue(EL.DATA_ASSINATURA, item.dataassinatura);
-          Dom.setValue(EL.CHEGOU_FABRICA, item.chegoufabrica);
-          Dom.setValue(EL.DATA_ENTREGA, item.dataentrega);
-          Dom.setValue(EL.LOJA, item.loja);
-          Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
-          Dom.setValue(EL.ETAPA, item.etapa);
-          Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
-          Dom.setValue(EL.VALOR_BRUTO, Numbers.currency(item.valorbruto));
-          Dom.setValue(
-            EL.VALOR_NEGOCIADO,
-            Numbers.currency(item.valornegociado)
-          );
-          Dom.setValue(EL.CUSTO_MATERIAL, Numbers.currency(item.customaterial));
-          Dom.setValue(
-            EL.CUSTO_ADICIONAL,
-            Numbers.currency(item.customaterialadicional)
-          );
-        });
-      } else {
-        Modal.showInfo("error", "ERRO", "Ordem de Compra Invalida");
-        Dom.clearInputFields();
-      }
-    }
-  }
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value);
+  },
+  focus(selector) {
+    Dom.setFocus(selector);
+  },
+  clear(selectors) {
+    // se você quiser manter o comportamento antigo que limpa tudo:
+    if (!selectors) return Dom.clearInputFields();
+    Dom.clearInputFields(selectors);
+  },
+};
+
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showError(message) {
+  return Modal.showInfo("error", "Erro", message);
 }
 
-async function validForm(e) {
-  const form = document.querySelector("form");
-  if (form.checkValidity()) {
-    e.preventDefault();
-    await updateProject();
-  }
+function showSuccess(message) {
+  return Modal.showInfo("success", "Sucesso", message);
 }
 
-function getElementsValues() {
-  const data = {
-    p_ordemdecompra: Dom.getValue(EL.OC),
-    p_contrato: Dom.getValue(EL.CONTRATO),
-    p_cliente: Dom.getValue(EL.CLIENTE),
-    p_tipoambiente: Dom.getValue(EL.TIPO_AMBIENTE),
-    p_ambiente: Dom.getValue(EL.AMBIENTE),
-    p_numproj: Dom.getValue(EL.NUM_PROJ),
-    p_vendedor: Dom.getValue(EL.VENDEDOR),
-    p_liberador: Dom.getValue(EL.LIBERADOR),
-    p_datacontrato: Dom.getValue(EL.DATA_CONTRATO),
-    p_dataassinatura: Dom.getValue(EL.DATA_ASSINATURA),
-    p_chegoufabrica: Dom.getValue(EL.CHEGOU_FABRICA),
-    p_dataentrega: Dom.getValue(EL.DATA_ENTREGA),
-    p_loja: Dom.getValue(EL.LOJA),
-    p_tipocliente: Dom.getValue(EL.TIPO_CLIENTE),
-    p_etapa: Dom.getValue(EL.ETAPA),
-    p_tipocontrato: Dom.getValue(EL.TIPO_CONTRATO),
-    p_valorbruto: Numbers.formatValueDecimal(Dom.getValue(EL.VALOR_BRUTO)),
-    p_valornegociado: Numbers.formatValueDecimal(
-      Dom.getValue(EL.VALOR_NEGOCIADO)
+function confirmSaveEdits() {
+  return Modal.ShowQuestion(null, "Deseja salvar edições ?");
+}
+
+/* =========================================================
+   VALIDATORS
+========================================================= */
+function isFormValid() {
+  const form = q("form") || document.querySelector("form");
+  return !!form?.checkValidity?.() && form.checkValidity();
+}
+
+function getOrderNumber() {
+  return Fields.get(SELECTORS.inputs.oc);
+}
+
+function hasOrderNumber(value) {
+  return !!String(value || "").trim();
+}
+
+/* =========================================================
+   FORMATTERS / INPUT MASKS
+========================================================= */
+function formatCurrency(value) {
+  return Numbers.currency(value);
+}
+
+function formatDecimalForApi(value) {
+  return Numbers.formatValueDecimal(value);
+}
+
+function handleCurrencyInput(e) {
+  const el = e.target;
+  // mantém a mesma ideia do seu código original (changeFormatCurrency),
+  // só que sem depender de uma função global externa.
+  el.value = Numbers.FormatCurrency
+    ? Numbers.FormatCurrency(el.value)
+    : el.value;
+}
+
+/* =========================================================
+   MAPPERS (API -> UI) and (UI -> API)
+========================================================= */
+function mapProjectToFormFields(item) {
+  return [
+    [SELECTORS.inputs.contrato, item.contrato],
+    [SELECTORS.inputs.cliente, item.cliente],
+    [SELECTORS.inputs.tipoAmbiente, item.tipoambiente],
+    [SELECTORS.inputs.ambiente, item.ambiente],
+    [SELECTORS.inputs.numProj, item.numproj],
+    [SELECTORS.inputs.vendedor, item.vendedor],
+    [SELECTORS.inputs.liberador, item.liberador],
+    [SELECTORS.inputs.dataContrato, item.datacontrato],
+    [SELECTORS.inputs.dataAssinatura, item.dataassinatura],
+    [SELECTORS.inputs.chegouFabrica, item.chegoufabrica],
+    [SELECTORS.inputs.dataEntrega, item.dataentrega],
+    [SELECTORS.inputs.loja, item.loja],
+    [SELECTORS.inputs.tipoCliente, item.tipocliente],
+    [SELECTORS.inputs.etapa, item.etapa],
+    [SELECTORS.inputs.tipoContrato, item.tipocontrato],
+    [SELECTORS.inputs.valorBruto, formatCurrency(item.valorbruto)],
+    [SELECTORS.inputs.valorNegociado, formatCurrency(item.valornegociado)],
+    [SELECTORS.inputs.custoMaterial, formatCurrency(item.customaterial)],
+    [
+      SELECTORS.inputs.custoAdicional,
+      formatCurrency(item.customaterialadicional),
+    ],
+  ];
+}
+
+function applyFields(pairs) {
+  pairs.forEach(([selector, value]) => Fields.set(selector, value));
+}
+
+function buildEditPayloadFromForm() {
+  return {
+    p_ordemdecompra: Fields.get(SELECTORS.inputs.oc),
+    p_contrato: Fields.get(SELECTORS.inputs.contrato),
+    p_cliente: Fields.get(SELECTORS.inputs.cliente),
+    p_tipoambiente: Fields.get(SELECTORS.inputs.tipoAmbiente),
+    p_ambiente: Fields.get(SELECTORS.inputs.ambiente),
+    p_numproj: Fields.get(SELECTORS.inputs.numProj),
+    p_vendedor: Fields.get(SELECTORS.inputs.vendedor),
+    p_liberador: Fields.get(SELECTORS.inputs.liberador),
+    p_datacontrato: Fields.get(SELECTORS.inputs.dataContrato),
+    p_dataassinatura: Fields.get(SELECTORS.inputs.dataAssinatura),
+    p_chegoufabrica: Fields.get(SELECTORS.inputs.chegouFabrica),
+    p_dataentrega: Fields.get(SELECTORS.inputs.dataEntrega),
+    p_loja: Fields.get(SELECTORS.inputs.loja),
+    p_tipocliente: Fields.get(SELECTORS.inputs.tipoCliente),
+    p_etapa: Fields.get(SELECTORS.inputs.etapa),
+    p_tipocontrato: Fields.get(SELECTORS.inputs.tipoContrato),
+    p_valorbruto: formatDecimalForApi(Fields.get(SELECTORS.inputs.valorBruto)),
+    p_valornegociado: formatDecimalForApi(
+      Fields.get(SELECTORS.inputs.valorNegociado)
     ),
-    p_customaterial: Numbers.formatValueDecimal(
-      Dom.getValue(EL.CUSTO_MATERIAL)
+    p_customaterial: formatDecimalForApi(
+      Fields.get(SELECTORS.inputs.custoMaterial)
     ),
-    p_customaterialadicional: Numbers.formatValueDecimal(
-      Dom.getValue(EL.CUSTO_ADICIONAL)
+    p_customaterialadicional: formatDecimalForApi(
+      Fields.get(SELECTORS.inputs.custoAdicional)
     ),
   };
-  return data;
 }
 
-async function updateProject() {
-  const result = await Modal.ShowQuestion(null, "Deseja salvar edições ?");
+/* =========================================================
+   USE CASES / HANDLERS
+========================================================= */
+async function loadProjectForEdit() {
+  const oc = getOrderNumber();
+  if (!hasOrderNumber(oc)) return;
 
-  if (result.isConfirmed) {
-    try {
-      const data = getElementsValues();
-      const response = await API.fetchBody("/setEditProjetos", "PUT", data);
+  try {
+    const res = await ProjectsEditAPI.fetchProjectForEdit(oc);
 
-      if (response.status !== 200) {
-        Modal.showInfo(
-          "error",
-          "Erro",
-          "Não foi possível carregar os dados !!!"
-        );
-      } else {
-        Modal.showInfo(
-          "success",
-          "Sucesso",
-          "Alterações salvas com Sucesso !!!"
-        );
-      }
-    } catch (error) {
-      Modal.showInfo("error", "Erro", "Erro na requisição: " + error.message);
+    if (res.status !== 200) {
+      await showError("Digite a ordem de compra");
+      return;
     }
+
+    const item = res?.data?.[0];
+    if (!item) {
+      await showError("Ordem de Compra Invalida");
+      Fields.clear(); // mantém o comportamento antigo de limpar tudo
+      return;
+    }
+
+    applyFields(mapProjectToFormFields(item));
+  } catch (err) {
+    await showError(`Erro ao carregar projeto: ${err?.message || err}`);
   }
 }
 
-function init() {
-  loadPage("adicionar_projetos", "editar.html");
-  Dom.setFocus(EL.OC);
-  getGroupedData("getGroupedAmbiente", EL.TIPO_AMBIENTE, "tipo_ambiente");
-  getGroupedData("getGroupedLiberador", EL.DL_LIBERADORES, "p_liberador");
-  getGroupedData("getGroupedVendedor", EL.DL_VENDEDORES, "p_vendedor");
-  Dom.allUpperCase();
-  Dom.enableEnterAsTab();
-  Dom.addEventBySelector(EL.OC, "blur", getEditProjetos);
-  Dom.addEventBySelector(EL.SALVAR, "click", async (e) => {
-    validForm(e);
-  });
-  Dom.addEventBySelector(EL.MOEDA, "input", (e) => {
-    changeFormatCurrency(e.target);
-  });
+async function handleSaveClick(e) {
+  if (!isFormValid()) return;
+
+  e.preventDefault();
+  await saveEditsFlow();
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  init();
-});
+async function saveEditsFlow() {
+  const result = await confirmSaveEdits();
+  if (!result.isConfirmed) return;
+
+  try {
+    const payload = buildEditPayloadFromForm();
+    const response = await ProjectsEditAPI.updateProject(payload);
+
+    if (response.status !== 200) {
+      await showError("Não foi possível carregar os dados !!!");
+      return;
+    }
+
+    await showSuccess("Alterações salvas com Sucesso !!!");
+  } catch (err) {
+    await showError(`Erro na requisição: ${err?.message || err}`);
+  }
+}
+
+/* =========================================================
+   PAGE SETUP (INIT)
+========================================================= */
+function loadView() {
+  loadPage("adicionar_projetos", "editar.html");
+}
+
+function loadGroupedData() {
+  getGroupedData(
+    "getGroupedAmbiente",
+    SELECTORS.inputs.tipoAmbiente,
+    "tipo_ambiente"
+  );
+  getGroupedData(
+    "getGroupedLiberador",
+    SELECTORS.datalists.liberadores,
+    "p_liberador"
+  );
+  getGroupedData(
+    "getGroupedVendedor",
+    SELECTORS.datalists.vendedores,
+    "p_vendedor"
+  );
+}
+
+function configureUiDefaults() {
+  Fields.focus(SELECTORS.inputs.oc);
+  Dom.allUpperCase();
+  Dom.enableEnterAsTab();
+}
+
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.inputs.oc, "blur", loadProjectForEdit);
+  Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
+  Dom.addEventBySelector(SELECTORS.masks.moeda, "input", handleCurrencyInput);
+}
+
+function initEditProjectPage() {
+  loadView();
+  loadGroupedData();
+  configureUiDefaults();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", initEditProjectPage);
