@@ -1,181 +1,207 @@
 import { getCookie } from "./utils.js";
-import { Dom, q, ce, qa } from "./UI/interface.js";
+import { Dom, q } from "./UI/interface.js";
 import { Modal } from "./utils/modal.js";
 import { API } from "./service/api.js";
 import { DateTime } from "./utils/time.js";
 
-/*========================================
-  HELPERS DOM
-========================================*/
-const EL = {
-  LOGIN: "login",
-  USUARIO: "#txt_usuario",
-  RESP: "#txt_resp",
-  CHK_URGENTE: "#chk_urgente",
-  NUM_OC: "#txt_numoc",
-  TIPO: "#txt_tipo",
-  DATA: "#txt_data",
-  IFRAME_IMPRESSAO: "#iframeImpressao",
-  IFRAME_IMPRESSAO1: "#iframeImpressao1",
-  LB_CAPA: "#lb_capa",
-  SPINNER: "#spinner",
-  SPINNER1: "#spinner-1",
-  LB_PENDENCIA: "#lb_pendencias",
-};
-
-/*========================================
-  HELPERS API
-========================================*/
-const DB = {
-  getDataAcessories: async function (buyOrder) {
-    const url = `/fillTableAcessorios?p_ordemdecompra=${buyOrder}`;
-    const res = await API.fetchQuery(url);
-    return res;
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  cookie: {
+    login: "login",
   },
-
-  getDataPendence: async function (buyOrder) {
-    const url = `/fillElements?p_ordemdecompra=${buyOrder}`;
-    const res = API.fetchQuery(url);
-    return res;
+  inputs: {
+    usuario: "#txt_usuario",
+    responsavel: "#txt_resp",
+    urgente: "#chk_urgente",
+    numOc: "#txt_numoc",
+    tipo: "#txt_tipo",
+    data: "#txt_data",
   },
-
-  setPermissions: async function (payload) {
-    const res = API.fetchBody("/setPermission", "POST", payload);
-    return res;
+  iframe: {
+    capa: "#iframeImpressao",
+    pendencia: "#iframeImpressao1",
   },
-
-  setType: async function (orderBy, type, urgent) {
-    const url = `/setTipo?p_ordemdecompra=${orderBy}&p_tipo=${type}&p_urgente=${urgent}`;
-    const res = await API.fetchQuery(url);
-    return res;
+  ui: {
+    lbCapa: "#lb_capa",
+    spinnerCapa: "#spinner",
+    lbPendencia: "#lb_pendencias",
+    spinnerPendencia: "#spinner-1",
   },
-
-  getPermission: async function () {
-    const res = await fetch("/checkPermission", {
-      credentials: "include",
-    });
-    return res;
+  links: {
+    logout: "#link_logout",
+    dashboard: "#dashboard",
+  },
+  buttons: {
+    capa: "#bt_capa",
+    capaPendencia: "#bt_capa_pendencia",
   },
 };
 
-async function populateElementsName() {
-  const usuario = await getCookie("login");
-  Dom.setInnerHtml(EL.USUARIO, usuario);
-  Dom.setValue(EL.RESP, usuario);
+/* =========================================================
+   API LAYER
+========================================================= */
+const PrintAPI = {
+  fetchAccessories(orderNumber) {
+    const url = `/fillTableAcessorios?p_ordemdecompra=${orderNumber}`;
+    return API.fetchQuery(url);
+  },
+
+  fetchPendencies(orderNumber) {
+    const url = `/fillElements?p_ordemdecompra=${orderNumber}`;
+    return API.fetchQuery(url);
+  },
+
+  setProjectType(orderNumber, type, urgent) {
+    const url = `/setTipo?p_ordemdecompra=${orderNumber}&p_tipo=${type}&p_urgente=${urgent}`;
+    return API.fetchQuery(url);
+  },
+
+  async fetchCurrentPermissions() {
+    const res = await fetch("/checkPermission", { credentials: "include" });
+    return res;
+  },
+
+  setPermissions(payload) {
+    return API.fetchBody("/setPermission", "POST", payload);
+  },
+};
+
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value);
+  },
+  getChecked(selector) {
+    return Dom.getChecked(selector);
+  },
+  setHtml(selector, html) {
+    Dom.setInnerHtml(selector, html);
+  },
+};
+
+/* =========================================================
+   UI HELPERS / MESSAGES
+========================================================= */
+function showError(message) {
+  return Modal.showInfo("error", "ERRO", message);
 }
 
-function isChecked() {
-  const checked = Dom.getChecked(EL.CHK_URGENTE);
-  if (checked) return "SIM";
-  return "-";
+function showWarning(message) {
+  return Modal.showInfo("warning", "Atenção", message);
 }
 
-function setLs(key, element) {
-  localStorage.setItem(key, Dom.getValue(element));
+function showSpinner(labelSelector, spinnerSelector, show) {
+  Dom.handleClass(labelSelector, "d-none", show ? "add" : "remove");
+  Dom.handleClass(spinnerSelector, "d-none", show ? "remove" : "add");
 }
 
-function setDataLocalStorage() {
-  setLs("numoc", EL.NUM_OC);
-  setLs("resp", EL.RESP);
-  setLs("tipo", EL.TIPO);
-  setLs("data", EL.DATA);
-  localStorage.setItem("urgente", isChecked());
+function redirectTo(url) {
+  window.location.href = url;
 }
 
-function isValidType() {
-  if (Dom.getValue(EL.TIPO) !== "-") return true;
-  return false;
+function printIframe(iframeSelector) {
+  const iframe = q(iframeSelector);
+  if (!iframe?.contentWindow) return;
+
+  iframe.contentWindow.location.reload();
+  setTimeout(() => iframe.contentWindow.print(), 500);
 }
 
-function showSpinnerCapa(element, spinner, show) {
-  Dom.handleClass(element, "d-none", show ? "add" : "remove");
-  Dom.handleClass(spinner, "d-none", show ? "remove" : "add");
+/* =========================================================
+   LOCAL STORAGE (single responsibility)
+========================================================= */
+function setLs(key, value) {
+  localStorage.setItem(key, value);
 }
 
-async function printPageCapa() {
-  if (!isValidType()) {
-    Modal.showInfo("warning", "Atenção", "Selecione o tipo do Projeto");
-    return;
-  }
-  showSpinnerCapa(EL.LB_CAPA, EL.SPINNER, true);
-  setDataLocalStorage();
-  await loadData();
-  q(EL.IFRAME_IMPRESSAO).contentWindow.location.reload();
-  var iframe = q(EL.IFRAME_IMPRESSAO);
-  setTimeout(async function () {
-    iframe.contentWindow.print();
-    showSpinnerCapa(EL.LB_CAPA, EL.SPINNER, false);
-    await setType(
-      Dom.getValue(EL.NUM_OC),
-      Dom.getValue(EL.TIPO),
-      Dom.getChecked(EL.CHK_URGENTE)
-    );
-  }, 500);
+function urgentLabel(isUrgent) {
+  return isUrgent ? "SIM" : "-";
 }
 
-async function printPageCapaPendencia() {
-  showSpinnerCapa(EL.LB_PENDENCIA, EL.SPINNER1, true);
-  setDataLocalStorage();
-  await loadData();
-  q(EL.IFRAME_IMPRESSAO1).contentWindow.location.reload();
-  var iframe = q(EL.IFRAME_IMPRESSAO1);
-  setTimeout(function () {
-    iframe.contentWindow.print();
-    showSpinnerCapa(EL.LB_PENDENCIA, EL.SPINNER1, false);
-  }, 500);
+function persistPrintContext() {
+  setLs("numoc", Fields.get(SELECTORS.inputs.numOc));
+  setLs("resp", Fields.get(SELECTORS.inputs.responsavel));
+  setLs("tipo", Fields.get(SELECTORS.inputs.tipo));
+  setLs("data", Fields.get(SELECTORS.inputs.data));
+  setLs("urgente", urgentLabel(Fields.getChecked(SELECTORS.inputs.urgente)));
 }
 
-async function confirmLogout() {
-  const result = await Modal.showConfirmation(null, "Deseja sair do Sistema ?");
-  return result;
+/* =========================================================
+   VALIDATORS
+========================================================= */
+function isEmpty(value) {
+  return value === null || value === undefined || String(value).trim() === "";
 }
 
-async function logout() {
-  const result = confirmLogout();
-  if (result.isConfirmed) {
-    await clearDataUsuario();
-    localStorage.clear();
-    window.location.href = "/";
-  }
+function hasValidProjectType() {
+  return Fields.get(SELECTORS.inputs.tipo) !== "-";
 }
 
-async function loadData() {
-  const buyOrder = Dom.getValue(EL.NUM_OC);
-  await fillElements(buyOrder);
-  await fillTableAcessorios(buyOrder);
+function getOrderNumber() {
+  return Fields.get(SELECTORS.inputs.numOc);
 }
 
-async function fillElements(buyOrder) {
-  if (!buyOrder || buyOrder.trim() === "") {
-    console.warn("Ordem de compra inválida ou ausente. Cancelando fetch.");
-    return;
-  }
-  const res = await DB.getDataPendence(buyOrder);
+/* =========================================================
+   DATA LOADERS (save into localStorage)
+========================================================= */
+async function loadPendenciesToLocalStorage(orderNumber) {
+  if (isEmpty(orderNumber)) return;
 
+  const res = await PrintAPI.fetchPendencies(orderNumber);
   if (res.status !== 200) {
-    const errTExt = await res.data;
-    console.error("Erro ao carregar os dados:", errTExt);
-  } else {
-    localStorage.setItem("project", JSON.stringify(res.data));
+    console.error("Erro ao carregar pendências:", res.data);
+    return;
   }
+
+  setLs("project", JSON.stringify(res.data));
 }
 
-async function fillTableAcessorios(buyOrder) {
-  const res = await DB.getDataAcessories(buyOrder);
+async function loadAccessoriesToLocalStorage(orderNumber) {
+  const res = await PrintAPI.fetchAccessories(orderNumber);
 
   try {
-    localStorage.setItem("acessorios", JSON.stringify(res.data));
+    setLs("acessorios", JSON.stringify(res.data));
   } catch (err) {
-    Modal.showInfo(
-      "error",
-      "Erro",
-      `Não foi possível carregar os dados. ${err.message}`
-    );
+    await showError(`Não foi possível carregar os dados. ${err.message}`);
   }
 }
 
-function payloadClearUser() {
-  const payload = {
+async function loadDataForPrint() {
+  const orderNumber = getOrderNumber();
+  await loadPendenciesToLocalStorage(orderNumber);
+  await loadAccessoriesToLocalStorage(orderNumber);
+}
+
+/* =========================================================
+   DOMAIN: SET PROJECT TYPE
+========================================================= */
+async function saveProjectType() {
+  const orderNumber = Fields.get(SELECTORS.inputs.numOc);
+  const type = Fields.get(SELECTORS.inputs.tipo);
+  const urgent = Fields.getChecked(SELECTORS.inputs.urgente);
+
+  const res = await PrintAPI.setProjectType(orderNumber, type, urgent);
+  if (res.status !== 200) await showError(`${res.data}`);
+}
+
+/* =========================================================
+   DOMAIN: USER DISPLAY / LOGOUT
+========================================================= */
+async function populateUserName() {
+  const usuario = await getCookie(SELECTORS.cookie.login);
+  Fields.setHtml(SELECTORS.inputs.usuario, usuario);
+  Fields.set(SELECTORS.inputs.responsavel, usuario);
+}
+
+function buildClearUserPayload() {
+  return {
     id: "",
     permissoes: null,
     login: "Não Logado",
@@ -194,77 +220,136 @@ function payloadClearUser() {
     valores: null,
     dashboard: null,
   };
-  return payload;
 }
 
-async function clearDataUsuario() {
-  try {
-    const payload = payloadClearUser();
-    const response = await API.fetchBody(payload);
-
-    if (response.status !== 200) {
-      throw new Error("Erro ao salvar permissões no backend");
-    }
-
-    console.log("Dados de usuário enviados com sucesso!");
-  } catch (error) {
-    console.error("Erro ao enviar dados:", error);
-  }
-}
-
-async function setType(orderBuy, type, urgent) {
-  const res = await DB.setType(orderBuy, type, urgent);
+async function clearUserPermissionsOnBackend() {
+  // seu código original chamava API.fetchBody(payload) sem endpoint/método.
+  // aqui usamos o endpoint correto que já existe no seu DB: /setPermission
+  const payload = buildClearUserPayload();
+  const res = await PrintAPI.setPermissions(payload);
 
   if (res.status !== 200) {
-    Modal.showInfo("error", "ERRO", `${res.data}`);
+    throw new Error("Erro ao salvar permissões no backend");
   }
 }
 
-const DASHBOARD_URL = "https://dashboardgd.streamlit.app/";
-
-async function fetchUserPermissions() {
-  const response = await DB.getPermission();
-  if (!response.ok) throw new Error("Não autenticado");
-  return response.json();
+async function confirmLogout() {
+  return Modal.showConfirmation(null, "Deseja sair do Sistema ?");
 }
 
-function getDashboardPermission(permissoes) {
+async function logoutFlow() {
+  const result = await confirmLogout();
+  if (!result.isConfirmed) return;
+
+  try {
+    await clearUserPermissionsOnBackend();
+  } catch (err) {
+    console.error("Erro ao enviar dados:", err);
+  } finally {
+    localStorage.clear();
+    redirectTo("/");
+  }
+}
+
+/* =========================================================
+   DOMAIN: DASHBOARD PERMISSION
+========================================================= */
+const DASHBOARD_URL = "https://dashboardgd.streamlit.app/";
+
+async function fetchCurrentPermissionsJson() {
+  const res = await PrintAPI.fetchCurrentPermissions();
+  if (!res.ok) throw new Error("Não autenticado");
+  return res.json();
+}
+
+function canAccessDashboard(permissoes) {
   return Boolean(permissoes?.dashboard);
 }
 
-function redirectToDashboard() {
-  window.location.href = DASHBOARD_URL;
-}
-
-function showNoPermissionMessage() {
-  Modal.showInfo("error", "ERRO", "Usuario sem Permissão");
-}
-
-function showPermissionError(error) {
-  Modal.showInfo("error", "ERRO", `ERRO: ${error.message}`);
-}
-
-async function handleDashboardPermissionClick() {
+async function handleDashboardClick() {
   try {
-    const permissoes = await fetchUserPermissions();
-    const allowed = getDashboardPermission(permissoes);
-
-    if (allowed) return redirectToDashboard();
-    return showNoPermissionMessage();
-  } catch (error) {
-    return showPermissionError(error);
+    const permissoes = await fetchCurrentPermissionsJson();
+    if (canAccessDashboard(permissoes)) return redirectTo(DASHBOARD_URL);
+    return showError("Usuario sem Permissão");
+  } catch (err) {
+    return showError(`ERRO: ${err.message}`);
   }
 }
 
-function init() {
-  Dom.setValue(EL.DATA, DateTime.today());
-  populateElementsName();
-  Dom.addEventBySelector("#link_logout", "click", logout);
-  Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
-  Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
-  Dom.addEventBySelector("#dashboard", "click", handleDashboardPermissionClick);
+/* =========================================================
+   PRINT FLOWS
+========================================================= */
+async function printCapaFlow() {
+  if (!hasValidProjectType()) {
+    await showWarning("Selecione o tipo do Projeto");
+    return;
+  }
+
+  showSpinner(SELECTORS.ui.lbCapa, SELECTORS.ui.spinnerCapa, true);
+
+  try {
+    persistPrintContext();
+    await loadDataForPrint();
+    printIframe(SELECTORS.iframe.capa);
+
+    // após imprimir, grava tipo/urgência
+    setTimeout(async () => {
+      await saveProjectType();
+      showSpinner(SELECTORS.ui.lbCapa, SELECTORS.ui.spinnerCapa, false);
+    }, 500);
+  } catch (err) {
+    showSpinner(SELECTORS.ui.lbCapa, SELECTORS.ui.spinnerCapa, false);
+    await showError(`Erro ao imprimir: ${err?.message || err}`);
+  }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  init();
-});
+async function printPendenciaFlow() {
+  showSpinner(SELECTORS.ui.lbPendencia, SELECTORS.ui.spinnerPendencia, true);
+
+  try {
+    persistPrintContext();
+    await loadDataForPrint();
+    printIframe(SELECTORS.iframe.pendencia);
+
+    setTimeout(() => {
+      showSpinner(
+        SELECTORS.ui.lbPendencia,
+        SELECTORS.ui.spinnerPendencia,
+        false
+      );
+    }, 500);
+  } catch (err) {
+    showSpinner(SELECTORS.ui.lbPendencia, SELECTORS.ui.spinnerPendencia, false);
+    await showError(`Erro ao imprimir: ${err?.message || err}`);
+  }
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+function configureDefaults() {
+  Fields.set(SELECTORS.inputs.data, DateTime.today());
+}
+
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.links.logout, "click", logoutFlow);
+  Dom.addEventBySelector(SELECTORS.buttons.capa, "click", printCapaFlow);
+  Dom.addEventBySelector(
+    SELECTORS.buttons.capaPendencia,
+    "click",
+    printPendenciaFlow
+  );
+  Dom.addEventBySelector(
+    SELECTORS.links.dashboard,
+    "click",
+    handleDashboardClick
+  );
+}
+
+async function init() {
+  configureDefaults();
+  await populateUserName();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", init);
