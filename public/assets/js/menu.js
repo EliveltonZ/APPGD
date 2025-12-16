@@ -49,6 +49,13 @@ const DB = {
     const res = await API.fetchQuery(url);
     return res;
   },
+
+  getPermission: async function () {
+    const res = await fetch("/checkPermission", {
+      credentials: "include",
+    });
+    return res;
+  },
 };
 
 async function populateElementsName() {
@@ -71,26 +78,33 @@ function setDataLocalStorage() {
   setLs("numoc", EL.NUM_OC);
   setLs("resp", EL.RESP);
   setLs("tipo", EL.TIPO);
-  localStorage.setItem("urgente", isChecked());
   setLs("data", EL.DATA);
+  localStorage.setItem("urgente", isChecked());
+}
+
+function isValidType() {
+  if (Dom.getValue(EL.TIPO) !== "-") return true;
+  return false;
+}
+
+function showSpinnerCapa(element, spinner, show) {
+  Dom.handleClass(element, "d-none", show ? "add" : "remove");
+  Dom.handleClass(spinner, "d-none", show ? "remove" : "add");
 }
 
 async function printPageCapa() {
-  if (Dom.getValue(EL.TIPO) == "-") {
+  if (!isValidType()) {
     Modal.showInfo("warning", "Atenção", "Selecione o tipo do Projeto");
     return;
   }
-
-  Dom.handleClass(EL.LB_CAPA, "d-none", "add");
-  Dom.handleClass(EL.SPINNER, "d-none", "remove");
+  showSpinnerCapa(EL.LB_CAPA, EL.SPINNER, true);
   setDataLocalStorage();
   await loadData();
   q(EL.IFRAME_IMPRESSAO).contentWindow.location.reload();
   var iframe = q(EL.IFRAME_IMPRESSAO);
   setTimeout(async function () {
     iframe.contentWindow.print();
-    Dom.handleClass(EL.LB_CAPA, "d-none", "remove");
-    Dom.handleClass(EL.SPINNER, "d-none", "add");
+    showSpinnerCapa(EL.LB_CAPA, EL.SPINNER, false);
     await setType(
       Dom.getValue(EL.NUM_OC),
       Dom.getValue(EL.TIPO),
@@ -100,16 +114,14 @@ async function printPageCapa() {
 }
 
 async function printPageCapaPendencia() {
-  Dom.handleClass(EL.LB_PENDENCIA, "d-none", "add");
-  Dom.handleClass(EL.SPINNER1, "d-none", "remove");
+  showSpinnerCapa(EL.LB_PENDENCIA, EL.SPINNER1, true);
   setDataLocalStorage();
   await loadData();
   q(EL.IFRAME_IMPRESSAO1).contentWindow.location.reload();
   var iframe = q(EL.IFRAME_IMPRESSAO1);
   setTimeout(function () {
     iframe.contentWindow.print();
-    Dom.handleClass(EL.LB_PENDENCIA, "d-none", "remove");
-    Dom.handleClass(EL.SPINNER1, "d-none", "add");
+    showSpinnerCapa(EL.LB_PENDENCIA, EL.SPINNER1, false);
   }, 500);
 }
 
@@ -208,25 +220,39 @@ async function setType(orderBuy, type, urgent) {
   }
 }
 
-async function dashboardPermission() {
-  const element = document.getElementById("dashboard");
+const DASHBOARD_URL = "https://dashboardgd.streamlit.app/";
+
+async function fetchUserPermissions() {
+  const response = await DB.getPermission();
+  if (!response.ok) throw new Error("Não autenticado");
+  return response.json();
+}
+
+function getDashboardPermission(permissoes) {
+  return Boolean(permissoes?.dashboard);
+}
+
+function redirectToDashboard() {
+  window.location.href = DASHBOARD_URL;
+}
+
+function showNoPermissionMessage() {
+  Modal.showInfo("error", "ERRO", "Usuario sem Permissão");
+}
+
+function showPermissionError(error) {
+  Modal.showInfo("error", "ERRO", `ERRO: ${error.message}`);
+}
+
+async function handleDashboardPermissionClick() {
   try {
-    const response = await fetch("/checkPermission", {
-      credentials: "include",
-    });
+    const permissoes = await fetchUserPermissions();
+    const allowed = getDashboardPermission(permissoes);
 
-    if (!response.ok) throw new Error("Não autenticado");
-
-    const permissoes = await response.json();
-    const valorPermissao = permissoes["dashboard"];
-
-    if (valorPermissao) {
-      window.location.href = "https://dashboardgd.streamlit.app/";
-    } else {
-      Modal.showInfo("error", "ERRO", "Usuario sem Permissão");
-    }
-  } catch (erro) {
-    Modal.showInfo("error", "ERRO", `ERRO: ${erro.message}`);
+    if (allowed) return redirectToDashboard();
+    return showNoPermissionMessage();
+  } catch (error) {
+    return showPermissionError(error);
   }
 }
 
@@ -236,7 +262,7 @@ function init() {
   Dom.addEventBySelector("#link_logout", "click", logout);
   Dom.addEventBySelector("#bt_capa", "click", printPageCapa);
   Dom.addEventBySelector("#bt_capa_pendencia", "click", printPageCapaPendencia);
-  Dom.addEventBySelector("#dashboard", "click", dashboardPermission);
+  Dom.addEventBySelector("#dashboard", "click", handleDashboardPermissionClick);
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {

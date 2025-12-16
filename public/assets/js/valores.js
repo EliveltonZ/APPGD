@@ -63,6 +63,7 @@ async function fillTable() {
     });
   }
 }
+
 function init() {
   loadPage("valores", "valores.html");
   fillTable();

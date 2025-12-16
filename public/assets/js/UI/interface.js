@@ -18,28 +18,23 @@ export class Dom {
     return value === "" ? null : value.toUpperCase();
   }
 
-  // define o valor do elemento passado no paramentro
   static setValue(element, value) {
     q(element).value = value;
   }
 
-  // define o texto (HTML) do elemento no parametro
   static setInnerHtml(element, value) {
     q(element).innerHTML = value;
   }
 
-  // recebe o valor booleano do elemento
   static getChecked(element) {
     let value = q(element).checked;
     return value === "" ? null : value;
   }
 
-  // define o valor booleano do elemento
   static setChecked(element, boolean) {
     q(element).checked = boolean;
   }
 
-  // define o foco do elemento
   static setFocus(element) {
     q(element).focus();
   }
@@ -130,7 +125,7 @@ export class Dom {
     }
   }
 
-  static handleClass(element, nameClass, type) {
+  static handleClass(element, nameClass, action) {
     // Obtém o elemento pelo Seletor
     const item = q(element);
 
@@ -147,17 +142,17 @@ export class Dom {
     }
 
     // Verifica o tipo de operação e executa
-    if (type.toLowerCase() === "add") {
+    if (action.toLowerCase() === "add") {
       item.classList.add(nameClass);
       return;
     }
-    if (type.toLowerCase() === "remove") {
+    if (action.toLowerCase() === "remove") {
       item.classList.remove(nameClass);
       return;
     }
 
     // Caso o tipo não seja reconhecido
-    console.error(`Tipo de operação "${type}" não identificado.`);
+    console.error(`Tipo de operação "${action}" não identificado.`);
   }
 
   static setUpperCase(input) {
