@@ -1,134 +1,221 @@
 import { loadPage } from "./utils.js";
-import { Dom, q, qa } from "./UI/interface.js";
+import { Dom, q } from "./UI/interface.js";
 import { API } from "./service/api.js";
 import { Numbers } from "./utils/number.js";
 import { Modal } from "./utils/modal.js";
 
-const EL = {
-  // Inputs
-  OC: "#txt_numoc",
-  AMBIENTE: "#txt_ambiente",
-  CONTRATO: "#txt_contrato",
-  CLIENTE: "#txt_cliente",
-  VENDEDOR: "#txt_vendedor",
-  LIBERADOR: "#txt_liberador",
-  DATA_CONTRATO: "#txt_datacontrato",
-  DATA_ASSINATURA: "#txt_dataassinatura",
-  DATA_ENTREGA: "#txt_dataentrega",
-  CHEGOU_FABRICA: "#txt_chegoufabrica",
-  LOJA: "#txt_loja",
-  TIPO_CLIENTE: "#txt_tipocliente",
-  ETAPA: "#txt_etapa",
-  TIPO_AMBIENTE: "#txt_tipoambiente",
-  NUM_PROJ: "#txt_numproj",
-  TIPO_CONTRATO: "#txt_tipocontrato",
-  TIPO_CLIENTE: "#txt_tipocliente",
-  VALOR_BRUTO: "#txt_valorbruto",
-  VALOR_NEGOCIADO: "#txt_valornegociado",
-  CUSTO_MATERIAL: "#txt_customaterial",
-  CUSTO_ADICIONAL: "#txt_custoadicional",
-
-  // Buttons
-  SALVAR: "#bt_salvar",
-
-  //Data List
-  DL_VENDEDORES: "#vendedores",
-  DL_LIBERADORES: "#liberadores",
-};
-
-const DB = {
-  getDataOrderBy: async function (orderBy) {
-    const url = `/getDeleteProjetos?p_ordemdecompra=${orderBy}`;
-    const res = await API.fetchQuery(url);
-    return res;
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  inputs: {
+    oc: "#txt_numoc",
+    ambiente: "#txt_ambiente",
+    contrato: "#txt_contrato",
+    cliente: "#txt_cliente",
+    vendedor: "#txt_vendedor",
+    liberador: "#txt_liberador",
+    dataContrato: "#txt_datacontrato",
+    dataAssinatura: "#txt_dataassinatura",
+    dataEntrega: "#txt_dataentrega",
+    chegouFabrica: "#txt_chegoufabrica",
+    loja: "#txt_loja",
+    tipoCliente: "#txt_tipocliente",
+    etapa: "#txt_etapa",
+    tipoAmbiente: "#txt_tipoambiente",
+    numProj: "#txt_numproj",
+    tipoContrato: "#txt_tipocontrato",
+    valorBruto: "#txt_valorbruto",
+    valorNegociado: "#txt_valornegociado",
+    custoMaterial: "#txt_customaterial",
+    custoAdicional: "#txt_custoadicional",
   },
-
-  delProject: async function (data) {
-    const res = await API.fetchBody("/setDeleteProjeto", "DELETE", data);
-    return res;
+  buttons: {
+    salvar: "#bt_salvar",
   },
 };
 
-async function getDeleteProjetos() {
-  const orderBy = Number(Dom.getValue(EL.OC));
-  if (!Number.isInteger(orderBy)) return;
+/* =========================================================
+   API LAYER
+========================================================= */
+const ProjectsDeleteAPI = {
+  fetchProjectByOrder(orderNumber) {
+    const url = `/getDeleteProjetos?p_ordemdecompra=${orderNumber}`;
+    return API.fetchQuery(url);
+  },
+  deleteProject(payload) {
+    return API.fetchBody("/setDeleteProjeto", "DELETE", payload);
+  },
+};
 
-  const res = await DB.fetchQuery(orderBy);
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value);
+  },
+  focus(selector) {
+    Dom.setFocus(selector);
+  },
+};
 
-  if (res.status !== 200) {
-    Modal.showInfo("error", "Erro", `${res.data}`);
-  } else {
-    if (res.data && res.data.length > 0) {
-      res.data.forEach((item) => {
-        Dom.setValue(EL.CONTRATO, item.contrato);
-        Dom.setValue(EL.CLIENTE, item.cliente);
-        Dom.setValue(EL.TIPO_AMBIENTE, item.tipoambiente);
-        Dom.setValue(EL.AMBIENTE, item.ambiente);
-        Dom.setValue(EL.NUM_PROJ, item.numproj);
-        Dom.setValue(EL.VENDEDOR, item.vendedor);
-        Dom.setValue(EL.LIBERADOR, item.liberador);
-        Dom.setValue(EL.DATA_CONTRATO, item.datacontrato);
-        Dom.setValue(EL.DATA_ASSINATURA, item.dataassinatura);
-        Dom.setValue(EL.CHEGOU_FABRICA, item.chegoufabrica);
-        Dom.setValue(EL.DATA_ENTREGA, item.dataentrega);
-        Dom.setValue(EL.LOJA, item.loja);
-        Dom.setValue(EL.TIPO_CLIENTE, item.tipocliente);
-        Dom.setValue(EL.ETAPA, item.etapa);
-        Dom.setValue(EL.TIPO_CONTRATO, item.tipocontrato);
-        Dom.setValue(EL.VALOR_BRUTO, Numbers.currency(item.valorbruto));
-        Dom.setValue(EL.VALOR_NEGOCIADO, Numbers.currency(item.valornegociado));
-        Dom.setValue(EL.CUSTO_MATERIAL, Numbers.currency(item.customaterial));
-        Dom.setValue(
-          EL.CUSTO_ADICIONAL,
-          Numbers.currency(item.customaterialadicional)
-        );
-      });
-    } else {
-      Modal.showInfo("error", "Erro", "Ordem de Compra Invalida").then(() => {
-        Dom.setFocus(EL.OC);
-      });
-    }
-  }
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showError(message) {
+  return Modal.showInfo("error", "Erro", message);
 }
 
-async function validForm(e) {
+function showSuccess(message) {
+  return Modal.showInfo("success", "Sucesso", message);
+}
+
+function confirmDelete() {
+  // mantendo o mesmo padrão do seu código original (Modal.ShowQuestion)
+  return Modal.ShowQuestion(null, "Deseja excluir Projeto ?");
+}
+
+/* =========================================================
+   VALIDATORS
+========================================================= */
+function isFormValid() {
   const form = q("form");
-  if (form.checkValidity()) {
-    e.preventDefault();
-    await setDeleteProjeto();
+  return !!form?.checkValidity?.() && form.checkValidity();
+}
+
+function parseOrderNumber() {
+  const raw = Fields.get(SELECTORS.inputs.oc);
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : NaN;
+}
+
+function isValidOrderNumber(n) {
+  return Number.isInteger(n) && n > 0;
+}
+
+/* =========================================================
+   MAPPERS (API -> UI) and (UI -> API)
+========================================================= */
+function currency(value) {
+  return Numbers.currency(value);
+}
+
+function mapProjectToFormFields(item) {
+  return [
+    [SELECTORS.inputs.contrato, item.contrato],
+    [SELECTORS.inputs.cliente, item.cliente],
+    [SELECTORS.inputs.tipoAmbiente, item.tipoambiente],
+    [SELECTORS.inputs.ambiente, item.ambiente],
+    [SELECTORS.inputs.numProj, item.numproj],
+    [SELECTORS.inputs.vendedor, item.vendedor],
+    [SELECTORS.inputs.liberador, item.liberador],
+    [SELECTORS.inputs.dataContrato, item.datacontrato],
+    [SELECTORS.inputs.dataAssinatura, item.dataassinatura],
+    [SELECTORS.inputs.chegouFabrica, item.chegoufabrica],
+    [SELECTORS.inputs.dataEntrega, item.dataentrega],
+    [SELECTORS.inputs.loja, item.loja],
+    [SELECTORS.inputs.tipoCliente, item.tipocliente],
+    [SELECTORS.inputs.etapa, item.etapa],
+    [SELECTORS.inputs.tipoContrato, item.tipocontrato],
+    [SELECTORS.inputs.valorBruto, currency(item.valorbruto)],
+    [SELECTORS.inputs.valorNegociado, currency(item.valornegociado)],
+    [SELECTORS.inputs.custoMaterial, currency(item.customaterial)],
+    [SELECTORS.inputs.custoAdicional, currency(item.customaterialadicional)],
+  ];
+}
+
+function applyFields(pairs) {
+  pairs.forEach(([selector, value]) => Fields.set(selector, value));
+}
+
+function buildDeletePayload() {
+  return { p_ordemdecompra: Fields.get(SELECTORS.inputs.oc) };
+}
+
+/* =========================================================
+   USE CASES / HANDLERS
+========================================================= */
+async function loadProjectForDeletion() {
+  const orderNumber = parseOrderNumber();
+
+  if (!isValidOrderNumber(orderNumber)) {
+    // silencioso como o original, mas pode mostrar msg se quiser
+    return;
+  }
+
+  try {
+    const res = await ProjectsDeleteAPI.fetchProjectByOrder(orderNumber);
+
+    if (res.status !== 200) {
+      await showError(`${res.data}`);
+      return;
+    }
+
+    const item = res?.data?.[0];
+    if (!item) {
+      await showError("Ordem de Compra Invalida");
+      Fields.focus(SELECTORS.inputs.oc);
+      return;
+    }
+
+    applyFields(mapProjectToFormFields(item));
+  } catch (err) {
+    await showError(`Erro ao buscar projeto: ${err?.message || err}`);
   }
 }
 
-function payloadDelProjects() {
-  return { p_ordemdecompra: Dom.getValue(EL.OC) };
+async function handleSaveClick(e) {
+  if (!isFormValid()) return;
+
+  e.preventDefault();
+  await deleteProjectFlow();
 }
 
-async function setDeleteProjeto() {
-  const result = await Modal.ShowQuestion(null, "Deseja excluir Projeto ?");
+async function deleteProjectFlow() {
+  const result = await confirmDelete();
+  if (!result.isConfirmed) return;
 
-  if (result.isConfirmed) {
-    const data = payloadDelProjects();
-    const response = await DB.delProject(data);
+  try {
+    const payload = buildDeletePayload();
+    const response = await ProjectsDeleteAPI.deleteProject(payload);
 
     if (response.status !== 200) {
-      Modal.show("error", "Erro", `ERRO: ${response.data}`);
-    } else {
-      await Modal.show("success", "Sucesso", "Excluido com Sucesso !!!");
-      document.location.href = "/excluir.html";
+      await showError(`ERRO: ${response.data}`);
+      return;
     }
+
+    await showSuccess("Excluido com Sucesso !!!");
+    document.location.href = "/excluir.html";
+  } catch (err) {
+    await showError(`Erro ao excluir: ${err?.message || err}`);
   }
 }
 
-function init() {
+/* =========================================================
+   PAGE SETUP (INIT)
+========================================================= */
+function loadView() {
   loadPage("adicionar_projetos", "excluir.html");
-  Dom.setFocus(EL.OC);
-  Dom.enableEnterAsTab();
-  Dom.addEventBySelector(EL.OC, "change", getDeleteProjetos);
-  Dom.addEventBySelector(EL.SALVAR, "click", async (e) => {
-    validForm(e);
-  });
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  init();
-});
+function configureUiDefaults() {
+  Fields.focus(SELECTORS.inputs.oc);
+  Dom.enableEnterAsTab();
+}
+
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.inputs.oc, "change", loadProjectForDeletion);
+  Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
+}
+
+function initDeleteProjectPage() {
+  loadView();
+  configureUiDefaults();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", initDeleteProjectPage);
