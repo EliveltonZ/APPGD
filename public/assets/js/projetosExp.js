@@ -2,7 +2,6 @@ import Swal from "./sweetalert2.esm.all.min.js";
 import {
   ajustarTamanhoModal,
   loadPage,
-  setDate,
   getName,
   confirmDateInsertion,
   handleElementsUser,
