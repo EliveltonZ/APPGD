@@ -148,7 +148,6 @@ function mapProjetoToFormFields(p) {
     [SELECTORS.form.chegada, DateTime.forBr(p.p_chegoufabrica)],
     [SELECTORS.form.entrega, DateTime.forBr(p.p_dataentrega)],
     [SELECTORS.form.tipo, p.p_tipo],
-    // backend tem "p_peças" no seu código (com acento). Mantive leitura defensiva:
     [SELECTORS.form.pecas, emptyToNull(p["p_peças"] ?? p.p_pecas)],
     [SELECTORS.form.area, emptyToNull(p.p_area)],
   ];
@@ -186,7 +185,7 @@ function buildLotePayload(ordemdecompra, lote) {
 }
 
 /* =========================================================
-   USE CASES / FLOWS
+   USE CASES 
 ========================================================= */
 async function loadProjetoByOc() {
   const oc = Fields.get(SELECTORS.form.numOc);
@@ -222,7 +221,6 @@ async function startLoteFlow() {
     await showError(`Não foi possivel iniciar o lote ${res.data}`);
     return;
   }
-
   await showSuccess("Lote iniciado com sucesso !!!");
 }
 

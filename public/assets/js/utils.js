@@ -161,12 +161,12 @@ export async function getConfig(params) {
   return data;
 }
 
-export async function setConfig(params) {
-  const response = await fetch("/setDate", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params),
-  });
+function followForIndex() {
+  Modal.showInfo("warning", "Sessão Expirada", "Faça novo login !!!").then(
+    () => {
+      window.location.href = "/";
+    }
+  );
 }
 
 export async function getCookie(key) {
@@ -174,10 +174,18 @@ export async function getCookie(key) {
     credentials: "include",
   });
 
-  if (!response.ok) throw new Error("Não autenticado");
+  if (!response.ok) followForIndex();
 
   const cookie = await response.json();
   return cookie[key];
+}
+
+export async function setConfig(params) {
+  const response = await fetch("/setDate", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
 }
 
 export async function sendMail(data) {
