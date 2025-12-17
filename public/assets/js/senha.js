@@ -3,35 +3,108 @@ import { Dom } from "./UI/interface.js";
 import { Modal } from "./utils/modal.js";
 import { API } from "./service/api.js";
 
-/*===========================
-  HELPER ELEMENTS
-===========================*/
-const EL = {
-  ID: "#txt_id",
-  SENHA_ATUAL: "#txt_senhaatual",
-  NOVA_SENHA: "#txt_novasenha",
-  CONFIRMAR_SENHA: "#txt_confirmsenha",
-  NOME: "#txt_nome",
-  BT_SENHA: "#bt_senha",
-};
-
-const DB = {
-  validatePassword: async function (payload) {
-    const res = await API.fetchBody("/passwordValidation", "POST", payload);
-    return res;
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  user: {
+    id: "#txt_id",
+    nome: "#txt_nome",
+  },
+  senha: {
+    atual: "#txt_senhaatual",
+    nova: "#txt_novasenha",
+    confirmar: "#txt_confirmsenha",
+    btSalvar: "#bt_senha",
   },
 };
 
+/* =========================================================
+   API LAYER
+========================================================= */
+const PasswordAPI = {
+  validatePassword(payload) {
+    return API.fetchBody("/passwordValidation", "POST", payload);
+  },
+
+  updatePassword(payload) {
+    // padronizado: sem fetch() direto
+    return API.fetchBody("/alterarSenha", "PUT", payload);
+  },
+};
+
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(sel) {
+    return Dom.getValue(sel);
+  },
+  set(sel, value) {
+    Dom.setValue(sel, value);
+  },
+  focus(sel) {
+    Dom.setFocus(sel);
+  },
+};
+
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showError(message) {
+  return Modal.showInfo("error", "ERRO", message);
+}
+
+function showWarning(message) {
+  return Modal.showInfo("warning", "ATENÇÃO", message);
+}
+
+function showSuccess(message) {
+  return Modal.showInfo("success", "Sucesso", message);
+}
+
+/* =========================================================
+   PAYLOADS
+========================================================= */
 function buildPasswordValidationPayload() {
   return {
-    p_id: Dom.getValue(EL.ID),
-    p_senha: Dom.getValue(EL.SENHA_ATUAL),
+    p_id: Fields.get(SELECTORS.user.id),
+    p_senha: Fields.get(SELECTORS.senha.atual),
   };
 }
 
-async function validateCurrentPassword() {
+function buildPasswordUpdatePayload() {
+  return {
+    p_id: Fields.get(SELECTORS.user.id),
+    p_senha: Fields.get(SELECTORS.senha.nova),
+  };
+}
+
+/* =========================================================
+   DOMAIN RULES
+========================================================= */
+function hasValidPasswordData(data) {
+  return Array.isArray(data)
+    ? data.length > 0
+    : !!data && Object.keys(data).length > 0;
+}
+
+function isNewPasswordConfirmed() {
+  return (
+    Fields.get(SELECTORS.senha.nova) === Fields.get(SELECTORS.senha.confirmar)
+  );
+}
+
+function hasRequiredUpdateFields(payload) {
+  return !!payload?.p_id && !!payload?.p_senha;
+}
+
+/* =========================================================
+   FLOWS / HANDLERS
+========================================================= */
+async function validateCurrentPasswordFlow() {
   const payload = buildPasswordValidationPayload();
-  const res = await DB.validatePassword(payload);
+  const res = await PasswordAPI.validatePassword(payload);
 
   if (res.status !== 200) {
     throw new Error(`Status ${res.status}`);
@@ -40,78 +113,71 @@ async function validateCurrentPassword() {
   return res.data;
 }
 
-function hasValidPasswordData(data) {
-  return Array.isArray(data)
-    ? data.length > 0
-    : data && Object.keys(data).length > 0;
-}
+async function updateUserPasswordFlow() {
+  const payload = buildPasswordUpdatePayload();
 
-function isNewPasswordConfirmed() {
-  return Dom.getValue(EL.NOVA_SENHA) === Dom.getValue(EL.CONFIRMAR_SENHA);
-}
-
-function buildPasswordUpdatePayload() {
-  return {
-    p_id: Dom.getValue(EL.ID),
-    p_senha: Dom.getValue(EL.NOVA_SENHA),
-  };
-}
-
-async function updateUserPassword() {
-  try {
-    const payload = buildPasswordUpdatePayload();
-
-    if (!payload.p_id || !payload.p_senha) {
-      Modal.showInfo("error", "ERRO", "ID ou senha não podem ser vazios.");
-      return;
-    }
-
-    const resp = await fetch("/alterarSenha", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!resp.ok) {
-      throw new Error(`Erro HTTP: ${resp.status}`);
-    }
-
-    Modal.showInfo("success", "Sucesso", "Nova senha definida com Sucesso!!!");
-  } catch (error) {
-    console.error(error);
-    Modal.showInfo(
-      "error",
-      "ERRO",
-      "Houve um erro ao executar alteração de senha"
-    );
+  if (!hasRequiredUpdateFields(payload)) {
+    await showError("ID ou senha não podem ser vazios.");
+    return;
   }
+
+  const res = await PasswordAPI.updatePassword(payload);
+
+  if (res.status !== 200) {
+    await showError(`Houve um erro ao alterar a senha. (${res.status})`);
+    return;
+  }
+
+  await showSuccess("Nova senha definida com sucesso!");
 }
 
 async function handlePasswordUpdate() {
-  const data = await validateCurrentPassword();
-  const isValid = hasValidPasswordData(data);
+  try {
+    const data = await validateCurrentPasswordFlow();
 
-  if (!isValid) {
-    Modal.showInfo("error", "Erro", "Senha digitada é inválida!");
-    return;
+    if (!hasValidPasswordData(data)) {
+      await showError("Senha digitada é inválida!");
+      return;
+    }
+
+    if (!isNewPasswordConfirmed()) {
+      await showWarning("Senhas não conferem!");
+      return;
+    }
+
+    await updateUserPasswordFlow();
+  } catch (err) {
+    console.error(err);
+    await showError("Houve um erro ao executar alteração de senha.");
   }
-
-  if (!isNewPasswordConfirmed()) {
-    Modal.showInfo("warning", "Atenção", "Senhas não conferem!!!");
-    return;
-  }
-
-  await updateUserPassword();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  Dom.setFocus(EL.SENHA_ATUAL);
+/* =========================================================
+   INIT
+========================================================= */
+async function hydrateUserFromCookies() {
+  // Preenche campos com cookies
+  Fields.set(SELECTORS.user.id, await getCookie("id"));
+  Fields.set(SELECTORS.user.nome, await getCookie("login"));
+}
+
+function configureUiDefaults() {
+  Fields.focus(SELECTORS.senha.atual);
   Dom.enableEnterAsTab();
-});
+}
 
-// Preenche campos com cookies
-Dom.setValue(EL.ID, await getCookie("id"));
-Dom.setValue(EL.NOME, await getCookie("login"));
+function bindEvents() {
+  Dom.addEventBySelector(
+    SELECTORS.senha.btSalvar,
+    "click",
+    handlePasswordUpdate
+  );
+}
 
-// Evento do botão
-Dom.addEventBySelector(EL.BT_SENHA, "click", handlePasswordUpdate);
+async function init() {
+  configureUiDefaults();
+  await hydrateUserFromCookies();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", init);
