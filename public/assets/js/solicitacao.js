@@ -1,14 +1,3 @@
-/**
- * SUGESTÃO DE ESTRUTURA DE ARQUIVOS
- * - services/orderService.js
- * - ui/renderers.js
- * - validators/validators.js
- * - controllers/appController.js
- * - main.js
- *
- * Abaixo está tudo junto para fácil adesão.
- */
-
 import {
   Dom,
   messageInformation,
@@ -171,13 +160,11 @@ async function handleOrderSubmit(evt) {
   evt.preventDefault();
   const form = document.querySelector("form");
 
-  // 1) validação nativa
   if (!validators.isNativeFormValid(form)) {
     form.reportValidity();
     return;
   }
 
-  // 2) validação de tabela
   if (!validators.hasAtLeastOneRow("#table-montador tbody")) {
     messageInformation(
       "warning",

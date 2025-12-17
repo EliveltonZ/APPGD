@@ -1,100 +1,141 @@
-import {
-  Dom,
-  enableEnterAsTab,
-  messageInformation,
-  messageQuestion,
-  criarSpinnerGlobal,
-  getCookie,
-} from "./utils.js";
+import { Dom, q } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { API } from "./service/api.js";
 
-/*=============================
-  HELPERS Elements
-=============================*/
-
-const SEL = {
-  ID: "#txt_id",
-  PASSWORD: "#txt_senha",
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  inputs: {
+    id: "#txt_id",
+    nome: "#txt_nome",
+    senha: "#txt_senha",
+  },
+  ui: {
+    form: "form",
+    button: "button",
+  },
 };
 
-/*=============================
-  HELPERS DOM
-=============================*/
+/* =========================================================
+   API LAYER
+========================================================= */
+const LoginAPI = {
+  fetchMontadorNameById(id) {
+    const url = `/getMontador?p_codigo=${id}`;
+    return API.fetchQuery(url);
+  },
 
-const q = function (element) {
-  return document.querySelector(element);
+  validateLogin(id, senha) {
+    const url = `/validateLogin?p_codigo=${id}&p_senha=${senha}`;
+    return API.fetchQuery(url);
+  },
 };
 
-const qa = function (element) {
-  return document.querySelectorAll(element);
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(sel) {
+    return Dom.getValue(sel);
+  },
+  set(sel, value) {
+    Dom.setValue(sel, value);
+  },
+  focus(sel) {
+    q(sel)?.focus();
+  },
+  clear(sel) {
+    const el = q(sel);
+    if (el) el.value = "";
+  },
 };
 
-const ls = function (key, value) {
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showInvalidCredentials() {
+  return Modal.showInfo("error", "ATENÇÃO", "Usuário ou senha inválidos");
+}
+
+/* =========================================================
+   STORAGE
+========================================================= */
+function lsSet(key, value) {
   localStorage.setItem(key, value);
-};
-
-/*=============================
-  HELPERS API
-=============================*/
-
-const API = {
-  fetchQuery: async function (url) {
-    const response = await fetch(url);
-    return await response.json();
-  },
-
-  fetchBody: async function (url, method, data) {
-    const response = await fetch(url, {
-      method: method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-  },
-};
-
-/*=============================
-  HELPER CONTROLERS
-=============================*/
-
-async function findID() {
-  const response = await API.fetchQuery(
-    `/getMontador?p_codigo=${Dom.getValue(SEL.ID.slice(1))}`
-  );
-  Dom.setValue("txt_nome", response[0].p_nome);
 }
 
-async function validateCredencials(event) {
-  const form = q("form");
-  if (form.checkValidity()) {
-    event.preventDefault();
-    const id = Dom.getValue(SEL.ID.slice(1));
-    const password = Dom.getValue(SEL.PASSWORD.slice(1));
-    const response = await API.fetchQuery(
-      `/validateLogin?p_codigo=${id}&p_senha=${password}`
-    );
-    if (response.length > 0) {
-      console.log(response[0]);
-      ls("id_montador", response[0].codigo);
-      ls("montador", response[0].nome);
-      window.location.href = "/pecas.html";
-    } else {
-      await messageInformation(
-        "error",
-        "ATENÇÃO",
-        "Usuario ou senha invalidos"
-      );
-      q(SEL.PASSWORD).value = "";
-      q(SEL.PASSWORD).focus();
-    }
+function setUserLocalStorage(data) {
+  // preservando seu contrato esperado: data[0].codigo / data[0].nome
+  lsSet("id_montador", data?.[0]?.codigo ?? "");
+  lsSet("montador", data?.[0]?.nome ?? "");
+}
+
+/* =========================================================
+   DOMAIN RULES
+========================================================= */
+function isFormValid() {
+  const form = q(SELECTORS.ui.form);
+  return !!form?.checkValidity?.() && form.checkValidity();
+}
+
+/* =========================================================
+   FLOWS / HANDLERS
+========================================================= */
+async function loadMontadorNameByIdFlow() {
+  const id = Fields.get(SELECTORS.inputs.id);
+  if (!id) return;
+
+  const res = await LoginAPI.fetchMontadorNameById(id);
+  const nome = res?.data?.[0]?.p_nome ?? "";
+
+  Fields.set(SELECTORS.inputs.nome, nome);
+}
+
+function goToPecas() {
+  window.location.href = "/pecas.html";
+}
+
+function clearAndFocusPassword() {
+  Fields.clear(SELECTORS.inputs.senha);
+  Fields.focus(SELECTORS.inputs.senha);
+}
+
+async function handleLoginClick(event) {
+  if (!isFormValid()) return;
+  event.preventDefault();
+
+  const id = Fields.get(SELECTORS.inputs.id);
+  const senha = Fields.get(SELECTORS.inputs.senha);
+
+  const res = await LoginAPI.validateLogin(id, senha);
+  const data = res?.data ?? [];
+  if (data.length > 0) {
+    setUserLocalStorage(data);
+    goToPecas();
+    return;
   }
+
+  await showInvalidCredentials();
+  clearAndFocusPassword();
 }
 
-/*============================
-  HELPER EVENT's
-============================*/
+/* =========================================================
+   INIT
+========================================================= */
+function configureUiDefaults() {
+  Fields.focus(SELECTORS.inputs.id);
+  Dom.enableEnterAsTab();
+}
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  q(SEL.ID).focus();
-});
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.inputs.id, "blur", loadMontadorNameByIdFlow);
+  Dom.addEventBySelector(SELECTORS.ui.button, "click", handleLoginClick);
+}
 
-Dom.addEventBySelector(SEL.ID, "blur", findID);
-Dom.addEventBySelector("button", "click", validateCredencials);
+function init() {
+  configureUiDefaults();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded", init);
