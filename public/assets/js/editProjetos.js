@@ -46,12 +46,12 @@ const SELECTORS = {
    API LAYER
 ========================================================= */
 const ProjectsEditAPI = {
-  fetchProjectForEdit(orderNumber) {
+  fetchProjectForEdit: async function (orderNumber) {
     const url = `/getEditProjetos?p_ordemdecompra=${orderNumber}`;
-    return API.fetchQuery(url);
+    return await API.fetchQuery(url);
   },
-  updateProject(payload) {
-    return API.fetchBody("/setEditProjetos", "PUT", payload);
+  updateProject: async function (payload) {
+    return await API.fetchBody("/setEditProjetos", "PUT", payload);
   },
 };
 
@@ -87,7 +87,7 @@ function showSuccess(message) {
 }
 
 function confirmSaveEdits() {
-  return Modal.ShowQuestion(null, "Deseja salvar edições ?");
+  return Modal.showConfirmation(null, "Deseja salvar edições ?");
 }
 
 /* =========================================================
@@ -110,20 +110,16 @@ function hasOrderNumber(value) {
    FORMATTERS / INPUT MASKS
 ========================================================= */
 function formatCurrency(value) {
-  return Numbers.currency(value);
+  return Numbers.currency(value * 100);
 }
 
 function formatDecimalForApi(value) {
-  return Numbers.formatValueDecimal(value);
+  return Numbers.decimal(value);
 }
 
 function handleCurrencyInput(e) {
   const el = e.target;
-  // mantém a mesma ideia do seu código original (changeFormatCurrency),
-  // só que sem depender de uma função global externa.
-  el.value = Numbers.FormatCurrency
-    ? Numbers.FormatCurrency(el.value)
-    : el.value;
+  el.value = Numbers.currency ? Numbers.currency(el.value) : el.value;
 }
 
 /* =========================================================
@@ -212,7 +208,6 @@ async function loadProjectForEdit() {
       Fields.clear(); // mantém o comportamento antigo de limpar tudo
       return;
     }
-
     applyFields(mapProjectToFormFields(item));
   } catch (err) {
     await showError(`Erro ao carregar projeto: ${err?.message || err}`);

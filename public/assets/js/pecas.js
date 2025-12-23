@@ -1,78 +1,84 @@
-import {
-  Dom,
-  messageInformation,
-  messageQuestion,
-  getCookie,
-} from "./utils.js";
+import { getCookie } from "./utils.js";
+import { Dom, q, qa, ce } from "./UI/interface.js";
+import { API } from "./service/api.js";
+import { Modal } from "./utils/modal.js";
 
 /*==========================
   HELPER render UI
 =============================*/
-const q = (element) => {
-  return document.querySelector(element);
-};
-
-const qa = (element) => {
-  return document.querySelectorAll(element);
-};
-
-const ce = (element) => {
-  return document.createElement(element);
-};
-
-const ls = function (key) {
-  return localStorage.getItem(key);
+const Field = {
+  getValue(selector) {
+    return Dom.getValue(selector);
+  },
+  setValue(selector, value) {
+    return Dom.setValue(selector, value);
+  },
+  ls(key) {
+    return localStorage.getItem(key);
+  },
+  ce(value, style) {
+    return Dom.createElement("td", value, style);
+  },
 };
 
 /* ==========================
   HELPERS id's
 =============================*/
 const SEL = {
-  // table
-  TSOLICITACOES: "#tab-2 table tbody",
-  // form solicitacao
-  SOLICITANTE: "#txt_solicitante",
-  DATA: "#txt_data",
-  CONTRATO: "#txt_contrato",
-  CLIENTE: "#txt_cliente",
-  AMBIENTE: "#txt_ambiente",
-  PECAS_TBODY: "table tbody",
-  BT_SALVAR: "bt_concluir",
+  ui: {
+    TSOLICITACOES: "#tab-2 table tbody",
+    TSOLICITACAO: "#tab-1 table tbody",
+    ID: "#txt_id",
+    BT_INSERIR: "#bt_inserir",
+    BT_CONCLUIR: "#bt_concluir",
+    LINK_TAB_2: "#link_tab2",
+  },
 
-  // form pecas
-  QUANTIDADE: "#txt_quantidade",
-  PECA: "#txt_peca",
-  DIMENSOES: "#txt_dimensoes",
-  COR: "#txt_cor",
-  LADO: "#txt_lado",
-  TIPO: "#txt_tipo",
-  FALHA: "#txt_falha",
-  OBSERVACOES: "#txt_obs",
+  form: {
+    SOLICITANTE: "#txt_solicitante",
+    DATA: "#txt_data",
+    CONTRATO: "#txt_contrato",
+    CLIENTE: "#txt_cliente",
+    AMBIENTE: "#txt_ambiente",
+    PECAS_TBODY: "table tbody",
+    BT_SALVAR: "bt_concluir",
+  },
+
+  form1: {
+    QUANTIDADE: "#txt_quantidade",
+    PECA: "#txt_peca",
+    DIMENSOES: "#txt_dimensoes",
+    COR: "#txt_cor",
+    LADO: "#txt_lado",
+    TIPO: "#txt_tipo",
+    FALHA: "#txt_falha",
+    OBSERVACOES: "#txt_obs",
+  },
 };
 
 /*=========================
   API fetch
 =========================*/
-const api = {
-  fetchBody: async function (url, method, data) {
-    const response = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erro na requisição: ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
+const ApiFetch = {
+  getOcorrencia: async function () {
+    const res = API.fetchQuery("/getOcorrencia");
+    return res;
   },
 
-  fetchQuery: async function (url) {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
+  getFalhas: async function () {
+    const res = API.fetchQuery("/getFalhas");
+    return res;
+  },
+
+  getSolicitacoes: async function (id) {
+    const url = `/getSolicitacoes?p_id_montador=${id}`;
+    const res = API.fetchQuery(url);
+    return res;
+  },
+
+  setPecas: async function (data) {
+    const res = await API.fetchBody("/setPecas", "POST", data);
+    return res;
   },
 };
 
@@ -80,35 +86,38 @@ const api = {
   render UI
 /*================================*/
 
-function textAlignCenter() {
-  return "text-align: center";
+function buildRow(tr) {
+  const textCenter = "text-align: center";
+  tr.append(Field.ce(Field.getValue(SEL.form1.QUANTIDADE), textCenter));
+  tr.append(Field.ce(Field.getValue(SEL.form1.PECA)));
+  tr.append(Field.ce(Field.getValue(SEL.form1.DIMENSOES)));
+  tr.append(Field.ce(Field.getValue(SEL.form1.COR)));
+  tr.append(Field.ce(Field.getValue(SEL.form1.LADO)));
+  tr.append(Field.ce(Field.getValue(SEL.form1.TIPO), textCenter));
+  tr.append(Field.ce(Field.getValue(SEL.form1.FALHA), textCenter));
+  tr.append(Field.ce(Field.getValue(SEL.form1.OBSERVACOES), "display: none"));
+  tr.innerHTML += insertButtonCellTable();
+}
+
+function rowTable(item) {
+  const tr = ce("tr");
+  tr.append(Field.ce(item.p_codigo));
+  tr.append(Field.ce(item.p_qtd));
+  tr.append(Field.ce(item.p_cor));
+  tr.append(Field.ce(item.p_peca));
+  tr.append(Field.ce(item.p_dimensoes));
+  tr.append(Field.ce(item.p_cliente));
+  tr.append(Field.ce(item.p_ambiente));
+  return tr;
 }
 
 function insertTableRow(event) {
   const form = q(".modal-body form");
   if (form.checkValidity()) {
     event.preventDefault();
-    const tbody = document.querySelector("table tbody");
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-    <td style="${textAlignCenter()}">${Dom.getValue(
-      `${SEL.QUANTIDADE.slice(1)}`
-    )}</td>
-    <td>${Dom.getValue(`${SEL.PECA.slice(1)}`)}</td>
-    <td>${Dom.getValue(`${SEL.DIMENSOES.slice(1)}`)}</td>
-    <td>${Dom.getValue(`${SEL.COR.slice(1)}`)}</td>
-    <td>${Dom.getValue(`${SEL.LADO.slice(1)}`)}</td>
-    <td style="${textAlignCenter()}">${Dom.getValue(
-      `${SEL.TIPO.slice(1)}`
-    )}</td>
-    <td style="${textAlignCenter()}">${Dom.getValue(
-      `${SEL.FALHA.slice(1)}`
-    )}</td>
-    ${insertButtonCellTable()}
-    <td style="display: none">${Dom.getValue(
-      `${SEL.OBSERVACOES.slice(1)}`
-    )}</td>
-  `;
+    const tbody = q("table tbody");
+    const tr = ce("tr");
+    buildRow(tr);
     tbody.appendChild(tr);
     form.reset();
   }
@@ -129,189 +138,188 @@ function insertButtonCellTable() {
 /*=============================
   CONTROLERS interface
 ==============================*/
+function populateTypeList(element, select) {
+  const option = ce("option");
+  option.value = element.p_cod;
+  option.innerHTML = element.p_descricao;
+  select.appendChild(option);
+}
+
+function populateFaillsList(element, select) {
+  const option = ce("option");
+  option.value = element.p_codigo;
+  option.innerHTML = `${element.p_codigo} - ${element.p_descricao}`;
+  select.appendChild(option);
+}
+
 async function populateType() {
-  const response = await api.fetchQuery("/getOcorrencia");
-  const select = q(SEL.TIPO);
+  const res = await ApiFetch.getOcorrencia();
+  const select = q(SEL.form1.TIPO);
   select.innerHTML = '<option value="">-</option>';
-  response.forEach((element) => {
-    const option = ce("option");
-    option.value = element.p_cod;
-    option.innerHTML = element.p_descricao;
-    select.appendChild(option);
-  });
+  res.data.forEach((element) => populateTypeList(element, select));
 }
 
 async function populateFaills() {
-  const response = await api.fetchQuery("/getFalhas");
-  const select = q(SEL.FALHA);
+  const response = await ApiFetch.getFalhas();
+  const select = q(SEL.form1.FALHA);
   select.innerHTML = '<option value="">-</option>';
-  response.forEach((element) => {
-    const option = ce("option");
-    option.value = element.p_codigo;
-    option.innerHTML = `${element.p_codigo} - ${element.p_descricao}`;
-    select.appendChild(option);
-  });
+  response.data.forEach((element) => populateFaillsList(element, select));
+}
+
+async function populateTableSolicitacion() {
+  const id = Field.getValue(SEL.ui.ID);
+  const res = await ApiFetch.getSolicitacoes(id);
+  const tbody = q(SEL.ui.TSOLICITACOES);
+  tbody.innerHTML = "";
+  res.data.forEach((item) => tbody.appendChild(rowTable(item)));
 }
 
 async function delRowTable(event) {
-  const button = event.target.closest("button");
+  const button = getButtonDelRow(event);
   if (button) {
-    const row = event.target.closest("tr");
-    const result = await messageQuestion("REMOVER", "Deseja remover peça ?");
+    const row = getRow(event);
+    const result = await confirmDelRow();
     if (result.isConfirmed) {
       row.remove();
     }
   }
 }
 
-async function populateTableSolicitacion() {
-  const id = Dom.getValue("txt_id");
-  const response = await api.fetchQuery(`/getSolicitacoes?p_id_montador=${id}`);
-  const tbody = q(SEL.TSOLICITACOES);
-  tbody.innerHTML = "";
-  response.forEach((item) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${item.p_codigo}</td>
-      <td>${item.p_qtd}</td>
-      <td>${item.p_cor}</td>
-      <td>${item.p_peca}</td>
-      <td>${item.p_dimensoes}</td>
-      <td>${item.p_cliente}</td>
-      <td>${item.p_ambiente}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+function getButtonDelRow(event) {
+  return event.target.closest("button");
+}
+
+function getRow(event) {
+  return event.target.closest("tr");
+}
+
+function getTableRows() {
+  return qa("table tbody tr");
+}
+
+function formSolicitation() {
+  return q("form");
+}
+
+/*=============================
+  HELPERS Modals
+==============================*/
+async function confirmDelRow() {
+  return await Modal.showConfirmation("REMOVER", "Deseja remover peça ?");
+}
+
+async function confirmSolicitation(params) {
+  return await Modal.showConfirmation("CONCLUIR", "Concluir Solicitação ?");
+}
+
+function hasRows(rows) {
+  if (!rows || rows.length === 0) {
+    Modal.showInfo("warning", "ATENÇÃO", "Insira ao menos uma peça !!!");
+    return false;
+  }
+  return true;
+}
+
+function handleFinalFeedback(data) {
+  return Modal.showInfo("warning", "PARCIAL", data);
+}
+
+function isFormValid() {
+  const form = formSolicitation();
+  return form.checkValidity();
+}
+
+async function userConfirmed() {
+  const result = await confirmSolicitation();
+  return !!result?.isConfirmed;
 }
 
 async function confirmSolicitacion(event) {
-  const form = q("form");
-  const table = q("table tbody");
-
-  if (!form.checkValidity()) return;
+  if (!isFormValid()) return;
   event.preventDefault();
 
-  const result = await messageQuestion(
-    "CONCLUIR",
-    "Concluir Solicitação ?",
-    "Concluir",
-    "Cancelar"
-  );
+  if (!(await userConfirmed())) return;
 
-  if (!result.isConfirmed) return;
+  const rows = getTableRows();
+  if (!hasRows(rows)) return;
 
-  const rows = qa("table tbody tr");
-  if (rows.length == 0) {
-    messageInformation("warning", "ATENÇÃO", "Insira ao menos uma peça !!!");
-    return;
-  }
+  const res = sendRows(rows);
+}
 
-  let successes = 0;
-  const errors = [];
+function buildRowData(row) {
+  return {
+    p_etiqueta: 0,
+    p_qtd: row.cells[0]?.innerHTML ?? "",
+    p_peca: row.cells[1]?.innerHTML ?? "",
+    p_dimensoes: row.cells[2]?.innerHTML ?? "",
+    p_cor: row.cells[3]?.innerHTML ?? "",
+    p_lado: row.cells[4]?.innerHTML ?? "",
+    p_ocorrencia: row.cells[5]?.innerHTML ?? "",
+    p_falha: row.cells[6]?.innerHTML ?? "",
+    p_observacoes: row.cells[7]?.innerHTML ?? "",
+    p_cliente: Dom.getValue(SEL.form.CLIENTE),
+    p_ambiente: Dom.getValue(SEL.form.AMBIENTE),
+    p_id_montador: Dom.getValue(SEL.ui.ID),
+  };
+}
 
+async function sendRows(rows) {
   for (const row of rows) {
-    const data = {
-      p_etiqueta: 0,
-      p_qtd: row.cells[0].innerHTML,
-      p_peca: row.cells[1].innerHTML,
-      p_dimensoes: row.cells[2].innerHTML,
-      p_cor: row.cells[3].innerHTML,
-      p_lado: row.cells[4].innerHTML,
-      p_ocorrencia: row.cells[5].innerHTML,
-      p_falha: row.cells[6].innerHTML,
-      p_observacoes: row.cells[8].innerHTML,
-      p_cliente: Dom.getValue("txt_cliente"),
-      p_ambiente: Dom.getValue("txt_ambiente"),
-      p_id_montador: Dom.getValue("txt_id"),
-    };
-
+    const data = buildRowData(row);
     try {
-      // Se api.fetchBody retorna um Response:
-      const resp = await api.fetchBody("/setPecas", "POST", data);
-
-      // Caso sua função já retorne JSON, troque as 3 linhas abaixo por: const json = resp;
-      const isResponse = typeof resp?.ok === "boolean";
-      const json = isResponse ? await resp.json() : resp;
-
-      // Padronize checagem de erro
-      if ((isResponse && !resp.ok) || json?.error || json?.code) {
-        const msg =
-          json?.message || json?.error || `HTTP ${resp?.status ?? "?"}`;
-        errors.push({ peca: data.p_peca, message: msg });
-      } else {
-        successes++;
-      }
+      const resp = await ApiFetch.setPecas(data);
+      Modal.showInfo(
+        "success",
+        "Sucesso",
+        "Solicitação enviada com sucesso"
+      ).then(() => {
+        window.location.href = "/pecas.html";
+      });
     } catch (err) {
-      errors.push({ peca: data.p_peca, message: err?.message || String(err) });
+      handleFinalFeedback(err);
     }
   }
+}
 
-  // Feedback final
-  if (errors.length === 0) {
-    messageInformation(
-      "success",
-      "SUCESSO",
-      "Solicitação aberta com sucesso!"
-    ).then((item) => {
-      window.location.href = "/pecas.html";
-    });
-    table.innerHTML = "";
-  } else if (successes > 0) {
-    messageInformation(
-      "warning",
-      "PARCIAL",
-      `Algumas linhas foram enviadas, mas ${errors.length} falharam:\n` +
-        errors.map((e) => `• ${e.peca}: ${e.message}`).join("\n")
-    );
+/*=============================
+  HELPERS Clock
+==============================*/
+function isTypeValid(el) {
+  if (el.tagName === "INPUT" && el.type === "datetime-local") return true;
+  return false;
+}
+
+function formatDateTime(now) {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+    now.getDate()
+  )}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+
+function atualizar(el) {
+  const now = new Date();
+  if (isTypeValid(el)) {
+    const valor = formatDateTime(now);
+    el.value = valor;
   } else {
-    messageInformation(
-      "error",
-      "ERRO",
-      `Nenhuma linha foi enviada. Detalhes:\n` +
-        errors.map((e) => `• ${e.peca}: ${e.message}`).join("\n")
-    );
+    el.textContent = now.toLocaleString("pt-BR");
   }
 }
 
-function iniciarRelogio(el) {
-  const elemento = q(el);
-  // Função que formata o horário atual
-  function atualizar() {
-    const agora = new Date();
-
-    // Se for um input datetime-local, usamos o formato adequado
-    if (elemento.tagName === "INPUT" && elemento.type === "datetime-local") {
-      const pad = (n) => String(n).padStart(2, "0");
-      const valor = `${agora.getFullYear()}-${pad(agora.getMonth() + 1)}-${pad(
-        agora.getDate()
-      )}T${pad(agora.getHours())}:${pad(agora.getMinutes())}:${pad(
-        agora.getSeconds()
-      )}`;
-      elemento.value = valor;
-    }
-
-    // Caso contrário, exibimos texto formatado
-    else {
-      elemento.textContent = agora.toLocaleString("pt-BR");
-    }
-  }
-
-  // Atualiza imediatamente e depois a cada segundo
-  atualizar();
-  const intervalo = setInterval(atualizar, 1000);
-
-  // Retorna uma função para parar o relógio, se necessário
-  return () => clearInterval(intervalo);
+function initClock(element) {
+  const el = q(element);
+  atualizar(el);
+  const intervalo = setInterval(() => atualizar(el), 1000);
 }
 
-Dom.addEventBySelector("#bt_inserir", "click", insertTableRow);
-Dom.addEventBySelector("table tbody", "click", delRowTable);
-Dom.addEventBySelector("#bt_concluir", "click", confirmSolicitacion);
-Dom.addEventBySelector("#asd", "click", populateTableSolicitacion);
 document.addEventListener("DOMContentLoaded", (event) => {
   populateType();
   populateFaills();
-  Dom.setValue("txt_id", ls("id_montador"));
-  Dom.setValue("txt_solicitante", ls("montador"));
-  iniciarRelogio("#txt_data");
+  Dom.setValue(SEL.ui.ID, Field.ls("id_montador"));
+  Dom.setValue(SEL.form.SOLICITANTE, Field.ls("montador"));
+  Dom.addEventBySelector(SEL.ui.BT_INSERIR, "click", insertTableRow);
+  Dom.addEventBySelector(SEL.ui.TSOLICITACAO, "click", delRowTable);
+  Dom.addEventBySelector(SEL.ui.BT_CONCLUIR, "click", confirmSolicitacion);
+  Dom.addEventBySelector(SEL.ui.LINK_TAB_2, "click", populateTableSolicitacion);
+  initClock(SEL.form.DATA);
 });

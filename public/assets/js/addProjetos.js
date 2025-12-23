@@ -246,7 +246,7 @@ async function handleSaveClick(e) {
 
 function handleCurrencyInput(e) {
   const element = e.target;
-  element.value = Numbers.FormatCurrency(element.value);
+  element.value = Numbers.currency(element.value);
 }
 
 /* =========================================================
