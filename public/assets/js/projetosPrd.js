@@ -41,7 +41,7 @@ const SELECTORS = {
   },
 
   modalAcessorios: {
-    tbody: () => qa("table tbody")[1],
+    tbody: () => q("form table tbody"),
   },
 
   etapas: {
@@ -543,7 +543,7 @@ async function sendEmailIfPrevisaoChanged() {
   const contrato = Fields.get(SELECTORS.projeto.contrato);
   const cliente = Fields.get(SELECTORS.projeto.cliente);
   const ambiente = Fields.get(SELECTORS.projeto.ambiente);
-  const previsao = Numbers.formatCoin(Fields.get(SELECTORS.projeto.previsao));
+  const previsao = Numbers.decimal(Fields.get(SELECTORS.projeto.previsao));
 
   if (prevOld === previsao) return;
 
@@ -607,7 +607,7 @@ async function saveProducaoFlow() {
 /* =========================================================
    USERS MODAL
 ========================================================= */
-function openUsuariosModalFromHtml() {
+function openUserModalFromHtml() {
   const html = q(SELECTORS.ui.modalUsuarios)?.innerHTML ?? "";
   Modal.showInfo(null, null, html);
 }
@@ -675,7 +675,7 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.ui.btFuncionarios,
     "click",
-    openUsuariosModalFromHtml
+    openUserModalFromHtml
   );
 
   window.addEventListener("resize", ajustarTamanhoModal);

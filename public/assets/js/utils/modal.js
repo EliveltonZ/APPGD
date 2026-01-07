@@ -12,7 +12,7 @@ export class Modal {
   }
 
   static async showConfirmation(
-    title,
+    title = null,
     message,
     confirmButtonText = "Confirmar",
     cancelButtonText = "Cancelar"

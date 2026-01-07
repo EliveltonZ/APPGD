@@ -1,146 +1,183 @@
-import {
-  Dom,
-  modalBarCode,
-  detectarDispositivo,
-  messageQuestion,
-  messageInformation,
-  convertDataBr,
-  getUsuario,
-  setDateTime,
-  dateTimeNow,
-} from "./utils.js";
+import { modalBarCode, detectarDispositivo, getName } from "./utils.js";
 
-function checkMachine() {
-  const dispositivo = detectarDispositivo();
+import { Dom, q } from "./UI/interface.js";
+import { API } from "./service/api.js";
+import { Modal } from "./utils/modal.js";
+import { DateTime } from "./utils/time.js";
 
-  if (dispositivo == "Android") {
-    const botao = document.getElementById("bt_scan");
-    botao.classList.remove("d-none");
-    botao.classList.add("d-flex");
-  }
+/* =========================================================
+   SELECTORS / ELEMENTS
+========================================================= */
+const SELECTORS = {
+  inputs: {
+    scan: "#txt_scan",
+    pedido: "#txt_pedido",
 
-  if (dispositivo == "Windows") {
-    const input = document.getElementById("txt_scan");
-    input.classList.remove("d-none");
-    input.classList.add("d-flex");
-  }
+    numoc: "#txt_numoc",
+    cliente: "#txt_cliente",
+    contrato: "#txt_contrato",
+    codcc: "#txt_codcc",
+    ambiente: "#txt_ambiente",
+    numproj: "#txt_numproj",
+    lote: "#txt_lote",
+    chegoufabrica: "#txt_chegoufabrica",
+    dataentrega: "#txt_dataentrega",
+    previsao: "#txt_previsao",
+    observacoes: "#txt_observacoes",
+
+    // campos por setor
+    corteInicio: "#txt_corteinicio",
+    corteFim: "#txt_cortefim",
+    corteId: "#txt_corteid",
+    corteResp: "#txt_corteresp",
+
+    customInicio: "#txt_customizacaoinicio",
+    customFim: "#txt_customizacaofim",
+    customId: "#txt_customizacaoid",
+    customResp: "#txt_customizacaoresp",
+
+    coladeiraInicio: "#txt_coladeirainicio",
+    coladeiraFim: "#txt_coladeirafim",
+    coladeiraId: "#txt_coladeiraid",
+    coladeiraResp: "#txt_coladeiraresp",
+
+    usinagemInicio: "#txt_usinageminicio",
+    usinagemFim: "#txt_usinagemfim",
+    usinagemId: "#txt_usinagemid",
+    usinagemResp: "#txt_usinagemresp",
+
+    montagemInicio: "#txt_montageminicio",
+    montagemFim: "#txt_montagemfim",
+    montagemId: "#txt_montagemid",
+    montagemResp: "#txt_montagemresp",
+
+    paineisInicio: "#txt_paineisinicio",
+    paineisFim: "#txt_paineisfim",
+    paineisId: "#txt_paineisid",
+    paineisResp: "#txt_paineisresp",
+
+    acabamentoInicio: "#txt_acabamentoinicio",
+    acabamentoFim: "#txt_acabamentofim",
+    acabamentoId: "#txt_acabamentoid",
+    acabamentoResp: "#txt_acabamentoresp",
+
+    embalagemInicio: "#txt_embalageminicio",
+    embalagemFim: "#txt_embalagemfim",
+    embalagemId: "#txt_embalagemid",
+    embalagemResp: "#txt_embalagemresp",
+  },
+  checks: {
+    cortePausa: "#chk_corte",
+    customPausa: "#chk_customizacao",
+    coladeiraPausa: "#chk_coladeira",
+    usinagemPausa: "#chk_usinagem",
+    montagemPausa: "#chk_montagem",
+    paineisPausa: "#chk_paineis",
+    acabamentoPausa: "#chk_acabamento",
+    embalagemPausa: "#chk_embalagem",
+
+    // checks auxiliares (reset no carregamento)
+    corteInicio: "#chk_corteinicio",
+    corteFim: "#chk_cortefim",
+    customInicio: "#chk_customizacaoinicio",
+    customFim: "#chk_customizacaofim",
+    coladeiraInicio: "#chk_coladeirainicio",
+    coladeiraFim: "#chk_coladeirafim",
+    usinagemInicio: "#chk_usinageminicio",
+    usinagemFim: "#chk_usinagemfim",
+    montagemInicio: "#chk_montageminicio",
+    montagemFim: "#chk_montagemfim",
+    paineisInicio: "#chk_paineisinicio",
+    paineisFim: "#chk_paineisfim",
+    acabamentoInicio: "#chk_acabamentoinicio",
+    acabamentoFim: "#chk_acabamentofim",
+    embalagemInicio: "#chk_embalageminicio",
+    embalagemFim: "#chk_embalagemfim",
+  },
+  buttons: {
+    salvar: "#bt_salvar",
+    scan: "#bt_scan",
+  },
+};
+
+/* =========================================================
+   API LAYER
+========================================================= */
+const ProducaoAPI = {
+  getProductionBarcode(pedido6) {
+    const url = `/getProducaoBarcode?p_pedido=${encodeURIComponent(pedido6)}`;
+    return API.fetchQuery(url);
+  },
+  setStage(payload) {
+    return API.fetchBody("/setEtapa", "PUT", payload);
+  },
+  setDataProduction(payload) {
+    return API.fetchBody("/setDataProducao", "PUT", payload);
+  },
+  getBarcode(pedido) {
+    const url = `/getCodigoBarras?p_pedido=${encodeURIComponent(pedido)}`;
+    return API.fetchQuery(url);
+  },
+};
+
+/* =========================================================
+   FIELD ACCESS (READ/WRITE)
+========================================================= */
+const Fields = {
+  get(selector) {
+    return Dom.getValue(selector);
+  },
+  set(selector, value) {
+    Dom.setValue(selector, value ?? "");
+  },
+  getChecked(selector) {
+    return Dom.getChecked(selector);
+  },
+  setChecked(selector, value) {
+    Dom.setChecked(selector, Boolean(value));
+  },
+  focus(selector) {
+    q(selector)?.focus?.();
+  },
+};
+
+/* =========================================================
+   UI MESSAGES
+========================================================= */
+function showError(message) {
+  return Modal.showInfo("error", "ERRO", message);
 }
 
-async function readBarcode(barcode) {
-  const pedido = Number(barcode.slice(0, 6));
-  const codigo = Number(barcode.slice(6, 9));
-
-  const data = {
-    p_pedido: pedido,
-    p_codigo: codigo,
-  };
-
-  const response = await fetch("/setEtapa", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+function showSuccess(message) {
+  return Modal.showInfo("success", "Sucesso", message);
 }
 
-async function getProducaoPedido(pedido) {
-  try {
-    const numPedido = Number(pedido.slice(0, 6)).toString();
-    const response = await fetch(`/getProducaoBarcode?p_pedido=${numPedido}`);
-    console.log(response);
-    if (!response.ok) {
-      throw new Error("Erro ao buscar os dados");
-    }
-    const data = await response.json();
-
-    data.forEach((item) => {
-      Dom.setValue("txt_numoc", item.ordemdecompra);
-      Dom.setValue("txt_cliente", item.cliente);
-      Dom.setValue("txt_contrato", item.contrato);
-      Dom.setValue("txt_codcc", item.codcc);
-      Dom.setValue("txt_ambiente", item.ambiente);
-      Dom.setValue("txt_numproj", item.numproj);
-      Dom.setValue("txt_lote", item.lote);
-      Dom.setValue("txt_chegoufabrica", convertDataBr(item.chegoufabrica));
-      Dom.setValue("txt_dataentrega", convertDataBr(item.dataentrega));
-      Dom.setValue("txt_previsao", item.previsao);
-
-      Dom.setValue("txt_corteinicio", item.corteinicio);
-      Dom.setValue("txt_cortefim", item.cortefim);
-      Dom.setChecked("chk_corte", item.cortepausa);
-      Dom.setValue("txt_corteid", item.corteresp);
-      getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp");
-      Dom.setChecked("chk_corteinicio", false);
-      Dom.setChecked("chk_cortefim", false);
-
-      Dom.setValue("txt_customizacaoinicio", item.customizacaoinicio);
-      Dom.setValue("txt_customizacaofim", item.customizacaofim);
-      Dom.setChecked("chk_customizacao", item.customizacaopausa);
-      Dom.setValue("txt_customizacaoid", item.customizacaoresp);
-      getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp");
-      Dom.setChecked("chk_customizacaoinicio", false);
-      Dom.setChecked("chk_customizacaofim", false);
-
-      Dom.setValue("txt_coladeirainicio", item.coladeirainicio);
-      Dom.setValue("txt_coladeirafim", item.coladeirafim);
-      Dom.setChecked("chk_coladeira", item.coladeirapausa);
-      Dom.setValue("txt_coladeiraid", item.coladeiraresp);
-      getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp");
-      Dom.setChecked("chk_coladeirainicio", false);
-      Dom.setChecked("chk_coladeirafim", false);
-
-      Dom.setValue("txt_usinageminicio", item.usinageminicio);
-      Dom.setValue("txt_usinagemfim", item.usinagemfim);
-      Dom.setChecked("chk_usinagem", item.usinagempausa);
-      Dom.setValue("txt_usinagemid", item.usinagemresp);
-      getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp");
-      Dom.setChecked("chk_usinageminicio", false);
-      Dom.setChecked("chk_usinagemfim", false);
-
-      Dom.setValue("txt_montageminicio", item.montageminicio);
-      Dom.setValue("txt_montagemfim", item.montagemfim);
-      Dom.setValue("txt_montagemfim", item.montagemfim);
-      Dom.setChecked("chk_montagem", item.montagempausa);
-      Dom.setValue("txt_montagemid", item.montagemresp);
-      getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp");
-      Dom.setChecked("chk_montageminicio", false);
-      Dom.setChecked("chk_montagemfim", false);
-
-      Dom.setValue("txt_paineisinicio", item.paineisinicio);
-      Dom.setValue("txt_paineisfim", item.paineisfim);
-      Dom.setValue("txt_paineisfim", item.paineisfim);
-      Dom.setChecked("chk_paineis", item.paineispausa);
-      Dom.setValue("txt_paineisid", item.paineisresp);
-      getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp");
-      Dom.setChecked("chk_paineisinicio", false);
-      Dom.setChecked("chk_paineisfim", false);
-
-      Dom.setValue("txt_acabamentoinicio", item.acabamentoinicio);
-      Dom.setValue("txt_acabamentofim", item.acabamentofim);
-      Dom.setValue("txt_acabamentofim", item.acabamentofim);
-      Dom.setChecked("chk_acabamento", item.acabamentopausa);
-      Dom.setValue("txt_acabamentoid", item.acabamentoresp);
-      getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp");
-      Dom.setChecked("chk_acabamentoinicio", false);
-      Dom.setChecked("chk_acabamentofim", false);
-
-      Dom.setValue("txt_embalageminicio", item.embalageminicio);
-      Dom.setValue("txt_embalagemfim", item.embalagemfim);
-      Dom.setValue("txt_embalagemfim", item.embalagemfim);
-      Dom.setChecked("chk_embalagem", item.embalagempausa);
-      Dom.setValue("txt_embalagemid", item.embalagemresp);
-      getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp");
-      Dom.setChecked("chk_embalageminicio", false);
-      Dom.setChecked("chk_embalagemfim", false);
-
-      Dom.setValue("txt_observacoes", item.observacoes);
-    });
-  } catch (err) {
-    alert(err.message);
-  }
-  document.getElementById("txt_scan").focus();
+function showHttpError(status) {
+  return Modal.showInfo("error", "ERRO", `ERRO: HTTP ${status}`);
 }
 
-function getEtapa(value) {
+function confirmUpdate() {
+  return Modal.showConfirmation(null, "Deseja confirmar Alterações?");
+}
+
+/* =========================================================
+   HELPERS / PARSERS
+========================================================= */
+function parseBarcode(barcode) {
+  const raw = String(barcode ?? "").trim();
+  const pedido = Number(raw.slice(0, 6));
+  const codigo = Number(raw.slice(6, 9));
+  const codigoStr = String(raw.slice(6, 9));
+  return { raw, pedido, codigo, codigoStr };
+}
+
+function orderBuy(value) {
+  return String(value ?? "")
+    .trim()
+    .slice(0, 6);
+}
+
+function getEtapaName(value) {
   const dataMap = {
     2: "Corte",
     3: "Customização",
@@ -153,122 +190,12 @@ function getEtapa(value) {
   return dataMap[value];
 }
 
-function acao(value) {
-  const dataMap = {
-    1: "Iniciar",
-    2: "Finalizar",
-  };
+function getAcaoName(value) {
+  const dataMap = { 1: "Iniciar", 2: "Finalizar" };
   return dataMap[value];
 }
 
-async function setDataProducao() {
-  const result = await messageQuestion(null, "Deseja confirmar Alterações?");
-
-  if (result.isConfirmed) {
-    try {
-      const data = {
-        p_ordemdecompra: Dom.getValue("txt_numoc"),
-        p_corteinicio: Dom.getValue("txt_corteinicio"),
-        p_cortefim: Dom.getValue("txt_cortefim"),
-        p_corteresp: Dom.getValue("txt_corteid"),
-        p_cortepausa: Dom.getChecked("chk_corte"),
-
-        p_customizacaoinicio: Dom.getValue("txt_customizacaoinicio"),
-        p_customizacaofim: Dom.getValue("txt_customizacaofim"),
-        p_customizacaoresp: Dom.getValue("txt_customizacaoid"),
-        p_customizacaopausa: Dom.getChecked("chk_customizacao"),
-
-        p_coladeirainicio: Dom.getValue("txt_coladeirainicio"),
-        p_coladeirafim: Dom.getValue("txt_coladeirafim"),
-        p_coladeiraresp: Dom.getValue("txt_coladeiraid"),
-        p_coladeirapausa: Dom.getChecked("chk_coladeira"),
-
-        p_usinageminicio: Dom.getValue("txt_usinageminicio"),
-        p_usinagemfim: Dom.getValue("txt_usinagemfim"),
-        p_usinagemresp: Dom.getValue("txt_usinagemid"),
-        p_usinagempausa: Dom.getChecked("chk_usinagem"),
-
-        p_montageminicio: Dom.getValue("txt_montageminicio"),
-        p_montagemfim: Dom.getValue("txt_montagemfim"),
-        p_montagemresp: Dom.getValue("txt_montagemid"),
-        p_montagempausa: Dom.getChecked("chk_montagem"),
-
-        p_paineisinicio: Dom.getValue("txt_paineisinicio"),
-        p_paineisfim: Dom.getValue("txt_paineisfim"),
-        p_paineisresp: Dom.getValue("txt_paineisid"),
-        p_paineispausa: Dom.getChecked("chk_paineis"),
-
-        p_acabamentoinicio: Dom.getValue("txt_acabamentoinicio"),
-        p_acabamentofim: Dom.getValue("txt_acabamentofim"),
-        p_acabamentoresp: Dom.getValue("txt_acabamentoid"),
-        p_acabamentopausa: Dom.getChecked("chk_acabamento"),
-
-        p_embalageminicio: Dom.getValue("txt_embalageminicio"),
-        p_embalagemfim: Dom.getValue("txt_embalagemfim"),
-        p_embalagemresp: Dom.getValue("txt_embalagemid"),
-        p_embalagempausa: Dom.getChecked("chk_embalagem"),
-
-        p_observacoes: Dom.getValue("txt_observacoes"),
-        p_previsao: Dom.getValue("txt_previsao"),
-      };
-
-      const response = await fetch("/setDataProducao", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        messageInformation(
-          "error",
-          "ERRO",
-          "Ocorreu um erro ao salvar os dados!"
-        );
-      } else {
-        messageInformation(
-          "success",
-          "Sucesso",
-          "Alterações confirmadas com sucesso!"
-        );
-      }
-    } catch (err) {
-      messageInformation(
-        "error",
-        "ERRO",
-        "Falha na comunicação com o servidor!" + err.message
-      );
-    }
-  }
-}
-
-async function getCodBar(barcode) {
-  const pedido = Number(barcode.slice(0, 6));
-  const etapa = Number(barcode.slice(6, 9)).toString();
-  const response = await fetch(`/getCodigoBarras?p_pedido=${pedido}`);
-  const data = await response.json();
-
-  const question = await messageQuestion(
-    "Codigo de Barras",
-    `${acao(etapa[1])} ${getEtapa(etapa[0])} ? <br> ${
-      data[0].p_contrato
-    } <br> ${data[0].p_cliente} <br> ${data[0].p_ambiente}`,
-    "Sim",
-    "Não"
-  );
-
-  if (question.isConfirmed) {
-    await readBarcode(barcode);
-    messageInformation(
-      "success",
-      "Sucesso",
-      `Processo atualizado com Sucesso !!!`
-    );
-  }
-  Dom.setValue("txt_scan", "");
-}
-
-function setor(value) {
+function getSectorKey(value) {
   const dataMap = {
     2: "corte",
     3: "customizacao",
@@ -281,80 +208,453 @@ function setor(value) {
   return dataMap[value];
 }
 
-function operacao(value) {
-  const dataMap = {
-    1: "inicio",
-    2: "fim",
-  };
+function getOperationKey(value) {
+  const dataMap = { 1: "inicio", 2: "fim" };
   return dataMap[value];
 }
 
-function setDateTimeSetor(barcode) {
-  const codebar = Number(barcode.slice(6, 9)).toString();
-  const etapa = setor(codebar[0]);
-  const action = operacao(codebar[1]);
-  const element = `txt_${etapa}${action}`;
-  try {
-    Dom.setValue(element, dateTimeNow());
-    Dom.setValue("txt_scan", "");
-  } catch (erro) {
-    messageInformation("error", "ERRO", `${erro}`);
+/* =========================================================
+   DEVICE UI
+========================================================= */
+function configureDeviceUi() {
+  const dispositivo = detectarDispositivo();
+
+  if (dispositivo === "Android") {
+    const botao = q(SELECTORS.buttons.scan);
+    botao?.classList?.remove("d-none");
+    botao?.classList?.add("d-flex");
+  }
+
+  if (dispositivo === "Windows") {
+    const input = q(SELECTORS.inputs.scan);
+    input?.classList?.remove("d-none");
+    input?.classList?.add("d-flex");
   }
 }
 
-async function buttonReadCodeBar() {
+/* =========================================================
+   MAPPERS (API -> UI) and (UI -> API)
+========================================================= */
+function mapProducaoToForm(item) {
+  return {
+    inputs: [
+      [SELECTORS.inputs.numoc, item.ordemdecompra],
+      [SELECTORS.inputs.cliente, item.cliente],
+      [SELECTORS.inputs.contrato, item.contrato],
+      [SELECTORS.inputs.codcc, item.codcc],
+      [SELECTORS.inputs.ambiente, item.ambiente],
+      [SELECTORS.inputs.numproj, item.numproj],
+      [SELECTORS.inputs.lote, item.lote],
+      [SELECTORS.inputs.chegoufabrica, DateTime.forBr(item.chegoufabrica)],
+      [SELECTORS.inputs.dataentrega, DateTime.forBr(item.dataentrega)],
+      [SELECTORS.inputs.previsao, item.previsao],
+
+      [SELECTORS.inputs.corteInicio, item.corteinicio],
+      [SELECTORS.inputs.corteFim, item.cortefim],
+      [SELECTORS.inputs.corteId, item.corteresp],
+
+      [SELECTORS.inputs.customInicio, item.customizacaoinicio],
+      [SELECTORS.inputs.customFim, item.customizacaofim],
+      [SELECTORS.inputs.customId, item.customizacaoresp],
+
+      [SELECTORS.inputs.coladeiraInicio, item.coladeirainicio],
+      [SELECTORS.inputs.coladeiraFim, item.coladeirafim],
+      [SELECTORS.inputs.coladeiraId, item.coladeiraresp],
+
+      [SELECTORS.inputs.usinagemInicio, item.usinageminicio],
+      [SELECTORS.inputs.usinagemFim, item.usinagemfim],
+      [SELECTORS.inputs.usinagemId, item.usinagemresp],
+
+      [SELECTORS.inputs.montagemInicio, item.montageminicio],
+      [SELECTORS.inputs.montagemFim, item.montagemfim],
+      [SELECTORS.inputs.montagemId, item.montagemresp],
+
+      [SELECTORS.inputs.paineisInicio, item.paineisinicio],
+      [SELECTORS.inputs.paineisFim, item.paineisfim],
+      [SELECTORS.inputs.paineisId, item.paineisresp],
+
+      [SELECTORS.inputs.acabamentoInicio, item.acabamentoinicio],
+      [SELECTORS.inputs.acabamentoFim, item.acabamentofim],
+      [SELECTORS.inputs.acabamentoId, item.acabamentoresp],
+
+      [SELECTORS.inputs.embalagemInicio, item.embalageminicio],
+      [SELECTORS.inputs.embalagemFim, item.embalagemfim],
+      [SELECTORS.inputs.embalagemId, item.embalagemresp],
+
+      [SELECTORS.inputs.observacoes, item.observacoes],
+    ],
+    checks: [
+      [SELECTORS.checks.cortePausa, item.cortepausa],
+      [SELECTORS.checks.customPausa, item.customizacaopausa],
+      [SELECTORS.checks.coladeiraPausa, item.coladeirapausa],
+      [SELECTORS.checks.usinagemPausa, item.usinagempausa],
+      [SELECTORS.checks.montagemPausa, item.montagempausa],
+      [SELECTORS.checks.paineisPausa, item.paineispausa],
+      [SELECTORS.checks.acabamentoPausa, item.acabamentopausa],
+      [SELECTORS.checks.embalagemPausa, item.embalagempausa],
+    ],
+  };
+}
+
+async function applyProductionToForm(mapped) {
+  mapped.inputs.forEach(([selector, value]) => Fields.set(selector, value));
+  mapped.checks.forEach(([selector, value]) =>
+    Fields.setChecked(selector, value)
+  );
+
+  // reset dos checks de inicio/fim (mesmo comportamento do original)
+  [
+    SELECTORS.checks.corteInicio,
+    SELECTORS.checks.corteFim,
+    SELECTORS.checks.customInicio,
+    SELECTORS.checks.customFim,
+    SELECTORS.checks.coladeiraInicio,
+    SELECTORS.checks.coladeiraFim,
+    SELECTORS.checks.usinagemInicio,
+    SELECTORS.checks.usinagemFim,
+    SELECTORS.checks.montagemInicio,
+    SELECTORS.checks.montagemFim,
+    SELECTORS.checks.paineisInicio,
+    SELECTORS.checks.paineisFim,
+    SELECTORS.checks.acabamentoInicio,
+    SELECTORS.checks.acabamentoFim,
+    SELECTORS.checks.embalagemInicio,
+    SELECTORS.checks.embalagemFim,
+  ].forEach((sel) => Fields.setChecked(sel, false));
+
+  Fields.set(
+    SELECTORS.inputs.corteResp,
+    await getName(SELECTORS.inputs.corteId)
+  );
+  Fields.set(
+    SELECTORS.inputs.customResp,
+    await getName(SELECTORS.inputs.customId)
+  );
+  Fields.set(
+    SELECTORS.inputs.coladeiraResp,
+    await getName(SELECTORS.inputs.coladeiraId)
+  );
+  Fields.set(
+    SELECTORS.inputs.usinagemResp,
+    await getName(SELECTORS.inputs.usinagemId)
+  );
+  Fields.set(
+    SELECTORS.inputs.montagemResp,
+    await getName(SELECTORS.inputs.montagemId)
+  );
+  Fields.set(
+    SELECTORS.inputs.paineisResp,
+    await getName(SELECTORS.inputs.paineisId)
+  );
+  Fields.set(
+    SELECTORS.inputs.acabamentoResp,
+    await getName(SELECTORS.inputs.acabamentoId)
+  );
+  Fields.set(
+    SELECTORS.inputs.embalagemResp,
+    await getName(SELECTORS.inputs.embalagemId)
+  );
+}
+
+function buildDataProductionPayloadFromForm() {
+  return {
+    p_ordemdecompra: Fields.get(SELECTORS.inputs.numoc),
+
+    p_corteinicio: Fields.get(SELECTORS.inputs.corteInicio),
+    p_cortefim: Fields.get(SELECTORS.inputs.corteFim),
+    p_corteresp: Fields.get(SELECTORS.inputs.corteId),
+    p_cortepausa: Fields.getChecked(SELECTORS.checks.cortePausa),
+
+    p_customizacaoinicio: Fields.get(SELECTORS.inputs.customInicio),
+    p_customizacaofim: Fields.get(SELECTORS.inputs.customFim),
+    p_customizacaoresp: Fields.get(SELECTORS.inputs.customId),
+    p_customizacaopausa: Fields.getChecked(SELECTORS.checks.customPausa),
+
+    p_coladeirainicio: Fields.get(SELECTORS.inputs.coladeiraInicio),
+    p_coladeirafim: Fields.get(SELECTORS.inputs.coladeiraFim),
+    p_coladeiraresp: Fields.get(SELECTORS.inputs.coladeiraId),
+    p_coladeirapausa: Fields.getChecked(SELECTORS.checks.coladeiraPausa),
+
+    p_usinageminicio: Fields.get(SELECTORS.inputs.usinagemInicio),
+    p_usinagemfim: Fields.get(SELECTORS.inputs.usinagemFim),
+    p_usinagemresp: Fields.get(SELECTORS.inputs.usinagemId),
+    p_usinagempausa: Fields.getChecked(SELECTORS.checks.usinagemPausa),
+
+    p_montageminicio: Fields.get(SELECTORS.inputs.montagemInicio),
+    p_montagemfim: Fields.get(SELECTORS.inputs.montagemFim),
+    p_montagemresp: Fields.get(SELECTORS.inputs.montagemId),
+    p_montagempausa: Fields.getChecked(SELECTORS.checks.montagemPausa),
+
+    p_paineisinicio: Fields.get(SELECTORS.inputs.paineisInicio),
+    p_paineisfim: Fields.get(SELECTORS.inputs.paineisFim),
+    p_paineisresp: Fields.get(SELECTORS.inputs.paineisId),
+    p_paineispausa: Fields.getChecked(SELECTORS.checks.paineisPausa),
+
+    p_acabamentoinicio: Fields.get(SELECTORS.inputs.acabamentoInicio),
+    p_acabamentofim: Fields.get(SELECTORS.inputs.acabamentoFim),
+    p_acabamentoresp: Fields.get(SELECTORS.inputs.acabamentoId),
+    p_acabamentopausa: Fields.getChecked(SELECTORS.checks.acabamentoPausa),
+
+    p_embalageminicio: Fields.get(SELECTORS.inputs.embalagemInicio),
+    p_embalagemfim: Fields.get(SELECTORS.inputs.embalagemFim),
+    p_embalagemresp: Fields.get(SELECTORS.inputs.embalagemId),
+    p_embalagempausa: Fields.getChecked(SELECTORS.checks.embalagemPausa),
+
+    p_observacoes: Fields.get(SELECTORS.inputs.observacoes),
+    p_previsao: Fields.get(SELECTORS.inputs.previsao),
+  };
+}
+
+/* =========================================================
+   USE CASES / HANDLERS
+========================================================= */
+async function handleLoadOrder(pedidoValue) {
+  try {
+    const p6 = orderBuy(pedidoValue);
+    if (!p6) {
+      await showError("Pedido inválido.");
+      return;
+    }
+
+    const res = await ProducaoAPI.getProductionBarcode(p6);
+
+    if (res.status !== 200) {
+      await showHttpError(res.status);
+      return;
+    }
+
+    const item = res?.data?.[0];
+    if (!item) {
+      await showError("Pedido não encontrado ou retorno vazio.");
+      return;
+    }
+
+    await applyProductionToForm(mapProducaoToForm(item));
+  } catch (err) {
+    await showError(`Erro ao buscar dados: ${err?.message || err}`);
+    console.warn(err.message);
+  } finally {
+    Fields.focus(SELECTORS.inputs.scan);
+  }
+}
+
+async function handleSaveClick() {
+  const confirm = await confirmUpdate();
+  if (!confirm.isConfirmed) return;
+
+  try {
+    const payload = buildDataProductionPayloadFromForm();
+    const res = await ProducaoAPI.setDataProduction(payload);
+
+    if (res.status === 200) {
+      await showSuccess("Alterações confirmadas com sucesso!");
+      return;
+    }
+
+    await showHttpError(res.status);
+  } catch (err) {
+    await showError(
+      `Falha na comunicação com o servidor: ${err?.message || err}`
+    );
+  }
+}
+
+async function handleReadBarcode(barcode) {
+  const { pedido, codigo } = parseBarcode(barcode);
+
+  if (!Number.isFinite(pedido) || !Number.isFinite(codigo)) {
+    await showError("Código de barras inválido.");
+    return;
+  }
+
+  try {
+    const payload = { p_pedido: pedido, p_codigo: codigo };
+    const res = await ProducaoAPI.setStage(payload);
+
+    if (res.status !== 200) {
+      await showHttpError(res.status);
+      return;
+    }
+
+    await showSuccess("Processo atualizado com sucesso!");
+  } catch (err) {
+    await showError(`Erro ao atualizar processo: ${err?.message || err}`);
+  } finally {
+    Fields.set(SELECTORS.inputs.scan, "");
+  }
+}
+
+function setDateTimeSetorFromBarcode(barcode) {
+  const { codigoStr } = parseBarcode(barcode);
+  const etapaKey = getSectorKey(codigoStr?.[1]);
+  const actionKey = getOperationKey(codigoStr?.[2]);
+
+  if (!etapaKey || !actionKey) {
+    showError("Etapa/Operação inválida no código de barras.");
+    return;
+  }
+
+  const element = `#txt_${etapaKey}${actionKey}`;
+  try {
+    Dom.setValue(element, DateTime.now());
+    Fields.set(SELECTORS.inputs.scan, "");
+  } catch (erro) {
+    showError(String(erro));
+  }
+}
+
+async function handleScanButtonClick() {
   try {
     const result = await modalBarCode();
-    const pedido = Number(result.slice(0, 6));
-    Dom.setValue("txt_pedido", pedido);
-    await getProducaoPedido(result);
-    await setDateTimeSetor(result);
+    const { pedido, raw } = parseBarcode(result);
+
+    Fields.set(SELECTORS.inputs.pedido, pedido);
+    await handleLoadOrder(raw);
+    setDateTimeSetorFromBarcode(raw);
   } catch (erro) {
-    messageInformation("error", "ERRO", `ERRO: ${erro.message}`);
+    await showError(`ERRO: ${erro?.message || erro}`);
   }
 }
 
-Dom.addEventBySelector("#bt_salvar", "click", setDataProducao);
-Dom.addEventBySelector("#txt_corteid", "change", () =>
-  getUsuario(Dom.getValue("txt_corteid"), "txt_corteresp")
-);
+async function handleScanInputChange() {
+  const barcode = Fields.get(SELECTORS.inputs.scan);
+  setDateTimeSetorFromBarcode(barcode);
+}
 
-Dom.addEventBySelector("#txt_customizacaoid", "change", () =>
-  getUsuario(Dom.getValue("txt_customizacaoid"), "txt_customizacaoresp")
-);
+/* =========================================================
+   (Opcional) CONFIRMAR ETAPA PELO CÓDIGO DE BARRAS
+   - mantido no padrão, caso você use esta função em algum lugar
+========================================================= */
+async function confirmStageFromBarcode(barcode) {
+  const { pedido, codigoStr } = parseBarcode(barcode);
 
-Dom.addEventBySelector("#txt_coladeiraid", "change", () =>
-  getUsuario(Dom.getValue("txt_coladeiraid"), "txt_coladeiraresp")
-);
+  try {
+    const res = await ProducaoAPI.getBarcode(pedido);
 
-Dom.addEventBySelector("#txt_usinagemid", "change", () =>
-  getUsuario(Dom.getValue("txt_usinagemid"), "txt_usinagemresp")
-);
+    if (res.status !== 200) {
+      await showHttpError(res.status);
+      return;
+    }
 
-Dom.addEventBySelector("#txt_montagemid", "change", () =>
-  getUsuario(Dom.getValue("txt_montagemid"), "txt_montagemresp")
-);
+    const data = res?.data?.[0];
+    if (!data) {
+      await showError("Retorno vazio para o código de barras.");
+      return;
+    }
 
-Dom.addEventBySelector("#txt_paineisid", "change", () =>
-  getUsuario(Dom.getValue("txt_paineisid"), "txt_paineisresp")
-);
+    const etapa = codigoStr;
+    const question = await Modal.showConfirmation(
+      "Codigo de Barras",
+      `${getAcaoName(etapa[1])} ${getEtapaName(etapa[0])} ? <br> ${
+        data.p_contrato
+      } <br> ${data.p_cliente} <br> ${data.p_ambiente}`,
+      "Sim",
+      "Não"
+    );
 
-Dom.addEventBySelector("#txt_acabamentoid", "change", () =>
-  getUsuario(Dom.getValue("txt_acabamentoid"), "txt_acabamentoresp")
-);
+    if (question.isConfirmed) {
+      await handleReadBarcode(barcode);
+    }
+  } catch (err) {
+    await showError(`Erro ao confirmar etapa: ${err?.message || err}`);
+  } finally {
+    Fields.set(SELECTORS.inputs.scan, "");
+  }
+}
 
-Dom.addEventBySelector("#txt_embalagemid", "change", () =>
-  getUsuario(Dom.getValue("txt_embalagemid"), "txt_embalagemresp")
-);
+/* =========================================================
+   BINDINGS
+========================================================= */
+function bindUsuarioLookups() {
+  Dom.addEventBySelector(SELECTORS.inputs.corteId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.corteResp,
+      await getName(SELECTORS.inputs.corteId)
+    );
+  });
 
-Dom.addEventBySelector("#txt_pedido", "change", () =>
-  getProducaoPedido(Dom.getValue("txt_pedido"))
-);
+  Dom.addEventBySelector(SELECTORS.inputs.customId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.customResp,
+      await getName(SELECTORS.inputs.customId)
+    );
+  });
 
-checkMachine();
-Dom.addEventBySelector("#bt_scan", "click", buttonReadCodeBar);
-Dom.addEventBySelector("#txt_scan", "change", () =>
-  setDateTimeSetor(Dom.getValue("txt_scan"))
-);
+  Dom.addEventBySelector(SELECTORS.inputs.coladeiraId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.coladeiraResp,
+      await getName(SELECTORS.inputs.coladeiraId)
+    );
+  });
 
-Dom.setFocus("txt_pedido");
+  Dom.addEventBySelector(SELECTORS.inputs.usinagemId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.usinagemResp,
+      await getName(SELECTORS.inputs.usinagemId)
+    );
+  });
+
+  Dom.addEventBySelector(SELECTORS.inputs.montagemId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.montagemResp,
+      await getName(SELECTORS.inputs.montagemId)
+    );
+  });
+
+  Dom.addEventBySelector(SELECTORS.inputs.paineisId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.paineisResp,
+      await getName(SELECTORS.inputs.paineisId)
+    );
+  });
+
+  Dom.addEventBySelector(SELECTORS.inputs.acabamentoId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.acabamentoResp,
+      await getName(SELECTORS.inputs.acabamentoId)
+    );
+  });
+
+  Dom.addEventBySelector(SELECTORS.inputs.embalagemId, "change", async () => {
+    Fields.set(
+      SELECTORS.inputs.embalagemResp,
+      await getName(SELECTORS.inputs.embalagemId)
+    );
+  });
+}
+
+function bindEvents() {
+  Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
+
+  Dom.addEventBySelector(SELECTORS.inputs.pedido, "change", () =>
+    handleLoadOrder(Fields.get(SELECTORS.inputs.pedido))
+  );
+
+  Dom.addEventBySelector(
+    SELECTORS.buttons.scan,
+    "click",
+    handleScanButtonClick
+  );
+  Dom.addEventBySelector(
+    SELECTORS.inputs.scan,
+    "change",
+    handleScanInputChange
+  );
+
+  bindUsuarioLookups();
+}
+
+/* =========================================================
+   PAGE SETUP (INIT)
+========================================================= */
+function configureUiDefaults() {
+  configureDeviceUi();
+  Fields.focus(SELECTORS.inputs.pedido);
+}
+
+function initProducaoPage() {
+  configureUiDefaults();
+  bindEvents();
+}
+
+window.addEventListener("DOMContentLoaded", initProducaoPage);

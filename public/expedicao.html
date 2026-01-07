@@ -8,10 +8,10 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=18f4612004461a8011880afb43ebd7f9">
-    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=64b5582ae63e835f5a4449eec1bc0391">
-    <link rel="stylesheet" href="assets/css/expedicao.min.css?h=5a6aeff7c2628604caefdb2d17977006">
-    <link rel="stylesheet" href="assets/css/iframe.min.css?h=01434aaabc8f269f742a1a157293e43a">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=264309bec01f37afd6ae5846bf0f0a1c">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
+    <link rel="stylesheet" href="assets/css/expedicao.min.css?h=07ef0d81a0c363e21b19105095c5cea2">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
     <link rel="stylesheet" href="assets/css/modal.min.css?h=15885214e91da51768301c797b6ac80c">
 <script type="module" src="/assets/js/projetosExp.js"></script>
     <link rel="icon" href="/assets/img/icone.png">
@@ -56,111 +56,113 @@
                     <p class="text-center text-danger" style="font-size: 25px;font-weight: bold;width: 100%;text-shadow: 0px 0px 7px;">EXPEDIÇÃO</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
                 </div>
                 <div class="modal-body text-start">
-                    <div class="d-flex justify-content-center">
-                        <div class="text-nowrap d-block" id="div-modal" style="width: 90%;font-size: 12px;">
-                            <div class="d-flex justify-content-between display-div">
-                                <div style="min-width: 48%;">
-                                    <div class="d-flex justify-content-between display-div">
-                                        <div style="min-width: 48%;"><label class="form-label d-block">Ordem de Compra:</label><input type="text" id="txt_numoc" class="d-block" disabled="" required="" style="width:100%;"></div>
-                                        <div style="min-width: 48%;"><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block" disabled="" required="" style="width:100%;"></div>
-                                    </div>
-                                    <div class="display-div"><label class="form-label d-block">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block" disabled="" required="" style="width:100%;"></div><input class="d-none" type="checkbox" id="chk_etapas"><label class="form-label" id="txt_etapas" style="width: 100%;text-align: center;font-size: 16px;">Label</label>
-                                </div>
-                                <div style="margin-right: 10px;"></div>
-                                <div class="justify-content-between display-div" style="display: flex;min-width: 48%;">
+                    <form>
+                        <div class="d-flex justify-content-center">
+                            <div class="text-nowrap d-block" id="div-modal" style="width: 95%;font-size: 12px;">
+                                <div class="d-flex justify-content-between display-div">
                                     <div style="min-width: 48%;">
-                                        <div><label class="form-label d-block">Corte Certo:</label><input type="text" id="txt_codcc" class="d-block" disabled="" required="" style="width:100%;"></div>
-                                        <div><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block" disabled="" required="" style="width:100%;"></div>
-                                        <div><label class="form-label d-block">N° Projeto:</label><input type="text" id="txt_numproj" class="d-block" disabled="" style="width:100%;"></div>
+                                        <div class="d-flex justify-content-between display-div">
+                                            <div style="min-width: 48%;"><label class="form-label d-block">Ordem de Compra:</label><input type="text" id="txt_numoc" class="d-block form-control" disabled="" required="" style="width:100%;"></div>
+                                            <div style="min-width: 48%;"><label class="form-label d-block">Contrato:</label><input type="text" id="txt_contrato" class="d-block form-control" disabled="" required="" style="width:100%;"></div>
+                                        </div>
+                                        <div class="display-div"><label class="form-label d-block">Nome do Cliente:</label><input type="text" id="txt_cliente" class="d-block form-control" disabled="" required="" style="width:100%;"></div><input class="d-none" type="checkbox" id="chk_etapas"><label class="form-label" id="txt_etapas" style="width: 100%;text-align: center;font-size: 16px;">Label</label>
                                     </div>
-                                    <div></div>
-                                    <div style="min-width: 48%;">
-                                        <div><label class="form-label d-block">Lote:</label><input type="text" id="txt_lote" class="d-block" disabled="" style="width:100%;"></div>
-                                        <div><label class="form-label d-block">Chegou Fabrica:</label><input type="text" id="txt_chegoufabrica" class="d-block" disabled="" style="width:100%;"></div>
-                                        <div><label class="form-label d-block">Prazo:</label><input type="text" id="txt_dataentrega" class="d-block" disabled="" style="width: 100%;color: rgb(255,0,0);font-weight: bold;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="height:40px;"></div>
-                            <div class="justify-content-between display-div" style="display: flex;">
-                                <div id="div-acessorios">
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_acessoriosavulsos" class="form-check-input"><label class="form-check-label" for="formCheck-1" style="width: 118px;">Acessórios Avulsos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_acessoriosavulsosq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_acessoriosavulsosl" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_paineis" class="form-check-input"><label class="form-check-label" for="formCheck-2" style="width: 118px;">Paineis</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_paineisq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_paineisl" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_portaaluminio" class="form-check-input"><label class="form-check-label" for="formCheck-10" style="width: 118px;">Portas de Alumínio</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_portaaluminioq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_portaaluminiol" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_vidroespelho" class="form-check-input"><label class="form-check-label" for="formCheck-9" style="width: 118px;">Vidros / Espelhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_vidroespelhoq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_vidroespelhol" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_pecapintura" class="form-check-input"><label class="form-check-label" for="formCheck-8" style="width: 118px;">Peças c/ Pinturas</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_pecapinturaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_pecapintural" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_tapecaria" class="form-check-input"><label class="form-check-label" for="formCheck-7" style="width: 118px;">Tapeçaria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_tapecariaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_tapecarial" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_serralheria" class="form-check-input"><label class="form-check-label" for="formCheck-6" style="width: 118px;">Serralheria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_serralheriaq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_serralherial" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_cabide" class="form-check-input"><label class="form-check-label" for="formCheck-5" style="width: 118px;">Cabide</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_cabideq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_cabidel" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_trilhos" class="form-check-input"><label class="form-check-label" for="formCheck-4" style="width: 118px;">Trilhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_trilhosq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_trilhosl" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
-                                        <div class="form-check"><input type="checkbox" id="chk_volumesmodulacao" class="form-check-input"><label class="form-check-label" for="formCheck-3" style="width: 118px;">Volumes Modulação</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_volumesmodulacaoq" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_volumesmodulacaol" style="text-align: center;width: 100%;" autocomplete="off">
-                                    </div>
-                                    <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Total Vol.</label><input type="text" id="txt_volmod" style="width: 26%;text-align: center;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Local</label><select id="txt_tamanho" style="text-align: center;width: 100%;" autocomplete="off">
-                                            <option value="-" selected="">-</option>
-                                            <option value="PEQUENO">PEQUENO</option>
-                                            <option value="MEDIO">MEDIO</option>
-                                            <option value="GRANDE">GRANDE</option>
-                                        </select></div>
-                                </div>
-                                <div class="margin-setor"></div>
-                                <div style="min-width: 48%;margin-left: 3%;">
-                                    <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Embalagem Inicio:</label>
-                                        <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_embalagem" style="margin-right: 4px;"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between"><input id="txt_embalageminicio" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalageminicio" style="width: 5%;"></div><label class="form-label d-block">Embalagem&nbsp;Fim:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_embalagemfim" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalagemfim" style="width: 5%;"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_embalagemid" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_embalagemresp" disabled="" style="width:100%;"></div>
-                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Pronto:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_pronto" type="date" style="width: 90%;"><input type="checkbox" id="chk_pronto" style="width: 5%;"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_prontoid" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_prontoresp" disabled="" style="width:100%;"></div>
-                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Entrega:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_entrega" type="date" style="width: 90%;"><input type="checkbox" id="chk_entrega" style="width: 5%;"></div>
-                                    <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_entregaid" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_entregaresp" disabled="" style="width:100%;"></div>
-                                    <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Almoxarifado:</label>
-                                    <div class="d-flex justify-content-between"><input id="txt_separacao" type="datetime-local" style="width: 90%;" name="txt_separacao"><input type="checkbox" id="chk_separacao" style="width: 5%;"></div>
-                                    <div class="d-flex justify-content-between align-items-center" style="margin-top: 10px;height: 26px;">
-                                        <div class="d-flex gap-4" style="height: 100%;"><label class="form-label d-flex align-items-xxl-center" style="margin: 0px;display: flex;">Pendências:</label><input type="checkbox" id="chk_pendencia" style="width: 20px;"></div>
-                                        <div class="d-flex justify-content-xxl-end gap-4" style="height: 100%;"><label class="form-label d-flex align-items-xxl-center" style="margin: 0px;display: flex;">Entrega Parcial:</label><input type="checkbox" id="chk_parcial" style="width: 20px;"></div>
+                                    <div style="margin-right: 10px;"></div>
+                                    <div class="justify-content-between display-div" style="display: flex;min-width: 48%;">
+                                        <div style="min-width: 48%;">
+                                            <div><label class="form-label d-block">Corte Certo:</label><input type="text" id="txt_codcc" class="d-block form-control" disabled="" required="" style="width:100%;"></div>
+                                            <div><label class="form-label d-block">Ambiente:</label><input type="text" id="txt_ambiente" class="d-block form-control" disabled="" required="" style="width:100%;"></div>
+                                            <div><label class="form-label d-block">N° Projeto:</label><input type="text" id="txt_numproj" class="d-block form-control" disabled="" style="width:100%;"></div>
+                                        </div>
+                                        <div></div>
+                                        <div style="min-width: 48%;">
+                                            <div><label class="form-label d-block">Lote:</label><input type="text" id="txt_lote" class="d-block form-control" disabled="" style="width:100%;"></div>
+                                            <div><label class="form-label d-block">Chegou Fabrica:</label><input type="text" id="txt_chegoufabrica" class="d-block form-control" disabled="" style="width:100%;"></div>
+                                            <div><label class="form-label d-block">Prazo:</label><input type="text" id="txt_dataentrega" class="d-block form-control" disabled="" style="width: 100%;color: rgb(255,0,0);font-weight: bold;"></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div style="height: 20px;"></div><label class="form-label d-block">Observações:</label><textarea id="txt_observacoes" style="width: 100%;overflow: auto;height: 90px;"></textarea>
-                            <div class="table-responsive">
-                                <table class="table" id="table_acessorios">
-                                    <thead>
-                                        <tr style="font-size: 9px;text-align: center;">
-                                            <th>Descrição</th>
-                                            <th>Medida</th>
-                                            <th>Qtd</th>
-                                            <th>Compra</th>
-                                            <th>Previsão</th>
-                                            <th>Recebido</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="table-group-divider"></tbody>
-                                </table>
+                                <div style="height:40px;"></div>
+                                <div class="justify-content-between display-div" style="display: flex;">
+                                    <div id="div-acessorios">
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_acessoriosavulsos" class="form-check-input"><label class="form-check-label" for="formCheck-1" style="width: 118px;">Acessórios Avulsos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_acessoriosavulsosq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_acessoriosavulsosl" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_paineis" class="form-check-input"><label class="form-check-label" for="formCheck-2" style="width: 118px;">Paineis</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_paineisq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_paineisl" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_portaaluminio" class="form-check-input"><label class="form-check-label" for="formCheck-10" style="width: 118px;">Portas de Alumínio</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_portaaluminioq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_portaaluminiol" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_vidroespelho" class="form-check-input"><label class="form-check-label" for="formCheck-9" style="width: 118px;">Vidros / Espelhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_vidroespelhoq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_vidroespelhol" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_pecapintura" class="form-check-input"><label class="form-check-label" for="formCheck-8" style="width: 118px;">Peças c/ Pinturas</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_pecapinturaq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_pecapintural" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_tapecaria" class="form-check-input"><label class="form-check-label" for="formCheck-7" style="width: 118px;">Tapeçaria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_tapecariaq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_tapecarial" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_serralheria" class="form-check-input"><label class="form-check-label" for="formCheck-6" style="width: 118px;">Serralheria</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_serralheriaq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_serralherial" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_cabide" class="form-check-input"><label class="form-check-label" for="formCheck-5" style="width: 118px;">Cabide</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_cabideq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_cabidel" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_trilhos" class="form-check-input"><label class="form-check-label" for="formCheck-4" style="width: 118px;">Trilhos</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_trilhosq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_trilhosl" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;">
+                                            <div class="form-check"><input type="checkbox" id="chk_volumesmodulacao" class="form-check-input"><label class="form-check-label" for="formCheck-3" style="width: 118px;">Volumes Modulação</label></div><label class="form-label" style="margin-right: 10px;">Qtd</label><input type="text" id="txt_volumesmodulacaoq" class="form-control" style="text-align: center;min-width: 10%;" autocomplete="off"><label class="form-label" style="margin-left: 10px;margin-right: 10px;">Local</label><input type="text" id="txt_volumesmodulacaol" class="form-control" style="text-align: center;width: 100%;" autocomplete="off">
+                                        </div>
+                                        <div class="d-flex" style="margin-top: 12px;margin-bottom: 10px;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Total Vol.</label><input class="form-control form-control" type="text" id="txt_volmod" style="width: 26%;text-align: center;"><label class="form-label" style="margin-right: 10px;margin-left: 10px;">Local</label><select class="form-select form-control" id="txt_tamanho" autocomplete="off" style="height: 25px;">
+                                                <option value="-" selected="">-</option>
+                                                <option value="PEQUENO">PEQUENO</option>
+                                                <option value="MEDIO">MEDIO</option>
+                                                <option value="GRANDE">GRANDE</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="margin-setor"></div>
+                                    <div style="min-width: 48%;margin-left: 3%;">
+                                        <div class="d-flex justify-content-between"><label class="form-label d-block" style="width: 50%;">Embalagem Inicio:</label>
+                                            <div><label class="form-label" style="margin-right: 10px;">Pausa</label><input type="checkbox" id="chk_embalagem" class="form-check-input"></div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2"><input id="txt_embalageminicio" class="form-control" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalageminicio" class="form-check-input margin-0"></div><label class="form-label d-block">Embalagem&nbsp;Fim:</label>
+                                        <div class="d-flex align-items-center gap-2"><input id="txt_embalagemfim" class="form-control" type="datetime-local" style="width: 90%;"><input type="checkbox" id="chk_embalagemfim" class="form-check-input margin-0"></div>
+                                        <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_embalagemid" class="form-control" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_embalagemresp" class="form-control" disabled="" style="width:100%;"></div>
+                                        <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Pronto:</label>
+                                        <div class="d-flex align-items-center gap-2"><input id="txt_pronto" class="form-control" type="date" style="width: 90%;"><input type="checkbox" id="chk_pronto" class="form-check-input margin-0"></div>
+                                        <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_prontoid" class="form-control" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_prontoresp" class="form-control" disabled="" style="width:100%;"></div>
+                                        <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Entrega:</label>
+                                        <div class="d-flex align-items-center gap-2"><input id="txt_entrega" class="form-control" type="date" style="width: 90%;"><input type="checkbox" id="chk_entrega" class="form-check-input margin-0"></div>
+                                        <div class="d-flex" style="margin-top:10px;"><label class="form-label">Resp:&nbsp;&nbsp;</label><input type="text" id="txt_entregaid" class="form-control" style="width:60px;margin-right:10px;text-align:center;" autocomplete="off"><input type="text" id="txt_entregaresp" class="form-control" disabled="" style="width:100%;"></div>
+                                        <div class="margin-setor" style="height: 3%;"></div><label class="form-label d-block">Almoxarifado:</label>
+                                        <div class="d-flex align-items-center gap-2"><input id="txt_separacao" class="form-control" type="datetime-local" style="width: 90%;" name="txt_separacao"><input type="checkbox" id="chk_separacao" class="form-check-input margin-0"></div>
+                                        <div class="d-flex justify-content-between align-items-center" style="margin-top: 10px;height: 26px;">
+                                            <div class="d-flex align-items-center gap-4" style="height: 100%;"><label class="form-label d-flex align-items-xxl-center" style="margin: 0px;display: flex;">Pendências:</label><input type="checkbox" id="chk_pendencia" class="form-check-input margin-0"></div>
+                                            <div class="d-flex align-items-center justify-content-xxl-end gap-4" style="height: 100%;"><label class="form-label d-flex align-items-xxl-center" style="margin: 0px;display: flex;">Entrega Parcial:</label><input type="checkbox" id="chk_parcial" class="form-check-input margin-0"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="height: 20px;"></div><label class="form-label d-block">Observações:</label><textarea class="form-control form-control" id="txt_observacoes" style="width: 100%;overflow: auto;height: 90px;"></textarea>
+                                <div class="table-responsive">
+                                    <table class="table" id="table_acessorios">
+                                        <thead>
+                                            <tr style="font-size: 9px;text-align: center;">
+                                                <th>Descrição</th>
+                                                <th>Medida</th>
+                                                <th>Qtd</th>
+                                                <th>Compra</th>
+                                                <th>Previsão</th>
+                                                <th>Recebido</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <div class="d-flex align-items-center" style="width: 100%;"><button class="btn btn-primary d-flex justify-content-center align-items-center" id="bt_funcionarios" type="button" style="height: 34px;width: 37.1px;"><i class="fa fa-user-circle-o"></i></button>

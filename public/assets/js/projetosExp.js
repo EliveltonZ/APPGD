@@ -17,7 +17,7 @@ import { Modal } from "./utils/modal.js";
    SELECTORS / ELEMENTS
 ========================================================= */
 const SELECTORS = {
-  projeto: {
+  project: {
     numOc: "#txt_numoc",
     cliente: "#txt_cliente",
     contrato: "#txt_contrato",
@@ -31,7 +31,7 @@ const SELECTORS = {
     observacoes: "#txt_observacoes",
   },
 
-  producao: {
+  production: {
     pronto: "#txt_pronto",
     prontoId: "#txt_prontoid",
     prontoResp: "#txt_prontoresp",
@@ -143,7 +143,6 @@ const ExpedicaoAPI = {
     return API.fetchQuery("/getOperadores");
   },
 
-  // config via Service (já existe)
   fetchConfig(id) {
     return Service.getConfig(id);
   },
@@ -320,38 +319,38 @@ async function setEtapaLabel(value, selector) {
 }
 
 async function populateExpedicaoForm(item) {
-  Fields.set(SELECTORS.projeto.numOc, item.ordemdecompra);
-  Fields.set(SELECTORS.projeto.cliente, item.cliente);
-  Fields.set(SELECTORS.projeto.contrato, item.contrato);
-  Fields.set(SELECTORS.projeto.codCc, item.codcc);
-  Fields.set(SELECTORS.projeto.ambiente, item.ambiente);
-  Fields.set(SELECTORS.projeto.numProj, item.numproj);
-  Fields.set(SELECTORS.projeto.lote, item.lote);
+  Fields.set(SELECTORS.project.numOc, item.ordemdecompra);
+  Fields.set(SELECTORS.project.cliente, item.cliente);
+  Fields.set(SELECTORS.project.contrato, item.contrato);
+  Fields.set(SELECTORS.project.codCc, item.codcc);
+  Fields.set(SELECTORS.project.ambiente, item.ambiente);
+  Fields.set(SELECTORS.project.numProj, item.numproj);
+  Fields.set(SELECTORS.project.lote, item.lote);
 
   Fields.set(
-    SELECTORS.projeto.chegouFabrica,
+    SELECTORS.project.chegouFabrica,
     DateTime.forBr(item.chegoufabrica)
   );
-  Fields.set(SELECTORS.projeto.dataEntrega, DateTime.forBr(item.dataentrega));
+  Fields.set(SELECTORS.project.dataEntrega, DateTime.forBr(item.dataentrega));
 
-  Fields.set(SELECTORS.producao.pronto, item.pronto);
-  Fields.set(SELECTORS.producao.entrega, item.entrega);
+  Fields.set(SELECTORS.production.pronto, item.pronto);
+  Fields.set(SELECTORS.production.entrega, item.entrega);
 
-  Fields.setChecked(SELECTORS.producao.chkPendencia, item.pendencia);
-  Fields.setChecked(SELECTORS.producao.chkParcial, item.parcial);
+  Fields.setChecked(SELECTORS.production.chkPendencia, item.pendencia);
+  Fields.setChecked(SELECTORS.production.chkParcial, item.parcial);
 
-  Fields.set(SELECTORS.producao.separacao, item.separacao);
+  Fields.set(SELECTORS.production.separacao, item.separacao);
 
-  Fields.set(SELECTORS.producao.prontoId, item.conferido);
+  Fields.set(SELECTORS.production.prontoId, item.conferido);
   Fields.set(
-    SELECTORS.producao.prontoResp,
-    await getName(SELECTORS.producao.prontoId)
+    SELECTORS.production.prontoResp,
+    await getName(SELECTORS.production.prontoId)
   );
 
-  Fields.set(SELECTORS.producao.entregaId, item.motorista);
+  Fields.set(SELECTORS.production.entregaId, item.motorista);
   Fields.set(
-    SELECTORS.producao.entregaResp,
-    await getName(SELECTORS.producao.entregaId)
+    SELECTORS.production.entregaResp,
+    await getName(SELECTORS.production.entregaId)
   );
 
   Fields.set(SELECTORS.embalagem.inicio, item.embalageminicio);
@@ -364,7 +363,6 @@ async function populateExpedicaoForm(item) {
     await getName(SELECTORS.embalagem.respId)
   );
 
-  // Itens especiais
   const S = SELECTORS.itensEspeciais;
 
   Fields.setChecked(S.avulsos.chk, item.avulso);
@@ -410,14 +408,14 @@ async function populateExpedicaoForm(item) {
   Fields.set(S.volMod, item.totalvolumes);
   Fields.set(S.tamanho, item.tamanho);
 
-  Fields.set(SELECTORS.projeto.observacoes, item.observacoes);
+  Fields.set(SELECTORS.project.observacoes, item.observacoes);
 
   // resets de confirmação
   Fields.setChecked(SELECTORS.embalagem.chkInicio, false);
   Fields.setChecked(SELECTORS.embalagem.chkFim, false);
 
-  Fields.setChecked(SELECTORS.producao.chkEtapas, item.etapa);
-  await setEtapaLabel(item.etapa, SELECTORS.producao.etapas);
+  Fields.setChecked(SELECTORS.production.chkEtapas, item.etapa);
+  await setEtapaLabel(item.etapa, SELECTORS.production.etapas);
 }
 
 async function populateExpedicaoFromResponse(data) {
@@ -433,14 +431,14 @@ function buildExpedicaoPayloadFromForm() {
   const S = SELECTORS.itensEspeciais;
 
   return {
-    p_ordemdecompra: Fields.get(SELECTORS.projeto.numOc),
-    p_pronto: Fields.get(SELECTORS.producao.pronto),
-    p_entrega: Fields.get(SELECTORS.producao.entrega),
-    p_pendencia: Fields.getChecked(SELECTORS.producao.chkPendencia),
-    p_parcial: Fields.getChecked(SELECTORS.producao.chkParcial),
-    p_separacao: Fields.get(SELECTORS.producao.separacao),
-    p_conferido: Fields.get(SELECTORS.producao.prontoId),
-    p_motorista: Fields.get(SELECTORS.producao.entregaId),
+    p_ordemdecompra: Fields.get(SELECTORS.project.numOc),
+    p_pronto: Fields.get(SELECTORS.production.pronto),
+    p_entrega: Fields.get(SELECTORS.production.entrega),
+    p_pendencia: Fields.getChecked(SELECTORS.production.chkPendencia),
+    p_parcial: Fields.getChecked(SELECTORS.production.chkParcial),
+    p_separacao: Fields.get(SELECTORS.production.separacao),
+    p_conferido: Fields.get(SELECTORS.production.prontoId),
+    p_motorista: Fields.get(SELECTORS.production.entregaId),
     p_embalageminicio: Fields.get(SELECTORS.embalagem.inicio),
     p_embalagemfim: Fields.get(SELECTORS.embalagem.fim),
     p_embalagempausa: Fields.getChecked(SELECTORS.embalagem.pausa),
@@ -488,7 +486,7 @@ function buildExpedicaoPayloadFromForm() {
 
     p_totalvolumes: Fields.get(S.volMod),
     p_tamanho: Fields.get(S.tamanho),
-    p_observacoes: Fields.get(SELECTORS.projeto.observacoes),
+    p_observacoes: Fields.get(SELECTORS.project.observacoes),
   };
 }
 
@@ -496,9 +494,9 @@ function buildExpedicaoPayloadFromForm() {
    DOMAIN RULES
 ========================================================= */
 function hasOpenStepsAndDatesFilled() {
-  const etapasConcluidas = Fields.getChecked(SELECTORS.producao.chkEtapas);
-  const pronto = Fields.get(SELECTORS.producao.pronto);
-  const entrega = Fields.get(SELECTORS.producao.entrega);
+  const etapasConcluidas = Fields.getChecked(SELECTORS.production.chkEtapas);
+  const pronto = Fields.get(SELECTORS.production.pronto);
+  const entrega = Fields.get(SELECTORS.production.entrega);
 
   if (etapasConcluidas) return false;
   return !!(pronto || entrega);
@@ -606,8 +604,8 @@ function openUsuariosModalFromHtml() {
 
 function listElementsUsers() {
   return [
-    [SELECTORS.producao.prontoId, SELECTORS.producao.prontoResp],
-    [SELECTORS.producao.entregaId, SELECTORS.producao.entregaResp],
+    [SELECTORS.production.prontoId, SELECTORS.production.prontoResp],
+    [SELECTORS.production.entregaId, SELECTORS.production.entregaResp],
     [SELECTORS.embalagem.respId, SELECTORS.embalagem.respNome],
   ];
 }
@@ -650,14 +648,14 @@ function bindEvents() {
   Dom.addEventBySelector(SELECTORS.ui.dataFiltro, "blur", handleFilterBlur);
   Dom.addEventBySelector(SELECTORS.ui.btSalvar, "click", saveExpedicaoFlow);
 
-  Dom.addEventBySelector(SELECTORS.producao.chkPronto, "click", () =>
-    setDate(SELECTORS.producao.chkPronto, SELECTORS.producao.pronto)
+  Dom.addEventBySelector(SELECTORS.production.chkPronto, "click", () =>
+    setDate(SELECTORS.production.chkPronto, SELECTORS.production.pronto)
   );
 
-  Dom.addEventBySelector(SELECTORS.producao.chkSeparacao, "click", () =>
+  Dom.addEventBySelector(SELECTORS.production.chkSeparacao, "click", () =>
     confirmDateInsertion(
-      SELECTORS.producao.chkSeparacao,
-      SELECTORS.producao.separacao
+      SELECTORS.production.chkSeparacao,
+      SELECTORS.production.separacao
     )
   );
 

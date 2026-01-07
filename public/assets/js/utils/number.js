@@ -37,10 +37,8 @@ export class Numbers {
   }
 
   static dateMask(value) {
-    // Remove qualquer caractere não numérico
     value = value.replace(/\D/g, "");
 
-    // Aplica MM/YY
     if (value.length <= 2) {
       return value;
     } else if (value.length <= 4) {

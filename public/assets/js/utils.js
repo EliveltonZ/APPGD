@@ -115,7 +115,6 @@ export async function loadPage(accessKey, page) {
 }
 
 function normalizePage(pathname) {
-  // garante leading slash, e que "/" e "/foo/" virem "/index.html" e "/foo/index.html"
   let p = pathname || "/";
   if (!p.startsWith("/")) p = "/" + p;
   if (p === "/" || p.endsWith("/")) p = p + "index.html";
@@ -133,6 +132,7 @@ export function checkPrevisao(firtItem, secondItem) {
   }
 }
 
+// usando
 export function applyDateMask(e) {
   const input = e.target;
   input.value = Numbers.dateMask(input.value);
@@ -461,22 +461,17 @@ export async function getName(element) {
 }
 
 export async function confirmDateInsertion(checkbox, element) {
-  const response = await Modal.showConfirmation(null, "Preencher data ?");
-  if (!response.isConfirmed) return;
-  const cb = checkIsTrue(checkbox);
-  if (!cb) q(checkbox).checked = false;
-  setDateElement(element);
+  const { isConfirmed } = await Modal.showConfirmation("Preencher data ?");
+  isConfirmed ? setDateElement(element) : (q(checkbox).checked = false);
 }
 
 function checkIsTrue(checkbox) {
-  const cb = q(checkbox);
-  if (cb.checked) return true;
-  return false;
+  return q(checkbox).checked;
 }
 
 function setDateElement(campoDataHora) {
   const el = q(campoDataHora);
-  el.value = DateTime.Now();
+  el.value = DateTime.now();
 }
 
 export async function handleElementsUser(elements) {

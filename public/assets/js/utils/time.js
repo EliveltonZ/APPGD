@@ -8,7 +8,7 @@ export class DateTime {
     return dataHoraFormatada;
   }
 
-  static Now() {
+  static now() {
     var dataAtual = new Date();
     var ano = dataAtual.getFullYear();
     var mes = String(dataAtual.getMonth() + 1).padStart(2, "0");
