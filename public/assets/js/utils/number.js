@@ -20,6 +20,16 @@ export class Numbers {
     return r;
   }
 
+  static currencyParse(value) {
+    if (value === null || value === undefined) return;
+
+    return Number(value).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+    });
+  }
+
   static decimal(valorInput) {
     if (valorInput) {
       const valorFormatado = valorInput.replace(/[^0-9,]/g, "");

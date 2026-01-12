@@ -41,11 +41,11 @@ function createTableRow(item) {
   tr.append(buildTableCell(item.p_ambiente, config));
   tr.append(buildTableCell(DateTime.forBr(item.p_chegoufabrica)));
   tr.append(buildTableCell(DateTime.forBr(item.p_dataentrega)));
-  tr.append(buildTableCell(Numbers.currency(item.p_valorbruto)));
-  tr.append(buildTableCell(Numbers.currency(item.p_valornegociado)));
-  tr.append(buildTableCell(Numbers.currency(item.p_customaterial)));
+  tr.append(buildTableCell(Numbers.currencyParse(item.p_valorbruto)));
+  tr.append(buildTableCell(Numbers.currencyParse(item.p_valornegociado)));
+  tr.append(buildTableCell(Numbers.currencyParse(item.p_customaterial)));
   tr.append(buildTableCell(Numbers.percent(item.p_desconto), colorDiscount));
-  tr.append(buildTableCell(Numbers.currency(item.p_lucrobruto)));
+  tr.append(buildTableCell(Numbers.currencyParse(item.p_lucrobruto)));
   tr.append(buildTableCell(Numbers.percent(item.p_margem), colorMarg));
   return tr;
 }

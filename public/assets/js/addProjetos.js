@@ -112,9 +112,13 @@ function applyMappedFields(fieldPairs) {
 }
 
 function toFixed2(value) {
-  // Se vier "", null etc, vira 0.00 (comportamento previsível)
-  const n = Number(String(value).replace(/\./g, "").replace(",", "."));
-  return (Number.isFinite(n) ? n : 0).toFixed(2);
+  try {
+    // Se vier "", null etc, vira 0.00 (comportamento previsível)
+    const n = Number(String(value).replace(/\./g, "").replace(",", "."));
+    return (Number.isFinite(n) ? n : 0).toFixed(2);
+  } catch (err) {
+    console.warn(err);
+  }
 }
 
 function buildProjectPayloadFromForm() {

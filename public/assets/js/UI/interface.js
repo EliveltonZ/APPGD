@@ -32,7 +32,11 @@ export class Dom {
   }
 
   static setChecked(element, boolean) {
-    q(element).checked = boolean;
+    try {
+      q(element).checked = boolean;
+    } catch {
+      console.log(`${element} não checavel`);
+    }
   }
 
   static setFocus(element) {

@@ -302,26 +302,6 @@ async function applyProductionToForm(mapped) {
     Fields.setChecked(selector, value)
   );
 
-  // reset dos checks de inicio/fim (mesmo comportamento do original)
-  [
-    SELECTORS.checks.corteInicio,
-    SELECTORS.checks.corteFim,
-    SELECTORS.checks.customInicio,
-    SELECTORS.checks.customFim,
-    SELECTORS.checks.coladeiraInicio,
-    SELECTORS.checks.coladeiraFim,
-    SELECTORS.checks.usinagemInicio,
-    SELECTORS.checks.usinagemFim,
-    SELECTORS.checks.montagemInicio,
-    SELECTORS.checks.montagemFim,
-    SELECTORS.checks.paineisInicio,
-    SELECTORS.checks.paineisFim,
-    SELECTORS.checks.acabamentoInicio,
-    SELECTORS.checks.acabamentoFim,
-    SELECTORS.checks.embalagemInicio,
-    SELECTORS.checks.embalagemFim,
-  ].forEach((sel) => Fields.setChecked(sel, false));
-
   Fields.set(
     SELECTORS.inputs.corteResp,
     await getName(SELECTORS.inputs.corteId)
@@ -431,8 +411,8 @@ async function handleLoadOrder(pedidoValue) {
 
     await applyProductionToForm(mapProducaoToForm(item));
   } catch (err) {
-    await showError(`Erro ao buscar dados: ${err?.message || err}`);
-    console.warn(err.message);
+    await showError(`Erro ao buscar dados: ${err}`);
+    console.warn(err);
   } finally {
     Fields.focus(SELECTORS.inputs.scan);
   }
