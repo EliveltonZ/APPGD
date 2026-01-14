@@ -69,7 +69,6 @@ function createTableRow(item) {
 }
 
 async function fillTable() {
-  await dateFilter();
   const res = await valoresAPI.getValues(Dom.getValue(SELECTORS.dateFilter));
   if (res.status !== 200) {
     Modal.showInfo("error", "ERRO", "não foi possivel carregar dados !!!");
@@ -81,15 +80,17 @@ async function fillTable() {
       tbody.appendChild(tr);
     });
   }
+  await saveFilterToConfig();
 }
 
-async function dateFilter() {
+async function setDateFilterField() {
   const dateFilter = await valoresAPI.fetchConfig(4);
   Dom.setValue(SELECTORS.dateFilter, dateFilter[0].p_data);
 }
 
-function init() {
+async function init() {
   loadPage("valores", "valores.html");
+  await setDateFilterField();
   fillTable();
   enableTableFilterSort("table");
   Table.onmouseover("table");
