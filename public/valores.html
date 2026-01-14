@@ -7,7 +7,7 @@
     <title>Valores</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=22a76adb84553754ab49fe153d0693eb">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=0b7f017c7490c38539d8ac44dcfd387f">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
     <link rel="stylesheet" href="assets/css/valores.min.css?h=5b82b33aa2737e95d630a93587e38c3e">
 <link rel="stylesheet" href="/assets/css/valores.css">
@@ -17,6 +17,7 @@
 
 <body style="font-family: 'Nunito Sans', sans-serif;">
     <div style="display: flex;flex-direction: column;height: 100vh;">
+        <div class="d-flex justify-content-end align-items-center" style="margin-top: 10px;margin-right: 10px;margin-left: 10px;"><label class="form-label" style="margin: 0px;">Entrega Maior que:&nbsp;</label><input id="txt_datafilter" type="date" style="width: 140px;text-align: center;"></div>
         <h1 class="text-primary" style="text-align: center;margin: 20px;text-shadow: 0px 0px 7px;">Valores</h1>
         <div class="table-responsive" style="text-align: center;">
             <table class="table" id="table">

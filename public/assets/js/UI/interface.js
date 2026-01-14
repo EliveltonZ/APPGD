@@ -130,22 +130,18 @@ export class Dom {
   }
 
   static handleClass(element, nameClass, action) {
-    // Obtém o elemento pelo Seletor
     const item = q(element);
 
-    // Verifica se o item existe
     if (!item) {
       console.error(`Elemento com ID "${element}" não encontrado.`);
       return;
     }
 
-    // Verifica se o nome da classe é válido
     if (!nameClass || typeof nameClass !== "string") {
       console.error("O nome da classe não é válido.");
       return;
     }
 
-    // Verifica o tipo de operação e executa
     if (action.toLowerCase() === "add") {
       item.classList.add(nameClass);
       return;

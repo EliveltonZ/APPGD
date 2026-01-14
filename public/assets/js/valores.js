@@ -3,15 +3,33 @@ import { enableTableFilterSort } from "./filtertable.js";
 import { Dom, Table, Style, q, ce, qa } from "./UI/interface.js";
 import { Numbers } from "./utils/number.js";
 import { DateTime } from "./utils/time.js";
-import { API } from "./service/api.js";
+import { API, Service } from "./service/api.js";
 import { Modal } from "./utils/modal.js";
 
-const DB = {
-  getValues: async function () {
-    const res = await API.fetchQuery("/fillTableValores");
+const SELECTORS = {
+  dateFilter: "#txt_datafilter",
+};
+
+const valoresAPI = {
+  fetchConfig(id) {
+    return Service.getConfig(id);
+  },
+
+  saveConfig(payload) {
+    return Service.setConfig(payload);
+  },
+
+  getValues: async function (date) {
+    const url = `/fillTableValores?p_prazo=${date}`;
+    const res = await API.fetchQuery(url);
     return res;
   },
 };
+
+async function saveFilterToConfig() {
+  const payload = { p_id: 4, p_date: Dom.getValue(SELECTORS.dateFilter) };
+  await valoresAPI.saveConfig(payload);
+}
 
 function buildTableCell(value, style) {
   return Dom.createElement("td", value, style);
@@ -51,7 +69,8 @@ function createTableRow(item) {
 }
 
 async function fillTable() {
-  const res = await DB.getValues();
+  await dateFilter();
+  const res = await valoresAPI.getValues(Dom.getValue(SELECTORS.dateFilter));
   if (res.status !== 200) {
     Modal.showInfo("error", "ERRO", "não foi possivel carregar dados !!!");
   } else {
@@ -64,12 +83,18 @@ async function fillTable() {
   }
 }
 
+async function dateFilter() {
+  const dateFilter = await valoresAPI.fetchConfig(4);
+  Dom.setValue(SELECTORS.dateFilter, dateFilter[0].p_data);
+}
+
 function init() {
   loadPage("valores", "valores.html");
   fillTable();
+  enableTableFilterSort("table");
   Table.onmouseover("table");
   Table.onclickHighlightRow("table");
-  enableTableFilterSort("table");
+  Dom.addEventBySelector(SELECTORS.dateFilter, "blur", fillTable);
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {

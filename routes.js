@@ -21,7 +21,7 @@ const senhaController = require("./controllers/senhaController");
 const usuariosController = require("./controllers/usuariosController");
 const emailController = require("./controllers/emailController");
 const assistenciaController = require("./controllers/assistenciasController");
-const solicitacaoContgroller = require("./controllers/solicitacaoContgroller");
+const solicitacaoContgroller = require("./controllers/solicitacaoController");
 const pecasController = require("./controllers/pecasController");
 
 // rota para envio de email
