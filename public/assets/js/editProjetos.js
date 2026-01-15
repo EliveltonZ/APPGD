@@ -110,7 +110,7 @@ function hasOrderNumber(value) {
    FORMATTERS / INPUT MASKS
 ========================================================= */
 function formatCurrency(value) {
-  return Numbers.currency(value * 100);
+  return Numbers.currency(value);
 }
 
 function formatDecimalForApi(value) {

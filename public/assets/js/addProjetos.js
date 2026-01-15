@@ -113,11 +113,13 @@ function applyMappedFields(fieldPairs) {
 
 function toFixed2(value) {
   try {
-    // Se vier "", null etc, vira 0.00 (comportamento previsível)
-    const n = Number(String(value).replace(/\./g, "").replace(",", "."));
-    return (Number.isFinite(n) ? n : 0).toFixed(2);
-  } catch (err) {
-    console.warn(err);
+    return value
+      ? String(value)
+          .replace(/[^\d,]/g, "")
+          .replace(",", ".")
+      : "0";
+  } catch {
+    return "0";
   }
 }
 
