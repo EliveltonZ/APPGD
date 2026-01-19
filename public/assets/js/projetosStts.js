@@ -175,16 +175,22 @@ function clearAccessoriesTable() {
   if (tbody) tbody.innerHTML = "";
   return tbody;
 }
+function buildRow(tr, value, style = true) {
+  if (style) {
+    tr.append(td(value, "text-align: center"));
+  } else {
+    tr.append(td(value));
+  }
+}
 
 function buildAccessoryRow(item) {
   const tr = ce("tr");
-  tr.append(td(item.id));
-  tr.append(td(item.descricao));
-  tr.append(td(item.medida));
-  tr.append(td(item.qtd));
-  tr.append(td(item.datacompra));
-  tr.append(td(item.previsao));
-  tr.append(td(item.recebido));
+  buildRow(tr, item.descricao, false);
+  buildRow(tr, item.medida);
+  buildRow(tr, item.qtd);
+  buildRow(tr, DateTime.forBr(item.datacompra));
+  buildRow(tr, DateTime.forBr(item.previsao));
+  buildRow(tr, DateTime.forBr(item.recebido));
   return tr;
 }
 
@@ -250,11 +256,9 @@ function populateStatusFields(item) {
   setStatusLabel(SELECTORS.status.paineis, item.spaineis);
   setStatusLabel(SELECTORS.status.acabamento, item.sacabamento);
   setStatusLabel(SELECTORS.status.embalagem, item.sembalagem);
-
   Fields.setHtml(SELECTORS.status.previsao, DateTime.forBr(item.previsao));
   Fields.setHtml(SELECTORS.status.pronto, DateTime.forBr(item.pronto));
   Fields.setHtml(SELECTORS.status.entrega, DateTime.forBr(item.entrega));
-
   Fields.setHtml(SELECTORS.status.tamanho, item.tamanho);
   Fields.setHtml(SELECTORS.status.totalVolumes, item.totalvolumes);
 }

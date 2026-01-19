@@ -94,7 +94,7 @@ function confirmSaveEdits() {
    VALIDATORS
 ========================================================= */
 function isFormValid() {
-  const form = q("form") || document.querySelector("form");
+  const form = q("form");
   return !!form?.checkValidity?.() && form.checkValidity();
 }
 
