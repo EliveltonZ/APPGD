@@ -1,7 +1,7 @@
 import { Dom, q, Table, Style } from "./UI/interface.js";
 import { DateTime } from "./utils/time.js";
 import { enableTableFilterSort } from "./filtertable.js";
-import { API } from "./service/api.js";
+import { API, Service } from "./service/api.js";
 import { Modal } from "./utils/modal.js";
 
 const EL = {
@@ -28,8 +28,68 @@ const EL = {
   PRODUCAO: "#chk_producao",
   SEM_MATERIAL: "#chk_sem_material",
   DATA_ENTREGA: "#txt_dataentrega",
+  DATA_FILTER: "#txt_datafilter",
 };
 
+/* =========================================================
+   FIELD ACCESS
+========================================================= */
+const Fields = {
+  get(sel) {
+    return Dom.getValue(sel);
+  },
+  set(sel, value) {
+    Dom.setValue(sel, value);
+  },
+  setHtml(sel, html) {
+    Dom.setInnerHtml(sel, html);
+  },
+  getChecked(sel) {
+    return Dom.getChecked(sel);
+  },
+  setChecked(sel, val) {
+    Dom.setChecked(sel, val);
+  },
+};
+
+/*================================================
+HELPER API
+================================================*/
+const assistAPI = {
+  async getAssist(value) {
+    const res = await API.fetchQuery(`/getAssistencia?p_solicitacao=${value}`);
+    return res.data;
+  },
+
+  async getAssists(dateFilter) {
+    const res = await API.fetchQuery(`/getAssistencias?p_data=${dateFilter}`);
+    return res.data;
+  },
+
+  async getContract(contrato_value) {
+    const res = await API.fetchQuery(
+      `/getContrato?p_contrato=${contrato_value}`,
+    );
+    return res.data;
+  },
+
+  async setAssist(payload) {
+    const res = await API.fetchBody("/setAssistencia", "PUT", payload);
+    return res;
+  },
+
+  async fetchConfig(id) {
+    return await Service.getConfig(id);
+  },
+
+  async saveConfig(payload) {
+    return await Service.setConfig(payload);
+  },
+};
+
+/*================================================
+HELPER EVENTS
+================================================*/
 function isUrgent(value) {
   if (value == "SIM") return "color: red" || "color: none";
 }
@@ -39,18 +99,18 @@ async function handleRowClickedTable(event) {
   const firstColumn = row.cells[1].textContent.trim();
   const result = await loadData(firstColumn);
   populateElements(result[0]);
-  Modal.create("modal-1");
+  Modal.show("modal-1");
 }
 
 async function loadData(value) {
-  const res = await API.fetchQuery(`/getAssistencia?p_solicitacao=${value}`);
-  return res.data;
+  const res = await assistAPI.getAssist(value);
+  return res;
 }
 
 async function getContrato() {
   const contrato_value = Dom.getValue(EL.CONTRATO);
   if (!contrato_value) return;
-  const res = await API.fetchQuery(`/getContrato?p_contrato=${contrato_value}`);
+  const res = await assistAPI.getContract(contrato_value);
   return res.data;
 }
 
@@ -80,11 +140,11 @@ function populateElements(data) {
 }
 
 async function confirmSave() {
-  const question = await Modal.ShowQuestion(
+  const question = await Modal.showConfirmation(
     "Salvar",
     "Deseja salvar dados",
     "confirmar",
-    "cancelar"
+    "cancelar",
   );
   if (question.isConfirmed) {
     setData();
@@ -111,8 +171,8 @@ function getElementsVAlues() {
 }
 
 async function setData() {
-  const data = getElementsVAlues();
-  const response = await API.fetchBody("/setAssistencia", "PUT", data);
+  const payload = getElementsVAlues();
+  const response = await assistAPI.setAssist(payload);
   if (response.status !== 200) {
     Modal.showInfo("error", "ERRO", "não foi possivel salvar dados");
     return;
@@ -120,41 +180,58 @@ async function setData() {
   Modal.showInfo("success", "SUCESSO", "alterações salvas com sucesso !!!");
 }
 
-async function populateTable() {
-  const response = await API.fetchQuery("/getAssistencias");
-  const td = "td";
-  const center = "text-align: center ";
-  const tbody = q("tbody");
+function buildRow(tr, value, style) {
+  tr.append(Dom.createElement("td", value, style));
+}
+
+async function getDateFilter() {
+  const dataFilter = await assistAPI.fetchConfig(5);
+  Fields.set(EL.DATA_FILTER, dataFilter[0].p_data);
+}
+
+async function setDataFilter(params) {
+  const dataFilter = Fields.get(EL.DATA_FILTER);
+  assistAPI.saveConfig({ p_id: 5, p_data: dataFilter });
+}
+
+function configTable(tbody) {
   tbody.innerHTML = "";
   tbody.style = "font-size: 10px;";
   tbody.classList.add("text-nowrap");
+}
+
+function contructTable(res, tbody) {
+  const center = "text-align: center ";
   let num = 1;
-  response.data.forEach((item) => {
+  res.forEach((item) => {
     const tr = document.createElement("tr");
     const color = Style.colorStatus(item.p_status);
     const urgent = isUrgent(item.p_urgente);
-
-    tr.append(Dom.createElement(td, num));
-    tr.append(Dom.createElement(td, item.p_solicitacao));
-    tr.append(Dom.createElement(td, item.p_corte, center));
-    tr.append(Dom.createElement(td, item.p_contrato, center));
-    tr.append(Dom.createElement(td, item.p_cliente));
-    tr.append(Dom.createElement(td, item.p_ambiente));
-    tr.append(
-      Dom.createElement(td, DateTime.forBr(item.p_datasolicitacao), center)
-    );
-    tr.append(Dom.createElement(td, item.p_prazo, center));
-    tr.append(Dom.createElement(td, item.p_status, `${center}; ${color}`));
-    tr.append(Dom.createElement(td, DateTime.forBr(item.p_iniciado), center));
-    tr.append(Dom.createElement(td, DateTime.forBr(item.p_previsao), center));
-    tr.append(Dom.createElement(td, DateTime.forBr(item.p_pronto), center));
-    tr.append(
-      Dom.createElement(td, DateTime.forBr(item.p_dataentrega), center)
-    );
-    tr.append(Dom.createElement(td, item.p_urgente, `${center}; ${urgent}`));
+    buildRow(tr, num);
+    buildRow(tr, item.p_solicitacao);
+    buildRow(tr, item.p_corte, center);
+    buildRow(tr, item.p_contrato, center);
+    buildRow(tr, item.p_cliente);
+    buildRow(tr, item.p_ambiente);
+    buildRow(tr, DateTime.forBr(item.p_datasolicitacao), center);
+    buildRow(tr, item.p_prazo, center);
+    buildRow(tr, item.p_status, `${center}; ${color}`);
+    buildRow(tr, DateTime.forBr(item.p_iniciado), center);
+    buildRow(tr, DateTime.forBr(item.p_previsao), center);
+    buildRow(tr, DateTime.forBr(item.p_pronto), center);
+    buildRow(tr, DateTime.forBr(item.p_dataentrega), center);
+    buildRow(tr, item.p_urgente, `${center}; ${urgent}`);
     num += 1;
     tbody.appendChild(tr);
   });
+}
+
+async function populateTable() {
+  await getDateFilter();
+  const res = await assistAPI.getAssists(Fields.get(EL.DATA_FILTER));
+  const tbody = q("tbody");
+  configTable(tbody);
+  contructTable(res, tbody);
 }
 
 function setLocalStorageItem(value) {
@@ -162,7 +239,7 @@ function setLocalStorageItem(value) {
 }
 
 function printPage() {
-  setLocalStorageItem(Dom.getValue(EL.CONTRATO));
+  setLocalStorageItem(Fields.get(EL.SOLICITACAO));
   const iframe = q("#iframeImpressao");
   iframe.contentWindow.location.reload();
   setTimeout(function () {
@@ -176,12 +253,12 @@ function init() {
   enableTableFilterSort("table");
   Table.onclickHighlightRow("table");
   Dom.addEventBySelector("#table tbody", "dblclick", (e) =>
-    handleRowClickedTable(e)
+    handleRowClickedTable(e),
   );
   Dom.addEventBySelector("#bt_salvar", "click", confirmSave);
   Dom.addEventBySelector("#bt_imprimir", "click", printPage);
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
-  init();
+document.addEventListener("DOMContentLoaded", async (event) => {
+  await init();
 });

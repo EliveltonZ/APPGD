@@ -1,6 +1,6 @@
 import { API } from "./service/api.js";
 import { Dom } from "./UI/interface.js";
-import { Date } from "./utils/time.js";
+import { DateTime } from "./utils/time.js";
 
 const DB = {
   getDataOrder: async function (orderBy) {
@@ -51,7 +51,7 @@ function setBackgroudDivUrgent() {
 
 async function fetchAndPopulateOrder() {
   const data = await getOrder();
-  populateElements(data[0]);
+  populateElements(data.data[0]);
   setBackgroudDivUrgent();
 }
 
@@ -59,6 +59,7 @@ async function getOrder() {
   const orderBy = getLocalStorageItem();
   if (!orderBy) return;
   const res = await DB.getDataOrder(orderBy);
+  return res;
 }
 
 function populateElements(data) {
@@ -67,7 +68,7 @@ function populateElements(data) {
   Dom.setInnerHtml(SELECTORS.SOLICITACAO1, data.p_solicitacao1);
   Dom.setInnerHtml(
     SELECTORS.DATA_SOLICITACAO,
-    Date.forBr(data.p_datasolicitacao)
+    DateTime.forBr(data.p_datasolicitacao)
   );
   Dom.setInnerHtml(SELECTORS.URGENTE, data.p_urgente);
   Dom.setInnerHtml(SELECTORS.CLIENTE, data.p_cliente);

@@ -165,7 +165,7 @@ function followForIndex() {
   Modal.showInfo("warning", "Sessão Expirada", "Faça novo login !!!").then(
     () => {
       window.location.href = "/";
-    }
+    },
   );
 }
 
@@ -210,7 +210,7 @@ export async function sendMail(data) {
 export function exportarParaExcel(
   data,
   nomeArquivo = "Projetos.xlsx",
-  nomeAba = "ConPlanejamentoProd"
+  nomeAba = "ConPlanejamentoProd",
 ) {
   if (!Array.isArray(data) || data.length === 0) {
     Swal.fire({
@@ -326,7 +326,7 @@ export async function modalBarCode() {
               return;
             }
             Quagga.start();
-          }
+          },
         );
 
         Quagga.onDetected((data) => {
@@ -461,23 +461,39 @@ export async function getName(element) {
 }
 
 export async function confirmDateInsertion(checkbox, element) {
-  const { isConfirmed } = await Modal.showConfirmation("Preencher data ?");
-  isConfirmed ? setDateElement(element) : (q(checkbox).checked = false);
+  try {
+    const f = q(element).type;
+    const { isConfirmed } = await Modal.showConfirmation("Preencher data ?");
+    isConfirmed ? setDateTimeField(element, f) : (q(checkbox).checked = false);
+  } catch (err) {
+    console.warn(checkbox, element, err);
+  }
 }
 
 function checkIsTrue(checkbox) {
   return q(checkbox).checked;
 }
 
-function setDateElement(campoDataHora) {
+function setDateTimeField(campoDataHora, type) {
   const el = q(campoDataHora);
-  el.value = DateTime.now();
+  console.log(type);
+  if (type == "date") {
+    el.value = DateTime.now().split("T")[0];
+  } else {
+    el.value = DateTime.now();
+  }
+}
+
+export function setDateField(campoDataHora) {
+  const el = q(campoDataHora);
+  el.value = DateTime.now().split("T")[0];
+  console.log(el.value);
 }
 
 export async function handleElementsUser(elements) {
   elements.forEach((item) => {
     Dom.addEventBySelector(item[0], "blur", async () =>
-      Dom.setValue(item[1], await getName(item[0]))
+      Dom.setValue(item[1], await getName(item[0])),
     );
   });
 }

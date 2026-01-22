@@ -329,7 +329,7 @@ async function populateExpedicaoForm(item) {
 
   Fields.set(
     SELECTORS.project.chegouFabrica,
-    DateTime.forBr(item.chegoufabrica)
+    DateTime.forBr(item.chegoufabrica),
   );
   Fields.set(SELECTORS.project.dataEntrega, DateTime.forBr(item.dataentrega));
 
@@ -344,13 +344,13 @@ async function populateExpedicaoForm(item) {
   Fields.set(SELECTORS.production.prontoId, item.conferido);
   Fields.set(
     SELECTORS.production.prontoResp,
-    await getName(SELECTORS.production.prontoId)
+    await getName(SELECTORS.production.prontoId),
   );
 
   Fields.set(SELECTORS.production.entregaId, item.motorista);
   Fields.set(
     SELECTORS.production.entregaResp,
-    await getName(SELECTORS.production.entregaId)
+    await getName(SELECTORS.production.entregaId),
   );
 
   Fields.set(SELECTORS.embalagem.inicio, item.embalageminicio);
@@ -360,7 +360,7 @@ async function populateExpedicaoForm(item) {
   Fields.set(SELECTORS.embalagem.respId, item.embalagemresp);
   Fields.set(
     SELECTORS.embalagem.respNome,
-    await getName(SELECTORS.embalagem.respId)
+    await getName(SELECTORS.embalagem.respId),
   );
 
   const S = SELECTORS.itensEspeciais;
@@ -619,11 +619,11 @@ function bindDateCheckboxes() {
 
   operations.forEach((item) => {
     Dom.addEventBySelector(`#chk_${item}inicio`, "click", () =>
-      confirmDateInsertion(`#chk_${item}inicio`, `txt_${item}inicio`)
+      confirmDateInsertion(`#chk_${item}inicio`, `#txt_${item}inicio`),
     );
 
     Dom.addEventBySelector(`#chk_${item}fim`, "click", () =>
-      confirmDateInsertion(`#chk_${item}fim`, `txt_${item}fim`)
+      confirmDateInsertion(`#chk_${item}fim`, `#txt_${item}fim`),
     );
   });
 }
@@ -642,27 +642,37 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.ui.table,
     "dblclick",
-    handleTableDoubleClick
+    handleTableDoubleClick,
   );
 
   Dom.addEventBySelector(SELECTORS.ui.dataFiltro, "blur", handleFilterBlur);
   Dom.addEventBySelector(SELECTORS.ui.btSalvar, "click", saveExpedicaoFlow);
 
   Dom.addEventBySelector(SELECTORS.production.chkPronto, "click", () =>
-    setDate(SELECTORS.production.chkPronto, SELECTORS.production.pronto)
+    confirmDateInsertion(
+      SELECTORS.production.chkPronto,
+      SELECTORS.production.pronto,
+    ),
+  );
+
+  Dom.addEventBySelector(SELECTORS.production.chkEntrega, "click", () =>
+    confirmDateInsertion(
+      SELECTORS.production.chkEntrega,
+      SELECTORS.production.entrega,
+    ),
   );
 
   Dom.addEventBySelector(SELECTORS.production.chkSeparacao, "click", () =>
     confirmDateInsertion(
       SELECTORS.production.chkSeparacao,
-      SELECTORS.production.separacao
-    )
+      SELECTORS.production.separacao,
+    ),
   );
 
   Dom.addEventBySelector(
     SELECTORS.ui.btFuncionarios,
     "click",
-    openUsuariosModalFromHtml
+    openUsuariosModalFromHtml,
   );
 }
 
