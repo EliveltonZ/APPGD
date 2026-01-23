@@ -286,30 +286,41 @@ function bindTooltipEvents() {
 /* =========================================================
    ACESSÓRIOS TABLE (MODAL)
 ========================================================= */
+
+function buildCell(tr, value, style) {
+  tr.append(td(value, style));
+}
+
+function buildRow(item, tbody) {
+  const d = DateTime.forBr;
+  const tr = ce("tr");
+  const fontSize = "font-size: 9px;";
+  const center = "text-align: center;";
+  buildCell(tr, item.id, `${fontSize} display:none`);
+  buildCell(tr, item.id, `${fontSize} display:none`);
+  buildCell(tr, item.descricao, fontSize);
+  buildCell(tr, item.medida, `${fontSize} ${center}`);
+  buildCell(tr, item.qtd, `${fontSize} ${center}`);
+  buildCell(tr, d(item.datacompra), `${fontSize} ${center}`);
+  buildCell(tr, d(item.previsao), `${fontSize} ${center}`);
+  buildCell(tr, d(item.recebido), `${fontSize} ${center}`);
+  tbody.appendChild(tr);
+}
+
+function populateTableAccessories(data, tbody) {
+  data.forEach((item) => {
+    buildRow(item, tbody);
+  });
+}
+
 async function loadAndRenderAcessorios(ordemdecompra) {
   const res = await ProducaoAPI.fetchAcessorios(ordemdecompra);
 
   try {
     const tbody = SELECTORS.modalAcessorios.tbody();
     if (!tbody) return;
-
     tbody.innerHTML = "";
-
-    const fontSize = "font-size: 9px;";
-    const center = "text-align: center;";
-    const d = DateTime.forBr;
-
-    res.data.forEach((item) => {
-      const tr = ce("tr");
-      tr.append(td(item.id, `${fontSize} display:none`));
-      tr.append(td(item.descricao, fontSize));
-      tr.append(td(item.medida, `${fontSize} ${center}`));
-      tr.append(td(item.qtd, fontSize));
-      tr.append(td(d(item.datacompra), `${fontSize} ${center}`));
-      tr.append(td(d(item.previsao), `${fontSize} ${center}`));
-      tr.append(td(d(item.recebido), `${fontSize} ${center}`));
-      tbody.appendChild(tr);
-    });
+    populateTableAccessories(res.data, tbody);
   } catch (err) {
     await showError(`ERRO:. ${err.message}`);
   }
@@ -335,7 +346,7 @@ async function fillProjetoFields(item) {
   Fields.set(SELECTORS.projeto.lote, item.lote);
   Fields.set(
     SELECTORS.projeto.chegouFabrica,
-    DateTime.forBr(item.chegoufabrica)
+    DateTime.forBr(item.chegoufabrica),
   );
   Fields.set(SELECTORS.projeto.dataEntrega, DateTime.forBr(item.dataentrega));
   Fields.set(SELECTORS.projeto.previsao, item.previsao);
@@ -415,7 +426,7 @@ async function populateProducaoForm(data) {
 
   localStorage.setItem(
     "previsao",
-    DateTime.forBr(Fields.get(SELECTORS.projeto.previsao))
+    DateTime.forBr(Fields.get(SELECTORS.projeto.previsao)),
   );
 }
 
@@ -647,11 +658,11 @@ function bindStageDateConfirmations() {
 
   operations.forEach((op) => {
     Dom.addEventBySelector(`#chk_${op}inicio`, "click", () =>
-      confirmDateInsertion(`#chk_${op}inicio`, `#txt_${op}inicio`)
+      confirmDateInsertion(`#chk_${op}inicio`, `#txt_${op}inicio`),
     );
 
     Dom.addEventBySelector(`#chk_${op}fim`, "click", () =>
-      confirmDateInsertion(`#chk_${op}fim`, `#txt_${op}fim`)
+      confirmDateInsertion(`#chk_${op}fim`, `#txt_${op}fim`),
     );
   });
 }
@@ -675,7 +686,7 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.ui.btFuncionarios,
     "click",
-    openUserModalFromHtml
+    openUserModalFromHtml,
   );
 
   window.addEventListener("resize", ajustarTamanhoModal);

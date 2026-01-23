@@ -614,9 +614,7 @@ function listElementsUsers() {
    DATE CHECKBOX WIRING
 ========================================================= */
 function bindDateCheckboxes() {
-  // mantendo o padrão original, mas isolando a “lista de operações”
   const operations = ["embalagem"];
-
   operations.forEach((item) => {
     Dom.addEventBySelector(`#chk_${item}inicio`, "click", () =>
       confirmDateInsertion(`#chk_${item}inicio`, `#txt_${item}inicio`),
@@ -678,12 +676,9 @@ function bindEvents() {
 
 async function init() {
   configureUiDefaults();
-
   await loadFilterFromConfig();
   await renderProjectsTable(Fields.get(SELECTORS.ui.dataFiltro));
-
   enableTableFilterSort(SELECTORS.ui.table.slice(1));
-
   await loadOperadoresTable();
   handleElementsUser(listElementsUsers());
   bindDateCheckboxes();

@@ -7,43 +7,41 @@
     <title>Acessos</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=5bc5132d68cded6d37c2fb51c0b13932">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=0a190496eb1d8c74930f9fa921a08e6c">
 <script type="module" src="/assets/js/acessos.js"></script>
     <link rel="icon" href="/assets/img/icone.png">
 </head>
 
-<body>
-    <div class="d-flex justify-content-center" style="font-family: 'Nunito Sans', sans-serif;">
-        <div class="text-nowrap d-block" style="width:90%;max-width:500px;"><label class="form-label d-block">ID:</label><input type="text" id="txt_id" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Login:</label><input type="text" id="txt_login" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Setor:</label><input type="text" id="txt_setor" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Camisa:</label><input type="text" id="txt_camiseta" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Calça:</label><input type="text" id="txt_calca" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Sapato:</label><input type="text" id="txt_sapato" class="d-block" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Local:</label><select class="form-select-sm d-block" id="txt_local" required="" style="width:100%;">
-                <option value="-">-</option>
-                <option value="FABRICA">FABRICA</option>
-                <option value="LOGISTICA">LOGISTICA</option>
-                <option value="LOJA">LOJA</option>
-            </select>
-            <div style="height: 20px;"></div>
-            <div class="d-flex justify-content-between">
-                <div>
-                    <div class="form-check"><input type="checkbox" id="chk_ativo" class="form-check-input"><label class="form-check-label" for="chk_ativo">Ativo</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_projetos" class="form-check-input"><label class="form-check-label" for="chk_projetos">Projetos</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_producao" class="form-check-input"><label class="form-check-label" for="chk_producao">Produção</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_expedicao" class="form-check-input"><label class="form-check-label" for="chk_expedicao">Expedição</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_usuarios" class="form-check-input"><label class="form-check-label" for="chk_usuarios">Usuarios</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_acessos" class="form-check-input"><label class="form-check-label" for="chk_acessos">Acessos</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_definicoes" class="form-check-input"><label class="form-check-label" for="chk_definicoes">Definições</label></div>
-                </div>
-                <div>
-                    <div class="form-check"><input type="checkbox" id="chk_calcular" class="form-check-input"><label class="form-check-label" for="chk_calcular">Calcular</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_previsoes" class="form-check-input"><label class="form-check-label" for="chk_previsoes">Previsões</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_compras" class="form-check-input"><label class="form-check-label" for="chk_compras">Compras</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_solicitacao" class="form-check-input"><label class="form-check-label" for="chk_solicitacao">Solicitação</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_prodass" class="form-check-input"><label class="form-check-label" for="chk_prodass">Prod Ass</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_valores" class="form-check-input"><label class="form-check-label" for="chk_valores">Valores</label></div>
-                    <div class="form-check"><input type="checkbox" id="chk_dashboard" class="form-check-input"><label class="form-check-label" for="chk_dashboard">Dashboard</label></div>
-                </div>
+<body class="d-flex justify-content-center" style="height: 100vh;">
+    <form style="max-width: 500px;width: 50%;"><label class="form-label d-block">ID:</label><input type="text" id="txt_id" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Login:</label><input type="text" id="txt_login" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Setor:</label><input type="text" id="txt_setor" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Camisa:</label><input type="text" id="txt_camiseta" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Calça:</label><input type="text" id="txt_calca" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Sapato:</label><input type="text" id="txt_sapato" class="d-block form-control" required="" style="width:100%;" autocomplete="off"><label class="form-label d-block">Local:</label><select class="form-select form-select-sm d-block form-control" id="txt_local" required="" style="width:100%;">
+            <option value="">-</option>
+            <option value="FABRICA">FABRICA</option>
+            <option value="LOGISTICA">LOGISTICA</option>
+            <option value="LOJA">LOJA</option>
+        </select>
+        <div style="height: 20px;"></div>
+        <div class="d-flex justify-content-between">
+            <div>
+                <div class="form-check"><input type="checkbox" id="chk_ativo" class="form-check-input"><label class="form-check-label" for="chk_ativo">Ativo</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_projetos" class="form-check-input"><label class="form-check-label" for="chk_projetos">Projetos</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_producao" class="form-check-input"><label class="form-check-label" for="chk_producao">Produção</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_expedicao" class="form-check-input"><label class="form-check-label" for="chk_expedicao">Expedição</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_usuarios" class="form-check-input"><label class="form-check-label" for="chk_usuarios">Usuarios</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_acessos" class="form-check-input"><label class="form-check-label" for="chk_acessos">Acessos</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_definicoes" class="form-check-input"><label class="form-check-label" for="chk_definicoes">Definições</label></div>
             </div>
-            <div class="d-flex justify-content-center"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" id="bt_salvar" type="button" style="margin: 20px;font-family: 'Nunito Sans', sans-serif;">Salvar</button></div>
+            <div>
+                <div class="form-check"><input type="checkbox" id="chk_calcular" class="form-check-input"><label class="form-check-label" for="chk_calcular">Calcular</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_previsoes" class="form-check-input"><label class="form-check-label" for="chk_previsoes">Previsões</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_compras" class="form-check-input"><label class="form-check-label" for="chk_compras">Compras</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_solicitacao" class="form-check-input"><label class="form-check-label" for="chk_solicitacao">Solicitação</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_prodass" class="form-check-input"><label class="form-check-label" for="chk_prodass">Prod Ass</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_valores" class="form-check-input"><label class="form-check-label" for="chk_valores">Valores</label></div>
+                <div class="form-check"><input type="checkbox" id="chk_dashboard" class="form-check-input"><label class="form-check-label" for="chk_dashboard">Dashboard</label></div>
+            </div>
         </div>
-    </div>
+        <div class="d-flex justify-content-center"><button class="btn btn-primary d-flex" data-bss-hover-animate="pulse" id="bt_salvar" type="button" style="margin: 20px;font-family: 'Nunito Sans', sans-serif;">Salvar</button></div>
+    </form>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
     <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
