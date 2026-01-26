@@ -9,14 +9,14 @@
     <title>APP GD</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=408c8ab9fd02cb493e48e7abcb1ec252">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=7e1102f1b4d17cc823cc6239e3b8fa22">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
     <link rel="stylesheet" href="assets/css/assistencias_prd.min.css?h=ecdb2fbe5aae5e0a85ed79940f872b66">
 </head>
 
 <body>
     <div class="d-flex justify-content-center align-items-center" style="height: 100vh">
-        <form>
+        <form style="max-width: 500px;">
             <div class="d-flex gap-2">
                 <div><label class="form-label">ID:</label><input class="form-control" type="text" id="txt_id" required="" style="text-align: center;"></div>
                 <div style="min-width: 80%;"><label class="form-label">Nome:</label><input class="form-control" type="text" id="txt_nome" disabled=""></div>

@@ -299,40 +299,40 @@ function mapProducaoToForm(item) {
 async function applyProductionToForm(mapped) {
   mapped.inputs.forEach(([selector, value]) => Fields.set(selector, value));
   mapped.checks.forEach(([selector, value]) =>
-    Fields.setChecked(selector, value)
+    Fields.setChecked(selector, value),
   );
 
   Fields.set(
     SELECTORS.inputs.corteResp,
-    await getName(SELECTORS.inputs.corteId)
+    await getName(SELECTORS.inputs.corteId),
   );
   Fields.set(
     SELECTORS.inputs.customResp,
-    await getName(SELECTORS.inputs.customId)
+    await getName(SELECTORS.inputs.customId),
   );
   Fields.set(
     SELECTORS.inputs.coladeiraResp,
-    await getName(SELECTORS.inputs.coladeiraId)
+    await getName(SELECTORS.inputs.coladeiraId),
   );
   Fields.set(
     SELECTORS.inputs.usinagemResp,
-    await getName(SELECTORS.inputs.usinagemId)
+    await getName(SELECTORS.inputs.usinagemId),
   );
   Fields.set(
     SELECTORS.inputs.montagemResp,
-    await getName(SELECTORS.inputs.montagemId)
+    await getName(SELECTORS.inputs.montagemId),
   );
   Fields.set(
     SELECTORS.inputs.paineisResp,
-    await getName(SELECTORS.inputs.paineisId)
+    await getName(SELECTORS.inputs.paineisId),
   );
   Fields.set(
     SELECTORS.inputs.acabamentoResp,
-    await getName(SELECTORS.inputs.acabamentoId)
+    await getName(SELECTORS.inputs.acabamentoId),
   );
   Fields.set(
     SELECTORS.inputs.embalagemResp,
-    await getName(SELECTORS.inputs.embalagemId)
+    await getName(SELECTORS.inputs.embalagemId),
   );
 }
 
@@ -418,12 +418,92 @@ async function handleLoadOrder(pedidoValue) {
   }
 }
 
+function getStepsForValidation(payload) {
+  return [
+    { etapa: "Corte", start: payload.p_corteinicio, end: payload.p_cortefim },
+    {
+      etapa: "Customização",
+      start: payload.p_customizacaoinicio,
+      end: payload.p_customizacaofim,
+    },
+    {
+      etapa: "Coladeira",
+      start: payload.p_coladeirainicio,
+      end: payload.p_coladeirafim,
+    },
+    {
+      etapa: "Usinagem",
+      start: payload.p_usinageminicio,
+      end: payload.p_usinagemfim,
+    },
+    {
+      etapa: "Montagem",
+      start: payload.p_montageminicio,
+      end: payload.p_montagemfim,
+    },
+    {
+      etapa: "Paineis",
+      start: payload.p_paineisinicio,
+      end: payload.p_paineisfim,
+    },
+    {
+      etapa: "Acabamentos",
+      start: payload.p_acabamentoinicio,
+      end: payload.p_acabamentofim,
+    },
+    {
+      etapa: "Embalagem",
+      start: payload.p_embalageminicio,
+      end: payload.p_embalagemfim,
+    },
+  ];
+}
+
+function validateSteps(payload) {
+  const steps = getStepsForValidation(payload);
+
+  for (const step of steps) {
+    if (step.end && !step.start) {
+      return `A data de início da etapa "${step.etapa}" não foi preenchida.`;
+    }
+
+    if (
+      step.start &&
+      step.end &&
+      DateTime.isEndBeforeStart(step.start, step.end)
+    ) {
+      return `A data de fim da etapa "${step.etapa}" não pode ser anterior à data de início.`;
+    }
+
+    if (step.start && DateTime.isDateInFuture(step.start)) {
+      return `A data de início da etapa "${step.etapa}" não pode ser maior que a data de hoje.`;
+    }
+
+    if (step.end && DateTime.isDateInFuture(step.end)) {
+      return `A data de fim da etapa "${step.etapa}" não pode ser maior que a data de hoje.`;
+    }
+  }
+
+  return null;
+}
+
+function showWarning(message) {
+  return Modal.showInfo("warning", "ATENÇÃO", message);
+}
+
 async function handleSaveClick() {
   const confirm = await confirmUpdate();
   if (!confirm.isConfirmed) return;
 
   try {
     const payload = buildDataProductionPayloadFromForm();
+    const error = validateSteps(payload);
+
+    if (error) {
+      await showWarning(error);
+      return;
+    }
+
     const res = await ProducaoAPI.setDataProduction(payload);
 
     if (res.status === 200) {
@@ -434,7 +514,7 @@ async function handleSaveClick() {
     await showHttpError(res.status);
   } catch (err) {
     await showError(
-      `Falha na comunicação com o servidor: ${err?.message || err}`
+      `Falha na comunicação com o servidor: ${err?.message || err}`,
     );
   }
 }
@@ -529,7 +609,7 @@ async function confirmStageFromBarcode(barcode) {
         data.p_contrato
       } <br> ${data.p_cliente} <br> ${data.p_ambiente}`,
       "Sim",
-      "Não"
+      "Não",
     );
 
     if (question.isConfirmed) {
@@ -549,56 +629,56 @@ function bindUsuarioLookups() {
   Dom.addEventBySelector(SELECTORS.inputs.corteId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.corteResp,
-      await getName(SELECTORS.inputs.corteId)
+      await getName(SELECTORS.inputs.corteId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.customId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.customResp,
-      await getName(SELECTORS.inputs.customId)
+      await getName(SELECTORS.inputs.customId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.coladeiraId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.coladeiraResp,
-      await getName(SELECTORS.inputs.coladeiraId)
+      await getName(SELECTORS.inputs.coladeiraId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.usinagemId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.usinagemResp,
-      await getName(SELECTORS.inputs.usinagemId)
+      await getName(SELECTORS.inputs.usinagemId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.montagemId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.montagemResp,
-      await getName(SELECTORS.inputs.montagemId)
+      await getName(SELECTORS.inputs.montagemId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.paineisId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.paineisResp,
-      await getName(SELECTORS.inputs.paineisId)
+      await getName(SELECTORS.inputs.paineisId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.acabamentoId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.acabamentoResp,
-      await getName(SELECTORS.inputs.acabamentoId)
+      await getName(SELECTORS.inputs.acabamentoId),
     );
   });
 
   Dom.addEventBySelector(SELECTORS.inputs.embalagemId, "change", async () => {
     Fields.set(
       SELECTORS.inputs.embalagemResp,
-      await getName(SELECTORS.inputs.embalagemId)
+      await getName(SELECTORS.inputs.embalagemId),
     );
   });
 }
@@ -607,18 +687,18 @@ function bindEvents() {
   Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
 
   Dom.addEventBySelector(SELECTORS.inputs.pedido, "change", () =>
-    handleLoadOrder(Fields.get(SELECTORS.inputs.pedido))
+    handleLoadOrder(Fields.get(SELECTORS.inputs.pedido)),
   );
 
   Dom.addEventBySelector(
     SELECTORS.buttons.scan,
     "click",
-    handleScanButtonClick
+    handleScanButtonClick,
   );
   Dom.addEventBySelector(
     SELECTORS.inputs.scan,
     "change",
-    handleScanInputChange
+    handleScanInputChange,
   );
 
   bindUsuarioLookups();

@@ -7,9 +7,8 @@
     <title>APP GD</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=f2318aea8b26f65579feaa90d08d6228">
-    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
-    <link rel="stylesheet" href="assets/css/pecas.min.css?h=8209d89fec1df106f22e10defc81ed48">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=73dd62c816751d421b92b9b86932e4e8">
+    <link rel="stylesheet" href="assets/css/pecas.min.css?h=60dd54a68d385d4bcdf0f909cf99a699">
 <script type="module" src="assets/js/pecas.js"></script>
 </head>
 
@@ -67,29 +66,32 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Nova Peça</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Quantidade</label><input class="form-control" type="text" id="txt_quantidade" style="width: 80%;" required=""></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Peça</label><input class="form-control" type="text" id="txt_peca" style="width: 80%;" required=""></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Dimensões</label><input class="form-control" type="text" id="txt_dimensoes" style="width: 80%;" required=""></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Cor</label><input class="form-control" type="text" id="txt_cor" style="width: 80%;"></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Lado</label><input class="form-control" type="text" id="txt_lado" style="width: 80%;"></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Tipo</label><select class="form-select" id="txt_tipo" style="width: 80%;" required=""></select></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Falha</label><select class="form-select" id="txt_falha" style="width: 80%;" required=""></select></div>
-                        <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Observações</label><textarea class="form-control" id="txt_obs" style="width: 80%;"></textarea></div>
+    <form class="overflow-auto" style="border: none;padding: 0px;">
+        <div class="modal fade" role="dialog" tabindex="-1" id="modal-1">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Nova Peça</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body d-flex justify-content-center overflow-auto" style="max-height: calc(100vh - 230px);">
+                        <div style="width: 95%;">
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Quantidade</label><input class="form-control" type="text" id="txt_quantidade" style="width: 80%;" required=""></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Peça</label><input class="form-control" type="text" id="txt_peca" style="width: 80%;" required=""></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Dimensões</label><input class="form-control" type="text" id="txt_dimensoes" style="width: 80%;" required=""></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Cor</label><input class="form-control" type="text" id="txt_cor" style="width: 80%;"></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Lado</label><input class="form-control" type="text" id="txt_lado" style="width: 80%;"></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Tipo</label><select class="form-select" id="txt_tipo" style="width: 80%;" required=""></select></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Falha</label><select class="form-select" id="txt_falha" style="width: 80%;" required=""></select></div>
+                            <div class="d-flex justify-content-between gap-2"><label class="form-label" style="width: 100px;text-align: right;">Observações</label><textarea class="form-control" id="txt_obs" style="width: 80%;"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer d-flex justify-content-center">
                         <div class="d-flex justify-content-center"><button class="btn btn-primary" id="bt_inserir" type="submit">Inserir</button></div>
-                    </form>
+                    </div>
                 </div>
-                <div class="modal-footer d-flex justify-content-center"></div>
             </div>
         </div>
-    </div>
+    </form>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
 </body>
 
