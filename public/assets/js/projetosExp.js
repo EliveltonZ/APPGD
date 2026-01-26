@@ -278,7 +278,7 @@ function buildAccessoryModalRow(item) {
 
   const tr = ce("tr");
   tr.append(td(item.id, tCenter + "display:none;"));
-  tr.append(td(item.descricao, tCenter + font9));
+  tr.append(td(item.descricao, font9));
   tr.append(td(item.medida, tCenter + font9));
   tr.append(td(item.qtd, tCenter + font9));
   tr.append(td(DateTime.forBr(item.datacompra), tCenter + font9));
