@@ -8,9 +8,9 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=35008b4b68d5a6a02179cde6d0d08523">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=d25c1938a16c18b2c1c96eee3e205e7e">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
-    <link rel="stylesheet" href="assets/css/expedicao.min.css?h=81e842aa403d9b06f321301d762e63a5">
+    <link rel="stylesheet" href="assets/css/expedicao.min.css?h=0aea0ded703edee3281ffcde0d50f0c5">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
     <link rel="stylesheet" href="assets/css/modal.min.css?h=15885214e91da51768301c797b6ac80c">
 <script type="module" src="/assets/js/projetosExp.js"></script>
@@ -144,7 +144,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div style="height: 20px;"></div><label class="form-label d-block">Observações:</label><textarea class="form-control form-control" id="txt_observacoes" style="width: 100%;overflow: auto;height: 90px;"></textarea>
+                                <div style="height: 20px;"></div><label class="form-label d-block">Observações:</label><textarea class="form-control form-control" id="txt_observacoes"></textarea>
                                 <div class="table-responsive">
                                     <table class="table" id="table_acessorios">
                                         <thead>
