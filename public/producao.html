@@ -8,7 +8,7 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/font-awesome.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=ea559ced753a98433d164e0cc5156914">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=54a6e3e3b2cb3c674d90f598589d2741">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
     <link rel="stylesheet" href="assets/css/producao.min.css?h=ca2a7e5702e321fab0bc02101050e38a">
@@ -57,7 +57,7 @@
                 <div class="modal-header d-flex justify-content-center" style="height: 31.5px;margin-top: 23px;">
                     <p class="text-center text-primary" style="font-size: 25px;font-weight: bold;text-align: center;width: 100%;text-shadow: 0px 0px 7px;">PRODUÇÃO</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
                 </div>
-                <div class="modal-body" style="padding: 0;">
+                <div class="modal-body d-flex justify-content-center" style="padding: 0;">
                     <form>
                         <div class="d-flex justify-content-center">
                             <div class="text-nowrap d-block" id="div-modal" style="font-size: 12px;width: 93%;">

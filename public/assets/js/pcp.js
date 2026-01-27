@@ -149,7 +149,7 @@ function mapProjetoToFormFields(p) {
     [SELECTORS.form.entrega, DateTime.forBr(p.p_dataentrega)],
     [SELECTORS.form.tipo, p.p_tipo],
     [SELECTORS.form.pecas, emptyToNull(p["p_peças"] ?? p.p_pecas)],
-    [SELECTORS.form.area, emptyToNull(p.p_area)],
+    [SELECTORS.form.area, p.p_area],
   ];
 }
 
@@ -210,7 +210,7 @@ async function startLoteFlow() {
   const result = await Modal.showConfirmation(
     "question",
     "LOTE",
-    "Iniciar Lote ?"
+    "Iniciar Lote ?",
   );
   if (!result.isConfirmed) return;
 
@@ -399,7 +399,7 @@ async function exportLoteDataFlow() {
 
   if (res.status !== 200) {
     await showError(
-      `Não foi possivel a conexão com banco de dados. ${res.data}`
+      `Não foi possivel a conexão com banco de dados. ${res.data}`,
     );
     return;
   }
@@ -417,18 +417,18 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.buttons.salvar,
     "click",
-    updateProjetoPcpFlow
+    updateProjetoPcpFlow,
   );
   Dom.addEventBySelector(SELECTORS.buttons.iniciarLote, "click", startLoteFlow);
   Dom.addEventBySelector(
     SELECTORS.buttons.exportar,
     "click",
-    exportLoteDataFlow
+    exportLoteDataFlow,
   );
   Dom.addEventBySelector(
     SELECTORS.buttons.gerarLote,
     "click",
-    generateLoteFlow
+    generateLoteFlow,
   );
   Dom.addEventBySelector(SELECTORS.buttons.modalLote, "click", openLoteModal);
 }
