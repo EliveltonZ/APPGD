@@ -207,11 +207,7 @@ async function loadProjetoByOc() {
 }
 
 async function startLoteFlow() {
-  const result = await Modal.showConfirmation(
-    "question",
-    "LOTE",
-    "Iniciar Lote ?",
-  );
+  const result = await Modal.showConfirmation(null, "Iniciar Lote ?");
   if (!result.isConfirmed) return;
 
   const payload = buildStartLotePayload();
@@ -318,10 +314,10 @@ function getCurrentLoteNumber() {
 }
 
 async function confirmLoteGeneration(lote) {
-  // no seu código original: Modal.confirmation(...)
-  // mantendo mas protegendo caso não exista e fallback para showConfirmation
-  const fn = Modal.confirmation ?? Modal.showConfirmation;
-  const result = await fn.call(Modal, null, `Deseja gerar o Lote ${lote} ?`);
+  const result = await Modal.showConfirmation(
+    null,
+    `Deseja gerar o Lote ${lote} ?`,
+  );
   return !!result?.isConfirmed;
 }
 
