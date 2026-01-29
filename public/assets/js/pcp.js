@@ -362,7 +362,6 @@ async function persistLoteSelection(rows, lote) {
     lista.push(item);
     await assignLoteToOc(numOC, lote);
   }
-
   return lista;
 }
 
@@ -399,9 +398,6 @@ async function exportLoteDataFlow() {
     );
     return;
   }
-
-  // seu código original chamava exportarParaExcel(res.data) mas não existe aqui
-  // então usamos o util já importado: Excel.export
   Excel.export(res.data);
 }
 

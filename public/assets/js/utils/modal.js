@@ -15,7 +15,7 @@ export class Modal {
     title = null,
     message,
     confirmButtonText = "Confirmar",
-    cancelButtonText = "Cancelar"
+    cancelButtonText = "Cancelar",
   ) {
     const result = await Swal.fire({
       icon: "question",
