@@ -342,26 +342,16 @@ async function populateExpedicaoForm(item) {
   Fields.set(SELECTORS.production.separacao, item.separacao);
 
   Fields.set(SELECTORS.production.prontoId, item.conferido);
-  Fields.set(
-    SELECTORS.production.prontoResp,
-    await getName(SELECTORS.production.prontoId),
-  );
+  Fields.set(SELECTORS.production.prontoResp, item.conferidoname);
 
   Fields.set(SELECTORS.production.entregaId, item.motorista);
-  Fields.set(
-    SELECTORS.production.entregaResp,
-    await getName(SELECTORS.production.entregaId),
-  );
+  Fields.set(SELECTORS.production.entregaResp, item.motoristaname);
 
   Fields.set(SELECTORS.embalagem.inicio, item.embalageminicio);
   Fields.set(SELECTORS.embalagem.fim, item.embalagemfim);
   Fields.setChecked(SELECTORS.embalagem.pausa, item.embalagempausa);
-
   Fields.set(SELECTORS.embalagem.respId, item.embalagemresp);
-  Fields.set(
-    SELECTORS.embalagem.respNome,
-    await getName(SELECTORS.embalagem.respId),
-  );
+  Fields.set(SELECTORS.embalagem.respNome, item.embalagemname);
 
   const S = SELECTORS.itensEspeciais;
 
