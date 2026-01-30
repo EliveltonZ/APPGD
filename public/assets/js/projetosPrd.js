@@ -358,7 +358,7 @@ async function fillStage(stageSelectors, item, keys) {
   Fields.set(stageSelectors.fim, item[keys.fim]);
   Fields.setChecked(stageSelectors.pausa, item[keys.pausa]);
   Fields.set(stageSelectors.respId, item[keys.respId]);
-  Fields.set(stageSelectors.respNome, await getName(stageSelectors.respId));
+  Fields.set(stageSelectors.respNome, item[keys.respNome]);
 }
 
 async function populateProducaoForm(data) {
@@ -370,6 +370,7 @@ async function populateProducaoForm(data) {
       fim: "cortefim",
       pausa: "cortepausa",
       respId: "corteresp",
+      respNome: "cortename",
     });
 
     await fillStage(SELECTORS.etapas.customizacao, item, {
@@ -377,6 +378,7 @@ async function populateProducaoForm(data) {
       fim: "customizacaofim",
       pausa: "customizacaopausa",
       respId: "customizacaoresp",
+      respNome: "customizacaoname",
     });
 
     await fillStage(SELECTORS.etapas.coladeira, item, {
@@ -384,6 +386,7 @@ async function populateProducaoForm(data) {
       fim: "coladeirafim",
       pausa: "coladeirapausa",
       respId: "coladeiraresp",
+      respNome: "coladeiraname",
     });
 
     await fillStage(SELECTORS.etapas.usinagem, item, {
@@ -391,6 +394,7 @@ async function populateProducaoForm(data) {
       fim: "usinagemfim",
       pausa: "usinagempausa",
       respId: "usinagemresp",
+      respNome: "usinagemname",
     });
 
     await fillStage(SELECTORS.etapas.montagem, item, {
@@ -398,6 +402,7 @@ async function populateProducaoForm(data) {
       fim: "montagemfim",
       pausa: "montagempausa",
       respId: "montagemresp",
+      respNome: "montagemname",
     });
 
     await fillStage(SELECTORS.etapas.paineis, item, {
@@ -405,6 +410,7 @@ async function populateProducaoForm(data) {
       fim: "paineisfim",
       pausa: "paineispausa",
       respId: "paineisresp",
+      respNome: "paineisname",
     });
 
     await fillStage(SELECTORS.etapas.acabamento, item, {
@@ -412,6 +418,7 @@ async function populateProducaoForm(data) {
       fim: "acabamentofim",
       pausa: "acabamentopausa",
       respId: "acabamentoresp",
+      respNome: "acabamentoname",
     });
 
     await fillStage(SELECTORS.etapas.embalagem, item, {
@@ -419,6 +426,7 @@ async function populateProducaoForm(data) {
       fim: "embalagemfim",
       pausa: "embalagempausa",
       respId: "embalagemresp",
+      respNome: "embalagemname",
     });
 
     resetStageConfirmations();
