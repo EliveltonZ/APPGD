@@ -268,7 +268,7 @@ async function fillProjectFields(item) {
   Fields.set(SELECTORS.projeto.lote, item.lote);
   Fields.set(
     SELECTORS.projeto.chegouFabrica,
-    DateTime.forBr(item.chegoufabrica)
+    DateTime.forBr(item.chegoufabrica),
   );
   Fields.set(SELECTORS.projeto.dataEntrega, DateTime.forBr(item.dataentrega));
   Fields.set(SELECTORS.projeto.observacoes, item.observacoes);
@@ -279,7 +279,7 @@ async function fillStageFields(stage, item, keys) {
   Fields.set(stage.fim, item[keys.fim]);
   Fields.setChecked(stage.pausa, item[keys.pausa]);
   Fields.set(stage.respId, item[keys.respId]);
-  Fields.set(stage.respNome, await getName(stage.respId));
+  Fields.set(stage.respNome, item[keys.respNome]);
 }
 
 async function populateModalFromProject(orderBuy) {
@@ -298,12 +298,14 @@ async function populateModalFromProject(orderBuy) {
       fim: "cortefim",
       pausa: "cortepausa",
       respId: "corteresp",
+      respNome: "cortename",
     });
     await fillStageFields(SELECTORS.etapas.customizacao, item, {
       inicio: "customizacaoinicio",
       fim: "customizacaofim",
       pausa: "customizacaopausa",
       respId: "customizacaoresp",
+      respNome: "customizacaoname",
     });
 
     await fillStageFields(SELECTORS.etapas.coladeira, item, {
@@ -311,6 +313,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "coladeirafim",
       pausa: "coladeirapausa",
       respId: "coladeiraresp",
+      respNome: "coladeiraname",
     });
 
     await fillStageFields(SELECTORS.etapas.usinagem, item, {
@@ -318,6 +321,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "usinagemfim",
       pausa: "usinagempausa",
       respId: "usinagemresp",
+      respNome: "usinagemname",
     });
 
     await fillStageFields(SELECTORS.etapas.montagem, item, {
@@ -325,6 +329,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "montagemfim",
       pausa: "montagempausa",
       respId: "montagemresp",
+      respNome: "montagemname",
     });
 
     await fillStageFields(SELECTORS.etapas.paineis, item, {
@@ -332,6 +337,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "paineisfim",
       pausa: "paineispausa",
       respId: "paineisresp",
+      respNome: "paineisname",
     });
 
     await fillStageFields(SELECTORS.etapas.acabamentos, item, {
@@ -339,6 +345,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "acabamentofim",
       pausa: "acabamentopausa",
       respId: "acabamentoresp",
+      respNome: "acabamentoname",
     });
 
     await fillStageFields(SELECTORS.etapas.embalagem, item, {
@@ -346,6 +353,7 @@ async function populateModalFromProject(orderBuy) {
       fim: "embalagemfim",
       pausa: "embalagempausa",
       respId: "embalagemresp",
+      respNome: "embalagemname",
     });
   }
 }
@@ -384,7 +392,7 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.ui.table,
     "dblclick",
-    handleTableDoubleClick
+    handleTableDoubleClick,
   );
 }
 
