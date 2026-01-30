@@ -252,34 +252,42 @@ function mapProducaoToForm(item) {
       [SELECTORS.inputs.corteInicio, item.corteinicio],
       [SELECTORS.inputs.corteFim, item.cortefim],
       [SELECTORS.inputs.corteId, item.corteresp],
+      [SELECTORS.inputs.corteResp, item.cortename],
 
       [SELECTORS.inputs.customInicio, item.customizacaoinicio],
       [SELECTORS.inputs.customFim, item.customizacaofim],
       [SELECTORS.inputs.customId, item.customizacaoresp],
+      [SELECTORS.inputs.customResp, item.customizacaoname],
 
       [SELECTORS.inputs.coladeiraInicio, item.coladeirainicio],
       [SELECTORS.inputs.coladeiraFim, item.coladeirafim],
       [SELECTORS.inputs.coladeiraId, item.coladeiraresp],
+      [SELECTORS.inputs.coladeiraResp, item.coladeiraname],
 
       [SELECTORS.inputs.usinagemInicio, item.usinageminicio],
       [SELECTORS.inputs.usinagemFim, item.usinagemfim],
       [SELECTORS.inputs.usinagemId, item.usinagemresp],
+      [SELECTORS.inputs.usinagemResp, item.usinagemname],
 
       [SELECTORS.inputs.montagemInicio, item.montageminicio],
       [SELECTORS.inputs.montagemFim, item.montagemfim],
       [SELECTORS.inputs.montagemId, item.montagemresp],
+      [SELECTORS.inputs.montagemResp, item.montagemname],
 
       [SELECTORS.inputs.paineisInicio, item.paineisinicio],
       [SELECTORS.inputs.paineisFim, item.paineisfim],
       [SELECTORS.inputs.paineisId, item.paineisresp],
+      [SELECTORS.inputs.paineisResp, item.paineisname],
 
       [SELECTORS.inputs.acabamentoInicio, item.acabamentoinicio],
       [SELECTORS.inputs.acabamentoFim, item.acabamentofim],
       [SELECTORS.inputs.acabamentoId, item.acabamentoresp],
+      [SELECTORS.inputs.acabamentoResp, item.acabamentoname],
 
       [SELECTORS.inputs.embalagemInicio, item.embalageminicio],
       [SELECTORS.inputs.embalagemFim, item.embalagemfim],
       [SELECTORS.inputs.embalagemId, item.embalagemresp],
+      [SELECTORS.inputs.embalagemResp, item.embalagemname],
 
       [SELECTORS.inputs.observacoes, item.observacoes],
     ],
@@ -300,39 +308,6 @@ async function applyProductionToForm(mapped) {
   mapped.inputs.forEach(([selector, value]) => Fields.set(selector, value));
   mapped.checks.forEach(([selector, value]) =>
     Fields.setChecked(selector, value),
-  );
-
-  Fields.set(
-    SELECTORS.inputs.corteResp,
-    await getName(SELECTORS.inputs.corteId),
-  );
-  Fields.set(
-    SELECTORS.inputs.customResp,
-    await getName(SELECTORS.inputs.customId),
-  );
-  Fields.set(
-    SELECTORS.inputs.coladeiraResp,
-    await getName(SELECTORS.inputs.coladeiraId),
-  );
-  Fields.set(
-    SELECTORS.inputs.usinagemResp,
-    await getName(SELECTORS.inputs.usinagemId),
-  );
-  Fields.set(
-    SELECTORS.inputs.montagemResp,
-    await getName(SELECTORS.inputs.montagemId),
-  );
-  Fields.set(
-    SELECTORS.inputs.paineisResp,
-    await getName(SELECTORS.inputs.paineisId),
-  );
-  Fields.set(
-    SELECTORS.inputs.acabamentoResp,
-    await getName(SELECTORS.inputs.acabamentoId),
-  );
-  Fields.set(
-    SELECTORS.inputs.embalagemResp,
-    await getName(SELECTORS.inputs.embalagemId),
   );
 }
 
