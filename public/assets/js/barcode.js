@@ -519,6 +519,11 @@ async function handleReadBarcode(barcode) {
   }
 }
 
+function styleField(element) {
+  const el = q(element);
+  el.classList.add("mark-field");
+}
+
 function setDateTimeSetorFromBarcode(barcode) {
   const { codigoStr } = parseBarcode(barcode);
   const etapaKey = getSectorKey(codigoStr?.[1]);
@@ -531,6 +536,7 @@ function setDateTimeSetorFromBarcode(barcode) {
 
   const element = `#txt_${etapaKey}${actionKey}`;
   try {
+    styleField(element);
     Dom.setValue(element, DateTime.now());
     Fields.set(SELECTORS.inputs.scan, "");
   } catch (erro) {
