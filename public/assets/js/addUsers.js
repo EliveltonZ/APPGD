@@ -70,7 +70,7 @@ function showHttpError(title, status, details) {
   return Modal.showInfo(
     "error",
     title,
-    `HTTP: ${status}${details ? ` - ${details}` : ""}`
+    `HTTP: ${status}${details ? ` - ${details}` : ""}`,
   );
 }
 
@@ -109,7 +109,7 @@ async function loadNextUserIdIntoForm() {
     if (response.status !== 200) {
       await showHttpError(
         "Não foi possível buscar o próximo ID.",
-        response.status
+        response.status,
       );
       return;
     }
@@ -127,15 +127,14 @@ async function loadNextUserIdIntoForm() {
   }
 }
 
-async function handleAddUserClick(event) {
-  event.preventDefault();
+async function handleAddUserClick(e) {
   if (!isFormValid()) return;
 
+  e.preventDefault();
   const payload = buildUserPayloadFromForm();
-
   const result = await Modal.showConfirmation(
     "Confirmar",
-    `Deseja adicionar ${payload.p_login}?`
+    `Deseja adicionar ${payload.p_login}?`,
   );
   if (!result.isConfirmed) return;
 
@@ -149,7 +148,7 @@ async function handleAddUserClick(event) {
 
     await showSuccess(
       "Sucesso",
-      `Usuário ${payload.p_login} salvo com sucesso!`
+      `Usuário ${payload.p_login} salvo com sucesso!`,
     );
   } catch (err) {
     await showGenericError("Erro ao salvar usuário", err);
@@ -172,7 +171,7 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.buttons.adicionar,
     "click",
-    handleAddUserClick
+    handleAddUserClick,
   );
 }
 
