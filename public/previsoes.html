@@ -7,9 +7,9 @@
     <title>Previsões</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=cb17dac83c9580a2d0bd2769f56c1f67">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=4d7b68bf755079783c34268da7231c94">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
-    <link rel="stylesheet" href="assets/css/previsoes.min.css?h=7f1ae7ceb9e2817d6653a73adeebdc95">
+    <link rel="stylesheet" href="assets/css/previsoes.min.css?h=90b44df2d4cfa3d7e4538826d938bbd6">
     <link rel="stylesheet" href="assets/css/modal.min.css?h=15885214e91da51768301c797b6ac80c">
 <script src="assets/js/projetosPrev.js" type="module"></script>
     <link rel="icon" href="/assets/img/icone.png">
@@ -57,7 +57,7 @@
                     <p class="text-center text-success" style="font-size: 25px;font-weight: bold;text-align: center;width: 100%;text-shadow: 0px 0px 7px;">PREVISÕES</p><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal" style="margin-top: -28px;"></button>
                 </div>
                 <div class="modal-body d-flex justify-content-center">
-                    <form>
+                    <form style="width: 100%;">
                         <div class="d-flex justify-content-center">
                             <div class="text-nowrap d-block" id="div-modal" style="font-size: 12px;width: 95%;">
                                 <div class="d-flex justify-content-between display-div gap">
