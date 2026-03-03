@@ -155,7 +155,7 @@ function getOrderNumberLength() {
   return String(Fields.get(SELECTORS.inputs.oc) || "").length;
 }
 
-function isOrderNumberLengthValid(length, min = 10) {
+function isOrderNumberLengthValid(length, min = 2) {
   return length >= min;
 }
 
@@ -171,7 +171,7 @@ function showHttpError(status, data) {
   return Modal.showInfo(
     "error",
     "ERRO",
-    `HTTP: ${status}${data ? ` - ${data}` : ""}`
+    `HTTP: ${status}${data ? ` - ${data}` : ""}`,
   );
 }
 
@@ -183,7 +183,7 @@ function showInvalidOrderModal(orderLength) {
   return Modal.showInfo(
     "warning",
     "Atenção",
-    `Ordem de compra inválida: caracteres ${orderLength}`
+    `Ordem de compra inválida: caracteres ${orderLength}`,
   );
 }
 
@@ -263,17 +263,17 @@ function loadInitialData() {
   getGroupedData(
     "getGroupedAmbiente",
     SELECTORS.inputs.tipoAmbiente,
-    "tipo_ambiente"
+    "tipo_ambiente",
   );
   getGroupedData(
     "getGroupedLiberador",
     SELECTORS.datalists.liberadores,
-    "p_liberador"
+    "p_liberador",
   );
   getGroupedData(
     "getGroupedVendedor",
     SELECTORS.datalists.vendedores,
-    "p_vendedor"
+    "p_vendedor",
   );
 }
 

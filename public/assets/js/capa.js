@@ -36,11 +36,19 @@ function colorUrgente(value) {
   }
 }
 
+function buildOrderBy(ordemdecompra) {
+  const numStr = String(ordemdecompra);
+  if (numStr.length < 10) {
+    return numStr;
+  }
+  return `${numStr.slice(0, 8)}-${numStr.slice(-2)}`;
+}
+
 function populateElements(ordemdecompra) {
   if (ordemdecompra) {
     const res = JSON.parse(localStorage.getItem("project"));
     const data = res[0];
-    const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
+    // const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
     Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
     Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
     Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
@@ -49,10 +57,10 @@ function populateElements(ordemdecompra) {
     Dom.setInnerHtml(SELECTORS.VENDEDOR, data.p_vendedor);
     Dom.setInnerHtml(
       SELECTORS.DATA_ENTREGA,
-      DateTime.forBr(data.p_dataentrega)
+      DateTime.forBr(data.p_dataentrega),
     );
     Dom.setInnerHtml(SELECTORS.LIBERADOR, data.p_liberador);
-    Dom.setInnerHtml(SELECTORS.NUM_OC, numoc);
+    Dom.setInnerHtml(SELECTORS.NUM_OC, buildOrderBy(ordemdecompra));
     Dom.setInnerHtml(SELECTORS.RESPONSAVEL, getLsItem("resp"));
     Dom.setInnerHtml(SELECTORS.DATA, DateTime.forBr(getLsItem("data")));
     Dom.setInnerHtml(SELECTORS.TIPO, getLsItem("tipo"));
@@ -82,7 +90,7 @@ function fillTableAcessorios(ordemdecompra) {
     Modal.showInfo(
       "error",
       "Erro",
-      `Não foi possível carregar os dados. ${err.message}`
+      `Não foi possível carregar os dados. ${err.message}`,
     );
   }
 }
