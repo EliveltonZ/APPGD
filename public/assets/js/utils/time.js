@@ -1,3 +1,4 @@
+import { q } from "../UI/interface.js";
 export class DateTime {
   static today() {
     var dataAtual = new Date();
@@ -62,5 +63,33 @@ export class DateTime {
     const start = new Date(startDate);
     const end = new Date(endDate);
     return end < start;
+  }
+
+  static #formatDateTime(now) {
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
+      now.getDate(),
+    )}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+  }
+
+  static #atualizar(el) {
+    const now = new Date();
+    if (this.#isTypeValid(el)) {
+      const valor = DateTime.#formatDateTime(now);
+      el.value = valor;
+    } else {
+      el.textContent = now.toLocaleString("pt-BR");
+    }
+  }
+
+  static #isTypeValid(el) {
+    if (el.tagName === "INPUT" && el.type === "datetime-local") return true;
+    return false;
+  }
+
+  static initClock(element) {
+    const now = new Date();
+    const el = q(element);
+    const intervalo = setInterval(() => DateTime.#atualizar(el), 1000);
   }
 }

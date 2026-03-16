@@ -14,8 +14,21 @@ export const ce = (element) => {
 
 export class Dom {
   static getValue(element) {
-    const value = q(element).value;
-    return value === "" ? null : value.toUpperCase();
+    try {
+      const value = q(element).value;
+      return value === "" ? null : value.toUpperCase();
+    } catch {
+      console.log(`elemento ${element} não encontrado`);
+    }
+  }
+
+  static getInnerHtml(element) {
+    try {
+      const select = q(element);
+      return select.options[select.selectedIndex].text;
+    } catch {
+      console.log(`elemento ${element} não encontrado`);
+    }
   }
 
   static setValue(element, value) {
@@ -67,7 +80,7 @@ export class Dom {
   static clearInputFields(exceptionsIds = []) {
     // Seleciona todos os campos de entrada, incluindo text, checkbox, select e date
     const allFields = qa(
-      'input[type="text"], input[type="checkbox"], select, input[type="date"]'
+      'input[type="text"], input[type="checkbox"], select, input[type="date"]',
     );
 
     allFields.forEach((field) => {
@@ -124,7 +137,7 @@ export class Dom {
       });
     } else {
       console.warn(
-        `Nenhum elemento com o seletor "${element}" foi encontrado.`
+        `Nenhum elemento com o seletor "${element}" foi encontrado.`,
       );
     }
   }

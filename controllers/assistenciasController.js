@@ -6,5 +6,4 @@ module.exports = {
   setAssistencia: createRpcHandler("set_assistencia", "body"),
   getCapaAssistencia: createRpcHandler("get_capa_assistencia", "query"),
   setNewOrder: createRpcHandler("set_solicitacao", "body"),
-  getMontador: createRpcHandler("get_montador", "query"),
 };

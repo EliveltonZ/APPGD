@@ -2,6 +2,7 @@ import { getCookie } from "./utils.js";
 import { Dom, q, qa, ce } from "./UI/interface.js";
 import { API } from "./service/api.js";
 import { Modal } from "./utils/modal.js";
+import { DateTime } from "./utils/time.js";
 
 /*==========================
   HELPER render UI
@@ -271,7 +272,7 @@ async function sendRows(rows) {
       Modal.showInfo(
         "success",
         "Sucesso",
-        "Solicitação enviada com sucesso"
+        "Solicitação enviada com sucesso",
       ).then(() => {
         window.location.href = "/pecas.html";
       });
@@ -292,7 +293,7 @@ function isTypeValid(el) {
 function formatDateTime(now) {
   const pad = (n) => String(n).padStart(2, "0");
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
-    now.getDate()
+    now.getDate(),
   )}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 }
 
@@ -321,5 +322,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
   Dom.addEventBySelector(SEL.ui.TSOLICITACAO, "click", delRowTable);
   Dom.addEventBySelector(SEL.ui.BT_CONCLUIR, "click", confirmSolicitacion);
   Dom.addEventBySelector(SEL.ui.LINK_TAB_2, "click", populateTableSolicitacion);
-  initClock(SEL.form.DATA);
+  DateTime.initClock(SEL.form.DATA);
 });

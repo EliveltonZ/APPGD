@@ -1,10 +1,58 @@
-import {
-  Dom,
-  messageInformation,
-  messageQuestion,
-  dateTimeNow,
-} from "./utils.js";
 import { enableTableFilterSort } from "./filtertable.js";
+import { Dom, q, qa, ce } from "./UI/interface.js";
+import { Modal } from "./utils/modal.js";
+import { DateTime } from "./utils/time.js";
+import { API } from "./service/api.js";
+
+/* =========================
+   SELECTOR
+   ========================= */
+const EL = {
+  solicitation: {
+    solicitacao: "#txt_solicitacao",
+    contrato: "#txt_contrato",
+    solicitante: "#txt_solicitante",
+    datasolicitacao: "#txt_data",
+    cliente: "#txt_cliente",
+    ambiente: "#txt_ambiente",
+    urgente: "#txt_urgente",
+    montador: "#txt_responsavel",
+    bairro: "#txt_bairro",
+    tempo: "#txt_tempo",
+    tipoassistencia: "#txt_tipo",
+    supervisor: "#txt_supervisor",
+    destino: "#txt_destino",
+    categoria: "#txt_categoria",
+  },
+
+  parts: {
+    qtd: "#txt_quantidade",
+    peca: "#txt_peca",
+    dimensoes: "#txt_dimensoes",
+    cor: "#txt_cor",
+    lado: "#txt_lado",
+    falha: "#txt_falha",
+    tipo: "#txt_tipo-1",
+    obs: "#txt_obs",
+  },
+
+  checkbox: {
+    montagem: "#chk_mont",
+    promob: "#chk_promob",
+    entrega: "#chk_entrega",
+  },
+  ui: {
+    t_body_montador: "#table-montador tbody",
+    t_body_pecas: "#table-pecas tbody",
+    form_equip: "#form-equip",
+    form_parts: "#form-parts",
+    form_solicitacao: "#div-form form",
+    bt_add: "#bt_adicionar",
+    bt_part: "#add_parts",
+    bt_part_1: "#add_parts-1",
+    bt_concluir: "#bt_concluir",
+  },
+};
 
 /* =========================
    SERVICES (API calls)
@@ -12,31 +60,31 @@ import { enableTableFilterSort } from "./filtertable.js";
 
 const orderService = {
   async createOrder(payload) {
-    const res = await fetch("/setNewOrder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res;
+    return API.fetchBody("/setNewOrder", "POST", payload);
   },
 
   async fetchInstallers() {
-    const res = await fetch("/getMontador");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    return API.fetchQuery("/getMontador");
   },
 
   async fetchContract(contractId) {
-    const res = await fetch(`/getContrato?p_contrato=${contractId}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+    return API.fetchQuery(`/getContrato?p_contrato=${contractId}`);
   },
 
-  async fetchOrderTypes() {
-    const res = await fetch("/getConfig");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
+  fetchOrderTypes() {
+    return API.fetchQuery("/getConfig");
+  },
+
+  getOcorrencia() {
+    return API.fetchQuery("/getOcorrencia");
+  },
+
+  getFalhas() {
+    return API.fetchQuery("/getFalhas");
+  },
+
+  fetchInsertItens(data) {
+    return API.fetchBody("/setPecas", "POST", data);
   },
 };
 
@@ -44,17 +92,13 @@ const orderService = {
    UI RENDERERS (DOM-only)
    ========================= */
 const ui = {
-  setRequestDate() {
-    Dom.setValue("txt_data", dateTimeNow());
-  },
-
-  lerTabela(idTabela) {
+  readTable(idTabela) {
     const tabela = document.getElementById(idTabela);
     const linhas = tabela.querySelectorAll("tbody tr");
     const dados = [];
 
     linhas.forEach((linha) => {
-      const celulas = linha.querySelectorAll("td");
+      const celulas = linha.qa("td");
       const valores = [];
 
       celulas.forEach((celula) => {
@@ -70,19 +114,19 @@ const ui = {
   renderSelectOptions(
     selectEl,
     items,
-    { valueKey, labelKey, includeEmpty = true } = {}
+    { valueKey, labelKey, includeEmpty = true } = {},
   ) {
     if (!selectEl) return;
     const fragment = document.createDocumentFragment();
     selectEl.innerHTML = "";
     if (includeEmpty) {
-      const opt = document.createElement("option");
+      const opt = ce("option");
       opt.value = "";
       opt.textContent = "-";
       fragment.appendChild(opt);
     }
     items.forEach((item) => {
-      const opt = document.createElement("option");
+      const opt = ce("option");
       opt.value = item[valueKey];
       opt.textContent = item[labelKey];
       fragment.appendChild(opt);
@@ -91,9 +135,9 @@ const ui = {
   },
 
   appendInstallerRow(id, name) {
-    const tbody = document.querySelector("table.table tbody");
+    const tbody = q("table.table tbody");
     if (!tbody) return;
-    const tr = document.createElement("tr");
+    const tr = ce("tr");
     tr.innerHTML = `
       <td style="text-align: center" >${id}</td>
       <td>${name}</td>
@@ -103,15 +147,55 @@ const ui = {
     tbody.appendChild(tr);
   },
 
+  appendPartsRow(list) {
+    const tbody = q(EL.ui.t_body_pecas);
+    if (!tbody) return;
+    const tr = ce("tr");
+    tr.innerHTML = `
+      <td>${list[0]}</td>
+      <td>${list[1]}</td>
+      <td>${list[2]}</td>
+      <td>${list[3]}</td>
+      <td>${list[4]}</td>
+      <td style="display:none">${list[5]}</td>
+      <td style="display:none">${list[6]}</td>
+      <td>${list[7]}</td>
+      <td >${list[8]}</td>
+      <td style="display:none">${list[9]}</td>
+    `;
+    const button = insertButtonCellTable();
+    tr.innerHTML += button;
+    tbody.appendChild(tr);
+  },
+
   clearTable(tbodySelector) {
-    const tbody = document.querySelector(tbodySelector);
+    const tbody = q(tbodySelector);
     if (tbody) tbody.innerHTML = "";
   },
 
   focusFirstField() {
-    document.getElementById("txt_solicitacao")?.focus();
+    q(EL.solicitation.solicitacao)?.focus();
   },
 };
+
+function t() {
+  const tbody = q(EL.ui.t_body_pecas);
+  getRows(tbody);
+}
+
+function getRows(tbody) {
+  const rows = tbody.querySelectorAll("tr");
+  rows.forEach((item) => {
+    getCellsItems(item);
+  });
+}
+
+function getCellsItems(cells) {
+  const tds = cells.querySelectorAll("td");
+  tds.forEach((item) => {
+    console.log(item.textContent);
+  });
+}
 
 /* =========================
    VALIDATORS (rules only)
@@ -122,7 +206,7 @@ const validators = {
   },
 
   hasAtLeastOneRow(tbodySelector) {
-    const tbody = document.querySelector(tbodySelector);
+    const tbody = q(tbodySelector);
     const count = tbody ? tbody.querySelectorAll("tr").length : 0;
     return count > 0;
   },
@@ -132,25 +216,50 @@ const validators = {
    HELPERS (data builders)
    ========================= */
 function buildOrderPayload() {
-  ui.setRequestDate();
   return {
-    p_solicitacao: Dom.getValue("txt_solicitacao"),
-    p_contrato: Dom.getValue("txt_contrato"),
-    p_solicitante: Dom.getValue("txt_solicitante"),
-    p_datasolicitacao: Dom.getValue("txt_data"),
-    p_cliente: Dom.getValue("txt_cliente"),
-    p_ambiente: Dom.getValue("txt_ambiente"),
-    p_urgente: Dom.getValue("txt_urgente"),
-    p_montador: Dom.getValue("txt_responsavel"),
-    p_bairro: Dom.getValue("txt_bairro"),
-    p_tempo: Dom.getValue("txt_tempo"),
-    p_tipoassistencia: Dom.getValue("txt_tipo"),
-    p_montagem: Dom.getChecked("chk_mont"),
-    p_promob: Dom.getChecked("chk_promob"),
-    p_entrega: Dom.getChecked("chk_entrega"),
-    p_supervisor: Dom.getValue("txt_supervisor"),
-    p_destino: Dom.getValue("txt_destino"),
+    p_solicitacao: Dom.getValue(EL.solicitation.solicitacao),
+    p_contrato: Dom.getValue(EL.solicitation.contrato),
+    p_solicitante: Dom.getValue(EL.solicitation.solicitante),
+    p_datasolicitacao: Dom.getValue(EL.solicitation.datasolicitacao),
+    p_cliente: Dom.getValue(EL.solicitation.cliente),
+    p_ambiente: Dom.getValue(EL.solicitation.ambiente),
+    p_urgente: Dom.getValue(EL.solicitation.urgente),
+    p_montador: Dom.getValue(EL.solicitation.montador),
+    p_bairro: Dom.getValue(EL.solicitation.bairro),
+    p_tempo: Dom.getValue(EL.solicitation.tempo),
+    p_tipoassistencia: Dom.getValue(EL.solicitation.tipoassistencia),
+    p_montagem: Dom.getChecked(EL.checkbox.montagem),
+    p_promob: Dom.getChecked(EL.checkbox.promob),
+    p_entrega: Dom.getChecked(EL.checkbox.entrega),
+    p_supervisor: Dom.getValue(EL.solicitation.supervisor),
+    p_destino: Dom.getValue(EL.solicitation.destino),
   };
+}
+
+function createPartRow() {
+  const qtd = Dom.getValue(EL.parts.qtd);
+  const peca = Dom.getValue(EL.parts.peca);
+  const dimensoes = Dom.getValue(EL.parts.dimensoes);
+  const cor = Dom.getValue(EL.parts.cor);
+  const tipo = Dom.getValue(EL.parts.tipo);
+  const falhaText = Dom.getInnerHtml(EL.parts.falha);
+  const tipoText = Dom.getInnerHtml(EL.parts.tipo);
+  const lado = Dom.getValue(EL.parts.lado);
+  const falha = Dom.getValue(EL.parts.falha);
+  const obs = Dom.getValue(EL.parts.obs);
+
+  return [
+    qtd,
+    peca,
+    dimensoes,
+    cor,
+    lado,
+    falha,
+    tipo,
+    falhaText,
+    tipoText,
+    obs,
+  ];
 }
 
 /* =========================
@@ -158,100 +267,144 @@ function buildOrderPayload() {
    ========================= */
 async function handleOrderSubmit(evt) {
   evt.preventDefault();
-  const form = document.querySelector("form");
+  const form = q(EL.ui.form_equip);
 
   if (!validators.isNativeFormValid(form)) {
     form.reportValidity();
     return;
   }
 
-  if (!validators.hasAtLeastOneRow("#table-montador tbody")) {
-    messageInformation(
-      "warning",
-      "ATTENTION",
-      "Insert at least one installer for this request."
-    );
+  if (!validators.hasAtLeastOneRow(EL.ui.t_body_montador)) {
+    Modal.showInfo("warning", "ATENÇÃO", "insira o montador responsável");
     return;
   }
 
-  // 3) confirmação
-  const confirm = await messageQuestion(
-    "Finish",
-    "Do you want to submit this assistance?",
-    "Confirm",
-    "Cancel"
+  const confirm = await Modal.showConfirmation(
+    "Finalizar",
+    "Deseja enviar esta solicitação de assistência?",
+    "Confirmar",
+    "Cancelar",
   );
+
   if (!confirm.isConfirmed) return;
 
-  // 4) envio
   try {
     const payload = buildOrderPayload();
     await orderService.createOrder(payload);
-    messageInformation("success", "SUCCESS", "Record created successfully!");
+    Modal.showInfo("success", "SUCESSO", "Registro criado com sucesso!");
 
-    // 5) limpeza
     form.reset();
-    ui.clearTable("#table-montador tbody");
+    ui.clearTable(EL.ui.t_body_montador);
   } catch (err) {
-    messageInformation("error", "ERROR", `Error: ${err.message}`);
+    Modal.showInfo("error", "ERROR", `Error: ${err.message}`);
   }
 }
 
 function handleInstallerAdd(evt) {
   evt.preventDefault();
-  const smallForm = document.querySelector("#no-form");
+  const smallForm = q(EL.ui.form_equip);
   if (!smallForm?.checkValidity()) {
     smallForm?.reportValidity();
     return;
   }
 
-  const select = document.getElementById("txt_categoria");
+  const select = q(EL.solicitation.categoria);
   const id = select.value;
   const name = select.options[select.selectedIndex].text;
   if (!id) return;
 
   ui.appendInstallerRow(id, name);
+  select.remove(select.selectedIndex);
   smallForm.reset();
 }
 
+function handleTableParts(evt) {
+  evt.preventDefault();
+  const form = q(EL.ui.form_parts);
+  if (!form?.checkValidity()) {
+    form?.reportValidity();
+  } else {
+    const itens = createPartRow();
+    ui.appendPartsRow(itens);
+    form.reset();
+  }
+}
+
+async function handleInsertSolicitation(evt) {
+  evt.preventDefault();
+  const form = q(EL.ui.form_solicitacao);
+  if (!form?.checkValidity()) {
+    form.reportValidity();
+  } else {
+    const result = await Modal.showConfirmation(null, "Concluir Solicitação ?");
+    if (result.isConfirmed) t(); //window.location.href = "/solicitacao.html";
+  }
+}
+
+async function populateType() {
+  const res = await orderService.getOcorrencia();
+  const select = q(EL.parts.tipo);
+  select.innerHTML = '<option value="">-</option>';
+  res.data.forEach((element) => populateTypeList(element, select));
+}
+
+async function populateFaills() {
+  const response = await orderService.getFalhas();
+  const select = q(EL.parts.falha);
+  select.innerHTML = '<option value="">-</option>';
+  response.data.forEach((element) => populateFaillsList(element, select));
+}
+
+function populateTypeList(element, select) {
+  const option = ce("option");
+  option.value = element.p_cod;
+  option.innerHTML = element.p_descricao;
+  select.appendChild(option);
+}
+
+function populateFaillsList(element, select) {
+  const option = ce("option");
+  option.value = element.p_codigo;
+  option.innerHTML = `${element.p_codigo} - ${element.p_descricao}`;
+  select.appendChild(option);
+}
+
 async function handleContractBlur() {
-  const contractId = Dom.getValue("txt_contrato");
+  const contractId = Dom.getValue(EL.solicitation.contrato);
   if (!contractId) return;
   try {
     const data = await orderService.fetchContract(contractId);
-    // ex.: data[0] existe segundo seu backend
-    Dom.setValue("txt_cliente", data?.[0]?.p_cliente ?? "");
+    Dom.setValue(EL.solicitation.cliente, data?.[0]?.p_cliente ?? "");
   } catch (e) {
-    messageInformation("error", "ERROR", "Unable to fetch contract.");
+    Modal.showInfo("error", "ERROR", `ERRO: ${e}`);
   }
 }
 
 async function loadOrderTypes() {
   try {
-    const data = await orderService.fetchOrderTypes();
-    const select = document.getElementById("txt_tipo");
-    ui.renderSelectOptions(select, data, {
+    const types = await orderService.fetchOrderTypes();
+    const select = q(EL.solicitation.tipoassistencia);
+    ui.renderSelectOptions(select, types.data, {
       valueKey: "p_cod",
       labelKey: "p_descricao",
       includeEmpty: true,
     });
   } catch {
-    messageInformation("error", "ERROR", "Unable to load order types.");
+    Modal.showInfo("error", "ERROR", "Não foi possível carregar os tipos");
   }
 }
 
 async function loadInstallers() {
   try {
-    const items = await orderService.fetchInstallers();
-    console.log(items);
-    const select = document.querySelector("#txt_categoria");
-    ui.renderSelectOptions(select, items, {
+    const installers = await orderService.fetchInstallers();
+    const select = q(EL.solicitation.categoria);
+    ui.renderSelectOptions(select, installers.data, {
       valueKey: "p_codigo",
       labelKey: "p_nome",
       includeEmpty: true,
     });
   } catch (err) {
-    messageInformation("error", "ERROR", `${err.message}`);
+    Modal.showInfo("error", "ERROR", "Não foi possível carregar os montadores");
   }
 }
 
@@ -275,14 +428,21 @@ function insertButtonCellTable() {
 }
 
 function initApp() {
+  populateType();
+  populateFaills();
   ui.focusFirstField();
-  Dom.addEventBySelector("#txt_contrato", "blur", handleContractBlur);
-  Dom.addEventBySelector("form", "submit", handleOrderSubmit);
-  Dom.addEventBySelector("#bt_adicionar", "click", handleInstallerAdd);
-  Dom.addEventBySelector("#table-montador tbody", "click", handleRowDel);
+  Dom.addEventBySelector(EL.solicitation.contrato, "blur", handleContractBlur);
+  Dom.addEventBySelector(EL.ui.form_equip, "submit", handleOrderSubmit);
+  Dom.addEventBySelector(EL.ui.bt_add, "click", handleInstallerAdd);
+  Dom.addEventBySelector(EL.ui.t_body_montador, "click", handleRowDel);
+  Dom.addEventBySelector(EL.ui.t_body_pecas, "click", handleRowDel);
+  Dom.addEventBySelector(EL.ui.bt_part, "click", handleTableParts);
+  Dom.addEventBySelector(EL.ui.bt_part_1, "click", t);
+  Dom.addEventBySelector(EL.ui.bt_concluir, "click", handleInsertSolicitation);
 
   loadOrderTypes();
   loadInstallers();
+  DateTime.initClock(EL.solicitation.datasolicitacao);
 }
 
 document.addEventListener("DOMContentLoaded", initApp);

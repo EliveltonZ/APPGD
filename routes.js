@@ -126,7 +126,6 @@ route.get("/getAssistencia", assistenciaController.getAssistencia);
 route.put("/setAssistencia", assistenciaController.setAssistencia);
 route.get("/getCapaAssistencia", assistenciaController.getCapaAssistencia);
 route.post("/setNewOrder", assistenciaController.setNewOrder);
-route.get("/getMontador", assistenciaController.getMontador);
 
 // rotas solicitacao
 route.get("/getConfig", solicitacaoContgroller.getConfig);
