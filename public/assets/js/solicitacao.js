@@ -57,17 +57,16 @@ const EL = {
 /* =========================
    SERVICES (API calls)
    ========================= */
-
 const orderService = {
-  async createOrder(payload) {
+  createOrder(payload) {
     return API.fetchBody("/setNewOrder", "POST", payload);
   },
 
-  async fetchInstallers() {
+  fetchInstallers() {
     return API.fetchQuery("/getMontador");
   },
 
-  async fetchContract(contractId) {
+  fetchContract(contractId) {
     return API.fetchQuery(`/getContrato?p_contrato=${contractId}`);
   },
 
@@ -178,25 +177,6 @@ const ui = {
   },
 };
 
-function t() {
-  const tbody = q(EL.ui.t_body_pecas);
-  getRows(tbody);
-}
-
-function getRows(tbody) {
-  const rows = tbody.querySelectorAll("tr");
-  rows.forEach((item) => {
-    getCellsItems(item);
-  });
-}
-
-function getCellsItems(cells) {
-  const tds = cells.querySelectorAll("td");
-  tds.forEach((item) => {
-    console.log(item.textContent);
-  });
-}
-
 /* =========================
    VALIDATORS (rules only)
    ========================= */
@@ -212,6 +192,29 @@ const validators = {
   },
 };
 
+function processPartsTable() {
+  const tbody = q(EL.ui.t_body_pecas);
+  processTableRows(tbody);
+}
+
+async function processTableRows(tbody) {
+  const rows = tbody.querySelectorAll("tr");
+  for (const row of rows) {
+    await processPartRow(row, onError);
+  }
+}
+
+async function processPartRow(row, { onError } = {}) {
+  try {
+    const cells = row.querySelectorAll("td");
+    const data = extractCellData(cells);
+    await fetchInsertItens(data);
+  } catch (err) {
+    if (onError) {
+      onError({ err, row });
+    }
+  }
+}
 /* =========================
    HELPERS (data builders)
    ========================= */
@@ -260,6 +263,19 @@ function createPartRow() {
     tipoText,
     obs,
   ];
+}
+
+function extractCellData(cells) {
+  return {
+    p_qtd: cells[0].textContent,
+    p_peca: cells[1].textContent,
+    p_dimensoes: cells[2].textContent,
+    p_cor: cells[3].textContent,
+    p_lado: cells[4].textContent,
+    p_ocorrencia: cells[6].textContent,
+    p_falha: celulas[5].textContent,
+    p_observacoes: cells[9].textContent,
+  };
 }
 
 /* =========================
@@ -334,10 +350,10 @@ async function handleInsertSolicitation(evt) {
   evt.preventDefault();
   const form = q(EL.ui.form_solicitacao);
   if (!form?.checkValidity()) {
-    form.reportValidity();
+    form?.reportValidity();
   } else {
     const result = await Modal.showConfirmation(null, "Concluir Solicitação ?");
-    if (result.isConfirmed) t(); //window.location.href = "/solicitacao.html";
+    if (result.isConfirmed) processPartsTable(); //window.location.href = "/solicitacao.html";
   }
 }
 
@@ -437,7 +453,7 @@ function initApp() {
   Dom.addEventBySelector(EL.ui.t_body_montador, "click", handleRowDel);
   Dom.addEventBySelector(EL.ui.t_body_pecas, "click", handleRowDel);
   Dom.addEventBySelector(EL.ui.bt_part, "click", handleTableParts);
-  Dom.addEventBySelector(EL.ui.bt_part_1, "click", t);
+  Dom.addEventBySelector(EL.ui.bt_part_1, "click", processPartsTable);
   Dom.addEventBySelector(EL.ui.bt_concluir, "click", handleInsertSolicitation);
 
   loadOrderTypes();

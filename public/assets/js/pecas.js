@@ -249,7 +249,6 @@ async function confirmSolicitacion(event) {
 
 function buildRowData(row) {
   return {
-    p_etiqueta: 0,
     p_qtd: row.cells[0]?.innerHTML ?? "",
     p_peca: row.cells[1]?.innerHTML ?? "",
     p_dimensoes: row.cells[2]?.innerHTML ?? "",
@@ -258,9 +257,6 @@ function buildRowData(row) {
     p_ocorrencia: row.cells[5]?.innerHTML ?? "",
     p_falha: row.cells[6]?.innerHTML ?? "",
     p_observacoes: row.cells[7]?.innerHTML ?? "",
-    p_cliente: Dom.getValue(SEL.form.CLIENTE),
-    p_ambiente: Dom.getValue(SEL.form.AMBIENTE),
-    p_id_montador: Dom.getValue(SEL.ui.ID),
   };
 }
 
