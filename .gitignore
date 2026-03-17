@@ -1,5 +1,6 @@
 node_modules/
 .env
+.claude/settings.local.json
 senha.txt
 APP GD.bsdesign
 teste.html
