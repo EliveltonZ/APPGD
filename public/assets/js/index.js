@@ -110,13 +110,13 @@ function hasValidPasswordResponse(response) {
    USE CASES / FLOWS
 ========================================================= */
 async function fetchUserLoginById(userId) {
-  const res = await AuthAPI.fetchUserAccessById(userId);
+  const res = await API.fetchQuery(`/getUsuario?p_id=${encodeURIComponent(userId)}`);
   if (res.status !== 200) throw new Error(`HTTP ${res.status}`);
 
   const user = res?.data?.[0];
   if (!user) return null;
 
-  return user.login || "";
+  return user.nome || user.login || "";
 }
 
 async function saveUserPermissions(user) {
@@ -146,6 +146,7 @@ async function processLogin() {
 ========================================================= */
 async function handleIdBlur() {
   const userId = q(SELECTORS.inputs.id).value.trim();
+  console.log('handleIdBlur userId=', userId);
 
   if (isEmpty(userId)) {
     Fields.set(SELECTORS.inputs.login, "");
@@ -156,6 +157,8 @@ async function handleIdBlur() {
   try {
     const login = await fetchUserLoginById(userId);
 
+    console.log('fetched login', login);
+
     if (!login) {
       await showError("Número de ID não encontrado");
       Fields.set(SELECTORS.inputs.id, "");
@@ -165,7 +168,8 @@ async function handleIdBlur() {
     }
 
     Fields.set(SELECTORS.inputs.login, login);
-  } catch {
+  } catch (err) {
+    console.error('handleIdBlur error', err);
     await showError("Número de ID não encontrado");
     Fields.set(SELECTORS.inputs.id, "");
     Fields.set(SELECTORS.inputs.login, "");
@@ -175,9 +179,12 @@ async function handleIdBlur() {
 
 async function handleLoginSubmit(event) {
   event.preventDefault();
+  console.log('handleLoginSubmit fired');
 
   try {
     const result = await processLogin();
+
+    console.log('processLogin result', result);
 
     if (!result.ok) {
       await showError("Senha digitada é inválida!");

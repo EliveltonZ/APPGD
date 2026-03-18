@@ -1,6 +1,5 @@
 const express = require("express");
 const route = express.Router();
-<<<<<<< HEAD
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require('express-validator');
 const ProjetosProdController = require("./controllers/projetosPrdController");
@@ -57,12 +56,6 @@ const validatePasswordChange = [
   }
 ];
 const acessosController = require("./controllers/acessosController");
-=======
-const ProjetosProdController = require("./controllers/projetosPrdController");
-const indexController = require("./controllers/indexController");
-const ultilsController = require("./controllers/ultilsController");
-const acessoCrontroller = require("./controllers/acessosController");
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 const addProjetosController = require("./controllers/addProjetosController");
 const menuController = require("./controllers/menuController");
 const addUsersController = require("./controllers/addUsersController");
@@ -80,11 +73,7 @@ const senhaController = require("./controllers/senhaController");
 const usuariosController = require("./controllers/usuariosController");
 const emailController = require("./controllers/emailController");
 const assistenciaController = require("./controllers/assistenciasController");
-<<<<<<< HEAD
 const solicitacaoController = require("./controllers/solicitacaoController");
-=======
-const solicitacaoContgroller = require("./controllers/solicitacaoController");
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 const pecasController = require("./controllers/pecasController");
 
 // rota para envio de email
@@ -104,20 +93,12 @@ route.get("/getCodigoBarras", ultilsController.getCodigoBarras);
 route.get("/getOperadores", ultilsController.getOperadores);
 route.get("/setTipo", ultilsController.setTipo);
 route.get("/getMontador", ultilsController.getMontador);
-<<<<<<< HEAD
 route.get("/validateLogin", authLimiter, ultilsController.validateLogin);
-=======
-route.get("/validateLogin", ultilsController.validateLogin);
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
 route.get("/getPecas", ultilsController.getPecas);
 
 // rotas index.js
-<<<<<<< HEAD
 route.post("/passwordValidation", authLimiter, validateLogin, indexController.passwordValidation);
-=======
-route.post("/passwordValidation", indexController.passwordValidation);
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 
 // rotas capa.js
 route.get("/fillElements", capaController.fillElements);
@@ -180,19 +161,11 @@ route.get("/fillTableStts", projetosSttsController.fillTable);
 route.get("/getStatus", projetosSttsController.getStatus);
 
 // rotas acessos.js
-<<<<<<< HEAD
 route.get("/getUserAccess", acessosController.getUserAccess);
 route.put("/setUserAccess", acessosController.setUserAccess);
 
 // rotas senha.js
 route.put("/alterarSenha", authLimiter, validatePasswordChange, senhaController.alterarSenha);
-=======
-route.get("/getUserAccess", acessoCrontroller.getUserAccess);
-route.put("/setUserAccess", acessoCrontroller.setUserAccess);
-
-// rotas senha.js
-route.put("/alterarSenha", senhaController.alterarSenha);
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 
 // rotas acessos pagina
 route.post("/setPermission", usuariosController.setPermissions);
@@ -207,11 +180,7 @@ route.get("/getCapaAssistencia", assistenciaController.getCapaAssistencia);
 route.post("/setNewOrder", assistenciaController.setNewOrder);
 
 // rotas solicitacao
-<<<<<<< HEAD
 route.get("/getConfig", solicitacaoController.getConfig);
-=======
-route.get("/getConfig", solicitacaoContgroller.getConfig);
->>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 
 // rotas pecas
 route.get("/getOcorrencia", pecasController.getOcorrencia);

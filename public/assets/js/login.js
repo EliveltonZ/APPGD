@@ -8,8 +8,8 @@ import { API } from "./service/api.js";
 const SELECTORS = {
   inputs: {
     id: "#txt_id",
-    nome: "#txt_nome",
-    senha: "#txt_senha",
+    nome: "#txt_login",
+    senha: "#password",
   },
   ui: {
     form: "form",
@@ -22,13 +22,13 @@ const SELECTORS = {
 ========================================================= */
 const LoginAPI = {
   fetchMontadorNameById(id) {
-    const url = `/getMontador?p_codigo=${id}`;
+    const url = `/getUsuario?p_id=${id}`;
     return API.fetchQuery(url);
   },
 
   validateLogin(id, senha) {
-    const url = `/validateLogin?p_codigo=${id}&p_senha=${senha}`;
-    return API.fetchQuery(url);
+    const url = "/passwordValidation";
+    return API.fetchBody(url, "POST", { id, senha });
   },
 };
 
@@ -66,9 +66,9 @@ function lsSet(key, value) {
 }
 
 function setUserLocalStorage(data) {
-  // preservando seu contrato esperado: data[0].codigo / data[0].nome
-  lsSet("id_montador", data?.[0]?.codigo ?? "");
-  lsSet("montador", data?.[0]?.nome ?? "");
+  const user = data?.[0] ?? {};
+  lsSet("id_montador", user.id ?? "");
+  lsSet("montador", user.login ?? "");
 }
 
 /* =========================================================
@@ -87,7 +87,9 @@ async function loadMontadorNameByIdFlow() {
   if (!id) return;
 
   const res = await LoginAPI.fetchMontadorNameById(id);
-  const nome = res?.data?.[0]?.p_nome ?? "";
+  const montadores = res?.data ?? [];
+  const match = montadores.find((m) => String(m.p_codigo) === String(id));
+  const nome = match?.p_nome ?? "";
 
   Fields.set(SELECTORS.inputs.nome, nome);
 }
