@@ -1,0 +1,6 @@
+url: https://aqtuuklwebzviodywcck.supabase.co
+api = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFxdHV1a2x3ZWJ6dmlvZHl3Y2NrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNzQ4MjcsImV4cCI6MjA3MDg1MDgyN30.deZngYaRtOHwh6JpLW0ylKGwJWfEqechK8zmwegMsr4
+
+essa parte do codigo abaixo nao estar representado um ciculo corretamente como devia no arquivo .sql
+
+WHEN EXISTS (SELECT 1 FROM "tblAcessorios" WHERE "tblAcessorios".ordemdecompra = "tblProjetos".ordemdecompra) THEN '●'

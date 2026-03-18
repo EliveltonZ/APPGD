@@ -2,7 +2,11 @@ const supabase = require("../client/clientSupabase");
 
 /**
  * @param {string} remoteFunction               – nome da função remota no Supabase
+<<<<<<< HEAD
  * @param {"query"|"body"|"none"} paramSource          – de onde virão os params: req.query, req.body ou nenhum
+=======
+ * @param {"query"|"body"} paramSource          – de onde virão os params: req.query ou req.body
+>>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
  * @param {object}   [opts]
  * @param {string}   [opts.errorMessage]        – texto para enviar ao cliente em caso de falha
  * @param {Function} [opts.transform]           – dado bruto => dado que vai no res.json()
@@ -15,6 +19,7 @@ function createRpcHandler(
 ) {
   return async (req, res) => {
     try {
+<<<<<<< HEAD
       const params =
         paramSource === "body"
           ? req.body
@@ -40,6 +45,10 @@ function createRpcHandler(
       }
 
       const { data, error } = await supabase.rpc(remoteFunction, rpcParams);
+=======
+      const params = paramSource === "body" ? req.body : req.query;
+      const { data, error } = await supabase.rpc(remoteFunction, params);
+>>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 
       if (error) {
         console.error(`RPC error [${remoteFunction}]:`, error);
@@ -49,6 +58,7 @@ function createRpcHandler(
         });
       }
 
+<<<<<<< HEAD
       // Check if login failed (for password validation)
       if (remoteFunction === 'check_password' && (!data || data.length === 0)) {
         const fs = require('fs');
@@ -57,6 +67,8 @@ function createRpcHandler(
         fs.appendFileSync(path.join(__dirname, '..', 'auth.log'), logEntry);
       }
 
+=======
+>>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
       const payload = transform ? transform(data) : data;
       return res.json(payload);
     } catch (err) {
@@ -69,6 +81,7 @@ function createRpcHandler(
   };
 }
 
+<<<<<<< HEAD
 // Basic sanitization function
 function sanitizeParams(params) {
   if (typeof params !== 'object' || params === null) return params;
@@ -87,4 +100,6 @@ function sanitizeParams(params) {
   return sanitized;
 }
 
+=======
+>>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
 module.exports = { createRpcHandler };

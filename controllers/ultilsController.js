@@ -13,7 +13,11 @@ module.exports = {
   getCodigoBarras: createRpcHandler("get_projeto_codigo_barras", "query"),
   getOperadores: createRpcHandler("get_operadores", "query"),
   setTipo: createRpcHandler("set_tipo", "query"),
+<<<<<<< HEAD
   getMontador: createRpcHandler("get_montadores", "none"),
+=======
+  getMontador: createRpcHandler("get_montadores", "query"),
+>>>>>>> da5d35dc1a329033dc243abb7e06c9a70eecddab
   validateLogin: createRpcHandler("validate_login", "query"),
   getSolicitacoes: createRpcHandler("get_solicitacoes", "query"),
   getPecas: createRpcHandler("total_pecas", "query"),

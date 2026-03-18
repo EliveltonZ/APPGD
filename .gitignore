@@ -12,6 +12,8 @@ teste2.html
 admin.html
 teste.bsdesign
 chave.txt
+ssl/private-key.pem
+ssl/certificate.pem
 
 # Logs
 logs
