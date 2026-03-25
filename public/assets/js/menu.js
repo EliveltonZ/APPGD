@@ -22,12 +22,15 @@ const SELECTORS = {
   iframe: {
     capa: "#iframeImpressao",
     pendencia: "#iframeImpressao1",
+    conferencia: "#iframeImpressao2",
   },
   ui: {
     lbCapa: "#lb_capa",
     spinnerCapa: "#spinner",
     lbPendencia: "#lb_pendencias",
     spinnerPendencia: "#spinner-1",
+    lbConferencia: "#lb_conferencia",
+    spinnerConferencia: "#spinner-2",
   },
   links: {
     logout: "#link_logout",
@@ -36,6 +39,7 @@ const SELECTORS = {
   buttons: {
     capa: "#bt_capa",
     capaPendencia: "#bt_capa_pendencia",
+    capaConferencia: "#bt_capa_conferencia",
   },
 };
 
@@ -292,7 +296,6 @@ async function printCapaFlow() {
     await loadDataForPrint();
     printIframe(SELECTORS.iframe.capa);
 
-    // após imprimir, grava tipo/urgência
     setTimeout(async () => {
       await saveProjectType();
       showSpinner(SELECTORS.ui.lbCapa, SELECTORS.ui.spinnerCapa, false);
@@ -315,11 +318,40 @@ async function printPendenciaFlow() {
       showSpinner(
         SELECTORS.ui.lbPendencia,
         SELECTORS.ui.spinnerPendencia,
-        false
+        false,
       );
     }, 500);
   } catch (err) {
     showSpinner(SELECTORS.ui.lbPendencia, SELECTORS.ui.spinnerPendencia, false);
+    await showError(`Erro ao imprimir: ${err?.message || err}`);
+  }
+}
+
+async function printConferedFlow() {
+  showSpinner(
+    SELECTORS.ui.lbConferencia,
+    SELECTORS.ui.spinnerConferencia,
+    true,
+  );
+
+  try {
+    persistPrintContext();
+    await loadDataForPrint();
+    printIframe(SELECTORS.iframe.conferencia);
+
+    setTimeout(() => {
+      showSpinner(
+        SELECTORS.ui.lbConferencia,
+        SELECTORS.ui.spinnerConferencia,
+        false,
+      );
+    }, 500);
+  } catch (err) {
+    showSpinner(
+      SELECTORS.ui.lbConferencia,
+      SELECTORS.ui.spinnerConferencia,
+      false,
+    );
     await showError(`Erro ao imprimir: ${err?.message || err}`);
   }
 }
@@ -335,14 +367,20 @@ function bindEvents() {
   Dom.addEventBySelector(SELECTORS.links.logout, "click", logoutFlow);
   Dom.addEventBySelector(SELECTORS.buttons.capa, "click", printCapaFlow);
   Dom.addEventBySelector(
+    SELECTORS.buttons.capaConferencia,
+    "click",
+    printConferedFlow,
+  );
+
+  Dom.addEventBySelector(
     SELECTORS.buttons.capaPendencia,
     "click",
-    printPendenciaFlow
+    printPendenciaFlow,
   );
   Dom.addEventBySelector(
     SELECTORS.links.dashboard,
     "click",
-    handleDashboardClick
+    handleDashboardClick,
   );
 }
 

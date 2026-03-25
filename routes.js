@@ -1,7 +1,7 @@
 const express = require("express");
 const route = express.Router();
 const rateLimit = require("express-rate-limit");
-const { body, validationResult } = require('express-validator');
+const { body, validationResult } = require("express-validator");
 const ProjetosProdController = require("./controllers/projetosPrdController");
 const indexController = require("./controllers/indexController");
 const ultilsController = require("./controllers/ultilsController");
@@ -17,43 +17,51 @@ const authLimiter = rateLimit({
 
 // Validation middleware
 const validateLogin = [
-  body('p_id').isInt().custom(value => {
-    if (value < -1) {
-      throw new Error('ID deve ser um número inteiro e positivo');
-    }
-    return true;
-  }).withMessage('ID deve ser um número inteiro e positivo'),
-  body('p_senha').isLength({ min: 1 }).withMessage('Senha é obrigatória'),
+  body("p_id")
+    .isInt()
+    .custom((value) => {
+      if (value < -1) {
+        throw new Error("ID deve ser um número inteiro e positivo");
+      }
+      return true;
+    })
+    .withMessage("ID deve ser um número inteiro e positivo"),
+  body("p_senha").isLength({ min: 1 }).withMessage("Senha é obrigatória"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
     next();
-  }
+  },
 ];
 
 const validatePasswordChange = [
-  body('id').isInt().custom(value => {
-    if (value < -1) {
-      throw new Error('ID deve ser um número inteiro e positivo');
-    }
-    return true;
-  }).withMessage('ID deve ser um número inteiro e positivo'),
-  body('nova_senha').isLength({ min: 6 }).withMessage('Nova senha deve ter pelo menos 6 caracteres'),
+  body("id")
+    .isInt()
+    .custom((value) => {
+      if (value < -1) {
+        throw new Error("ID deve ser um número inteiro e positivo");
+      }
+      return true;
+    })
+    .withMessage("ID deve ser um número inteiro e positivo"),
+  body("nova_senha")
+    .isLength({ min: 6 })
+    .withMessage("Nova senha deve ter pelo menos 6 caracteres"),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
-        message: 'Validation failed',
-        errors: errors.array()
+        message: "Validation failed",
+        errors: errors.array(),
       });
     }
     next();
-  }
+  },
 ];
 const acessosController = require("./controllers/acessosController");
 const addProjetosController = require("./controllers/addProjetosController");
@@ -98,7 +106,12 @@ route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
 route.get("/getPecas", ultilsController.getPecas);
 
 // rotas index.js
-route.post("/passwordValidation", authLimiter, validateLogin, indexController.passwordValidation);
+route.post(
+  "/passwordValidation",
+  authLimiter,
+  validateLogin,
+  indexController.passwordValidation,
+);
 
 // rotas capa.js
 route.get("/fillElements", capaController.fillElements);
@@ -165,7 +178,12 @@ route.get("/getUserAccess", acessosController.getUserAccess);
 route.put("/setUserAccess", acessosController.setUserAccess);
 
 // rotas senha.js
-route.put("/alterarSenha", authLimiter, validatePasswordChange, senhaController.alterarSenha);
+route.put(
+  "/alterarSenha",
+  authLimiter,
+  validatePasswordChange,
+  senhaController.alterarSenha,
+);
 
 // rotas acessos pagina
 route.post("/setPermission", usuariosController.setPermissions);
@@ -181,6 +199,7 @@ route.post("/setNewOrder", assistenciaController.setNewOrder);
 
 // rotas solicitacao
 route.get("/getConfig", solicitacaoController.getConfig);
+route.get("/setEquipSat", solicitacaoController.setEquipSat);
 
 // rotas pecas
 route.get("/getOcorrencia", pecasController.getOcorrencia);

@@ -5,7 +5,6 @@ import { DateTime } from "./utils/time.js";
 /*================== 
 HELPERS ELEMENTS ID
 ==================*/
-
 const SELECTORS = {
   CONTRATO: "#lb_contrato",
   Q_PROJ: "#lb_qproj",
@@ -38,9 +37,7 @@ function colorUrgente(value) {
 
 function buildOrderBy(ordemdecompra) {
   const numStr = String(ordemdecompra);
-  if (numStr.length < 10) {
-    return numStr;
-  }
+  if (numStr.length < 10) return numStr;
   return `${numStr.slice(0, 8)}-${numStr.slice(-2)}`;
 }
 

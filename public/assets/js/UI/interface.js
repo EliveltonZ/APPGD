@@ -32,11 +32,19 @@ export class Dom {
   }
 
   static setValue(element, value) {
-    q(element).value = value;
+    try {
+      q(element).value = value;
+    } catch {
+      console.warn(`${element} não encontrado`);
+    }
   }
 
   static setInnerHtml(element, value) {
-    q(element).innerHTML = value;
+    try {
+      q(element).innerHTML = value;
+    } catch {
+      console.warn(`${element} não encontrado`);
+    }
   }
 
   static getChecked(element) {

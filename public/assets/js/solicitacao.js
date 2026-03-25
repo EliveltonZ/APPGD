@@ -41,6 +41,7 @@ const EL = {
     promob: "#chk_promob",
     entrega: "#chk_entrega",
   },
+
   ui: {
     t_body_montador: "#table-montador tbody",
     t_body_pecas: "#table-pecas tbody",
@@ -91,25 +92,6 @@ const orderService = {
    UI RENDERERS (DOM-only)
    ========================= */
 const ui = {
-  readTable(idTabela) {
-    const tabela = document.getElementById(idTabela);
-    const linhas = tabela.querySelectorAll("tbody tr");
-    const dados = [];
-
-    linhas.forEach((linha) => {
-      const celulas = linha.qa("td");
-      const valores = [];
-
-      celulas.forEach((celula) => {
-        valores.push(celula.textContent.trim());
-      });
-
-      dados.push(valores);
-    });
-
-    return dados;
-  },
-
   renderSelectOptions(
     selectEl,
     items,
@@ -200,21 +182,28 @@ function processPartsTable() {
 async function processTableRows(tbody) {
   const rows = tbody.querySelectorAll("tr");
   for (const row of rows) {
-    await processPartRow(row, onError);
+    await processPartRow(row);
   }
 }
 
-async function processPartRow(row, { onError } = {}) {
+async function processPartRow(row) {
+  processRows(row, extractParts);
+}
+
+async function processInstallerRow(row) {
+  processRows(row, extractInstallers);
+}
+
+async function processRows(row, _function) {
   try {
     const cells = row.querySelectorAll("td");
-    const data = extractCellData(cells);
-    await fetchInsertItens(data);
-  } catch (err) {
-    if (onError) {
-      onError({ err, row });
-    }
+    const data = _function(cells);
+    console.log(data);
+  } catch {
+    console.warn(`erro: ${err}`);
   }
 }
+
 /* =========================
    HELPERS (data builders)
    ========================= */
@@ -265,16 +254,24 @@ function createPartRow() {
   ];
 }
 
-function extractCellData(cells) {
+function extractParts(cells) {
   return {
     p_qtd: cells[0].textContent,
     p_peca: cells[1].textContent,
     p_dimensoes: cells[2].textContent,
     p_cor: cells[3].textContent,
+    p_id_assistencia: Dom.getValue(EL.solicitation.solicitacao),
     p_lado: cells[4].textContent,
     p_ocorrencia: cells[6].textContent,
-    p_falha: celulas[5].textContent,
+    p_falha: cells[5].textContent,
     p_observacoes: cells[9].textContent,
+  };
+}
+
+function extractInstallers(cells) {
+  return {
+    p_id_sat: Dom.getValue(EL.solicitation.solicitacao),
+    p_id_montador: cells[0].textContent,
   };
 }
 
@@ -353,7 +350,7 @@ async function handleInsertSolicitation(evt) {
     form?.reportValidity();
   } else {
     const result = await Modal.showConfirmation(null, "Concluir Solicitação ?");
-    if (result.isConfirmed) processPartsTable(); //window.location.href = "/solicitacao.html";
+    if (result.isConfirmed) processPartsTable();
   }
 }
 
@@ -446,6 +443,8 @@ function insertButtonCellTable() {
 function initApp() {
   populateType();
   populateFaills();
+  loadOrderTypes();
+  loadInstallers();
   ui.focusFirstField();
   Dom.addEventBySelector(EL.solicitation.contrato, "blur", handleContractBlur);
   Dom.addEventBySelector(EL.ui.form_equip, "submit", handleOrderSubmit);
@@ -455,9 +454,6 @@ function initApp() {
   Dom.addEventBySelector(EL.ui.bt_part, "click", handleTableParts);
   Dom.addEventBySelector(EL.ui.bt_part_1, "click", processPartsTable);
   Dom.addEventBySelector(EL.ui.bt_concluir, "click", handleInsertSolicitation);
-
-  loadOrderTypes();
-  loadInstallers();
   DateTime.initClock(EL.solicitation.datasolicitacao);
 }
 
