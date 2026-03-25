@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="pt-br" data-bss-forced-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>APP GD</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=afd5ef158ebfc6b2cf8d25d5a1998e14">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
+    <link rel="stylesheet" href="assets/css/capa_conferencia.min.css?h=585ba595a334e6cd90f03b40ab194e6e">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
+<link rel="icon" href="/assets/img/icone.png">
+    <script src="assets/js/capaConferencia.js" type="module"></script>
+</head>
+
+<body class="d-flex justify-content-xl-center" style="font-family: 'Nunito Sans', sans-serif">
+    <div class="text-reset justify-content-center div-border" id="impressao" style="width: 720px;font-size: 12px;background: #ffffff;padding-left: 10px;padding-right: 10px;">
+        <div class="d-flex justify-content-between div-border" style="width: 100%;margin-top: 4px;height: 48px;">
+            <div class="d-flex justify-content-center align-items-center div-border" style="width: 18vh;"><img src="assets/img/Capturar.png?h=585181b55d7fbff25d723edd33ba6b19" style="width: 60%;height: 80%;"></div>
+            <div class="d-flex justify-content-center align-items-center" style="width: 88vh;background: #bdeebf;"><label class="form-label margin-0" style="color: var(--bs-emphasis-color);font-weight: bold;font-size: 26px;">REGISTRO DE VERIFICAÇÃO VOLUMÉTRICA</label></div>
+        </div>
+        <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;margin-top: 8px;">
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 122px;"><label class="form-label fw-bold margin-0">CÓD. CORTE CERTO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 96px;"><label class="form-label fw-bold margin-0">LOTE</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 104px;"><label class="form-label fw-bold margin-0">PEDIDO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 131px;"><label class="form-label fw-bold margin-0">CONTRATO</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 110px;"><label class="form-label fw-bold margin-0"><strong>QTDE PROJETOS</strong></label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right" style="width: 104px;"><label class="form-label fw-bold margin-0">NUM. PROJETO</label></div>
+            <div class="d-flex justify-content-center align-items-center" style="width: 61px;"><label class="form-label fw-bold margin-0">URG</label></div>
+        </div>
+        <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;">
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label margin-0" id="lb_corte">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 96px;"><label class="form-label margin-0" id="lb_lote">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label margin-0" id="lb_pedido">...</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_contrato">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 110px;"><label class="form-label margin-0" id="lb_qproj">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label margin-0" id="lb_numproj">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" id="div_urgente" style="width: 61px;"><label class="form-label justify-content-center align-items-center margin-0" id="lb_urgente">-</label></div>
+        </div>
+        <div class="d-flex justify-content-center title" style="background: #F9ADAD;margin-top: 8px;"><label class="form-label">INFORMAÇÕES DO CONTRATO</label></div>
+        <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;margin-top: 0px;">
+            <div class="d-flex d-xxl-flex justify-content-center align-items-center justify-content-xxl-center align-items-xxl-center div-border-right div-border-top" style="width: 122px;"><label class="form-label fw-bold margin-0">CLIENTE:</label></div>
+            <div class="d-flex align-items-center div-border-right div-border-top" style="width: 343px;"><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_cliente" style="margin-left: 5px;">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label fw-bold margin-0">N° O.C.:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_numoc">-</label></div>
+        </div>
+        <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;margin-top: 0;">
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label fw-bold margin-0">AMBIENTE:</label></div>
+            <div class="d-flex align-items-center div-border-right div-border-top" style="width: 343px;"><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente" style="margin-left: 5px;">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;background: #C6E0B4;"><label class="form-label fw-bold margin-0">ENTREGA:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_dataentrega" style="color: var(--bs-red)">-</label></div>
+        </div>
+        <div class="d-flex justify-content-between div-border" style="width: 100%;text-align: center;height: 26px;margin-top: 0;">
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 122px;"><label class="form-label fw-bold div-border-right margin-0">VENDEDOR:</label></div>
+            <div class="d-flex align-items-center div-border-right div-border-top" style="width: 343px;"><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_vendedor" style="margin-left: 5px;">-</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-right div-border-top" style="width: 104px;"><label class="form-label fw-bold margin-0">LIBERADOR:</label></div>
+            <div class="d-flex justify-content-center align-items-center div-border-top" style="width: 131px;"><label class="form-label margin-0" id="lb_liberador">-</label></div>
+        </div>
+        <div class="div-border" style="margin-top: 8px;">
+            <div class="d-flex justify-content-center title margin-0" style="background: #bdeebf;"><label class="form-label">VOLUMES</label></div>
+            <div class="justify-content-center div-border-top div-container" id="checkboxes" style="padding-bottom: 20px;margin: 0;padding-top: 10px;"></div>
+        </div>
+        <div class="rodape">
+            <div class="d-flex justify-content-between div-border" style="height: 50%;padding-left: 10px;padding-right: 10px;">
+                <div class="d-flex div-border"><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_contrato-1" style="margin-left: 5px;">-</label><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_contrato-2" style="margin-left: 5px;">-</label><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_cliente-1" style="margin-left: 5px;">-</label><label class="form-label d-flex justify-content-between align-items-center margin-0" id="lb_cliente-2" style="margin-left: 5px;">-</label><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente-1" style="margin-left: 5px;">-</label></div>
+                <div class="d-flex align-items-center margin-0 div-border"><label class="form-label text-center justify-content-center align-text-bottom margin-0">Data:&nbsp; &nbsp;_____/______/______</label></div>
+            </div>
+            <div class="d-flex align-items-center gap-4 div-border" style="padding-top: 10px;height: 50%;padding-left: 10px;"><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente-3" style="margin-left: 5px;">Responsável:</label><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente-4" style="margin-left: 5px;">______________________</label>
+                <div class="form-check div-border margin-0"><input class="form-check-input margin-0" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Completo</label></div>
+                <div class="form-check div-border margin-0"><input class="form-check-input margin-0" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Faltando</label></div><label class="form-label d-flex align-items-center margin-0" id="lb_ambiente-2" style="margin-left: 5px;">_______________________________________</label>
+            </div>
+        </div>
+    </div>
+    <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+</body>
+
+</html>
