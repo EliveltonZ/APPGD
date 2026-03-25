@@ -8,6 +8,8 @@ const session = require("express-session");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 const helmet = require("helmet");
+const fs = require("fs");
+
 require("dotenv").config({ path: __dirname + "/client/.env" });
 
 const useCors = true;
@@ -35,31 +37,27 @@ app.use(
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100,
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // limit each IP to 50 login attempts per windowMs (reduzido para evitar bloqueio durante dev)
+  windowMs: 15 * 60 * 1000,
+  max: 50,
   message: "Too many login attempts, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// NÃO aplicar rate limit global - apenas em rotas de API específicas
-// app.use(limiter); ← REMOVIDO para permitir assets estáticos sem bloqueio
-
 // Logging
 app.use(
   morgan("combined", {
-    stream: require("fs").createWriteStream(
-      path.join(__dirname, "access.log"),
-      { flags: "a" },
-    ),
+    stream: fs.createWriteStream(path.join(__dirname, "access.log"), {
+      flags: "a",
+    }),
   }),
 );
 
@@ -80,7 +78,6 @@ app.use((req, res, next) => {
   );
 
   if (isSuspicious) {
-    const fs = require("fs");
     const logEntry = `[${new Date().toISOString()}] SUSPICIOUS ACTIVITY: ${req.method} ${req.url} from ${req.ip}\n`;
     fs.appendFileSync(path.join(__dirname, "security.log"), logEntry);
     console.warn("Suspicious activity detected:", req.method, req.url, req.ip);
@@ -101,50 +98,25 @@ app.use(cookieParser(process.env.SESSION_SECRET));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || "fallback-secret",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // set to true if using https
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax",
+    },
   }),
 );
 
 app.use("/", routes);
 
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, "public", "error.html"));
 });
 
-const PORT = 5500;
+const PORT = process.env.PORT || 5500;
 
-// HTTPS configuration for production
-if (process.env.NODE_ENV === "production") {
-  const https = require("https");
-  const fs = require("fs");
-
-  // You'll need to provide your SSL certificate files
-  const options = {
-    key: fs.readFileSync(process.env.SSL_KEY_PATH || "path/to/private-key.pem"),
-    cert: fs.readFileSync(
-      process.env.SSL_CERT_PATH || "path/to/certificate.pem",
-    ),
-  };
-
-  https.createServer(options, app).listen(443, () => {
-    console.log("HTTPS Server running on port 443");
-  });
-
-  // Redirect HTTP to HTTPS
-  const http = require("http");
-  http
-    .createServer((req, res) => {
-      res.writeHead(301, {
-        Location: "https://" + req.headers["host"] + req.url,
-      });
-      res.end();
-    })
-    .listen(80);
-} else {
-  app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
