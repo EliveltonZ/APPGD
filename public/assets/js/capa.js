@@ -45,7 +45,6 @@ function populateElements(ordemdecompra) {
   if (ordemdecompra) {
     const res = JSON.parse(localStorage.getItem("project"));
     const data = res[0];
-    // const numoc = `${ordemdecompra.slice(0, 8)}-${ordemdecompra.slice(-2)}`;
     Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
     Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
     Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
