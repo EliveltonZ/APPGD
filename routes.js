@@ -63,6 +63,7 @@ const validatePasswordChange = [
     next();
   },
 ];
+
 const acessosController = require("./controllers/acessosController");
 const addProjetosController = require("./controllers/addProjetosController");
 const menuController = require("./controllers/menuController");
@@ -82,6 +83,7 @@ const usuariosController = require("./controllers/usuariosController");
 const emailController = require("./controllers/emailController");
 const assistenciaController = require("./controllers/assistenciasController");
 const solicitacaoController = require("./controllers/solicitacaoController");
+const qualidadeController = require("./controllers/qualidadeController");
 const pecasController = require("./controllers/pecasController");
 
 // rota para envio de email
@@ -103,7 +105,8 @@ route.get("/setTipo", ultilsController.setTipo);
 route.get("/getMontador", ultilsController.getMontador);
 route.get("/validateLogin", authLimiter, ultilsController.validateLogin);
 route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
-route.get("/getPecas", ultilsController.getPecas);
+route.get("/getFalhas", ultilsController.getFalhas);
+route.get("/getCausa", ultilsController.getCausa);
 
 // rotas index.js
 route.post(
@@ -199,12 +202,16 @@ route.post("/setNewOrder", assistenciaController.setNewOrder);
 
 // rotas solicitacao
 route.get("/getConfig", solicitacaoController.getConfig);
-route.get("/setEquipSat", solicitacaoController.setEquipSat);
+route.post("/setEquipSat", solicitacaoController.setEquipSat);
+route.get("/getPecas", solicitacaoController.getPecas);
 
 // rotas pecas
-route.get("/getOcorrencia", pecasController.getOcorrencia);
-route.get("/getFalhas", pecasController.getFalhas);
+route.get("/getOcorrencia", ultilsController.getOcorrencia);
 route.post("/setPecas", pecasController.setPecas);
+
+// rotas qualidade
+route.get("/getPecasQualidade", qualidadeController.getPecasQualidade);
+route.put("/updateCausaRaiz", qualidadeController.updateCausaRaiz);
 
 route.get("/user-data", (req, res) => {
   if (!req.session.user) {

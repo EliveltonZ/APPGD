@@ -3,17 +3,23 @@ import { Dom, q, qa, ce } from "./UI/interface.js";
 import { Modal } from "./utils/modal.js";
 import { DateTime } from "./utils/time.js";
 import { API } from "./service/api.js";
+import { getCookie } from "./utils.js";
 
 /* =========================
    SELECTOR
    ========================= */
 const EL = {
+  cookie: {
+    login: "login",
+  },
+
   solicitation: {
     solicitacao: "#txt_solicitacao",
     contrato: "#txt_contrato",
     solicitante: "#txt_solicitante",
     datasolicitacao: "#txt_data",
     cliente: "#txt_cliente",
+    liberador: "#txt_liberador",
     ambiente: "#txt_ambiente",
     urgente: "#txt_urgente",
     montador: "#txt_responsavel",
@@ -40,6 +46,7 @@ const EL = {
     montagem: "#chk_mont",
     promob: "#chk_promob",
     entrega: "#chk_entrega",
+    garantia: "#chk_garantia",
   },
 
   ui: {
@@ -50,7 +57,6 @@ const EL = {
     form_solicitacao: "#div-form form",
     bt_add: "#bt_adicionar",
     bt_part: "#add_parts",
-    bt_part_1: "#add_parts-1",
     bt_concluir: "#bt_concluir",
   },
 };
@@ -61,6 +67,14 @@ const EL = {
 const orderService = {
   createOrder(payload) {
     return API.fetchBody("/setNewOrder", "POST", payload);
+  },
+
+  createItens(data) {
+    return API.fetchBody("/setPecas", "POST", data);
+  },
+
+  createInstaller(payload) {
+    return API.fetchBody("/setEquipSat", "POST", payload);
   },
 
   fetchInstallers() {
@@ -75,18 +89,199 @@ const orderService = {
     return API.fetchQuery("/getConfig");
   },
 
-  getOcorrencia() {
+  fetchOcorrencia() {
     return API.fetchQuery("/getOcorrencia");
   },
 
-  getFalhas() {
+  fetchFalls() {
     return API.fetchQuery("/getFalhas");
   },
+};
 
-  fetchInsertItens(data) {
-    return API.fetchBody("/setPecas", "POST", data);
+/* =========================
+   VALIDATORS (rules only)
+   ========================= */
+const validators = {
+  isNativeFormValid(form) {
+    return form.checkValidity();
+  },
+
+  hasAtLeastOneRow(tbodySelector) {
+    const tbody = q(tbodySelector);
+    const count = tbody ? tbody.querySelectorAll("tr").length : 0;
+    return count > 0;
+  },
+
+  verifyOrder() {
+    const contractId = Dom.getValue(EL.solicitation.contrato);
+    if (!contractId) return false;
+    return true;
   },
 };
+
+/* =========================
+   PROCESS TABLES 
+   ========================= */
+
+function processTableRows(tbody, _function) {
+  const rows = tbody.querySelectorAll("tr");
+  for (const row of rows) _function(row);
+}
+function processPartsTable() {
+  const tbody = q(EL.ui.t_body_pecas);
+  processTableRows(tbody, processPartRow);
+}
+
+function processInstallerTable() {
+  const tbody = q(EL.ui.t_body_montador);
+  processTableRows(tbody, processInstallerRow);
+}
+
+async function processPartRow(row) {
+  const parts = processRows(row, extractParts);
+  await orderService.createItens(parts);
+}
+
+async function processInstallerRow(row) {
+  const installer = processRows(row, extractInstallers);
+  await orderService.createInstaller(installer);
+}
+
+function processRows(row, extract_function) {
+  try {
+    const cells = row.querySelectorAll("td");
+    const data = extract_function(cells);
+    return data;
+  } catch {
+    console.warn(`erro: ${err}`);
+  }
+}
+
+/* =========================
+   HELPERS (data builders)
+   ========================= */
+function buildOrderPayload() {
+  return {
+    p_solicitacao: Dom.getValue(EL.solicitation.solicitacao),
+    p_contrato: Dom.getValue(EL.solicitation.contrato),
+    p_solicitante: Dom.getValue(EL.solicitation.solicitante),
+    p_datasolicitacao: Dom.getValue(EL.solicitation.datasolicitacao),
+    p_cliente: Dom.getValue(EL.solicitation.cliente),
+    p_ambiente: Dom.getValue(EL.solicitation.ambiente),
+    p_urgente: Dom.getValue(EL.solicitation.urgente),
+    p_montador: "",
+    p_bairro: Dom.getValue(EL.solicitation.bairro),
+    p_tempo: Dom.getValue(EL.solicitation.tempo),
+    p_tipoassistencia: Dom.getValue(EL.solicitation.tipoassistencia),
+    p_montagem: Dom.getChecked(EL.checkbox.montagem),
+    p_promob: Dom.getChecked(EL.checkbox.promob),
+    p_entrega: Dom.getChecked(EL.checkbox.entrega),
+    p_supervisor: Dom.getValue(EL.solicitation.supervisor),
+    p_destino: Dom.getValue(EL.solicitation.destino),
+    p_garantia: Dom.getChecked(EL.checkbox.garantia),
+  };
+}
+
+function createPartRow() {
+  const { parts } = EL;
+  return [
+    Dom.getValue(parts.qtd),
+    Dom.getValue(parts.peca),
+    Dom.getValue(parts.dimensoes),
+    Dom.getValue(parts.cor),
+    Dom.getValue(parts.lado),
+    Dom.getValue(parts.falha),
+    Dom.getValue(parts.tipo),
+    Dom.getInnerHtml(parts.falha),
+    Dom.getInnerHtml(parts.tipo),
+    Dom.getValue(parts.obs),
+  ];
+}
+
+function extractParts(cells) {
+  return {
+    p_qtd: cells[0].textContent,
+    p_peca: cells[1].textContent,
+    p_dimensoes: cells[2].textContent,
+    p_cor: cells[3].textContent,
+    p_id_assistencia: Dom.getValue(EL.solicitation.solicitacao),
+    p_lado: cells[4].textContent,
+    p_ocorrencia: cells[6].textContent,
+    p_falha: cells[5].textContent,
+    p_observacoes: cells[9].textContent,
+  };
+}
+
+function extractInstallers(cells) {
+  return {
+    p_id_sat: Dom.getValue(EL.solicitation.solicitacao),
+    p_id_montador: cells[0].textContent,
+  };
+}
+
+/* =========================
+   CONTROLLERS (flows)
+   ========================= */
+function handleInstallerAdd(evt) {
+  evt.preventDefault();
+  const smallForm = q(EL.ui.form_equip);
+  if (!smallForm?.checkValidity()) {
+    smallForm?.reportValidity();
+    return;
+  }
+
+  const select = q(EL.solicitation.categoria);
+  const id = select.value;
+  const name = select.options[select.selectedIndex].text;
+  if (!id) return;
+
+  ui.appendInstallerRow(id, name);
+  select.remove(select.selectedIndex);
+  smallForm.reset();
+}
+
+function handleTableParts(evt) {
+  evt.preventDefault();
+  const form = q(EL.ui.form_parts);
+  if (!form?.checkValidity()) {
+    form?.reportValidity();
+  } else {
+    const itens = createPartRow();
+    ui.appendPartsRow(itens);
+    form.reset();
+  }
+}
+
+async function handleSolicitation(evt) {
+  evt.preventDefault();
+  const form = q(EL.ui.form_solicitacao);
+  if (!form?.checkValidity()) {
+    form?.reportValidity();
+  } else {
+    const result = await Modal.showConfirmation(null, "Concluir Solicitação ?");
+    if (result.isConfirmed) {
+      try {
+        await createOrderService(); // insere assistencia na base
+        await processInstallerTable(); // insere equip na base de dados
+        await processPartsTable(); // insere peças na base de dados
+        Modal.showInfo("success", "Sucesso", "asteca Concluida !!!").then(
+          () => {
+            window.location.href = "/solicitacao.html";
+          },
+        );
+      } catch (err) {
+        Modal.showInfo("error", "ERRO", `${err}`);
+      }
+    }
+  }
+}
+
+async function createOrderService() {
+  const data = buildOrderPayload();
+  console.log(data);
+  return;
+  await orderService.createOrder(data);
+}
 
 /* =========================
    UI RENDERERS (DOM-only)
@@ -160,209 +355,17 @@ const ui = {
 };
 
 /* =========================
-   VALIDATORS (rules only)
+   POPULATE SELECTs
    ========================= */
-const validators = {
-  isNativeFormValid(form) {
-    return form.checkValidity();
-  },
-
-  hasAtLeastOneRow(tbodySelector) {
-    const tbody = q(tbodySelector);
-    const count = tbody ? tbody.querySelectorAll("tr").length : 0;
-    return count > 0;
-  },
-};
-
-function processPartsTable() {
-  const tbody = q(EL.ui.t_body_pecas);
-  processTableRows(tbody);
-}
-
-async function processTableRows(tbody) {
-  const rows = tbody.querySelectorAll("tr");
-  for (const row of rows) {
-    await processPartRow(row);
-  }
-}
-
-async function processPartRow(row) {
-  processRows(row, extractParts);
-}
-
-async function processInstallerRow(row) {
-  processRows(row, extractInstallers);
-}
-
-async function processRows(row, _function) {
-  try {
-    const cells = row.querySelectorAll("td");
-    const data = _function(cells);
-    console.log(data);
-  } catch {
-    console.warn(`erro: ${err}`);
-  }
-}
-
-/* =========================
-   HELPERS (data builders)
-   ========================= */
-function buildOrderPayload() {
-  return {
-    p_solicitacao: Dom.getValue(EL.solicitation.solicitacao),
-    p_contrato: Dom.getValue(EL.solicitation.contrato),
-    p_solicitante: Dom.getValue(EL.solicitation.solicitante),
-    p_datasolicitacao: Dom.getValue(EL.solicitation.datasolicitacao),
-    p_cliente: Dom.getValue(EL.solicitation.cliente),
-    p_ambiente: Dom.getValue(EL.solicitation.ambiente),
-    p_urgente: Dom.getValue(EL.solicitation.urgente),
-    p_montador: Dom.getValue(EL.solicitation.montador),
-    p_bairro: Dom.getValue(EL.solicitation.bairro),
-    p_tempo: Dom.getValue(EL.solicitation.tempo),
-    p_tipoassistencia: Dom.getValue(EL.solicitation.tipoassistencia),
-    p_montagem: Dom.getChecked(EL.checkbox.montagem),
-    p_promob: Dom.getChecked(EL.checkbox.promob),
-    p_entrega: Dom.getChecked(EL.checkbox.entrega),
-    p_supervisor: Dom.getValue(EL.solicitation.supervisor),
-    p_destino: Dom.getValue(EL.solicitation.destino),
-  };
-}
-
-function createPartRow() {
-  const qtd = Dom.getValue(EL.parts.qtd);
-  const peca = Dom.getValue(EL.parts.peca);
-  const dimensoes = Dom.getValue(EL.parts.dimensoes);
-  const cor = Dom.getValue(EL.parts.cor);
-  const tipo = Dom.getValue(EL.parts.tipo);
-  const falhaText = Dom.getInnerHtml(EL.parts.falha);
-  const tipoText = Dom.getInnerHtml(EL.parts.tipo);
-  const lado = Dom.getValue(EL.parts.lado);
-  const falha = Dom.getValue(EL.parts.falha);
-  const obs = Dom.getValue(EL.parts.obs);
-
-  return [
-    qtd,
-    peca,
-    dimensoes,
-    cor,
-    lado,
-    falha,
-    tipo,
-    falhaText,
-    tipoText,
-    obs,
-  ];
-}
-
-function extractParts(cells) {
-  return {
-    p_qtd: cells[0].textContent,
-    p_peca: cells[1].textContent,
-    p_dimensoes: cells[2].textContent,
-    p_cor: cells[3].textContent,
-    p_id_assistencia: Dom.getValue(EL.solicitation.solicitacao),
-    p_lado: cells[4].textContent,
-    p_ocorrencia: cells[6].textContent,
-    p_falha: cells[5].textContent,
-    p_observacoes: cells[9].textContent,
-  };
-}
-
-function extractInstallers(cells) {
-  return {
-    p_id_sat: Dom.getValue(EL.solicitation.solicitacao),
-    p_id_montador: cells[0].textContent,
-  };
-}
-
-/* =========================
-   CONTROLLERS (flows)
-   ========================= */
-async function handleOrderSubmit(evt) {
-  evt.preventDefault();
-  const form = q(EL.ui.form_equip);
-
-  if (!validators.isNativeFormValid(form)) {
-    form.reportValidity();
-    return;
-  }
-
-  if (!validators.hasAtLeastOneRow(EL.ui.t_body_montador)) {
-    Modal.showInfo("warning", "ATENÇÃO", "insira o montador responsável");
-    return;
-  }
-
-  const confirm = await Modal.showConfirmation(
-    "Finalizar",
-    "Deseja enviar esta solicitação de assistência?",
-    "Confirmar",
-    "Cancelar",
-  );
-
-  if (!confirm.isConfirmed) return;
-
-  try {
-    const payload = buildOrderPayload();
-    await orderService.createOrder(payload);
-    Modal.showInfo("success", "SUCESSO", "Registro criado com sucesso!");
-
-    form.reset();
-    ui.clearTable(EL.ui.t_body_montador);
-  } catch (err) {
-    Modal.showInfo("error", "ERROR", `Error: ${err.message}`);
-  }
-}
-
-function handleInstallerAdd(evt) {
-  evt.preventDefault();
-  const smallForm = q(EL.ui.form_equip);
-  if (!smallForm?.checkValidity()) {
-    smallForm?.reportValidity();
-    return;
-  }
-
-  const select = q(EL.solicitation.categoria);
-  const id = select.value;
-  const name = select.options[select.selectedIndex].text;
-  if (!id) return;
-
-  ui.appendInstallerRow(id, name);
-  select.remove(select.selectedIndex);
-  smallForm.reset();
-}
-
-function handleTableParts(evt) {
-  evt.preventDefault();
-  const form = q(EL.ui.form_parts);
-  if (!form?.checkValidity()) {
-    form?.reportValidity();
-  } else {
-    const itens = createPartRow();
-    ui.appendPartsRow(itens);
-    form.reset();
-  }
-}
-
-async function handleInsertSolicitation(evt) {
-  evt.preventDefault();
-  const form = q(EL.ui.form_solicitacao);
-  if (!form?.checkValidity()) {
-    form?.reportValidity();
-  } else {
-    const result = await Modal.showConfirmation(null, "Concluir Solicitação ?");
-    if (result.isConfirmed) processPartsTable();
-  }
-}
-
 async function populateType() {
-  const res = await orderService.getOcorrencia();
+  const res = await orderService.fetchOcorrencia();
   const select = q(EL.parts.tipo);
   select.innerHTML = '<option value="">-</option>';
   res.data.forEach((element) => populateTypeList(element, select));
 }
 
 async function populateFaills() {
-  const response = await orderService.getFalhas();
+  const response = await orderService.fetchFalls();
   const select = q(EL.parts.falha);
   select.innerHTML = '<option value="">-</option>';
   response.data.forEach((element) => populateFaillsList(element, select));
@@ -383,11 +386,12 @@ function populateFaillsList(element, select) {
 }
 
 async function handleContractBlur() {
-  const contractId = Dom.getValue(EL.solicitation.contrato);
-  if (!contractId) return;
+  if (!validators.verifyOrder()) return;
   try {
+    const contractId = Dom.getValue(EL.solicitation.contrato);
     const data = await orderService.fetchContract(contractId);
-    Dom.setValue(EL.solicitation.cliente, data?.[0]?.p_cliente ?? "");
+    Dom.setValue(EL.solicitation.cliente, data.data[0]?.p_cliente ?? "");
+    Dom.setValue(EL.solicitation.liberador, data.data[0]?.p_liberador ?? "");
   } catch (e) {
     Modal.showInfo("error", "ERROR", `ERRO: ${e}`);
   }
@@ -440,20 +444,24 @@ function insertButtonCellTable() {
   `;
 }
 
+async function setUserLogged() {
+  const usuario = await getCookie(EL.cookie.login);
+  Dom.setValue(EL.solicitation.solicitante, usuario);
+}
+
 function initApp() {
   populateType();
   populateFaills();
   loadOrderTypes();
   loadInstallers();
+  setUserLogged();
   ui.focusFirstField();
   Dom.addEventBySelector(EL.solicitation.contrato, "blur", handleContractBlur);
-  Dom.addEventBySelector(EL.ui.form_equip, "submit", handleOrderSubmit);
   Dom.addEventBySelector(EL.ui.bt_add, "click", handleInstallerAdd);
   Dom.addEventBySelector(EL.ui.t_body_montador, "click", handleRowDel);
   Dom.addEventBySelector(EL.ui.t_body_pecas, "click", handleRowDel);
   Dom.addEventBySelector(EL.ui.bt_part, "click", handleTableParts);
-  Dom.addEventBySelector(EL.ui.bt_part_1, "click", processPartsTable);
-  Dom.addEventBySelector(EL.ui.bt_concluir, "click", handleInsertSolicitation);
+  Dom.addEventBySelector(EL.ui.bt_concluir, "click", handleSolicitation);
   DateTime.initClock(EL.solicitation.datasolicitacao);
 }
 

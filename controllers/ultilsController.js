@@ -17,4 +17,7 @@ module.exports = {
   validateLogin: createRpcHandler("validate_login", "query"),
   getSolicitacoes: createRpcHandler("get_solicitacoes", "query"),
   getPecas: createRpcHandler("total_pecas", "query"),
+  getOcorrencia: createRpcHandler("get_ocorrencias", "query"),
+  getFalhas: createRpcHandler("get_falhas", "query"),
+  getCausa: createRpcHandler("get_causa_falha", "query"),
 };

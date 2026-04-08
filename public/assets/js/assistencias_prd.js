@@ -3,6 +3,7 @@ import { DateTime } from "./utils/time.js";
 import { enableTableFilterSort } from "./filtertable.js";
 import { API, Service } from "./service/api.js";
 import { Modal } from "./utils/modal.js";
+import { loadPage } from "./utils.js";
 
 const EL = {
   SOLICITACAO: "#txt_solicitacao",
@@ -20,13 +21,15 @@ const EL = {
   INICIADO: "#txt_iniciado",
   PRONTO: "#txt_pronto",
   CONFERENTE: "#txt_conferente",
+  DESPACHANTE: "#txt_despachante",
   LIBERADOR: "#txt_liberador",
   MOTORISTA: "#txt_motorista",
   ENTREGUE: "#txt_entregue",
-  RESPONSAVEL: "#txt_responsavel",
+  SUPERVISOR: "#txt_supervisor",
   ESCRITORIO: "#chk_escritorio",
   PRODUCAO: "#chk_producao",
   SEM_MATERIAL: "#chk_sem_material",
+  PENDENCIA: "#chk_pendencia",
   DATA_ENTREGA: "#txt_dataentrega",
   DATA_FILTER: "#txt_datafilter",
 };
@@ -130,13 +133,15 @@ function populateElements(data) {
   Dom.setValue(EL.INICIADO, data.p_iniciado);
   Dom.setValue(EL.PRONTO, data.p_pronto);
   Dom.setValue(EL.CONFERENTE, data.p_conferente);
-  Dom.setValue(EL.LIBERADOR, data.p_liberacao);
+  Dom.setValue(EL.DESPACHANTE, data.p_liberacao);
+  Dom.setValue(EL.LIBERADOR, data.p_liberador);
   Dom.setValue(EL.MOTORISTA, data.p_responsavel);
   Dom.setValue(EL.ENTREGUE, data.p_dataentrega);
-  Dom.setValue(EL.RESPONSAVEL, data.p_montador);
+  Dom.setValue(EL.SUPERVISOR, data.p_supervisor);
   Dom.setChecked(EL.ESCRITORIO, data.p_escritorio);
   Dom.setChecked(EL.PRODUCAO, data.p_producao);
   Dom.setChecked(EL.SEM_MATERIAL, data.p_sem_material);
+  Dom.setChecked(EL.PENDENCIA, data.p_pendencia);
 }
 
 async function confirmSave() {
@@ -151,27 +156,29 @@ async function confirmSave() {
   }
 }
 
-function getElementsVAlues() {
+function getElementsValues() {
   const data = {
     p_solicitacao: Dom.getValue(EL.SOLICITACAO),
     p_pedido: Dom.getValue(EL.PEDIDO),
     p_corte: Dom.getValue(EL.CORTE),
     p_observacao: Dom.getValue(EL.OBS_FABRICA),
+    p_observacao2: Dom.getValue(EL.OBS_LOGISTICA),
     p_iniciado: Dom.getValue(EL.INICIADO),
     p_pronto: Dom.getValue(EL.PRONTO),
     p_conferente: Dom.getValue(EL.CONFERENTE),
-    p_responsavel: Dom.getValue(EL.RESPONSAVEL),
-    p_liberacao: Dom.getValue(EL.LIBERADOR),
+    p_responsavel: "",
+    p_liberacao: Dom.getValue(EL.DESPACHANTE),
     p_dataentrega: Dom.getValue(EL.ENTREGUE),
     p_escritorio: Dom.getChecked(EL.ESCRITORIO),
     p_producao: Dom.getChecked(EL.PRODUCAO),
     p_sem_material: Dom.getChecked(EL.SEM_MATERIAL),
+    p_pendencia: Dom.getChecked(EL.PENDENCIA),
   };
   return data;
 }
 
 async function setData() {
-  const payload = getElementsVAlues();
+  const payload = getElementsValues();
   const response = await assistAPI.setAssist(payload);
   if (response.status !== 200) {
     Modal.showInfo("error", "ERRO", "não foi possivel salvar dados");
@@ -200,7 +207,7 @@ function configTable(tbody) {
   tbody.classList.add("text-nowrap");
 }
 
-function contructTable(res, tbody) {
+function buildTable(res, tbody) {
   const center = "text-align: center ";
   let num = 1;
   res.forEach((item) => {
@@ -231,7 +238,7 @@ async function populateTable() {
   const res = await assistAPI.getAssists(Fields.get(EL.DATA_FILTER));
   const tbody = q("tbody");
   configTable(tbody);
-  contructTable(res, tbody);
+  buildTable(res, tbody);
 }
 
 function setLocalStorageItem(value) {
@@ -248,6 +255,7 @@ function printPage() {
 }
 
 function init() {
+  loadPage("producao_assistencia", "assistencias_prd.html");
   populateTable();
   Table.onmouseover("table");
   enableTableFilterSort("table");

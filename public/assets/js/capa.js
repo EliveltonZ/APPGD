@@ -5,7 +5,7 @@ import { DateTime } from "./utils/time.js";
 /*================== 
 HELPERS ELEMENTS ID
 ==================*/
-const SELECTORS = {
+const EL = {
   CONTRATO: "#lb_contrato",
   Q_PROJ: "#lb_qproj",
   NUM_PROJ: "#lb_qproj",
@@ -28,8 +28,8 @@ function getLsItem(item) {
 
 function colorUrgente(value) {
   if (value === "SIM") {
-    const div = Dom.getElement(SELECTORS.DIV_URGENTE);
-    const label = Dom.getElement(SELECTORS.URGENTE);
+    const div = Dom.getElement(EL.DIV_URGENTE);
+    const label = Dom.getElement(EL.URGENTE);
     div.style.background = "red";
     label.style.color = "white";
   }
@@ -45,22 +45,19 @@ function populateElements(ordemdecompra) {
   if (ordemdecompra) {
     const res = JSON.parse(localStorage.getItem("project"));
     const data = res[0];
-    Dom.setInnerHtml(SELECTORS.CONTRATO, data.p_contrato);
-    Dom.setInnerHtml(SELECTORS.Q_PROJ, Number(data.p_numproj.slice(-2)));
-    Dom.setInnerHtml(SELECTORS.NUM_PROJ, data.p_numproj);
-    Dom.setInnerHtml(SELECTORS.CLIENTE, data.p_cliente);
-    Dom.setInnerHtml(SELECTORS.AMBIENTE, data.p_ambiente);
-    Dom.setInnerHtml(SELECTORS.VENDEDOR, data.p_vendedor);
-    Dom.setInnerHtml(
-      SELECTORS.DATA_ENTREGA,
-      DateTime.forBr(data.p_dataentrega),
-    );
-    Dom.setInnerHtml(SELECTORS.LIBERADOR, data.p_liberador);
-    Dom.setInnerHtml(SELECTORS.NUM_OC, buildOrderBy(ordemdecompra));
-    Dom.setInnerHtml(SELECTORS.RESPONSAVEL, getLsItem("resp"));
-    Dom.setInnerHtml(SELECTORS.DATA, DateTime.forBr(getLsItem("data")));
-    Dom.setInnerHtml(SELECTORS.TIPO, getLsItem("tipo"));
-    Dom.setInnerHtml(SELECTORS.URGENTE, getLsItem("urgente"));
+    Dom.setInnerHtml(EL.CONTRATO, data.p_contrato);
+    Dom.setInnerHtml(EL.Q_PROJ, Number(data.p_numproj.slice(-2)));
+    Dom.setInnerHtml(EL.NUM_PROJ, data.p_numproj);
+    Dom.setInnerHtml(EL.CLIENTE, data.p_cliente);
+    Dom.setInnerHtml(EL.AMBIENTE, data.p_ambiente);
+    Dom.setInnerHtml(EL.VENDEDOR, data.p_vendedor);
+    Dom.setInnerHtml(EL.DATA_ENTREGA, DateTime.forBr(data.p_dataentrega));
+    Dom.setInnerHtml(EL.LIBERADOR, data.p_liberador);
+    Dom.setInnerHtml(EL.NUM_OC, buildOrderBy(ordemdecompra));
+    Dom.setInnerHtml(EL.RESPONSAVEL, getLsItem("resp"));
+    Dom.setInnerHtml(EL.DATA, DateTime.forBr(getLsItem("data")));
+    Dom.setInnerHtml(EL.TIPO, getLsItem("tipo"));
+    Dom.setInnerHtml(EL.URGENTE, getLsItem("urgente"));
     colorUrgente(getLsItem("urgente"));
   }
 }

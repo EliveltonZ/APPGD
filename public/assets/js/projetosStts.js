@@ -337,12 +337,10 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.ui.tableMain,
     "dblclick",
-    handleMainTableDoubleClick
+    handleMainTableDoubleClick,
   );
 
   Dom.addEventBySelector(SELECTORS.ui.dataFiltro, "blur", handleFilterBlur);
-
-  window.addEventListener("resize", ajustarTamanhoModal);
 }
 
 async function init() {
@@ -355,4 +353,5 @@ async function init() {
   bindEvents();
 }
 
+window.addEventListener("resize", ajustarTamanhoModal);
 document.addEventListener("DOMContentLoaded", init);

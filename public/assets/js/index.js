@@ -6,7 +6,7 @@ import { Modal } from "./utils/modal.js";
 /* =========================================================
    SELECTORS / ELEMENTS
 ========================================================= */
-const SELECTORS = {
+const EL = {
   inputs: {
     id: "#txt_id",
     login: "#txt_login",
@@ -68,8 +68,8 @@ function showError(message) {
 ========================================================= */
 function buildLoginPayload() {
   return {
-    p_id: Fields.get(SELECTORS.inputs.id),
-    p_senha: Fields.get(SELECTORS.inputs.password),
+    p_id: Fields.get(EL.inputs.id),
+    p_senha: Fields.get(EL.inputs.password),
   };
 }
 
@@ -92,6 +92,8 @@ function buildPermissionPayload(user) {
     solicitar_assistencia: user.solicitar_assistencia,
     valores: user.valores,
     dashboard: user.dashboard,
+    qualidade: user.qualidade,
+    logistica_assistencia: user.logistica_assistencia,
   };
 }
 
@@ -123,6 +125,7 @@ async function fetchUserLoginById(userId) {
 
 async function saveUserPermissions(user) {
   const payload = buildPermissionPayload(user);
+  // console.log(payload);
   const res = await AuthAPI.setPermissions(payload);
 
   if (res.status !== 200) {
@@ -138,6 +141,7 @@ async function processLogin() {
   if (!hasValidPasswordResponse(res)) return { ok: false };
 
   const user = res.data[0];
+  console.log(user);
   await saveUserPermissions(user);
 
   return { ok: true };
@@ -147,12 +151,12 @@ async function processLogin() {
    HANDLERS
 ========================================================= */
 async function handleIdBlur() {
-  const userId = q(SELECTORS.inputs.id).value.trim();
+  const userId = q(EL.inputs.id).value.trim();
   console.log("handleIdBlur userId=", userId);
 
   if (isEmpty(userId)) {
-    Fields.set(SELECTORS.inputs.login, "");
-    Fields.focus(SELECTORS.inputs.id);
+    Fields.set(EL.inputs.login, "");
+    Fields.focus(EL.inputs.id);
     return;
   }
 
@@ -163,19 +167,19 @@ async function handleIdBlur() {
 
     if (!login) {
       await showError("Número de ID não encontrado");
-      Fields.set(SELECTORS.inputs.id, "");
-      Fields.set(SELECTORS.inputs.login, "");
-      Fields.focus(SELECTORS.inputs.id);
+      Fields.set(EL.inputs.id, "");
+      Fields.set(EL.inputs.login, "");
+      Fields.focus(EL.inputs.id);
       return;
     }
 
-    Fields.set(SELECTORS.inputs.login, login);
+    Fields.set(EL.inputs.login, login);
   } catch (err) {
     console.error("handleIdBlur error", err);
     await showError("Número de ID não encontrado");
-    Fields.set(SELECTORS.inputs.id, "");
-    Fields.set(SELECTORS.inputs.login, "");
-    Fields.focus(SELECTORS.inputs.id);
+    Fields.set(EL.inputs.id, "");
+    Fields.set(EL.inputs.login, "");
+    Fields.focus(EL.inputs.id);
   }
 }
 
@@ -190,7 +194,7 @@ async function handleLoginSubmit(event) {
 
     if (!result.ok) {
       await showError("Senha digitada é inválida!");
-      Fields.clearAndFocus(SELECTORS.inputs.password);
+      Fields.clearAndFocus(EL.inputs.password);
       return;
     }
 
@@ -205,15 +209,15 @@ async function handleLoginSubmit(event) {
    INIT
 ========================================================= */
 function configureUiDefaults() {
-  Fields.set(SELECTORS.inputs.id, "");
-  Fields.focus(SELECTORS.inputs.id);
+  Fields.set(EL.inputs.id, "");
+  Fields.focus(EL.inputs.id);
   Dom.enableEnterAsTab();
   criarSpinnerGlobal();
 }
 
 function bindEvents() {
-  Dom.addEventBySelector(SELECTORS.buttons.login, "click", handleLoginSubmit);
-  Dom.addEventBySelector(SELECTORS.inputs.id, "blur", handleIdBlur);
+  Dom.addEventBySelector(EL.buttons.login, "click", handleLoginSubmit);
+  Dom.addEventBySelector(EL.inputs.id, "blur", handleIdBlur);
 }
 
 function initLoginPage() {

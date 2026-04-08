@@ -13,6 +13,18 @@ export const ce = (element) => {
 };
 
 export class Dom {
+  static _setInnerHtmlSelectorAll(element, value) {
+    const elements = qa(element);
+
+    if (elements.length === 0) {
+      console.warn(`${element} não encontrado`);
+      return;
+    }
+    elements.forEach((el) => {
+      el.innerHTML = value;
+    });
+  }
+
   static getValue(element) {
     try {
       const value = q(element).value;
@@ -41,7 +53,7 @@ export class Dom {
 
   static setInnerHtml(element, value) {
     try {
-      q(element).innerHTML = value;
+      Dom._setInnerHtmlSelectorAll(element, value);
     } catch {
       console.warn(`${element} não encontrado`);
     }
@@ -71,7 +83,7 @@ export class Dom {
 
   static createElement(element, value, style = "", className = null) {
     const el = ce(element);
-    el.textContent = Dom.checkValue(value);
+    el.textContent = value;
     el.setAttribute("style", style);
     if (className) el.classList.add(className);
     return el;
@@ -277,6 +289,7 @@ export class Style {
   static colorStatus(item) {
     const colors = {
       ATRASADO: "color: rgb(255, 0, 0)",
+      "SEM MATERIAL": "color: rgb(255, 0, 0)",
       INICIADO: "color: rgb(194, 184, 6)",
       "A VENCER": "color: rgb(226, 109, 0)",
       PENDENCIA: "color: rgb(186, 2, 227)",

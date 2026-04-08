@@ -4,12 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Solicitação</title>
+    <title>APP GD</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=27f35034166d9a9e2f1406c6d168e084">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=e1d50f308488b4545c0eb3808b98293d">
+    <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
+    <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
     <link rel="stylesheet" href="assets/css/solicitacao.min.css?h=ff2c192bc4286572785680b8095e5c78">
-<link rel="icon" href="assets/img/icone.png">
 <script type="module" src="./assets/js/solicitacao.js"></script>
 </head>
 
@@ -31,15 +32,18 @@
                         <option value="Não">Não</option>
                         <option value="Sim">Sim</option>
                     </select></div>
-                <div class="text-nowrap d-flex gap-2 div-block"><label class="form-label format-label margin-max-width">SUPERVISOR:</label><input class="form-control" type="text" id="txt_supervisor" required="" style="text-align: center;" autocomplete="off"><label class="form-label format-label">LIBERADOR:</label><input class="form-control" type="text" id="txt_liberador" style="text-align: center;" autocomplete="off"><label class="form-label format-label margin-max-width">SITUAÇÃO:</label><input class="form-control" type="text" id="txt_situacao" disabled="" style="text-align: center;" value="EM ABERTO"></div>
+                <div class="text-nowrap d-flex gap-2 div-block"><label class="form-label format-label">RESPONSAVEL:</label><input class="form-control" type="text" id="txt_responsavel" style="text-align: center;" required="" autocomplete="off"><label class="form-label format-label">LIBERADOR:</label><select class="form-select" id="txt_liberador" style="text-align: center;" required="">
+                        <option value="" selected="">-</option>
+                        <option value="ROSANA">ROSANA</option>
+                        <option value="MONALISA">MONALISA</option>
+                    </select><label class="form-label format-label margin-max-width">SITUAÇÃO:</label><input class="form-control" type="text" id="txt_situacao" disabled="" style="text-align: center;" value="EM ABERTO"></div>
                 <div class="text-nowrap d-flex gap-2 div-block"><label class="form-label format-label">BAIRRO:</label><input class="form-control" type="text" id="txt_bairro" style="text-align: center;" autocomplete="off"><label class="form-label format-label">TEMPO:</label><input class="form-control" type="text" id="txt_tempo" style="text-align: center;" autocomplete="off"><label class="form-label format-label">TIPO:</label><select class="form-select" id="txt_tipo" style="text-align: center;min-width: 30%;" required="">
                         <option value="">Montagem - Finalização</option>
                     </select></div>
                 <div class="d-flex align-items-center gap-3 div-block">
                     <div class="form-check margin-0"><input class="form-check-input" type="checkbox" id="chk_mont"><label class="form-check-label" for="chk_mont">MONT.:</label></div>
                     <div class="form-check margin-0"><input class="form-check-input" type="checkbox" id="chk_promob"><label class="form-check-label" for="chk_promob">PROMOB:</label></div>
-                    <div class="form-check margin-0"><input class="form-check-input" type="checkbox" id="chk_entrega"><label class="form-check-label" for="chk_entrega">ENTREGA:</label></div>
-                    <div class="form-check margin-0"><input class="form-check-input" type="checkbox" id="chk_garantia"><label class="form-check-label" for="chk_garantia">GARANTIA:</label></div><label class="form-label format-label">DESTINO:</label><select class="form-select text-center" id="txt_destino" required="">
+                    <div class="form-check margin-0"><input class="form-check-input" type="checkbox" id="chk_entrega"><label class="form-check-label" for="chk_entrega">ENTREGA:</label></div><label class="form-label format-label margin-max-width">SUPERVISOR:</label><input class="form-control" type="text" id="txt_supervisor" required="" style="text-align: center;" autocomplete="off"><label class="form-label format-label">DESTINO:</label><select class="form-select text-center" id="txt_destino" required="">
                         <option value="" selected="">-</option>
                         <option value="FABRICA">FABRICA</option>
                         <option value="LOGISTICA">LOGISTICA</option>
@@ -96,13 +100,7 @@
                             </div>
                             <div class="d-flex gap-2" style="margin-bottom: 10px;">
                                 <div class="d-flex gap-2"><label class="form-label" style="text-align: right;">Cor</label><input class="form-control" type="text" id="txt_cor"></div>
-                                <div class="d-flex gap-2"><label class="form-label" style="text-align: right;">Lado</label><select class="form-select" id="txt_lado" style="width: 190px;">
-                                        <option value="-" selected="">-</option>
-                                        <option value="SUPERIOR DIRETO">INFEROR DIREITO</option>
-                                        <option value="SUPERIOR DIREITO">SUPERIOR DIREITO</option>
-                                        <option value="INFERIOR ESQUERDO">INFERIOR ESQUERDO</option>
-                                        <option value="SUPERIOR ESQUERDO">SUPERIOR ESQUERDO</option>
-                                    </select></div>
+                                <div class="d-flex gap-2"><label class="form-label" style="text-align: right;">Lado</label><input class="form-control" type="text" id="txt_lado"></div>
                                 <div class="d-flex gap-2" style="width: 500px;"><label class="form-label" style="text-align: right;">Falha</label><select class="form-select" id="txt_falha" required="" style="width: 100%;"></select></div>
                                 <div class="d-flex gap-2" style="width: 208px;"><label class="form-label" style="text-align: right;">Tipo</label><select class="form-select" id="txt_tipo-1" required="" style="width: 100%;"></select></div>
                             </div>

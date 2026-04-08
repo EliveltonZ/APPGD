@@ -227,8 +227,6 @@ function buildClearUserPayload() {
 }
 
 async function clearUserPermissionsOnBackend() {
-  // seu código original chamava API.fetchBody(payload) sem endpoint/método.
-  // aqui usamos o endpoint correto que já existe no seu DB: /setPermission
   const payload = buildClearUserPayload();
   const res = await PrintAPI.setPermissions(payload);
 

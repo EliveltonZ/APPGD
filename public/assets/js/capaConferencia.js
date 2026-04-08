@@ -1,4 +1,4 @@
-import { Dom } from "./UI/interface.js";
+import { Dom, q, qa, ce } from "./UI/interface.js";
 import { DateTime } from "./utils/time.js";
 import { Modal } from "./utils/modal.js";
 
@@ -22,8 +22,7 @@ const EL = {
 
 function fillElements(ordemdecompra) {
   if (ordemdecompra) {
-    const res = JSON.parse(localStorage.getItem("project"));
-    const data = res[0];
+    const data = parseJson();
     Dom.setInnerHtml(EL.CONTRATO, data.p_contrato);
     Dom.setInnerHtml(EL.CONTRATO1, data.p_contrato);
     Dom.setInnerHtml(EL.Q_PROJ, Number(data.p_numproj.slice(-2)));
@@ -43,63 +42,22 @@ function fillElements(ordemdecompra) {
   }
 }
 
+function parseJson() {
+  const res = JSON.parse(localStorage.getItem("project"));
+  return res[0];
+}
+
 function buildOrderBy(ordemdecompra) {
   const numStr = String(ordemdecompra);
   if (numStr.length < 10) return numStr;
   return `${numStr.slice(0, 8)}-${numStr.slice(-2)}`;
 }
 
-function getLocalStorageItem(item) {
-  return localStorage.getItem(item);
-}
-
-function colorUrgente(value) {
-  if (value === "SIM") {
-    const div = document.getElementById(EL.DIV_URGENTE);
-    div.style.background = "red";
-    const label = document.getElementById(EL.LB_URGENTE);
-    label.style.color = "white";
-  }
-}
-
-function isBool(value) {
-  if (value == true) {
-    return "SIM";
-  }
-  return "NÃO";
-}
-
-function fillTableAcessorios(ordemdecompra) {
-  try {
-    const data = JSON.parse(localStorage.getItem("acessorios"));
-    const tbody = document.querySelectorAll("table tbody")[0];
-    const td = "td";
-    const font9 = "font-size: 9px; ";
-    const fCenter = "text-align: center;";
-    tbody.innerHTML = "";
-
-    data.forEach((item) => {
-      const tr = document.createElement("tr");
-      tr.append(Dom.createElement(td, item.categoria, font9));
-      tr.append(Dom.createElement(td, item.descricao, font9));
-      tr.append(Dom.createElement(td, item.medida, font9 + fCenter));
-      tr.append(Dom.createElement(td, item.qtd, font9 + fCenter));
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    Modal.showInfo(
-      "error",
-      "Erro",
-      `Não foi possível carregar os dados. ${err.message}`,
-    );
-  }
-}
-
 function buildGridVols(values) {
-  const container = document.getElementById("checkboxes");
+  const container = q("#checkboxes");
 
   for (let i = 1; i <= values; i++) {
-    const item = document.createElement("div");
+    const item = ce("div");
     item.className = "item";
     item.style = "margin-left: 30px";
     item.innerHTML = `<input type="checkbox"> <span>${i}</span>`;

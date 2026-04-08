@@ -90,13 +90,14 @@ export async function loadPage(accessKey, page) {
     if (!response.ok) throw new Error("Não autenticado");
 
     const permissoes = await response.json();
+    // console.log(permissoes);
     const valorPermissao = permissoes?.[accessKey];
+    // console.log(`${accessKey} - ${valorPermissao}`);
 
     const current = normalizePage(window.location.pathname);
     const targetAllowed = "/" + normalizeFile(page); // ex.: "/previsoes.html"
     const targetDenied = "/erro.html";
     const targetIndex = "/index.html";
-
     if (typeof valorPermissao === "boolean") {
       if (valorPermissao) {
         if (current !== targetAllowed) location.replace(targetAllowed);
