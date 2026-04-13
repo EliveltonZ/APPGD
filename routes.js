@@ -107,6 +107,7 @@ route.get("/validateLogin", authLimiter, ultilsController.validateLogin);
 route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
 route.get("/getFalhas", ultilsController.getFalhas);
 route.get("/getCausa", ultilsController.getCausa);
+route.get("/getMax", ultilsController.getMax);
 
 // rotas index.js
 route.post(

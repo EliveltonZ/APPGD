@@ -278,8 +278,6 @@ async function handleSolicitation(evt) {
 
 async function createOrderService() {
   const data = buildOrderPayload();
-  console.log(data);
-  return;
   await orderService.createOrder(data);
 }
 

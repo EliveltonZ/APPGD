@@ -399,7 +399,12 @@ export function criarSpinnerGlobal() {
   }
 }
 
-const urlsIgnoradas = ["/fillElements", "/fillTableAcessorios", "/sendMail"];
+const urlsIgnoradas = [
+  "/fillElements",
+  "/fillTableAcessorios",
+  "/sendMail",
+  "/getMax",
+];
 
 function deveMostrarSpinner(url) {
   return !urlsIgnoradas.some((ignorada) => url.includes(ignorada));

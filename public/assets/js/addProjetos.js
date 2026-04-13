@@ -207,7 +207,8 @@ function setStoreCodeIntoForm(contract) {
 
 async function setMaxOrder() {
   const order = await ProjectAPI.fetchMaxOrder();
-  Fields.set(SELECTORS.inputs.oc, order.data[0].p_max + 1);
+  const nextOrder = order.data[0].p_max + 1;
+  Fields.set(SELECTORS.inputs.oc, nextOrder);
 }
 
 async function handleContractBlur() {
