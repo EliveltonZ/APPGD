@@ -404,6 +404,7 @@ const urlsIgnoradas = [
   "/fillTableAcessorios",
   "/sendMail",
   "/getMax",
+  "/passwordValidation",
 ];
 
 function deveMostrarSpinner(url) {

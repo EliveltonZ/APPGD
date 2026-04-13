@@ -108,6 +108,7 @@ route.get("/getSolicitacoes", ultilsController.getSolicitacoes);
 route.get("/getFalhas", ultilsController.getFalhas);
 route.get("/getCausa", ultilsController.getCausa);
 route.get("/getMax", ultilsController.getMax);
+route.get("/getLojas", ultilsController.getLojas);
 
 // rotas index.js
 route.post(

@@ -57,6 +57,10 @@ const ProjectAPI = {
   fetchMaxOrder() {
     return API.fetchQuery("/getMax");
   },
+
+  fetchShops() {
+    return API.fetchQuery("/getLojas");
+  },
 };
 
 /* =========================================================
@@ -86,10 +90,6 @@ function isEmpty(value) {
 
 function getContractValue() {
   return Fields.get(SELECTORS.inputs.contrato);
-}
-
-function getStoreCodeFromContract(contract) {
-  return String(contract).slice(0, 3);
 }
 
 /* =========================================================
@@ -201,9 +201,6 @@ function confirmCreateProject() {
 /* =========================================================
    USE CASES / HANDLERS
 ========================================================= */
-function setStoreCodeIntoForm(contract) {
-  Fields.set(SELECTORS.inputs.loja, getStoreCodeFromContract(contract));
-}
 
 async function setMaxOrder() {
   const order = await ProjectAPI.fetchMaxOrder();
@@ -216,8 +213,6 @@ async function handleContractBlur() {
   if (isEmpty(contract)) return;
 
   try {
-    setStoreCodeIntoForm(contract);
-
     const res = await ProjectAPI.fetchContract(contract);
     if (res.status !== 200) return showHttpError(res.status, res.data);
 

@@ -191,7 +191,6 @@ function buildProjectRow(item, index) {
   tr.append(td(item.ambiente, leftText));
   tr.append(td(item.status, corStatus));
   tr.append(td(item.dias_restantes));
-  tr.append(td(item.material));
   tr.append(td(item.scorte, corCorte));
   tr.append(td(item.scustom, corCustom));
   tr.append(td(item.scoladeira, corColadeira));
@@ -286,7 +285,7 @@ async function populateModalFromProject(orderBuy) {
   const res = await PrevisaoAPI.fetchProjectByOc(orderBuy);
 
   if (res.status !== 200) {
-    await showError(`Ocorreu um erro ao carregar o projeto: ${res.data}`);
+    await showError(`Ocorreu um erro ao carregar projetos: ${res.data}`);
     return;
   }
 

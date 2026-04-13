@@ -21,4 +21,5 @@ module.exports = {
   getFalhas: createRpcHandler("get_falhas", "query"),
   getCausa: createRpcHandler("get_causa_falha", "query"),
   getMax: createRpcHandler("max_order"),
+  getLojas: createRpcHandler("get_lojas", "query"),
 };

@@ -8,8 +8,8 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=01ee846f90fa016f8987e2c2905ebe6c">
-    <link rel="stylesheet" href="assets/css/menu.min.css?h=b408e72496b489c76d39113ca1909ec8">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=ae8df5197bfbbe594bcabff82556eceb">
+    <link rel="stylesheet" href="assets/css/menu.min.css?h=7fe6af543634d6d4a73bd8ffad54783a">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
 <link rel="icon" href="/assets/img/icone.png">
     <script type="module" src="assets/js/menu.js"></script>
@@ -19,49 +19,41 @@
     <div class="d-xl-flex justify-content-xl-center" id="wrapper">
         <nav class="navbar align-items-start" id="navbar">
             <div class="container-fluid d-flex">
-                <ul class="navbar-nav" id="accordionSidebar">
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-folder-plus"></i><span>Pedidos</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Pedidos</span></div><a class="submenu-link" href="adicionar.html"><i class="fas fa-plus-circle"></i><span>Novo Projeto</span></a><a class="submenu-link" href="editar.html"><i class="far fa-edit"></i><span>Editar Projeto</span></a><a class="submenu-link" href="excluir.html"><i class="far fa-times-circle"></i><span>Excluir Projeto</span></a>
+                <div class="d-flex w-100">
+                    <nav class="navbar" id="menu" style="font-size: 14px;">
+                        <div class="container-fluid">
+                            <ul class="navbar-nav" id="accordionSidebar" style="width: 100%;">
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="adicionar.html"><i class="fas fa-plus-circle fs-5 me-2"></i><span>Novo Projeto</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="editar.html"><i class="far fa-edit fs-5 me-2"></i><span>Editar Projeto</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="excluir.html"><i class="far fa-times-circle fs-5 me-2"></i><span>Excluir Projeto</span></a></li>
+                                <li class="nav-item nav-hr">
+                                    <hr>
+                                </li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="pendencias.html"><i class="fas fa-stopwatch fs-5 me-2"></i><span>Pendências</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="compras.html"><i class="fas fa-coins fs-5 me-2"></i><span>Compras</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="valores.html"><i class="far fa-money-bill-alt fs-5 me-2"></i><span>Valores</span></a></li>
+                                <li class="nav-item nav-hr">
+                                    <hr>
+                                </li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="pcp.html"><i class="fas fa-redo-alt fs-5 me-2"></i><span>PCP</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="producao.html"><i class="fas fa-tools fs-5 me-2"></i><span>Produção</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="previsoes.html"><i class="fas fa-clock fs-5 me-2"></i><span>Previsão</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="expedicao.html"><i class="fas fa-truck fs-5 me-2"></i><span>Expedição</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="status.html"><i class="far fa-check-circle fs-5 me-2"></i><span>Status</span></a></li>
+                                <li class="nav-item" data-bss-hover-animate="pulse"><button class="btn btn-link fw-bold text-start d-flex align-items-center nav-link ps-4 my-2 menu-link" data-bs-toggle="modal" data-bs-target="#modal" type="button"><i class="far fa-file-pdf fs-5 me-2"></i><span>Relatórios</span></button></li>
+                                <li class="nav-item nav-hr">
+                                    <hr>
+                                </li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="senha.html"><i class="fas fa-lock fs-5 me-2"></i><span>Senha</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="usuarios.html"><i class="fas fa-user-plus fs-5 me-2"></i><span>Novo Usuário</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" href="acessos.html"><i class="fas fa-key fs-5 me-2"></i><span>Acessos</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" id="dashboard" href="#"><i class="fas fa-chart-line fs-5 me-2"></i><span>Dashboards</span></a></li>
+                                <li class="nav-item"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 menu-link" data-bss-hover-animate="pulse" id="assistencias" href="menu_assist.html"><i class="fas fa-exclamation-circle fs-5 me-2"></i><span>Assistências</span></a></li>
+                                <li class="nav-item mt-2"><a class="nav-link fw-bold d-flex align-items-center ps-4 my-2 small menu-link" data-bss-hover-animate="pulse" id="link_logout" href="#"><i class="fas fa-power-off me-2"></i><span class="text-nowrap" id="txt_usuario" style="font-size: 13px;">Usuário</span></a></li>
+                            </ul>
                         </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-shopping-cart"></i><span>Compras</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Compras</span></div><a class="submenu-link" href="compras.html"><i class="fas fa-coins"></i><span>Compras</span></a><a class="submenu-link" href="pendencias.html"><i class="fas fa-stopwatch"></i><span>Pendências</span></a>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-industry"></i><span>PCP</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Planejamento e Controle de Produção</span></div><a class="submenu-link" href="pcp.html"><i class="fas fa-redo-alt"></i><span>PCP</span></a><a class="submenu-link" href="producao.html"><i class="fas fa-tools"></i><span>Produção</span></a><a class="submenu-link" href="expedicao.html"><i class="fas fa-truck"></i><span>Expedição</span></a><button class="submenu-action" data-bs-toggle="modal" data-bs-target="#modal" type="button"><i class="far fa-file-pdf"></i><span>Relatórios</span></button>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-truck-loading"></i><span>Logística</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Logística</span></div><a class="submenu-link" href="status.html"><i class="far fa-check-circle"></i><span>Status</span></a><a class="submenu-link" href="previsoes.html"><i class="fas fa-clock"></i><span>Previsão</span></a>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-tools"></i><span>Assistências</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Assistências Técnicas</span></div><a class="submenu-link" id="assistencias" href="menu_assist.html"><i class="fas fa-exclamation-circle"></i><span>Assistências</span></a>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-wallet"></i><span>Financeiro</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Financeiro</span></div><a class="submenu-link" href="valores.html"><i class="far fa-money-bill-alt"></i><span>Valores</span></a>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-chart-line"></i><span>Dashboards</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Dashboards</span></div><a class="submenu-link" id="dashboard" href="#"><i class="fas fa-chart-line"></i><span>Dashboards</span></a>
-                        </div>
-                    </li>
-                    <li class="menu-group"><button class="menu-category-btn" type="button"><i class="fas fa-cog"></i><span>Configurações</span></button>
-                        <div class="menu-submenu">
-                            <div class="menu-submenu-title"><span>Configurações do sistema</span></div><a class="submenu-link" href="usuarios.html"><i class="fas fa-user-plus"></i><span>Novo Usuário</span></a><a class="submenu-link" href="senha.html"><i class="fas fa-lock"></i><span>Senha</span></a><a class="submenu-link" href="acessos.html"><i class="fas fa-key"></i><span>Acessos</span></a>
-                        </div>
-                    </li>
-                    <li class="logout-box"><a id="link_logout" href="#"><i class="fas fa-power-off"></i><span id="txt_usuario">Usuário</span></a></li>
-                </ul>
+                    </nav><label class="form-label d-none" id="label-menu" for="toggle"></label><input class="d-none" type="checkbox" id="toggle">
+                </div>
             </div>
         </nav>
         <div class="d-flex flex-column" id="content-wrapper" style="width: 100%;">
@@ -97,6 +89,7 @@
         </div>
     </div>
     <script src="assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script>
+    <script src="assets/js/script.min.js?h=35a745003519d0480832903c736bc4ec"></script>
 </body>
 
 </html>
