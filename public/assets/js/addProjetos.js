@@ -51,8 +51,11 @@ const ProjectAPI = {
   },
 
   fetchContract(contract) {
-    const url = `/getContrato?p_contrato=${contract}`;
-    return API.fetchQuery(url);
+    return API.fetchQuery(`/getContrato?p_contrato=${contract}`);
+  },
+
+  fetchMaxOrder() {
+    return API.fetchQuery("/getMax");
   },
 };
 
@@ -202,6 +205,11 @@ function setStoreCodeIntoForm(contract) {
   Fields.set(SELECTORS.inputs.loja, getStoreCodeFromContract(contract));
 }
 
+async function setMaxOrder() {
+  const order = await ProjectAPI.fetchMaxOrder();
+  Fields.set(SELECTORS.inputs.oc, order.data[0].p_max + 1);
+}
+
 async function handleContractBlur() {
   const contract = getContractValue();
   if (isEmpty(contract)) return;
@@ -288,6 +296,9 @@ function bindEvents() {
   Dom.addEventBySelector(SELECTORS.inputs.numProj, "input", applyDateMask);
   Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
   Dom.addEventBySelector(SELECTORS.masks.moeda, "input", handleCurrencyInput);
+  Dom.addEventBySelector(SELECTORS.inputs.oc, "dblclick", async () =>
+    setMaxOrder(),
+  );
 }
 
 function initProjectFormPage() {
