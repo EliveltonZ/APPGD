@@ -361,7 +361,7 @@ async function populateModalFromProject(orderBuy) {
    EVENT HANDLERS
 ========================================================= */
 function getOcFromRowCell(tdEl) {
-  return Table.getIndexColumnValue(tdEl, 22);
+  return Table.getIndexColumnValue(tdEl, 21);
 }
 
 async function handleTableDoubleClick(event) {
