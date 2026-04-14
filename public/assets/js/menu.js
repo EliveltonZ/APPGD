@@ -200,7 +200,7 @@ async function saveProjectType() {
 ========================================================= */
 async function populateUserName() {
   const usuario = await getCookie(SELECTORS.cookie.login);
-  Fields.setHtml(SELECTORS.inputs.usuario, usuario);
+  Fields.setHtml(SELECTORS.inputs.usuario, usuario.split(" ")[0]);
   Fields.set(SELECTORS.inputs.responsavel, usuario);
 }
 
