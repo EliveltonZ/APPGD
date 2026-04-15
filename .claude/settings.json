@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Write(public/**)",
+      "Write(controllers/**)",
+      "Write(client/**)",
+      "Write(routes.js)",
+      "Write(server.js)",
+      "Write(CLAUDE.md)",
+      "Write(PRD.md)",
+      "Write(Spec.md)",
+      "Write(.claude/**)",
+      "Bash(npm test*)",
+      "Bash(npm run*)",
+      "Bash(node *)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git checkout -b*)",
+      "Bash(git add*)",
+      "Bash(git commit*)"
+    ],
+    "deny": [
+      "Write(.env*)",
+      "Write(package.json)",
+      "Write(package-lock.json)",
+      "Bash(git push*)",
+      "Bash(git merge*)",
+      "Bash(npm install*)",
+      "Bash(rm -rf*)"
+    ]
+  }
+}
