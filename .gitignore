@@ -137,3 +137,14 @@ package/
 
 # Sensitive data directories
 estrutra de dados APPGD/
+
+
+# CLAUDE CODE
+# Arquivos de sessão do Claude Code (temporários)
+PRD.md
+Spec.md
+.temp/
+
+# Configurações locais do Claude (não compartilhar com o time)
+.claude/settings.local.json
+CLAUDE.md
