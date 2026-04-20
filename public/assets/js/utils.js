@@ -1,7 +1,7 @@
 import Swal from "./sweetalert2.esm.all.min.js";
 import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-import { Service } from "./service/api.js";
-import { q } from "./UI/interface.js";
+import { API, Service } from "./service/api.js";
+import { ce, q } from "./UI/interface.js";
 import { DateTime } from "./utils/time.js";
 import { Modal } from "./utils/modal.js";
 import { Dom } from "./UI/interface.js";
@@ -19,24 +19,37 @@ export function ajustarTamanhoModal() {
   }
 }
 
-export async function getGroupedData(route, id_element, index_name) {
-  const response = await fetch(`/${route}`);
+export async function getGroupedData(route, id_element, [id, value]) {
+  const res = await getData(route);
+  if (!checkData(res)) return;
 
-  if (!response.ok) {
-    const errText = await response.text();
-    console.log(errText);
-  } else {
-    const data = await response.json();
-    const element = document.querySelector(id_element);
-    element.innerHTML = '<option value="">-</option>';
+  const data = await res.data;
+  const select = getSelectControl(id_element);
+  populateSelect(data, select, [id, value]);
+}
 
-    data.forEach((item) => {
-      const option = document.createElement("option");
-      option.value = item[index_name];
-      option.textContent = item[index_name];
-      element.appendChild(option);
-    });
-  }
+function getSelectControl(id_element) {
+  const element = q(id_element);
+  element.innerHTML = '<option value="">-</option>';
+  return element;
+}
+
+export async function getData(route) {
+  return await API.fetchQuery(route);
+}
+
+function checkData(response) {
+  if (!response.ok) return true;
+  return false;
+}
+
+function populateSelect(data, element, [id, value]) {
+  data.forEach((item) => {
+    const option = ce("option");
+    option.value = item[id];
+    option.textContent = item[value];
+    element.appendChild(option);
+  });
 }
 
 function setUpperCase(input) {
@@ -405,6 +418,8 @@ const urlsIgnoradas = [
   "/sendMail",
   "/getMax",
   "/passwordValidation",
+  "/getCapaAssistencia",
+  "/getPecas",
 ];
 
 function deveMostrarSpinner(url) {
