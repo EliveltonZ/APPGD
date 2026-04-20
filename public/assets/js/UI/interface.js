@@ -28,7 +28,7 @@ export class Dom {
   static getValue(element) {
     try {
       const value = q(element).value;
-      return value === "" ? null : value.toUpperCase();
+      return value === "" ? null : value.toUpperCase().trim();
     } catch {
       console.log(`elemento ${element} não encontrado`);
     }

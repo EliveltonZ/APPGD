@@ -176,13 +176,13 @@ function buildEditPayloadFromForm() {
     p_tipocontrato: Fields.get(SELECTORS.inputs.tipoContrato),
     p_valorbruto: formatDecimalForApi(Fields.get(SELECTORS.inputs.valorBruto)),
     p_valornegociado: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.valorNegociado)
+      Fields.get(SELECTORS.inputs.valorNegociado),
     ),
     p_customaterial: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.custoMaterial)
+      Fields.get(SELECTORS.inputs.custoMaterial),
     ),
     p_customaterialadicional: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.custoAdicional)
+      Fields.get(SELECTORS.inputs.custoAdicional),
     ),
   };
 }
@@ -248,21 +248,18 @@ function loadView() {
 }
 
 function loadGroupedData() {
-  getGroupedData(
-    "getGroupedAmbiente",
-    SELECTORS.inputs.tipoAmbiente,
-    "tipo_ambiente"
-  );
-  getGroupedData(
-    "getGroupedLiberador",
-    SELECTORS.datalists.liberadores,
-    "p_liberador"
-  );
-  getGroupedData(
-    "getGroupedVendedor",
-    SELECTORS.datalists.vendedores,
-    "p_vendedor"
-  );
+  getGroupedData("listarAmbiente", EL.inputs.tipoAmbiente, [
+    "p_id",
+    "p_tipo_ambiente",
+  ]);
+  getGroupedData("listarLiberador", EL.datalists.liberadores, [
+    "p_id",
+    "p_liberador",
+  ]);
+  getGroupedData("listarVendedor", EL.datalists.vendedores, [
+    "p_id",
+    "p_vendedor",
+  ]);
 }
 
 function configureUiDefaults() {

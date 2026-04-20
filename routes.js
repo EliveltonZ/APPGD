@@ -91,9 +91,13 @@ route.post("/sendMail", emailController.sendMails);
 
 // rotas utils.js
 route.get("/getUsuario", ultilsController.getUsuario);
-route.get("/getGroupedLiberador", ultilsController.getGroupedLiberador);
-route.get("/getGroupedAmbiente", ultilsController.getGroupedAmbiente);
-route.get("/getGroupedVendedor", ultilsController.getGroupedVendedor);
+route.get("/listarLiberadores", ultilsController.listarLiberadores);
+route.get("/listarAmbientes", ultilsController.listarAmbientes);
+route.get("/listarVendedores", ultilsController.listarVendedores);
+route.get("/listarLojas", ultilsController.listarLojas);
+route.get("/listarTipoClientes", ultilsController.listarTipoCliente);
+route.get("/listarEtapas", ultilsController.listarEtapas);
+route.get("/listarTipoContrato", ultilsController.listarTipoContrato);
 route.get("/getGroupedAcessorios", ultilsController.getGroupedAcessorios);
 route.get("/fillTableAcessorios", ultilsController.fillTableAcessorios);
 route.get("/getDate", ultilsController.getDate);
@@ -126,8 +130,10 @@ route.get("/getAcessoriosCompras", comprasController.getAcessoriosCompras);
 route.put("/setAcessorios", comprasController.setAcessorios);
 
 // rotas addProjetos.js
-route.get("/getContrato", addProjetosController.getContrato);
-route.post("/setProjeto", addProjetosController.setProjeto);
+route.get("/getContrato", addProjetosController.selectContract);
+route.get("/listClients", addProjetosController.listClients);
+route.post("/createProject", addProjetosController.createProject);
+route.post("/createClient", addProjetosController.createClient);
 
 // rotas editProjetos.js
 route.get("/getEditProjetos", editProjetosController.getEditProjetos);
