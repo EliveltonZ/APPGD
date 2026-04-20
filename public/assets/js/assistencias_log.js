@@ -250,7 +250,7 @@ function printPage() {
   iframe.contentWindow.location.reload();
   setTimeout(function () {
     iframe.contentWindow.print();
-  }, 1000);
+  }, 2000);
 }
 
 function init() {
