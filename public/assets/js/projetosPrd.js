@@ -589,7 +589,7 @@ async function handleTableDblClick(event) {
   const oc = Table.getIndexColumnValue(tdEl, 2);
   const codcc = Table.getIndexColumnValue(tdEl, 5);
 
-  if (codcc !== "-") {
+  if (codcc !== "") {
     await loadProducao(oc);
     await loadAndRenderAcessorios(oc);
     Modal.show("modal");
