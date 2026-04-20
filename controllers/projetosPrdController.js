@@ -2,8 +2,8 @@
 const { createRpcHandler } = require("./rpcHandlerFactory");
 
 module.exports = {
-  fillTable: createRpcHandler("get_project_prod", "query"),
-  getProducao: createRpcHandler("get_producao", "query"),
+  fillTable: createRpcHandler("listar_projetos_producao", "query"),
+  getProducao: createRpcHandler("buscar_projeto_producao", "query"),
   getProducaoBarcode: createRpcHandler("get_producao_barcode", "query"),
-  setDataProducao: createRpcHandler("set_data_producao", "body"),
+  setDataProducao: createRpcHandler("atualizar_dados_producao", "body"),
 };
