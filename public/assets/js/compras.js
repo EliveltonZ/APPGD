@@ -106,12 +106,13 @@ function clearTableBody() {
   return tbody;
 }
 
-function buildRowFromItem(item) {
+function buildRowFromItem(item, num) {
   const tr = ce("tr");
   const left = "text-align:left;";
   const statusStyle = Style.colorStatus(item.status);
 
   tr.classList.add("open-modal-row");
+  tr.append(td(num));
   tr.append(td(item.contrato));
   tr.append(td(item.cliente, left));
   tr.append(td(item.ambiente, left));
@@ -134,26 +135,26 @@ function buildRowFromItem(item) {
 function renderAccessoriesPurchases(rows) {
   const tbody = clearTableBody();
   if (!tbody) return;
-  rows.forEach((item) => tbody.appendChild(buildRowFromItem(item)));
+  rows.forEach((item, i) => tbody.appendChild(buildRowFromItem(item, i + 1)));
 }
 
 /* =========================================================
    FORM POPULATION (TABLE -> FORM)
 ========================================================= */
 const COLUMN_TO_FIELD = {
-  15: { selector: SELECTORS.form.id },
-  0: { selector: SELECTORS.form.contrato },
-  1: { selector: SELECTORS.form.cliente },
-  2: { selector: SELECTORS.form.ambiente },
-  3: { selector: SELECTORS.form.descricao },
-  4: { selector: SELECTORS.form.medida },
-  5: { selector: SELECTORS.form.parcelamento },
-  6: { selector: SELECTORS.form.cartao },
-  7: { selector: SELECTORS.form.qtd },
-  8: { selector: SELECTORS.form.fornecedor },
-  10: { selector: SELECTORS.form.compra, isDate: true },
-  11: { selector: SELECTORS.form.previsao, isDate: true },
-  12: { selector: SELECTORS.form.recebido, isDate: true },
+  16: { selector: SELECTORS.form.id },
+  1: { selector: SELECTORS.form.contrato },
+  2: { selector: SELECTORS.form.cliente },
+  3: { selector: SELECTORS.form.ambiente },
+  4: { selector: SELECTORS.form.descricao },
+  5: { selector: SELECTORS.form.medida },
+  6: { selector: SELECTORS.form.parcelamento },
+  7: { selector: SELECTORS.form.cartao },
+  8: { selector: SELECTORS.form.qtd },
+  9: { selector: SELECTORS.form.fornecedor },
+  11: { selector: SELECTORS.form.compra, isDate: true },
+  12: { selector: SELECTORS.form.previsao, isDate: true },
+  13: { selector: SELECTORS.form.recebido, isDate: true },
 };
 
 function fillFormFromRowCell(cell) {
