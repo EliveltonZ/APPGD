@@ -2,7 +2,7 @@ const { createRpcHandler } = require("./rpcHandlerFactory");
 
 // Exportando as funções
 module.exports = {
-  fillTable: createRpcHandler("get_project_exp", "query"),
-  getExpedicao: createRpcHandler("get_expedicao", "query"),
+  fillTable: createRpcHandler("listar_projetos_expedicao", "query"),
+  getExpedicao: createRpcHandler("buscar_projeto_expedicao", "query"),
   setDataExpedicao: createRpcHandler("set_expedicao", "body"),
 };

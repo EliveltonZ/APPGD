@@ -516,7 +516,7 @@ async function handleTableDoubleClick(event) {
   const oc = Table.getIndexColumnValue(tdEl, 2);
   const codcc = Table.getIndexColumnValue(tdEl, 5);
 
-  if (codcc !== "-") {
+  if (codcc !== "") {
     await loadExpedicao(oc);
     await loadAndRenderAccessoriesModal(oc);
     Modal.show("modal");
