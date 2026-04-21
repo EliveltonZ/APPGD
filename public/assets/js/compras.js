@@ -77,6 +77,14 @@ function showSuccess(message) {
   return Modal.showInfo("success", "Sucesso", message);
 }
 
+async function showConfirmedSave() {
+  const result = await Modal.showConfirmation(
+    "Confirmar",
+    "Salvar Alterações ?",
+  );
+  return result.isConfirmed;
+}
+
 /* =========================================================
    NORMALIZERS / FORMATTERS
 ========================================================= */
@@ -215,6 +223,8 @@ async function handleTableDblClick(event) {
 }
 
 async function handleUpdateClick() {
+  const result = await showConfirmedSave();
+  if (!result) return;
   try {
     const payload = buildAccessoryPayloadFromForm();
     const res = await PurchasesAPI.updateAccessory(payload);

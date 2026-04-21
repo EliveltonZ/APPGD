@@ -10,7 +10,7 @@ module.exports = {
   listarEtapas: createRpcHandler("listar_etapas"),
   listarTipoContrato: createRpcHandler("listar_tipo_contrato"),
   fillTableAcessorios: createRpcHandler("get_acessorios"),
-  getGroupedAcessorios: createRpcHandler("get_group_by_acessorios"),
+  listarCategorias: createRpcHandler("listar_categoria"),
   getDate: createRpcHandler("buscar_data"),
   setDate: createRpcHandler("set_data", "body"),
   setEtapa: createRpcHandler("set_etapa", "body"),

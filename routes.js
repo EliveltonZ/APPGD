@@ -98,7 +98,7 @@ route.get("/listarLojas", ultilsController.listarLojas);
 route.get("/listarTipoClientes", ultilsController.listarTipoCliente);
 route.get("/listarEtapas", ultilsController.listarEtapas);
 route.get("/listarTipoContrato", ultilsController.listarTipoContrato);
-route.get("/getGroupedAcessorios", ultilsController.getGroupedAcessorios);
+route.get("/listarCategorias", ultilsController.listarCategorias);
 route.get("/fillTableAcessorios", ultilsController.fillTableAcessorios);
 route.get("/getDate", ultilsController.getDate);
 route.put("/setDate", ultilsController.setDate);
@@ -211,7 +211,7 @@ route.post("/setNewOrder", assistenciaController.setNewOrder);
 // rotas solicitacao
 route.get("/getConfig", solicitacaoController.getConfig);
 route.post("/setEquipSat", solicitacaoController.setEquipSat);
-route.get("/getPecas", solicitacaoController.getPecas);
+route.get("/getContratoAssist", solicitacaoController.getContratoAssist);
 
 // rotas pecas
 route.get("/getOcorrencia", ultilsController.getOcorrencia);

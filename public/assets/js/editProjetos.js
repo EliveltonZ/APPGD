@@ -1,5 +1,5 @@
 import { getGroupedData, loadPage } from "./utils.js";
-import { Dom, q } from "./UI/interface.js";
+import { Dom, q, ce } from "./UI/interface.js";
 import { API } from "./service/api.js";
 import { Numbers } from "./utils/number.js";
 import { Modal } from "./utils/modal.js";
@@ -7,19 +7,20 @@ import { Modal } from "./utils/modal.js";
 /* =========================================================
    SELECTORS / ELEMENTS
 ========================================================= */
-const SELECTORS = {
+const EL = {
   inputs: {
     oc: "#txt_numoc",
     ambiente: "#txt_ambiente",
     contrato: "#txt_contrato",
     cliente: "#txt_cliente",
-    vendedor: "#txt_vendedor",
-    liberador: "#txt_liberador",
+    id_cliente: "#txt_id_cliente",
+    vendedores: "#txt_vendedor",
+    liberadores: "#txt_liberador",
     dataContrato: "#txt_datacontrato",
     dataAssinatura: "#txt_dataassinatura",
     dataEntrega: "#txt_dataentrega",
     chegouFabrica: "#txt_chegoufabrica",
-    loja: "#txt_loja",
+    lojas: "#txt_loja",
     tipoCliente: "#txt_tipocliente",
     etapa: "#txt_etapa",
     tipoAmbiente: "#txt_tipoambiente",
@@ -40,6 +41,11 @@ const SELECTORS = {
   masks: {
     moeda: ".moeda",
   },
+  form: {
+    cliente: "#txt_cliente_form",
+    bt_salvar: "#bt_salvar_form",
+    tbl_clientes: ".table",
+  },
 };
 
 /* =========================================================
@@ -50,8 +56,13 @@ const ProjectsEditAPI = {
     const url = `/getEditProjetos?p_ordemdecompra=${orderNumber}`;
     return await API.fetchQuery(url);
   },
+
   updateProject: async function (payload) {
     return await API.fetchBody("/setEditProjetos", "PUT", payload);
+  },
+
+  fetchClients() {
+    return API.fetchQuery("/listClients");
   },
 };
 
@@ -62,12 +73,15 @@ const Fields = {
   get(selector) {
     return Dom.getValue(selector);
   },
+
   set(selector, value) {
     Dom.setValue(selector, value);
   },
+
   focus(selector) {
     Dom.setFocus(selector);
   },
+
   clear(selectors) {
     // se você quiser manter o comportamento antigo que limpa tudo:
     if (!selectors) return Dom.clearInputFields();
@@ -90,6 +104,9 @@ function confirmSaveEdits() {
   return Modal.showConfirmation(null, "Deseja salvar edições ?");
 }
 
+function createModal() {
+  return Modal.show("modal-1");
+}
 /* =========================================================
    VALIDATORS
 ========================================================= */
@@ -99,7 +116,7 @@ function isFormValid() {
 }
 
 function getOrderNumber() {
-  return Fields.get(SELECTORS.inputs.oc);
+  return Fields.get(EL.inputs.oc);
 }
 
 function hasOrderNumber(value) {
@@ -127,28 +144,26 @@ function handleCurrencyInput(e) {
 ========================================================= */
 function mapProjectToFormFields(item) {
   return [
-    [SELECTORS.inputs.contrato, item.contrato],
-    [SELECTORS.inputs.cliente, item.cliente],
-    [SELECTORS.inputs.tipoAmbiente, item.tipoambiente],
-    [SELECTORS.inputs.ambiente, item.ambiente],
-    [SELECTORS.inputs.numProj, item.numproj],
-    [SELECTORS.inputs.vendedor, item.vendedor],
-    [SELECTORS.inputs.liberador, item.liberador],
-    [SELECTORS.inputs.dataContrato, item.datacontrato],
-    [SELECTORS.inputs.dataAssinatura, item.dataassinatura],
-    [SELECTORS.inputs.chegouFabrica, item.chegoufabrica],
-    [SELECTORS.inputs.dataEntrega, item.dataentrega],
-    [SELECTORS.inputs.loja, item.loja],
-    [SELECTORS.inputs.tipoCliente, item.tipocliente],
-    [SELECTORS.inputs.etapa, item.etapa],
-    [SELECTORS.inputs.tipoContrato, item.tipocontrato],
-    [SELECTORS.inputs.valorBruto, formatCurrency(item.valorbruto)],
-    [SELECTORS.inputs.valorNegociado, formatCurrency(item.valornegociado)],
-    [SELECTORS.inputs.custoMaterial, formatCurrency(item.customaterial)],
-    [
-      SELECTORS.inputs.custoAdicional,
-      formatCurrency(item.customaterialadicional),
-    ],
+    [EL.inputs.contrato, item.contrato],
+    [EL.inputs.id_cliente, item.id_cliente],
+    [EL.inputs.cliente, item.cliente],
+    [EL.inputs.tipoAmbiente, item.id_tipoambiente],
+    [EL.inputs.ambiente, item.ambiente],
+    [EL.inputs.numProj, item.numproj],
+    [EL.inputs.vendedores, item.id_vendedor],
+    [EL.inputs.liberadores, item.id_liberador],
+    [EL.inputs.dataContrato, item.datacontrato],
+    [EL.inputs.dataAssinatura, item.dataassinatura],
+    [EL.inputs.chegouFabrica, item.chegoufabrica],
+    [EL.inputs.dataEntrega, item.dataentrega],
+    [EL.inputs.lojas, item.id_loja],
+    [EL.inputs.tipoCliente, item.id_tipocliente],
+    [EL.inputs.etapa, item.id_etapa],
+    [EL.inputs.tipoContrato, item.id_tipocontrato],
+    [EL.inputs.valorBruto, formatCurrency(item.valorbruto)],
+    [EL.inputs.valorNegociado, formatCurrency(item.valornegociado)],
+    [EL.inputs.custoMaterial, formatCurrency(item.customaterial)],
+    [EL.inputs.custoAdicional, formatCurrency(item.customaterialadicional)],
   ];
 }
 
@@ -156,33 +171,49 @@ function applyFields(pairs) {
   pairs.forEach(([selector, value]) => Fields.set(selector, value));
 }
 
+function createCells(value) {
+  const td = ce("td");
+  td.innerHTML = value;
+  return td;
+}
+
+function createRow(data) {
+  const tr = ce("tr");
+  tr.append(createCells(data.p_id));
+  tr.append(createCells(data.p_nome));
+  return tr;
+}
+
+async function buildTableClients() {
+  const tbody = q(EL.form.tbl_clientes).getElementsByTagName("tbody")[0];
+  tbody.innerHTML = "";
+  const data = await ProjectsEditAPI.fetchClients();
+  data.data.forEach((e) => tbody.appendChild(createRow(e)));
+}
+
 function buildEditPayloadFromForm() {
   return {
-    p_ordemdecompra: Fields.get(SELECTORS.inputs.oc),
-    p_contrato: Fields.get(SELECTORS.inputs.contrato),
-    p_cliente: Fields.get(SELECTORS.inputs.cliente),
-    p_tipoambiente: Fields.get(SELECTORS.inputs.tipoAmbiente),
-    p_ambiente: Fields.get(SELECTORS.inputs.ambiente),
-    p_numproj: Fields.get(SELECTORS.inputs.numProj),
-    p_vendedor: Fields.get(SELECTORS.inputs.vendedor),
-    p_liberador: Fields.get(SELECTORS.inputs.liberador),
-    p_datacontrato: Fields.get(SELECTORS.inputs.dataContrato),
-    p_dataassinatura: Fields.get(SELECTORS.inputs.dataAssinatura),
-    p_chegoufabrica: Fields.get(SELECTORS.inputs.chegouFabrica),
-    p_dataentrega: Fields.get(SELECTORS.inputs.dataEntrega),
-    p_loja: Fields.get(SELECTORS.inputs.loja),
-    p_tipocliente: Fields.get(SELECTORS.inputs.tipoCliente),
-    p_etapa: Fields.get(SELECTORS.inputs.etapa),
-    p_tipocontrato: Fields.get(SELECTORS.inputs.tipoContrato),
-    p_valorbruto: formatDecimalForApi(Fields.get(SELECTORS.inputs.valorBruto)),
-    p_valornegociado: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.valorNegociado),
-    ),
-    p_customaterial: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.custoMaterial),
-    ),
+    p_ordemdecompra: Fields.get(EL.inputs.oc),
+    p_contrato: Fields.get(EL.inputs.contrato),
+    p_id_cliente: Fields.get(EL.inputs.id_cliente),
+    p_id_tipoambiente: Fields.get(EL.inputs.tipoAmbiente),
+    p_ambiente: Fields.get(EL.inputs.ambiente),
+    p_numproj: Fields.get(EL.inputs.numProj),
+    p_id_vendedor: Fields.get(EL.inputs.vendedores),
+    p_id_liberador: Fields.get(EL.inputs.liberadores),
+    p_datacontrato: Fields.get(EL.inputs.dataContrato),
+    p_dataassinatura: Fields.get(EL.inputs.dataAssinatura),
+    p_chegoufabrica: Fields.get(EL.inputs.chegouFabrica),
+    p_dataentrega: Fields.get(EL.inputs.dataEntrega),
+    p_id_loja: Fields.get(EL.inputs.lojas),
+    p_id_tipocliente: Fields.get(EL.inputs.tipoCliente),
+    p_id_etapa: Fields.get(EL.inputs.etapa),
+    p_id_tipocontrato: Fields.get(EL.inputs.tipoContrato),
+    p_valorbruto: formatDecimalForApi(Fields.get(EL.inputs.valorBruto)),
+    p_valornegociado: formatDecimalForApi(Fields.get(EL.inputs.valorNegociado)),
+    p_customaterial: formatDecimalForApi(Fields.get(EL.inputs.custoMaterial)),
     p_customaterialadicional: formatDecimalForApi(
-      Fields.get(SELECTORS.inputs.custoAdicional),
+      Fields.get(EL.inputs.custoAdicional),
     ),
   };
 }
@@ -245,40 +276,64 @@ async function saveEditsFlow() {
 ========================================================= */
 function loadView() {
   loadPage("adicionar_projetos", "editar.html");
-}
 
-function loadGroupedData() {
-  getGroupedData("listarAmbiente", EL.inputs.tipoAmbiente, [
+  getGroupedData("/listarAmbientes", EL.inputs.tipoAmbiente, [
     "p_id",
     "p_tipo_ambiente",
   ]);
-  getGroupedData("listarLiberador", EL.datalists.liberadores, [
+  getGroupedData("/listarLiberadores", EL.inputs.liberadores, [
     "p_id",
     "p_liberador",
   ]);
-  getGroupedData("listarVendedor", EL.datalists.vendedores, [
+  getGroupedData("/listarVendedores", EL.inputs.vendedores, [
     "p_id",
     "p_vendedor",
   ]);
+  getGroupedData("/listarTipoClientes", EL.inputs.tipoCliente, [
+    "p_id",
+    "p_tipocliente",
+  ]);
+  getGroupedData("/listarTipoContrato", EL.inputs.tipoContrato, [
+    "p_id",
+    "p_tipocontrato",
+  ]);
+
+  getGroupedData("/listarLojas", EL.inputs.lojas, ["p_id", "p_loja"]);
+  getGroupedData("/listarEtapas", EL.inputs.etapa, ["p_id", "p_etapa"]);
 }
 
 function configureUiDefaults() {
-  Fields.focus(SELECTORS.inputs.oc);
+  Fields.focus(EL.inputs.oc);
   Dom.allUpperCase();
   Dom.enableEnterAsTab();
 }
 
+function getTextCell(tdEL, index) {
+  const item = tdEL.getElementsByTagName("td")[index];
+  return item.textContent;
+}
+
+function handleSelectClient(e) {
+  const tdEL = e.target.closest("tr");
+  const idClient = getTextCell(tdEL, 0);
+  const name = getTextCell(tdEL, 1);
+  Fields.set(EL.inputs.id_cliente, idClient);
+  Fields.set(EL.inputs.cliente, name);
+}
+
 function bindEvents() {
-  Dom.addEventBySelector(SELECTORS.inputs.oc, "blur", loadProjectForEdit);
-  Dom.addEventBySelector(SELECTORS.buttons.salvar, "click", handleSaveClick);
-  Dom.addEventBySelector(SELECTORS.masks.moeda, "input", handleCurrencyInput);
+  Dom.addEventBySelector(EL.inputs.oc, "blur", loadProjectForEdit);
+  Dom.addEventBySelector(EL.buttons.salvar, "click", handleSaveClick);
+  Dom.addEventBySelector(EL.masks.moeda, "input", handleCurrencyInput);
+  Dom.addEventBySelector(EL.inputs.id_cliente, "dblclick", createModal);
+  Dom.addEventBySelector(EL.form.tbl_clientes, "dblclick", handleSelectClient);
 }
 
 function initEditProjectPage() {
   loadView();
-  loadGroupedData();
   configureUiDefaults();
   bindEvents();
+  buildTableClients();
 }
 
 document.addEventListener("DOMContentLoaded", initEditProjectPage);

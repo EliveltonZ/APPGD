@@ -30,8 +30,6 @@ const EL = {
     valorNegociado: "#txt_valornegociado",
     custoMaterial: "#txt_customaterial",
     custoAdicional: "#txt_custoadicional",
-    liberadores: "#txt_liberador",
-    vendedores: "#txt_vendedor",
   },
   buttons: {
     salvar: "#bt_salvar",
@@ -331,6 +329,7 @@ function handleCurrencyInput(e) {
 ========================================================= */
 function loadInitialData() {
   loadPage("adicionar_projetos", "adicionar.html");
+
   getGroupedData("/listarAmbientes", EL.inputs.tipoAmbiente, [
     "p_id",
     "p_tipo_ambiente",

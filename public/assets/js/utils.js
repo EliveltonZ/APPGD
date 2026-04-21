@@ -29,9 +29,13 @@ export async function getGroupedData(route, id_element, [id, value]) {
 }
 
 function getSelectControl(id_element) {
-  const element = q(id_element);
-  element.innerHTML = '<option value="">-</option>';
-  return element;
+  try {
+    const element = q(id_element);
+    element.innerHTML = '<option value="">-</option>';
+    return element;
+  } catch {
+    console.warn(`${id_element} não encontrado`);
+  }
 }
 
 export async function getData(route) {
