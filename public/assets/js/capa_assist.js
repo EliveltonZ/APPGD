@@ -62,10 +62,10 @@ function setBackgroudDivUrgent() {
 }
 
 async function fetchAndPopulateOrder() {
+  buildRowParts();
   const data = await getOrder();
   populateElements(data.data[0]);
   setBackgroudDivUrgent();
-  buildRowParts();
 }
 
 async function getOrder() {

@@ -259,7 +259,7 @@ function printPage() {
   setTimeout(function () {
     showSpinner(EL.LB_CAPA, EL.SPINNER, false);
     iframe.contentWindow.print();
-  }, 2000);
+  }, 2500);
 }
 
 function init() {
