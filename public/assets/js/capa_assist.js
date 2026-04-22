@@ -11,7 +11,7 @@ const DB = {
   },
 
   getPart: async function (orderBy) {
-    const url = `/getPecasQualidade?p_id_assistencia=${orderBy}`;
+    const url = `/getPecas?p_id_assistencia=${orderBy}`;
     const response = API.fetchQuery(url);
     return response;
   },

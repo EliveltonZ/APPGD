@@ -1,5 +1,4 @@
 import Swal from "./sweetalert2.esm.all.min.js";
-import "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
 import { API, Service } from "./service/api.js";
 import { ce, q } from "./UI/interface.js";
 import { DateTime } from "./utils/time.js";

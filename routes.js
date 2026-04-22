@@ -216,6 +216,7 @@ route.get("/getContratoAssist", solicitacaoController.getContratoAssist);
 // rotas pecas
 route.get("/getOcorrencia", ultilsController.getOcorrencia);
 route.post("/setPecas", pecasController.setPecas);
+route.get("/getPecas", pecasController.getPecas);
 
 // rotas qualidade
 route.get("/getPecasQualidade", qualidadeController.getPecasQualidade);
