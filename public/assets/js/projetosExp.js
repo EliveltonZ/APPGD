@@ -49,7 +49,7 @@ const SELECTORS = {
     chkParcial: "#chk_parcial",
     chkEtapas: "#chk_etapas",
     etapas: "#txt_etapas",
-
+    acessorios: "#txt_acessorios",
     tableAcessorios: "#table_acessorios",
   },
 
@@ -304,7 +304,7 @@ async function loadAndRenderAccessoriesModal(ordemdecompra) {
 /* =========================================================
    FORM POPULATION (API -> UI)
 ========================================================= */
-async function setEtapaLabel(value, selector) {
+function setEtapaLabel(value, selector) {
   const el = q(selector);
   if (!el) return;
 
@@ -352,6 +352,7 @@ async function populateExpedicaoForm(item) {
   Fields.setChecked(SELECTORS.embalagem.pausa, item.embalagempausa);
   Fields.set(SELECTORS.embalagem.respId, item.embalagemresp);
   Fields.set(SELECTORS.embalagem.respNome, item.embalagemname);
+  Fields.set(SELECTORS.production.acessorios, item.p_total);
 
   const S = SELECTORS.itensEspeciais;
 
@@ -405,7 +406,7 @@ async function populateExpedicaoForm(item) {
   Fields.setChecked(SELECTORS.embalagem.chkFim, false);
 
   Fields.setChecked(SELECTORS.production.chkEtapas, item.etapa);
-  await setEtapaLabel(item.etapa, SELECTORS.production.etapas);
+  setEtapaLabel(item.etapa, SELECTORS.production.etapas);
 }
 
 async function populateExpedicaoFromResponse(data) {
@@ -492,6 +493,11 @@ function hasOpenStepsAndDatesFilled() {
   return !!(pronto || entrega);
 }
 
+function hasAcessoriesPendences() {
+  const etapasConcluidas = q(SELECTORS.production.acessorios).value;
+  console.log(etapasConcluidas !== 0);
+}
+
 /* =========================================================
    FLOWS / HANDLERS
 ========================================================= */
@@ -516,7 +522,7 @@ async function handleTableDoubleClick(event) {
   const oc = Table.getIndexColumnValue(tdEl, 2);
   const codcc = Table.getIndexColumnValue(tdEl, 5);
 
-  if (codcc !== "-") {
+  if (codcc !== "") {
     await loadExpedicao(oc);
     await loadAndRenderAccessoriesModal(oc);
     Modal.show("modal");
@@ -529,7 +535,7 @@ async function handleTableDoubleClick(event) {
 async function saveExpedicaoFlow() {
   const result = await confirm("Confirmar Alterações ?");
   if (!result.isConfirmed) return;
-
+  hasAcessoriesPendences();
   try {
     if (hasOpenStepsAndDatesFilled()) {
       await showWarning("Projeto com etapas em ABERTO");

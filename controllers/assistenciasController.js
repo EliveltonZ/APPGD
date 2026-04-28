@@ -1,9 +1,9 @@
 const { createRpcHandler } = require("./rpcHandlerFactory");
 
 module.exports = {
-  getAssistencias: createRpcHandler("get_assistencias", "query"),
-  getAssistencia: createRpcHandler("get_assistencia", "query"),
-  setAssistencia: createRpcHandler("set_assistencia", "body"),
-  getCapaAssistencia: createRpcHandler("get_capa_assistencia", "query"),
-  setNewOrder: createRpcHandler("set_solicitacao", "body"),
+  getAssistencias: createRpcHandler("listar_assistencias"),
+  getAssistencia: createRpcHandler("buscar_assistencia"),
+  setAssistencia: createRpcHandler("atualizar_assistencia", "body"),
+  getCapaAssistencia: createRpcHandler("buscar_capa_assistencia"),
+  setNewOrder: createRpcHandler("inserir_solicitacao", "body"),
 };

@@ -20,6 +20,7 @@ const EL = {
   OBS_LOGISTICA: "#txt_obs_logistica",
   INICIADO: "#txt_iniciado",
   PRONTO: "#txt_pronto",
+  PREVISAO: "#txt_previsao",
   CONFERENTE: "#txt_conferente",
   DESPACHANTE: "#txt_despachante",
   LIBERADOR: "#txt_liberador",
@@ -32,6 +33,8 @@ const EL = {
   PENDENCIA: "#chk_pendencia",
   DATA_ENTREGA: "#txt_dataentrega",
   DATA_FILTER: "#txt_datafilter",
+  SPINNER: "#spinner",
+  LB_CAPA: "#lb_capa",
 };
 
 /* =========================================================
@@ -61,6 +64,7 @@ HELPER API
 const assistAPI = {
   async getAssist(value) {
     const res = await API.fetchQuery(`/getAssistencia?p_solicitacao=${value}`);
+    console.log(res);
     return res.data;
   },
 
@@ -117,11 +121,18 @@ async function getContrato() {
   return res.data;
 }
 
+function showSpinner(labelSelector, spinnerSelector, show) {
+  Dom.handleClass(labelSelector, "d-none", show ? "add" : "remove");
+  Dom.handleClass(spinnerSelector, "d-none", show ? "remove" : "add");
+  // console.log(labelSelector, spinnerSelector, show);
+}
+
 function populateElements(data) {
   Dom.setValue(EL.SOLICITACAO, data.p_idsolicitacao);
   Dom.setValue(EL.CONTRATO, data.p_contrato);
   Dom.setValue(EL.SOLICITANTE, data.p_solicitante);
   Dom.setValue(EL.DATA_SOLICITACAO, DateTime.forBr(data.p_datasolicitacao));
+  Dom.setValue(EL.PREVISAO, data.p_previsao);
   Dom.setValue(EL.CLIENTE, data.p_cliente);
   Dom.setValue(EL.PEDIDO, data.p_pedido);
   Dom.setValue(EL.CORTE, data.p_corte);
@@ -165,6 +176,7 @@ function getElementsValues() {
     p_observacao2: Dom.getValue(EL.OBS_LOGISTICA),
     p_iniciado: Dom.getValue(EL.INICIADO),
     p_pronto: Dom.getValue(EL.PRONTO),
+    p_previsao: Dom.getValue(EL.PREVISAO),
     p_conferente: Dom.getValue(EL.CONFERENTE),
     p_responsavel: "",
     p_liberacao: Dom.getValue(EL.DESPACHANTE),
@@ -246,12 +258,14 @@ function setLocalStorageItem(value) {
 }
 
 function printPage() {
+  showSpinner(EL.LB_CAPA, EL.SPINNER, true);
   setLocalStorageItem(Fields.get(EL.SOLICITACAO));
   const iframe = q("#iframeImpressao");
   iframe.contentWindow.location.reload();
   setTimeout(function () {
+    showSpinner(EL.LB_CAPA, EL.SPINNER, false);
     iframe.contentWindow.print();
-  }, 1000);
+  }, 2500);
 }
 
 function init() {

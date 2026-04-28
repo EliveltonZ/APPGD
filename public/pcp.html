@@ -9,8 +9,8 @@
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
     <link rel="stylesheet" href="assets/fonts/fontawesome-all.min.css?h=28d14b47338f273ae463f5202a7b3039">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=bc2791f5fcdac75c4482d3ef39aad175">
-    <link rel="stylesheet" href="assets/css/pcp.min.css?h=ecc5774505fd9952d898175373ece445">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=6b7d8178fa6137844258050612b9d773">
+    <link rel="stylesheet" href="assets/css/pcp.min.css?h=55ae3930dd12e7e2b9edb603e00e06f9">
     <link rel="stylesheet" href="assets/css/iframe.min.css?h=af11c30dc087e4f7fc84b940dfb88f2c">
 <link rel="icon" href="assets/img/icone.png">
     <script type="module" src="assets/js/pcp.js"></script>
@@ -54,7 +54,7 @@
                             <div style="margin-top: 20px;"><label class="form-label" style="display: block;">Pedido:</label><input class="form-control" type="text" id="txt_pedido" style="display: block;text-align: center;" autocomplete="off"></div>
                             <div style="margin-top: 20px;min-width: 15%;"><label class="form-label" style="display: block;">Chegada Fab:</label><input class="form-control" type="text" id="txt_chegada" style="display: block;text-align: center;" disabled=""></div>
                             <div style="margin-top: 20px;min-width: 15%;"><label class="form-label" style="display: block;">Entrega:</label><input class="form-control" type="text" id="txt_entrega" style="display: block;text-align: center;" disabled=""></div>
-                            <div style="margin-top: 20px;min-width: 25%;"><label class="form-label" style="display: block;">Tipo:</label><select class="form-select form-select-sm" id="txt_tipo" style="display: block;text-align: center;">
+                            <div style="margin-top: 20px;min-width: 25%;"><label class="form-label" style="display: block;">Tipo:</label><select class="form-select" id="txt_tipo" style="display: block;text-align: center;">
                                     <option value="-">-</option>
                                     <option value="PLANO DE CORTE">PLANO DE CORTE</option>
                                     <option value="PROMOB">PROMOB</option>

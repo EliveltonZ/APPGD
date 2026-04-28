@@ -165,6 +165,7 @@ const Fields = {
    UI MESSAGES
 ========================================================= */
 function showError(message) {
+  console.warn(message);
   return Modal.showInfo("error", "ERRO", message);
 }
 
@@ -562,9 +563,10 @@ async function sendEmailIfPrevisaoChanged() {
   const contrato = Fields.get(SELECTORS.projeto.contrato);
   const cliente = Fields.get(SELECTORS.projeto.cliente);
   const ambiente = Fields.get(SELECTORS.projeto.ambiente);
-  const previsao = Numbers.decimal(Fields.get(SELECTORS.projeto.previsao));
+  const previsao = DateTime.forBr(Fields.get(SELECTORS.projeto.previsao));
 
   if (prevOld === previsao) return;
+  console.log(prevOld, previsao);
 
   const email = await Service.getConfig(1);
   const title = `*** ${contrato} - ${cliente} - ${ambiente} - PREV: ${previsao} ***`;
@@ -587,7 +589,7 @@ async function handleTableDblClick(event) {
   const oc = Table.getIndexColumnValue(tdEl, 2);
   const codcc = Table.getIndexColumnValue(tdEl, 5);
 
-  if (codcc !== "-") {
+  if (codcc !== "") {
     await loadProducao(oc);
     await loadAndRenderAcessorios(oc);
     Modal.show("modal");

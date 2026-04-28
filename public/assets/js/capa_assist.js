@@ -5,7 +5,7 @@ import { getCookie } from "./utils.js";
 
 const DB = {
   getDataOrder: async function (orderBy) {
-    const url = `getCapaAssistencia?p_solicitacao=${orderBy}`;
+    const url = `/getCapaAssistencia?p_solicitacao=${orderBy}`;
     const response = await API.fetchQuery(url);
     return response;
   },
@@ -62,10 +62,10 @@ function setBackgroudDivUrgent() {
 }
 
 async function fetchAndPopulateOrder() {
+  buildRowParts();
   const data = await getOrder();
   populateElements(data.data[0]);
   setBackgroudDivUrgent();
-  buildRowParts();
 }
 
 async function getOrder() {

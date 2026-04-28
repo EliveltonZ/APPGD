@@ -32,6 +32,8 @@ const EL = {
   PENDENCIA: "#chk_pendencia",
   DATA_ENTREGA: "#txt_dataentrega",
   DATA_FILTER: "#txt_datafilter",
+  SPINNER: "#spinner",
+  LB_CAPA: "#lb_capa",
 };
 
 /* =========================================================
@@ -117,6 +119,11 @@ async function getContrato() {
   return res.data;
 }
 
+function showSpinner(labelSelector, spinnerSelector, show) {
+  Dom.handleClass(labelSelector, "d-none", show ? "add" : "remove");
+  Dom.handleClass(spinnerSelector, "d-none", show ? "remove" : "add");
+  // console.log(labelSelector, spinnerSelector, show);
+}
 function populateElements(data) {
   Dom.setValue(EL.SOLICITACAO, data.p_idsolicitacao);
   Dom.setValue(EL.CONTRATO, data.p_contrato);
@@ -245,12 +252,14 @@ function setLocalStorageItem(value) {
 }
 
 function printPage() {
+  showSpinner(EL.LB_CAPA, EL.SPINNER, true);
   setLocalStorageItem(Fields.get(EL.SOLICITACAO));
   const iframe = q("#iframeImpressao");
   iframe.contentWindow.location.reload();
   setTimeout(function () {
+    showSpinner(EL.LB_CAPA, EL.SPINNER, false);
     iframe.contentWindow.print();
-  }, 1000);
+  }, 2500);
 }
 
 function init() {

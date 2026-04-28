@@ -11,7 +11,7 @@ const supabase = require("../client/clientSupabase");
 function createRpcHandler(
   remoteFunction,
   paramSource = "query",
-  { errorMessage, transform } = {}
+  { errorMessage, transform } = {},
 ) {
   return async (req, res) => {
     try {
@@ -19,8 +19,8 @@ function createRpcHandler(
         paramSource === "body"
           ? req.body
           : paramSource === "query"
-          ? req.query
-          : {};
+            ? req.query
+            : {};
 
       // Basic sanitization - remove potential harmful characters
       const sanitizedParams = sanitizeParams(params);
@@ -50,11 +50,11 @@ function createRpcHandler(
       }
 
       // Check if login failed (for password validation)
-      if (remoteFunction === 'check_password' && (!data || data.length === 0)) {
-        const fs = require('fs');
-        const path = require('path');
-        const logEntry = `[${new Date().toISOString()}] FAILED LOGIN: ID ${sanitizedParams.id || 'unknown'} from IP ${req.ip || req.connection.remoteAddress}\n`;
-        fs.appendFileSync(path.join(__dirname, '..', 'auth.log'), logEntry);
+      if (remoteFunction === "check_password" && (!data || data.length === 0)) {
+        const fs = require("fs");
+        const path = require("path");
+        const logEntry = `[${new Date().toISOString()}] FAILED LOGIN: ID ${sanitizedParams.id || "unknown"} from IP ${req.ip || req.connection.remoteAddress}\n`;
+        fs.appendFileSync(path.join(__dirname, "..", "auth.log"), logEntry);
       }
 
       const payload = transform ? transform(data) : data;
@@ -71,14 +71,14 @@ function createRpcHandler(
 
 // Basic sanitization function
 function sanitizeParams(params) {
-  if (typeof params !== 'object' || params === null) return params;
+  if (typeof params !== "object" || params === null) return params;
 
   const sanitized = {};
   for (const [key, value] of Object.entries(params)) {
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       // Remove potential SQL injection characters and trim
-      sanitized[key] = value.replace(/[<>'"&]/g, '').trim();
-    } else if (typeof value === 'object') {
+      sanitized[key] = value.replace(/[<>'"&]/g, "").trim();
+    } else if (typeof value === "object") {
       sanitized[key] = sanitizeParams(value);
     } else {
       sanitized[key] = value;

@@ -29,6 +29,7 @@ const EL = {
     supervisor: "#txt_supervisor",
     destino: "#txt_destino",
     categoria: "#txt_categoria",
+    observacoes: "#txt_observacoes",
   },
 
   parts: {
@@ -82,7 +83,7 @@ const orderService = {
   },
 
   fetchContract(contractId) {
-    return API.fetchQuery(`/getContrato?p_contrato=${contractId}`);
+    return API.fetchQuery(`/getContratoAssist?p_contrato=${contractId}`);
   },
 
   fetchOrderTypes() {
@@ -179,6 +180,7 @@ function buildOrderPayload() {
     p_supervisor: Dom.getValue(EL.solicitation.supervisor),
     p_destino: Dom.getValue(EL.solicitation.destino),
     p_garantia: Dom.getChecked(EL.checkbox.garantia),
+    p_observacoes: Dom.getValue(EL.solicitation.observacoes),
   };
 }
 
@@ -264,7 +266,7 @@ async function handleSolicitation(evt) {
         await createOrderService(); // insere assistencia na base
         await processInstallerTable(); // insere equip na base de dados
         await processPartsTable(); // insere peças na base de dados
-        Modal.showInfo("success", "Sucesso", "asteca Concluida !!!").then(
+        Modal.showInfo("success", "Sucesso", "Asteca concluida !!!").then(
           () => {
             window.location.href = "/solicitacao.html";
           },

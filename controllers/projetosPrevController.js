@@ -1,5 +1,5 @@
 const { createRpcHandler } = require("./rpcHandlerFactory");
 module.exports = {
-  fillTablePrevisao: createRpcHandler("get_project_previsao", "query"),
-  getPrevisao: createRpcHandler("get_previsao", "query"),
+  fillTablePrevisao: createRpcHandler("listar_projetos_previsao", "query"),
+  getPrevisao: createRpcHandler("buscar_projeto_previsao", "query"),
 };

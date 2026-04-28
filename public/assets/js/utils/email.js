@@ -5,10 +5,9 @@ export class Email {
     try {
       const response = await API.fetchBody("/sendMail", "POST", data);
 
-      if (!response.status !== 200) {
-        Modal.showInfo("error", "ERRO", `${response.data}`);
+      if (response.status !== 200 || response.status !== 250) {
+        return response.data;
       }
-      return response.data;
     } catch (error) {
       throw error; // Opcional: relançar o erro para ser tratado em outro lugar
     }

@@ -228,7 +228,7 @@ function fillAccessoriesFormFromRow(row) {
 function buildAccessoryPayloadFromForm() {
   return {
     p_ordemdecompra: Fields.get(SELECTORS.inputs.numOc),
-    p_categoria: Fields.get(SELECTORS.inputs.categoria),
+    p_id_categoria: Fields.get(SELECTORS.inputs.categoria),
     p_descricao: Fields.get(SELECTORS.inputs.descricao),
     p_medida: Fields.get(SELECTORS.inputs.medida),
     p_quantidade: Fields.get(SELECTORS.inputs.qtd),
@@ -272,7 +272,7 @@ async function loadContractPendencies() {
    DOMAIN: ACESSÓRIOS
 ========================================================= */
 async function loadAccessoriesTable(
-  orderNumber = Fields.get(SELECTORS.inputs.numOc)
+  orderNumber = Fields.get(SELECTORS.inputs.numOc),
 ) {
   if (!orderNumber) return;
 
@@ -314,7 +314,7 @@ async function deleteAccessoryFlowFromButton(button) {
 
   const result = await confirm(
     "Deseja remover o item selecionado ?",
-    "REMOVER ITEM"
+    "REMOVER ITEM",
   );
   if (!result.isConfirmed) return;
 
@@ -390,11 +390,10 @@ function handleAccessoriesTableClick(event) {
    INIT
 ========================================================= */
 function loadGroupedData() {
-  getGroupedData(
-    "getGroupedAcessorios",
-    SELECTORS.inputs.categoria,
-    "p_categoria"
-  );
+  getGroupedData("/listarCategorias", SELECTORS.inputs.categoria, [
+    "p_id",
+    "p_categoria",
+  ]);
 }
 
 function configureUiDefaults() {
@@ -408,34 +407,34 @@ function bindEvents() {
   Dom.addEventBySelector(
     SELECTORS.inputs.contrato,
     "blur",
-    loadContractPendencies
+    loadContractPendencies,
   );
   Dom.addEventBySelector(
     SELECTORS.buttons.adicionar,
     "click",
-    insertAccessoryFlow
+    insertAccessoryFlow,
   );
 
   Dom.addEventBySelector(
     SELECTORS.tables.contratos,
     "click",
-    handleContractsTableClick
+    handleContractsTableClick,
   );
   Dom.addEventBySelector(
     SELECTORS.tables.acessorios,
     "dblclick",
-    handleAccessoriesTableDblClick
+    handleAccessoriesTableDblClick,
   );
   Dom.addEventBySelector(
     SELECTORS.tables.acessorios,
     "click",
-    handleAccessoriesTableClick
+    handleAccessoriesTableClick,
   );
 
   Dom.addEventBySelector(
     SELECTORS.inputs.compra,
     "blur",
-    handlePurchaseDateBlur
+    handlePurchaseDateBlur,
   );
 }
 

@@ -7,9 +7,9 @@
     <title>Assistências Produção</title>
     <script>!function(){const e=()=>localStorage.getItem("theme"),t=document.documentElement.getAttribute("data-bss-forced-theme"),a=()=>{if(t)return t;const a=e();if(a)return a;const r=document.documentElement.getAttribute("data-bs-theme");return r||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")},r=e=>{"auto"===e&&window.matchMedia("(prefers-color-scheme: dark)").matches?document.documentElement.setAttribute("data-bs-theme","dark"):document.documentElement.setAttribute("data-bs-theme",e)};r(a());const c=(e,t=!1)=>{const a=[].slice.call(document.querySelectorAll(".theme-switcher"));if(a.length){document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.classList.remove("active"),e.setAttribute("aria-pressed","false")}));for(const t of a){const a=t.querySelector('[data-bs-theme-value="'+e+'"]');a&&(a.classList.add("active"),a.setAttribute("aria-pressed","true"))}}};window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",(()=>{const t=e();"light"!==t&&"dark"!==t&&r(a())})),window.addEventListener("DOMContentLoaded",(()=>{c(a()),document.querySelectorAll("[data-bs-theme-value]").forEach((e=>{e.addEventListener("click",(t=>{t.preventDefault();const a=e.getAttribute("data-bs-theme-value");(e=>{localStorage.setItem("theme",e)})(a),r(a),c(a)}))}))}))}();</script>
     <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css?h=a549af2a81cd9900ee897d8bc9c4b5e9">
-    <link rel="stylesheet" href="assets/css/styles.min.css?h=45c725c739e58ba095c7d1a8920b6b46">
+    <link rel="stylesheet" href="assets/css/styles.min.css?h=5112998f575b4149fdfd62980ca9b5e2">
     <link rel="stylesheet" href="assets/css/styles-1.min.css?h=9be72030b8ecee866f4c0367d4786337">
-    <link rel="stylesheet" href="assets/css/assistencias_prd.min.css?h=920d82f3223e0e1db9ed07660932565d">
+    <link rel="stylesheet" href="assets/css/assistencias_prd.min.css?h=f5f306788f06aab4934e1579adb77755">
 <link rel="icon" href="assets/img/icone.png">
 <script type="module" src="./assets/js/assistencias_prd.js"></script>
 </head>
@@ -74,6 +74,7 @@
                             <div class="margin-0" style="min-width: 33%;">
                                 <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">INICIADO</label><input class="form-control" id="txt_iniciado" type="date" style="text-align: center;"></div>
                                 <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">PRONTO</label><input class="form-control" id="txt_pronto" type="date" style="text-align: center;"></div>
+                                <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">PREVISÃO</label><input class="form-control" id="txt_previsao" type="date" style="text-align: center;"></div>
                                 <div class="d-flex justify-content-between gap-3"><label class="form-label text-sm-end width">CONFERENTE</label><input class="form-control text-center" type="text" id="txt_conferente"></div>
                             </div>
                             <div class="d-flex flex-column margin-0" style="min-width: 33%;padding-left: 80px;">
@@ -99,7 +100,7 @@
                                 <tbody></tbody>
                             </table>
                         </div>
-                        <div class="d-flex justify-content-center gap-3" style="padding-bottom: 20px;"><button class="btn btn-primary" id="bt_imprimir" type="button">Imprimir</button><button class="btn btn-primary" id="bt_salvar" type="button">Salvar</button></div>
+                        <div class="d-flex justify-content-center gap-3" style="padding-bottom: 20px;"><button class="btn btn-primary" id="bt_imprimir" type="button"><span class="d-none spinner-border spinner-border-sm" id="spinner"></span><label class="form-label" id="lb_capa">Imprimir</label></button><button class="btn btn-primary" id="bt_salvar" type="button">Salvar</button></div>
                     </form>
                 </div>
             </div>

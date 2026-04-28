@@ -76,7 +76,7 @@ function showSuccess(message) {
 
 function confirmDelete() {
   // mantendo o mesmo padrão do seu código original (Modal.ShowQuestion)
-  return Modal.ShowQuestion(null, "Deseja excluir Projeto ?");
+  return Modal.showConfirmation(null, "Deseja excluir Projeto ?");
 }
 
 /* =========================================================
