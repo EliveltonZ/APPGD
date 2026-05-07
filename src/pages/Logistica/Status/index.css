@@ -1,0 +1,84 @@
+.st-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.st-page__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.st-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.st-page__subtitle {
+  font-size: 13px;
+  color: var(--text);
+  margin: 4px 0 0;
+}
+
+/* ── Inline date filter ───────────────────────── */
+
+.st-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-date-filter__label {
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.st-date-filter__input {
+  height: 32px;
+  padding: 0 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-h);
+  font-size: 12.5px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+
+.st-date-filter__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.st-date-filter__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.st-date-filter__clear:hover {
+  background: var(--accent2-bg);
+  color: var(--accent2);
+  border-color: var(--accent2);
+}

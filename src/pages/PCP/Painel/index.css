@@ -1,0 +1,87 @@
+.pcp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  max-width: 100%;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+
+.pcp-page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pcp-page__title {
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  margin: 0 !important;
+}
+
+.pcp-page__subtitle {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Pipeline stats ──────────────────────────────────── */
+
+.pcp-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 900px;
+}
+
+/* ── Action cards grid ───────────────────────────────── */
+
+.pcp-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  max-width: 900px;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .pcp-pipeline {
+    grid-template-columns: repeat(2, 1fr);
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .pcp-pipeline {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 460px !important;
+  }
+  .pcp-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .pcp-pipeline {
+    grid-template-columns: 1fr;
+  }
+
+  .container-controllers {
+    display: flex;
+    flex-direction: column;
+    justify-content: start !important;
+  }
+}
+
+/* ── container-controller ───────────────────────────────── */
+
+.container-controllers {
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 200px);
+}

@@ -1,0 +1,75 @@
+.as-team-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.as-team-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.as-team-table th {
+  background: var(--content-bg);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.as-team-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-h);
+}
+
+.as-team-table tr:last-child td {
+  border-bottom: none;
+}
+
+.as-team-table tr:hover td {
+  background: var(--content-bg);
+}
+
+.as-team-table__id {
+  color: var(--text);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Remove button (shared) ─────────────────────────── */
+
+.as-table-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--accent2);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.as-table-remove:hover {
+  opacity: 1;
+  background: var(--accent2-bg);
+}
+
+/* ── Empty state (shared) ───────────────────────────── */
+
+.as-empty {
+  font-size: 13px;
+  color: var(--text);
+  opacity: 0.65;
+  margin: 0;
+  padding: 12px 0;
+  font-style: italic;
+}

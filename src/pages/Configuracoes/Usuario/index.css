@@ -1,0 +1,238 @@
+/* ══════════════════════════════════════════════
+   Usuários — Cadastro
+   ══════════════════════════════════════════════ */
+
+.cu-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Header ──────────────────────────────────── */
+
+.cu-page__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cu-page__heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cu-page__icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.cu-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.cu-page__subtitle {
+  font-size: 13px;
+  color: var(--text);
+  margin: 3px 0 0;
+}
+
+/* ── Card shell ──────────────────────────────── */
+
+.cu-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cu-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.cu-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+
+.cu-card__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.container-table {
+  width: 100%;
+  height: calc(100vh - 230px);
+  overflow-y: auto;
+}
+/* ── Table ───────────────────────────────────── */
+
+thead th {
+  position: sticky;
+  top: 0;
+}
+
+.cu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.cu-th {
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  background: var(--content-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.cu-row:hover .cu-td {
+  background: var(--content-bg);
+}
+
+.cu-td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.cu-table tbody tr:last-child .cu-td {
+  border-bottom: none;
+}
+
+.cu-td--id {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.cu-user-name {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.cu-badge-you {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0.1rem 0.45rem;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+
+.cu-td--role {
+  font-size: 13px;
+}
+
+.cu-td--actions {
+  text-align: right;
+}
+
+/* ── Row action buttons ──────────────────────── */
+
+.cu-td--actions {
+  align-items: center;
+}
+
+.cu-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+  white-space: nowrap;
+}
+
+.cu-action-btn--edit {
+  color: var(--text);
+}
+
+.cu-action-btn--edit:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.cu-action-btn--delete {
+  color: var(--text);
+  padding: 5px 8px;
+}
+
+.cu-action-btn--delete:hover:not(:disabled) {
+  background: var(--accent2-bg);
+  color: var(--accent2);
+  border-color: var(--accent2);
+}
+
+.cu-action-btn--delete:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+/* ── Form (inside modal) ─────────────────────── */
+
+.cu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cu-form__hint {
+  font-size: 12.5px;
+  color: var(--text);
+  margin: -4px 0 0;
+  font-style: italic;
+}
+
+.cu-form__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

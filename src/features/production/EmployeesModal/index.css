@@ -1,0 +1,51 @@
+.emp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.emp-table th {
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.emp-table td {
+  padding: 11px 12px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+  transition: color 0.1s;
+}
+
+.emp-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.emp-table__row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.emp-table__row:hover {
+  background: var(--accent-bg);
+}
+
+.emp-table__row:hover td {
+  color: var(--accent);
+}
+
+.emp-table__id {
+  font-family: var(--mono);
+  font-size: 12px;
+  width: 56px;
+  color: var(--text);
+}
+
+.emp-table__row:hover .emp-table__id {
+  color: var(--accent);
+}

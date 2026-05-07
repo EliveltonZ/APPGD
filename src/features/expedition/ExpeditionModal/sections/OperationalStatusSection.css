@@ -1,0 +1,237 @@
+.ops-status {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ops-status__cards-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.ops-status__bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+}
+
+/* ── Card ─────────────────────────────────────────────── */
+
+.ops-status__card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.ops-status__card-header {
+  padding: 9px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ── Card state modifiers ─────────────────────────────── */
+
+.ops-status__card--active {
+  border-color: rgba(234, 179, 8, 0.55);
+}
+.ops-status__card--paused {
+  border-color: rgba(249, 115, 22, 0.45);
+}
+.ops-status__card--done {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+/* ── State badge inside card header ──────────────────── */
+
+.ops-status__card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.ops-status__card-badge--active {
+  background: rgba(234, 179, 8, 0.14);
+  color: #ca8a04;
+}
+.ops-status__card-badge--paused {
+  background: rgba(249, 115, 22, 0.14);
+  color: #f97316;
+}
+.ops-status__card-badge--done {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+
+.ops-status__card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Field ────────────────────────────────────────────── */
+
+.ops-status__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.resp {
+  width: 100%;
+}
+
+.ops-status__field--row {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.ops-status__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.ops-status__label--inline {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-h);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Inputs ───────────────────────────────────────────── */
+
+.ops-status__input {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ops-status__input:focus {
+  border-color: var(--accent);
+}
+
+.ops-status__input:disabled {
+  background: var(--code-bg);
+  color: var(--text);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ops-status__input--id {
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.ops-status__input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ops-status__input-row .ops-status__input {
+  flex: 1;
+}
+
+.ops-status__textarea {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: vertical;
+  width: 100%;
+  box-sizing: border-box;
+  line-height: 145%;
+}
+
+.ops-status__textarea:focus {
+  border-color: var(--accent);
+}
+
+/* ── Pick button ──────────────────────────────────────── */
+
+.ops-status__pick-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.ops-status__pick-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+/* ── Checkbox ─────────────────────────────────────────── */
+
+.ops-status__checkbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.ops-status__checkbox:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Resp Status ─────────────────────────────────────────── */
+
+.ops-status__resp {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 700px) {
+  .ops-status__cards-row {
+    grid-template-columns: 1fr;
+  }
+  .ops-status__bottom-row {
+    grid-template-columns: 1fr;
+  }
+}

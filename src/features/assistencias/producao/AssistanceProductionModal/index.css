@@ -1,0 +1,232 @@
+/* ── Modal body ───────────────────────────────────────── */
+
+.ap-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Section card ─────────────────────────────────────── */
+
+.ap-section {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ap-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  padding: 8px 14px;
+  background: var(--content-bg);
+  border-bottom: 1px solid var(--border);
+  margin: 0;
+}
+
+.ap-section__body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Read-only field ──────────────────────────────────── */
+
+.ap-read {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ap-read__label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.ap-read__value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-h);
+  padding: 7px 10px;
+  background: var(--content-bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Textarea ─────────────────────────────────────────── */
+
+.ap-textarea {
+  width: 100%;
+  padding: 9px 11px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.ap-textarea:focus {
+  border-color: var(--accent);
+}
+
+/* ── Operational checkboxes ───────────────────────────── */
+
+.ap-op-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+}
+
+.ap-op-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--text-h);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ap-op-item input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* ── Urgente tag (modal identification) ───────────────── */
+
+.ap-urgente-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+}
+
+/* ── Team table ───────────────────────────────────────── */
+
+.ap-team-wrap {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ap-team-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ap-team-table th {
+  background: var(--content-bg);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.ap-team-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-h);
+}
+
+.ap-team-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ap-team-table tr:hover td {
+  background: var(--content-bg);
+}
+
+/* ── Empty state ──────────────────────────────────────── */
+
+.ap-empty {
+  font-size: 13px;
+  color: var(--text);
+  padding: 12px 0;
+  margin: 0;
+}
+
+/* ── Buttons ──────────────────────────────────────────── */
+
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--sans);
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.ap-btn--primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.ap-btn--primary:hover {
+  filter: brightness(1.1);
+}
+
+.ap-btn--secondary {
+  background: var(--content-bg);
+  color: var(--text-h);
+  border-color: var(--border);
+}
+
+.ap-btn--secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ap-btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: transparent;
+}
+
+.ap-btn--ghost:hover {
+  background: var(--content-bg);
+  color: var(--text-h);
+}
+
+/* ── Modal action bar ─────────────────────────────────── */
+
+.ap-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}

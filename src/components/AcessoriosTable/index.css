@@ -1,0 +1,73 @@
+.acc-table__wrapper {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.acc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.acc-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.acc-table__th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+.acc-table__th:first-child { border-radius: 12px 0 0 0; }
+.acc-table__th:last-child  { border-radius: 0 12px 0 0; }
+
+.acc-table__th--center { text-align: center; }
+
+.acc-table__td {
+  padding: 9px 12px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.acc-table__row:last-child .acc-table__td { border-bottom: none; }
+
+.acc-table__td--center { text-align: center; }
+
+.acc-table__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+
+.acc-table__badge--ok {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.acc-table__badge--pend {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+}
+
+.acc-table__empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text);
+  opacity: 0.5;
+  font-size: 13px;
+}

@@ -1,0 +1,70 @@
+.fcst-filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fcst-filters__search {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.fcst-filters__search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text);
+  pointer-events: none;
+}
+
+.fcst-filters__search-input {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px 7px 30px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.fcst-filters__search-input:focus { border-color: var(--accent); }
+
+.fcst-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fcst-filters__field label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text);
+}
+
+.fcst-filters__field select,
+.fcst-filters__field input[type="date"] {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.fcst-filters__field select:focus,
+.fcst-filters__field input[type="date"]:focus {
+  border-color: var(--accent);
+}

@@ -1,0 +1,138 @@
+.users-modal__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.users-modal__box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100svh - 80px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.users-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--code-bg);
+  border-radius: 10px 10px 0 0;
+}
+
+.users-modal__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-h);
+  font-family: var(--sans);
+}
+
+.users-modal__close {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.users-modal__close:hover {
+  background: var(--accent-bg);
+}
+
+.users-modal__search-wrap {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.users-modal__search {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: var(--sans);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.users-modal__search:focus {
+  border-color: var(--accent);
+}
+
+.users-modal__table-wrap {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.users-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--sans);
+}
+
+.users-modal__th {
+  padding: 8px 18px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+
+.users-modal__row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.users-modal__row:hover {
+  background: var(--accent-bg);
+}
+
+.users-modal__row:nth-child(even) {
+  background: var(--code-bg);
+}
+
+.users-modal__row:nth-child(even):hover {
+  background: var(--accent-bg);
+}
+
+.users-modal__td {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.users-modal__td--id {
+  font-weight: 600;
+  color: var(--accent);
+  width: 70px;
+}
+
+.users-modal__empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text);
+  opacity: 0.5;
+  font-size: 0.85rem;
+}

@@ -1,0 +1,148 @@
+.acc-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Checklist table ──────────────────────────────────── */
+
+.acc-checklist__table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.acc-checklist__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.acc-checklist__table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.acc-checklist__table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+.acc-checklist__table th:first-child {
+  border-radius: 12px 0 0 0;
+}
+.acc-checklist__table th:last-child {
+  border-radius: 0 12px 0 0;
+}
+
+.acc-checklist__th--check,
+.acc-checklist__th--qtd {
+  text-align: center;
+  width: 80px;
+}
+
+.acc-checklist__th--local {
+  width: 200px;
+}
+
+.acc-checklist__table td {
+  padding: 8px 12px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.acc-checklist__table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.acc-checklist__td--check,
+.acc-checklist__td--qtd {
+  text-align: center;
+}
+
+.acc-checklist__checkbox {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.acc-checklist__input {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.acc-checklist__input:focus {
+  border-color: var(--accent);
+}
+
+.acc-checklist__input--num {
+  width: 60px;
+  text-align: center;
+}
+.acc-checklist__input--local {
+  width: 100%;
+}
+
+/* ── Volumes ──────────────────────────────────────────── */
+
+.acc-checklist__volumes {
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--code-bg);
+}
+
+.acc-checklist__volumes-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.acc-checklist__volumes-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.acc-checklist__vol-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.acc-checklist__vol-label--total {
+  margin-left: auto;
+}
+
+.acc-checklist__input--vol {
+  width: 80px;
+}
+.acc-checklist__input--total {
+  border-color: var(--accent);
+  font-weight: 600;
+}

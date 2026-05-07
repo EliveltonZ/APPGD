@@ -1,0 +1,37 @@
+.notfound-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.notfound-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  max-width: 380px;
+}
+
+.notfound-code {
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent2);
+  letter-spacing: -4px;
+  font-family: var(--heading);
+}
+
+.notfound-title {
+  font-size: 22px !important;
+  margin: 0 !important;
+  letter-spacing: -0.3px !important;
+}
+
+.notfound-description {
+  color: var(--text);
+  font-size: 15px;
+  margin: 0 0 8px;
+}

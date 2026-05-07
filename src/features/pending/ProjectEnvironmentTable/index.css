@@ -1,0 +1,31 @@
+/* Row alert for projects with late items */
+.penv-table__row--alert {
+  background: rgba(220, 38, 38, 0.03);
+}
+
+.penv-table__row--alert:hover {
+  background: rgba(220, 38, 38, 0.07) !important;
+}
+
+/* Count badges */
+.penv-count {
+  display: inline-block;
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  background: var(--code-bg);
+  color: var(--text);
+}
+
+.penv-count--atrasado {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.penv-count--ok {
+  background: transparent;
+  color: var(--text);
+}

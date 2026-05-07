@@ -1,0 +1,143 @@
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --code-bg: #f4f3ec;
+  --content-bg: #f0f2f6;
+  --border: #e5e4e7;
+  --accent: #2080c5;
+  --accent-bg: rgba(32, 128, 197, 0.1);
+  --accent-border: rgba(32, 128, 197, 0.45);
+  --accent2: #be1e1e;
+  --accent2-bg: rgba(190, 30, 30, 0.1);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --sidebar-width: 175px;
+  --sidebar-bg: #afaa8c;
+  --sidebar-text: #414142;
+  --sidebar-text-h: #dde3ed;
+  --sidebar-border: rgba(255, 255, 255, 0.2);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+  --transparence: 0.5;
+  --aguardando: rgba(107, 99, 117, var(--transparence));
+  --entregue: rgba(0, 101, 173, var(--transparence));
+  --iniciado: rgba(211, 183, 0, var(--transparence));
+  --pronto: rgba(14, 172, 0, var(--transparence));
+  --a-vencer: rgba(255, 134, 36, var(--transparence));
+  --atrasado: rgba(255, 2, 2, var(--transparence));
+  --pendencia: rgba(177, 0, 153, var(--transparence));
+
+  font: 18px/145% var(--sans);
+  letter-spacing: 0.18px;
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @media (max-width: 1024px) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #14192c;
+    --code-bg: #0b0e20;
+    --content-bg: #000411;
+    --border: #2e303a;
+    --accent: #4da8e8;
+    --accent-bg: rgba(77, 168, 232, 0.15);
+    --accent-border: rgba(77, 168, 232, 0.45);
+    --accent2: #e05a5a;
+    --accent2-bg: rgba(224, 90, 90, 0.15);
+
+    --sidebar-bg: #0b1024;
+    --sidebar-text: #5e6a7a;
+    --sidebar-text-h: #c4cedf;
+    --sidebar-border: rgba(255, 255, 255, 0.1);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.04);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
+
+/* Chrome, Safari, Edge (baseados em WebKit) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}

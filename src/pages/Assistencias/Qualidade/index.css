@@ -1,0 +1,28 @@
+.qcp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+.qcp-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.qcp-page__title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: var(--text-h) !important;
+  margin: 0 0 4px !important;
+  letter-spacing: -0.2px !important;
+}
+
+.qcp-page__subtitle {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+}

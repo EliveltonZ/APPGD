@@ -1,0 +1,29 @@
+.client-section__row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.client-section__action {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.client-section__action-spacer {
+  display: block;
+  font-size: 14px;
+  line-height: 1;
+  color: transparent;
+  user-select: none;
+}
+
+@media (max-width: 560px) {
+  .client-section__row {
+    grid-template-columns: 1fr;
+  }
+}

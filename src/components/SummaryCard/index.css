@@ -1,0 +1,63 @@
+.sc-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--sc-accent, var(--accent));
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sc-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sc-card__icon {
+  color: var(--sc-accent, var(--accent));
+  opacity: 0.85;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sc-card__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-card__value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--sc-accent, var(--accent));
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  margin-top: 2px;
+}
+
+.sc-card__value--loading {
+  color: var(--border);
+  animation: sc-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes sc-pulse {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.3; }
+}
+
+.sc-card__secondary {
+  font-size: 11px;
+  color: var(--text);
+  opacity: 0.75;
+  margin-top: 2px;
+}

@@ -1,0 +1,7 @@
+.qc-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 640px) { .qc-cards { grid-template-columns: 1fr; } }
