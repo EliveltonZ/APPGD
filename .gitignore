@@ -33,3 +33,6 @@ dist-ssr
 # Build output
 backend/public
 backend/dist
+
+# Lock file — gerado localmente no Windows; o Render (Linux) precisa gerar o próprio
+package-lock.json
