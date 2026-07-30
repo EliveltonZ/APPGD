@@ -25,7 +25,7 @@ const CAMPO_LABEL: Record<string, string> = {
 };
 
 export function ParadasAdminPage() {
-  const { showToast } = useToast();
+  const toast = useToast();
 
   const [maquinas,  setMaquinas]  = useState<Maquina[]>([]);
   const [paradas,   setParadas]   = useState<ParadaRow[]>([]);
@@ -81,11 +81,11 @@ export function ParadasAdminPage() {
     setSaving(true);
     try {
       await editarParada(editando.id, editForm);
-      showToast('Parada atualizada', 'success');
+      toast.success('Parada atualizada');
       setEditando(null);
       carregar();
     } catch (e: unknown) {
-      showToast((e as Error).message ?? 'Erro ao salvar', 'error');
+      toast.error((e as Error).message ?? 'Erro ao salvar');
     } finally {
       setSaving(false);
     }
@@ -99,7 +99,7 @@ export function ParadasAdminPage() {
   }
 
   return (
-    <AppLayout title="Admin — Paradas de Máquina">
+    <AppLayout pageTitle="Admin — Paradas de Máquina">
       <div className="paradas-admin">
 
         {/* Filtros */}

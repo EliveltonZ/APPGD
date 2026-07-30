@@ -10,7 +10,7 @@ export const menuGroups: MenuGroup[] = ROUTE_GROUPS.map((group) => ({
   id: group.id,
   label: group.label,
   icon: group.icon,
-  items: ROUTE_ITEMS.filter((route) => route.groupId === group.id && !route.hidden).map(
+  items: ROUTE_ITEMS.filter((route) => route.groupId === group.id && !(route as { hidden?: boolean }).hidden).map(
     (route) => ({
       id: route.permissionKey,
       label: route.menuLabel,

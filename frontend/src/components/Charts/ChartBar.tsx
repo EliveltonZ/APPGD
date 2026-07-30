@@ -245,7 +245,7 @@ export function ChartBar({
               style={{ cursor: onBarClick ? 'pointer' : undefined }}
               onClick={(entry) => {
                 if (!onBarClick) return
-                const val = String(entry[xKey])
+                const val = String((entry as unknown as Record<string, unknown>)[xKey])
                 onBarClick(val === selectedValue ? '' : val)
               }}
             >

@@ -16,7 +16,7 @@ function fmtEntrega(val: string): string {
   return `${d}/${m}/${y}`;
 }
 
-export function exportLoteExcel(
+export async function exportLoteExcel(
   rows: LoteExportRow[],
   lote: string,
 ): Promise<void> {

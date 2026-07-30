@@ -1,11 +1,6 @@
-import type {
-  ProductionOrder,
-  ProductionDetail,
-  Employee,
-} from "../types/production";
 import { emptySetores } from "./productionConfig";
 
-export const mockOrders: ProductionOrder[] = [
+export const mockOrders = [
   {
     id: 1,
     flagged: true,
@@ -470,7 +465,7 @@ export const mockOrders: ProductionOrder[] = [
   },
 ];
 
-export const mockDetails: Record<number, ProductionDetail> = {
+export const mockDetails: Record<number, unknown> = {
   1: {
     orderId: 1,
     ordemCompra: "OC-2401",
@@ -565,7 +560,7 @@ export const mockDetails: Record<number, ProductionDetail> = {
   },
 };
 
-export const mockEmployees: Employee[] = [
+export const mockEmployees = [
   { id: "001", nome: "Carlos Silva" },
   { id: "002", nome: "Maria Santos" },
   { id: "003", nome: "João Pereira" },

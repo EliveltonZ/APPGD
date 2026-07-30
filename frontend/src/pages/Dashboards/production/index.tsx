@@ -32,7 +32,7 @@ export function ProductionDashboardsPage() {
         </div>
 
         <div className="proj-chart">
-          <GraphBar data={stData} />
+          <GraphBar data={stData} color="#3b82f6" />
           <p className="proj-chart__axis-label">Status de Produção por etapa</p>
         </div>
       </div>

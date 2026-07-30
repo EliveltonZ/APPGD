@@ -8,6 +8,7 @@ export interface DashboardRecord {
   loja: number;
   loja_nome: string | null;
   pronto: string; // YYYY-MM-DD
+  mes: string;   // YYYY-MM
 }
 
 export interface ProductionRecord {

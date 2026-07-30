@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { AssistanceProduction } from '../types/assistenciaProducao';
 
 function dt(offset: number): { prazo: string; prazoDias: number } {

@@ -164,7 +164,7 @@ export function startLote(lote: number, dataInicio: string): Promise<unknown> {
 
 export function updateProjectPcp(form: ProjectReleaseFormData): Promise<unknown> {
   return apiPost("/pcp/projeto", {
-    p_ordemdecompra: form.numOC,
+    p_ordemdecompra: Number(form.numOC),
     p_urgente:       form.urgente,
     p_codcc:         Number(form.corteCC) || 0,
     p_lote:          Number(form.lote) || 0,

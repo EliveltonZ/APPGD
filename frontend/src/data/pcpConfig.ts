@@ -38,7 +38,7 @@ export function emptyProjectRelease(): ProjectReleaseFormData {
     tipo: "promob",
     pecas: 0,
     area: 0,
-    lote: 0,
+    lote: '',
     chegouFabrica: "",
     entrega: "",
   };

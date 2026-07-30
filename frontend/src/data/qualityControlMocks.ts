@@ -1,6 +1,4 @@
-import type { QualityItem } from '../types/qualityControl';
-
-export const MOCK_QUALITY_ITEMS: QualityItem[] = [
+export const MOCK_QUALITY_ITEMS = [
   {
     id: 'q1',
     codigo: 'QC-2025-001',

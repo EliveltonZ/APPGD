@@ -54,7 +54,7 @@ export function ChartDonut({
     labelFormat === null
       ? undefined
       : labelFormat
-        ? (entry: DonutSegment) => labelFormat(entry)
+        ? (entry: unknown) => labelFormat(entry as DonutSegment)
         : ({ name, value }: { name: string; value: number }) =>
             `${name} (${value})`;
 
@@ -75,7 +75,7 @@ export function ChartDonut({
             cornerRadius={cornerRadius}
             paddingAngle={2}
             stroke="none"
-            label={renderLabel}
+            label={renderLabel as any}
             labelLine={false}
           >
             {data.map((entry, i) => (

@@ -1,9 +1,6 @@
 import { buildProjectValue } from '../utils/financeiroUtils';
-import type { ProjectValue } from '../types/financeiro';
 
-type RawProject = Omit<ProjectValue, 'descPct' | 'lucroBruto' | 'margem' | 'marginStatus'>;
-
-const RAW: RawProject[] = [
+const RAW = [
   { id:  1, numOC: 'OC-0842', contrato: '2401', data: '2024-01-10', cliente: 'Marcos Oliveira',          np: '01/01', loja: 'Loja Centro', ambiente: 'Cozinha Completa',      bruto: 45000,  negociado: 38000, material: 22000  },
   { id:  2, numOC: 'OC-0851', contrato: '2402', data: '2024-02-05', cliente: 'Fernanda Costa',            np: '01/01', loja: 'Loja Norte',  ambiente: 'Dormitório Casal',       bruto: 28000,  negociado: 21000, material: 17000  },
   { id:  3, numOC: 'OC-0863', contrato: '2403', data: '2024-03-15', cliente: 'João Carlos Silva',         np: '01/01', loja: 'Loja Sul',    ambiente: 'Home Office',            bruto: 12000,  negociado: 8500,  material: 8000   },
@@ -24,6 +21,7 @@ const RAW: RawProject[] = [
   { id: 18, numOC: 'OC-1012', contrato: '2418', data: '2025-05-06', cliente: 'Vanessa Cruz Rodrigues',    np: '02/02', loja: 'Loja Online', ambiente: 'Closet + Dormitório',    bruto: 58000,  negociado: 48000, material: 28000  },
 ];
 
-export const mockProjectValues: ProjectValue[] = RAW.map(buildProjectValue);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const mockProjectValues = RAW.map((raw) => buildProjectValue(raw as any));
 
 export const MOCK_LOJAS = ['Loja Centro', 'Loja Norte', 'Loja Sul', 'Loja Online'];

@@ -36,7 +36,7 @@ export interface ProjectReleaseFormData {
   tipo: ProjectType;
   pecas: number;
   area: number;
-  lote: number;
+  lote: string;
   chegouFabrica: string;
   entrega: string;
 }

@@ -11,8 +11,8 @@ const PREF_END   = "dash_end";
 
 interface LojaOption { id: number; nome: string }
 
-interface ChartItem { name: string; value: number }
-interface LojaItem  { name: string; value: number; color: string }
+interface ChartItem { name: string; value: number; [key: string]: unknown }
+interface LojaItem  { name: string; value: number; color: string; [key: string]: unknown }
 
 type CrossDim = 'ambiente' | 'vendedor' | 'liberador'
 

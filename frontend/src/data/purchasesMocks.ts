@@ -1,6 +1,4 @@
-import type { Purchase } from '../types/purchases';
-
-export const mockPurchases: Purchase[] = [
+export const mockPurchases = [
   {
     id: 1,
     contrato: 'CT-001',

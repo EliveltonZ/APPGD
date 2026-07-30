@@ -15,10 +15,10 @@ export function PlanejamentoPage() {
 
   const summary = useMemo(
     () => ({
-      total:       projects.length,
-      emAndamento: projects.filter((p) => p.status !== "PARCEADO" && p.status !== "PENDENCIA").length,
-      atrasados:   projects.filter((p) => p.status === "ATRASADO").length,
-      aVencer:     projects.filter((p) => p.status === "A VENCER").length,
+      total:     projects.length,
+      iniciados: projects.filter((p) => p.status === "INICIADO").length,
+      atrasados: projects.filter((p) => p.status === "ATRASADO").length,
+      aVencer:   projects.filter((p) => p.status === "A VENCER").length,
     }),
     [projects],
   );

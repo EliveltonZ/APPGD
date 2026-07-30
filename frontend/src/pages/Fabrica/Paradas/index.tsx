@@ -4,7 +4,7 @@ import { useToast } from '../../../context/ToastContext';
 import { useAuth } from '../../../context/AuthContext';
 import {
   fetchMaquinas, fetchTipos, fetchPedidoInfo, fetchParadaAberta,
-  fetchAbertas, iniciarParada, finalizarParada,
+  iniciarParada, finalizarParada,
   fetchTodasParadas, editarParada, fetchHistorico,
   type Maquina, type TipoReq, type PedidoInfo, type ParadaAberta,
   type ParadaRow, type HistoricoRow, type EditarParadaPayload,
@@ -203,7 +203,7 @@ export function ParadasPage() {
   const nomeTipo        = tipos.find(t => String(t.id) === tipoId)?.descricao ?? '';
 
   return (
-    <AppLayout title="Paradas de Máquina">
+    <AppLayout pageTitle="Paradas de Máquina">
       <div className="paradas-layout">
 
         {/* ── Aviso de bloqueio ───────────────────────────────────── */}

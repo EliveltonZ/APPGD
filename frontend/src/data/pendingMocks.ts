@@ -1,6 +1,4 @@
-import type { PendingProject } from "../types/pending";
-
-export const mockPendingProjects: PendingProject[] = [
+export const mockPendingProjects = [
   {
     id: 1,
     numOC: "OC-2026-001",

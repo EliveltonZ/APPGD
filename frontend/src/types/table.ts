@@ -12,6 +12,7 @@ export interface TableColumn<T extends object = object> {
   align?: "left" | "center" | "right";
   sortable?: boolean;
   filterable?: boolean;
+  valueFormatter?: (v: unknown) => string;
   render?: (value: unknown, row: T) => ReactNode;
 }
 

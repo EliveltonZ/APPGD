@@ -5,8 +5,8 @@ import type { TableColumn } from "../../../types/table";
 import type { StatusProject, ProjectStatus } from "../../../types/status";
 import "./index.css";
 
-function isoToBR(v: string | null | undefined): string {
-  if (!v) return "—";
+function isoToBR(v: unknown): string {
+  if (!v || typeof v !== "string") return "—";
   const [y, m, d] = v.split("-");
   return `${d}/${m}/${y}`;
 }

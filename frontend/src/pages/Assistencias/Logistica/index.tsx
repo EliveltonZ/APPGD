@@ -106,7 +106,6 @@ export function AssistenciasLogisticaPage() {
           id={viewingId}
           onClose={() => setViewingId(null)}
           onSaved={handleSaved}
-          logisticsMode
         />
       )}
     </AppLayout>

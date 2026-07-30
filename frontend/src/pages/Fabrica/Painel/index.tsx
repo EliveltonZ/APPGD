@@ -12,11 +12,9 @@ import { StartBatchModal } from "../../../features/pcp/StartBatchModal";
 import { ExportProjectsModal } from "../../../features/pcp/ExportProjectsModal";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchProductionProjects, fetchPcpCards, fetchLotes, startLote } from "../../../services/pcp";
-import type { PcpCards } from "../../../services/pcp";
 import { PROJECT_STATUS_LABELS } from "../../../data/pcpConfig";
 import type {
   ProductionProject,
-  ExportProjectsFormData,
   ProjectStatus,
 } from "../../../types/pcp";
 import "./index.css";
@@ -78,7 +76,7 @@ const STATUS_CARD_DEF: Record<ProjectStatus, { accent: string; icon: ReactNode }
 
 export function PcpPage() {
   const toast = useToast();
-  const { data: fetched, loading } = useApiData(fetchProductionProjects);
+  const { data: fetched } = useApiData(fetchProductionProjects);
   const { data: cards, loading: loadingCards } = useApiData(fetchPcpCards);
   const { data: lotes } = useApiData(fetchLotes);
   const [openModal, setOpenModal] = useState<ModalKey | null>(null);
@@ -130,7 +128,6 @@ export function PcpPage() {
     }
   }
 
-  function handleExport(_form: ExportProjectsFormData) { setOpenModal(null); }
 
   return (
     <AppLayout pageTitle="PCP">
@@ -172,7 +169,6 @@ export function PcpPage() {
 
       <ProjectReleaseModal
         isOpen={openModal === "release"}
-        projects={projects}
         onClose={() => setOpenModal(null)}
         onSave={handleReleaseSave}
       />
@@ -190,7 +186,6 @@ export function PcpPage() {
       <ExportProjectsModal
         isOpen={openModal === "export"}
         onClose={() => setOpenModal(null)}
-        onExport={handleExport}
       />
     </AppLayout>
   );

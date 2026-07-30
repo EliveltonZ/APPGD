@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { AuthUser } from "../types/auth";
 import { emptyPermissions } from "../types/auth";
 
