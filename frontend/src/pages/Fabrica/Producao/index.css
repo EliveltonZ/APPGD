@@ -1,0 +1,40 @@
+.producao-page {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.producao-page__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.producao-page__title {
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  margin: 0 0 2px !important;
+}
+
+.producao-page__subtitle {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+}
+
+.producao-page__summary {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .producao-page__summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

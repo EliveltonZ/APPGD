@@ -1,0 +1,43 @@
+.apt-obs {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.apt-obs__header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.apt-obs__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.apt-obs__body {
+  padding: 0.875rem 1rem;
+  flex: 1;
+}
+
+.apt-obs__text {
+  font-size: 0.82rem;
+  color: var(--text-h);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.apt-obs__empty {
+  font-size: 0.82rem;
+  color: var(--text);
+  font-style: italic;
+  margin: 0;
+}

@@ -1,0 +1,1 @@
+export { CapaPendenciasPage } from "./CapaPendencias";

@@ -1,0 +1,1 @@
+export { CapaVerificacaoPage } from "./CapaVerificacao";

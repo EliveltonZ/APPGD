@@ -1,0 +1,209 @@
+/* ── Page ───────────────────────────────────────────────── */
+.rel-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 24px;
+  min-height: 100%;
+}
+
+/* ── Card ───────────────────────────────────────────────── */
+.rel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px 36px;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.rel-card__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0 0 4px;
+  text-align: center;
+}
+
+/* ── Divider ────────────────────────────────────────────── */
+.rel-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── Fields ─────────────────────────────────────────────── */
+.rel-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rel-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rel-row {
+  display: flex;
+  gap: 8px;
+}
+
+.rel-input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.rel-input:focus {
+  border-color: var(--accent);
+}
+
+.rel-select {
+  padding: 9px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text-h);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+.rel-select:focus {
+  border-color: var(--accent);
+}
+.rel-select--error {
+  border-color: #dc2626;
+}
+
+.rel-error-hint {
+  font-size: 11px;
+  font-weight: 500;
+  color: #dc2626;
+}
+
+/* ── Controls row (tipo + urgente) ──────────────────────── */
+.rel-controls {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.rel-controls .rel-field {
+  flex: 1;
+}
+
+.rel-field--urgente {
+  flex: 0 0 auto !important;
+}
+
+.rel-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 0;
+  font-size: 13px;
+  color: var(--text-h);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── Buttons ────────────────────────────────────────────── */
+.rel-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.rel-btn--primary {
+  background: var(--accent);
+  color: #fff;
+}
+.rel-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover, #2563eb);
+}
+.rel-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── OC label ───────────────────────────────────────────── */
+.rel-oc-label {
+  font-size: 12.5px;
+  color: var(--text-h);
+  margin: 0;
+  text-align: center;
+}
+
+/* ── Report grid ────────────────────────────────────────── */
+.rel-grid {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  /* flex-wrap: wrap; */
+}
+
+.rel-report-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 148px;
+  padding: 22px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+}
+.rel-report-card:hover:not(:disabled) {
+  border-color: var(--accent);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+.rel-report-card--loading,
+.rel-report-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rel-report-card__icon {
+  color: var(--accent);
+}
+.rel-report-card__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── Not found ──────────────────────────────────────────── */
+.rel-not-found {
+  font-size: 13px;
+  color: #c0392b;
+  text-align: center;
+  margin: 0;
+}

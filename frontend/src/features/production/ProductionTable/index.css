@@ -1,0 +1,24 @@
+/* Row state by status */
+.prod-table__row--atrasado {
+  background: rgba(255, 6, 6, 0.04);
+}
+.prod-table__row--a_vencer {
+  background: rgba(249, 116, 22, 0.04);
+}
+
+.fcst-table__flag {
+  color: var(--accent2);
+}
+
+.fcst-table__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.fcst-table__row--atrasado td:first-child {
+  border-left: none;
+  box-shadow: inset 2px 0 0 var(--accent2);
+}

@@ -1,0 +1,12 @@
+/* ── Prazo late ─────────────────────────────────── */
+
+.st-prazo--late {
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* ── Row highlight ──────────────────────────────── */
+
+.st-row--atrasado td:first-child {
+  box-shadow: inset 2px 0 0 var(--accent2);
+}

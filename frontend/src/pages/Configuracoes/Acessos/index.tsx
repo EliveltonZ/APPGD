@@ -1,0 +1,257 @@
+import { useState, useRef, useEffect } from 'react'
+import { Shield, Edit2, X, Save, ChevronRight } from 'lucide-react'
+import { AppLayout } from '../../../components/Layout/AppLayout'
+import { ROUTE_GROUPS, ROUTE_ITEMS } from '../../../config/appRoutes'
+import type { PermissionKey } from '../../../config/appRoutes'
+import type { AuthUser, UserPermissions } from '../../../types/auth'
+import { fetchAcessos, saveAcessos } from '../../../services/usuarios'
+import { useToast } from '../../../context/ToastContext'
+import './index.css'
+
+function GroupCheckbox({
+  checked,
+  indeterminate,
+  onChange,
+}: {
+  checked: boolean
+  indeterminate: boolean
+  onChange: () => void
+}) {
+  const ref = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = indeterminate
+  }, [indeterminate])
+  return <input type="checkbox" ref={ref} checked={checked} onChange={onChange} />
+}
+
+const TOTAL = ROUTE_ITEMS.length
+
+export function ConfigAcessosPage() {
+  const toast = useToast()
+  const [users, setUsers] = useState<AuthUser[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<UserPermissions | null>(null)
+  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    fetchAcessos()
+      .then(setUsers)
+      .catch(() => toast.error('Erro ao carregar usuários.'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const editingUser = editingId ? (users.find((u) => u.id === editingId) ?? null) : null
+
+  function openEditor(user: AuthUser) {
+    setEditingId(user.id)
+    setDraft({ ...user.permissions })
+    setExpanded(new Set())
+  }
+
+  function closeEditor() {
+    setEditingId(null)
+    setDraft(null)
+    setExpanded(new Set())
+  }
+
+  function toggleExpand(groupId: string) {
+    setExpanded((prev) => {
+      const next = new Set(prev)
+      next.has(groupId) ? next.delete(groupId) : next.add(groupId)
+      return next
+    })
+  }
+
+  function togglePermission(key: PermissionKey) {
+    setDraft((prev) => (prev ? { ...prev, [key]: !prev[key] } : prev))
+  }
+
+  function groupStats(groupId: string) {
+    const items = ROUTE_ITEMS.filter((r) => r.groupId === groupId)
+    const active = draft ? items.filter((r) => draft[r.permissionKey as PermissionKey]).length : 0
+    return { total: items.length, active }
+  }
+
+  function toggleGroupAll(groupId: string) {
+    const { total, active } = groupStats(groupId)
+    const selectAll = active < total
+    const keys = ROUTE_ITEMS
+      .filter((r) => r.groupId === groupId)
+      .map((r) => r.permissionKey as PermissionKey)
+    setDraft((prev) => {
+      if (!prev) return prev
+      const next = { ...prev }
+      keys.forEach((k) => { next[k] = selectAll })
+      return next
+    })
+  }
+
+  async function save() {
+    if (!editingUser || !draft) return
+    try {
+      await saveAcessos(Number(editingUser.id), draft)
+      const updated: AuthUser = { ...editingUser, permissions: draft }
+      setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? updated : u)))
+      toast.success('Acessos atualizados com sucesso!')
+      closeEditor()
+    } catch {
+      toast.error('Erro ao salvar acessos.')
+    }
+  }
+
+  function countActive(permissions: UserPermissions) {
+    return Object.values(permissions).filter(Boolean).length
+  }
+
+  return (
+    <AppLayout pageTitle="Acessos">
+      <div className="ac-page">
+        <div className="ac-page-header">
+          <Shield size={18} />
+          <h2>Controle de Acessos</h2>
+        </div>
+
+        <div className="ac-card">
+          <table className="ac-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Cargo</th>
+                <th>Permissões</th>
+                <th aria-label="Ações" />
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: 'var(--text)' }}>Carregando...</td></tr>
+              ) : users.map((user) => {
+                const active = countActive(user.permissions)
+                const pct = (active / TOTAL) * 100
+                return (
+                  <tr key={user.id}>
+                    <td className="ac-role">{user.id}</td>
+                    <td>
+                      <span className="ac-user-name">{user.nome}</span>
+                    </td>
+                    <td className="ac-role">{user.role}</td>
+                    <td>
+                      <div className="ac-perm-row">
+                        <div className="ac-bar">
+                          <div className="ac-bar-fill" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="ac-perm-label">{active} / {TOTAL}</span>
+                      </div>
+                    </td>
+                    <td className="ac-actions">
+                      <button className="ac-btn-edit" onClick={() => openEditor(user)}>
+                        <Edit2 size={13} />
+                        Editar
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {editingUser && draft && (
+        <>
+          <div className="ac-overlay" onClick={closeEditor} />
+          <div className="ac-panel">
+            {/* Header */}
+            <div className="ac-panel-header">
+              <div>
+                <p className="ac-panel-name">{editingUser.nome}</p>
+                <p className="ac-panel-role">{editingUser.role}</p>
+              </div>
+              <button className="ac-btn-close" onClick={closeEditor} aria-label="Fechar">
+                <X size={17} />
+              </button>
+            </div>
+
+            {/* Scrollable permission tree */}
+            <div className="ac-panel-body">
+              <nav className="ac-nav">
+                {ROUTE_GROUPS.map((group) => {
+                  const items = ROUTE_ITEMS.filter((r) => r.groupId === group.id)
+                  if (items.length === 0) return null
+
+                  const { total, active } = groupStats(group.id)
+                  const isExpanded = expanded.has(group.id)
+                  const Icon = group.icon
+
+                  return (
+                    <div
+                      key={group.id}
+                      className={`ac-group${isExpanded ? ' ac-group--expanded' : ''}${active > 0 ? ' ac-group--has-active' : ''}`}
+                    >
+                      <button
+                        type="button"
+                        className="ac-group-trigger"
+                        onClick={() => toggleExpand(group.id)}
+                      >
+                        {/* Checkbox stops propagation so it doesn't toggle accordion */}
+                        <span
+                          className="ac-group-checkbox"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <GroupCheckbox
+                            checked={active === total}
+                            indeterminate={active > 0 && active < total}
+                            onChange={() => toggleGroupAll(group.id)}
+                          />
+                        </span>
+
+                        <span className="ac-group-icon">
+                          <Icon size={14} />
+                        </span>
+                        <span className="ac-group-label">{group.label}</span>
+                        <span className="ac-group-count">{active}/{total}</span>
+                        <ChevronRight size={12} className="ac-group-chevron" />
+                      </button>
+
+                      <div className="ac-group-list-wrap">
+                        <ul className="ac-group-list">
+                          {items.map((item) => (
+                            <li key={item.permissionKey}>
+                              <label className="ac-item">
+                                <input
+                                  type="checkbox"
+                                  checked={draft[item.permissionKey as PermissionKey]}
+                                  onChange={() =>
+                                    togglePermission(item.permissionKey as PermissionKey)
+                                  }
+                                />
+                                <span className="ac-item-dot" />
+                                <span>{item.menuLabel}</span>
+                              </label>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )
+                })}
+              </nav>
+            </div>
+
+            {/* Footer */}
+            <div className="ac-panel-footer">
+              <button className="btn btn-ghost btn-sm" onClick={closeEditor}>
+                Cancelar
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={save}>
+                <Save size={13} />
+                Salvar
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </AppLayout>
+  )
+}

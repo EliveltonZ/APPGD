@@ -24,3 +24,12 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Build output
+backend/public
+backend/dist

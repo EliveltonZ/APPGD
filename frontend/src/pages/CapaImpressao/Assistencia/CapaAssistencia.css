@@ -1,0 +1,210 @@
+/* ── Reset e base ─────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  color: #000;
+}
+
+/* ── Wrapper ──────────────────────────────────────────── */
+.ca-wrapper {
+  width: 700px;
+  font-size: 12px;
+  font-family: "Nunito Sans", Arial, sans-serif;
+  background: #fff;
+  color: #000;
+}
+
+/* ── Flexbox utilities ────────────────────────────────── */
+.d-flex {
+  display: flex;
+}
+.justify-content-center {
+  justify-content: center;
+}
+.justify-content-between {
+  justify-content: space-between;
+}
+.align-items-center {
+  align-items: center;
+}
+.align-items-end {
+  align-items: flex-end;
+}
+.text-center {
+  text-align: center;
+}
+.w-100 {
+  width: 100%;
+}
+.gap-1 {
+  gap: 4px;
+}
+.gap-2 {
+  gap: 8px;
+}
+
+/* ── Typography ───────────────────────────────────────── */
+.form-label {
+  margin-bottom: 0;
+  font-size: 12px;
+  font-family: inherit;
+}
+.fw-bold {
+  font-weight: bold;
+}
+.margin-0 {
+  margin: 0;
+}
+.text-danger {
+  color: #dc3545;
+}
+.text-reset {
+  color: inherit;
+}
+
+.font {
+  white-space: nowrap;
+}
+
+.font-10 {
+  font-size: 10px;
+}
+.font-8 {
+  font-size: 8px;
+}
+.font-11 {
+  font-size: 11px;
+}
+.font-26 {
+  font-size: 26px;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+/* ── Borders ──────────────────────────────────────────────
+   Margem negativa nas bordas "de chegada" (left / top) para
+   sobrepor a borda "de saída" do elemento anterior — assim
+   dois elementos adjacentes exibem uma única linha de 1 px
+   em vez de duas linhas de 1 px somando 2 px.
+────────────────────────────────────────────────────────── */
+.div-border-left {
+  border-left: 1px solid #000;
+}
+.div-border-right {
+  border-right: 1px solid #000;
+}
+.div-border-top {
+  border-top: 1px solid #000;
+  margin-top: -1px;
+}
+.div-border-bottom {
+  border-bottom: 1px solid #000;
+}
+.div-border {
+  border: 1px solid #000;
+}
+
+/* ── Special states ───────────────────────────────────── */
+.div-urgente-sim {
+  background: red !important;
+}
+.div-urgente-sim .form-label {
+  color: #fff;
+}
+
+/* ── Partes/peças ─────────────────────────────────────── */
+.item-peca {
+  margin-top: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+/* ── Print toolbar ────────────────────────────────────── */
+.ca-toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f4f6f8;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.ca-toolbar__btn {
+  padding: 6px 18px;
+  border-radius: 6px;
+  border: none;
+  background: #2a6496;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ca-toolbar__btn:hover {
+  background: #1e4e78;
+}
+
+.ca-toolbar__btn--ghost {
+  background: transparent;
+  color: #555;
+  border: 1px solid #ccc;
+}
+.ca-toolbar__btn--ghost:hover {
+  background: #e8ecef;
+}
+
+/* ── Spinner ──────────────────────────────────────────── */
+.ca-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #bdd7ee;
+  border-top-color: #2a6496;
+  border-radius: 50%;
+  animation: ca-spin 0.7s linear infinite;
+}
+@keyframes ca-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Print ────────────────────────────────────────────── */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+.ca-page-break {
+  break-before: page;
+  page-break-before: always;
+  display: block;
+  height: 0;
+}
+
+@media print {
+  .ca-wrapper {
+    margin: 0 auto;
+  }
+  .ca-toolbar {
+    display: none !important;
+  }
+}
+
+.div-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}

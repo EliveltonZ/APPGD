@@ -1,0 +1,12 @@
+/* Wrapper interno — só organiza o layout vertical.
+   A estilização do card (borda, bg, padding) fica no .proj-chart do dashboard. */
+.chart-wrap {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-wrap svg *:focus {
+  outline: none;
+}

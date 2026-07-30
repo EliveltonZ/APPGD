@@ -1,0 +1,124 @@
+.cad-u-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+  height: 100%;
+  min-height: 0;
+}
+
+.cad-u-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cad-u-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.cad-u-count {
+  font-size: 12px;
+  color: var(--text-h);
+  margin: 2px 0 0;
+}
+
+/* ── Badge status ─────────────────────────────────────────────────────────── */
+
+.cad-u-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cad-u-badge--ativo {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.cad-u-badge--inativo {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cad-u-badge--ativo  { background: rgba(34,197,94,0.2);  color: #4ade80; }
+  .cad-u-badge--inativo{ background: rgba(239,68,68,0.18); color: #f87171; }
+}
+
+:root[data-theme="dark"] .cad-u-badge--ativo   { background: rgba(34,197,94,0.2);  color: #4ade80; }
+:root[data-theme="dark"] .cad-u-badge--inativo  { background: rgba(239,68,68,0.18); color: #f87171; }
+:root[data-theme="light"] .cad-u-badge--ativo   { background: rgba(34,197,94,0.15); color: #16a34a; }
+:root[data-theme="light"] .cad-u-badge--inativo { background: rgba(239,68,68,0.12); color: #dc2626; }
+
+/* ── Formulário ───────────────────────────────────────────────────────────── */
+
+.cad-u-form {
+  padding: 8px 0 0;
+}
+
+.cad-u-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Toggle Ativo ─────────────────────────────────────────────────────────── */
+
+.cad-u-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cad-u-toggle__track {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.cad-u-toggle__track:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary, #3b82f6);
+}
+
+.cad-u-toggle__track--on {
+  background: #22c55e;
+}
+
+.cad-u-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.cad-u-toggle__track--on .cad-u-toggle__thumb {
+  transform: translateX(18px);
+}
+
+.cad-u-toggle__label {
+  font-size: 13px;
+  color: var(--text);
+}

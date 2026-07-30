@@ -1,0 +1,180 @@
+.sector-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.sector-card--active {
+  border-color: rgba(234, 179, 8, 0.55);
+}
+
+.sector-card--done {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.sector-card--paused {
+  border-color: rgba(249, 115, 22, 0.45);
+}
+
+.sector-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.sector-card__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: 0.1px;
+}
+
+.sector-card__badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.sector-card__badge--waiting {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text);
+}
+
+.sector-card__badge--active {
+  background: rgba(234, 179, 8, 0.14);
+  color: #ca8a04;
+}
+
+.sector-card__badge--done {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+
+.sector-card__badge--paused {
+  background: rgba(249, 115, 22, 0.14);
+  color: #f97316;
+}
+
+.sector-card__body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sector-card__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.sector-card__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sector-card__field--id {
+  flex: none;
+  width: 40px;
+}
+
+.sector-card__label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.sector-card__input {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 7px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.sector-card__input:focus {
+  border-color: var(--accent);
+}
+
+.sector-card__input[readonly] {
+  background: var(--code-bg);
+  color: var(--text);
+  cursor: default;
+}
+
+.sector-card__check {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  padding-bottom: 5px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.sector-card__check--standalone {
+  padding-bottom: 0;
+}
+
+.sector-card__check input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+
+.sector-card__responsible {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.sector-card__pick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.sector-card__pick:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}

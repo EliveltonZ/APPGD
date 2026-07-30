@@ -1,0 +1,61 @@
+/* Styles exclusive to the volumetric verification report.
+   Base styles (cp-*, toolbar, modal, spinner) come from CapaImpressao.css. */
+
+/* ── Volumes grid ────────────────────────────────────────── */
+
+.vol-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px 0;
+  padding: 6px 16px 14px;
+  width: 100%;
+  box-sizing: border-box;
+  justify-items: center;
+  border: 0.25pt solid #000;
+  border-top: none;
+}
+
+.vol-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-family: "Nunito Sans", Arial, sans-serif;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  cursor: default;
+  border: none !important;
+  padding: 1px 0;
+}
+
+.vol-item input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin: 0;
+  cursor: default;
+}
+
+/* ── Fixed footer ────────────────────────────────────────── */
+
+.print-footer {
+  position: fixed;
+  bottom: 0;
+  left: 10px;
+  width: 700px;
+  height: 80px;
+  background: #fff;
+  border: 0.25pt solid #000;
+  border-top: 2px dashed #000;
+}
+
+@media print {
+  .capa-wrapper {
+    padding: 0 1px 0 0;
+  }
+
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+  }
+}

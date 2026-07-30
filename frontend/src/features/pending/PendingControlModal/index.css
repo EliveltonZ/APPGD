@@ -1,0 +1,263 @@
+.pend-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pend-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── pfield — shared form fields ──────────────────────── */
+
+.pfield {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pfield--span2 {
+  grid-column: span 2;
+}
+.pfield--span3 {
+  grid-column: span 3;
+}
+.pfield--full {
+  grid-column: 1 / -1;
+}
+
+.pfield label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.pfield input[type="text"],
+.pfield input[type="date"],
+.pfield input[type="number"],
+.pfield textarea,
+.pfield__select {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.pfield input:focus,
+.pfield textarea:focus,
+.pfield__select:focus {
+  border-color: var(--accent);
+}
+
+.pfield input:disabled {
+  background: var(--code-bg);
+  color: var(--text);
+  cursor: default;
+  opacity: 0.75;
+}
+
+/* ── pinfo-section ────────────────────────────────────── */
+
+.pinfo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── frow grid helpers ────────────────────────────────── */
+
+.frow {
+  display: grid;
+  gap: 12px;
+}
+
+.frow--1 {
+  grid-template-columns: 1fr;
+}
+.frow--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.frow--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.frow--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .frow--3,
+  .frow--4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Inner items table ────────────────────────────────── */
+
+.pend-items-table-wrapper {
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.pend-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pend-items-table thead th {
+  background: var(--code-bg);
+  color: var(--text);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.pend-items-table tbody td {
+  padding: 6px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-h);
+  text-transform: lowercase;
+  font-size: 12px;
+}
+
+.pend-items-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pend-items-table__empty {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--text);
+}
+
+/* ── Row states ───────────────────────────────────────── */
+
+.pend-items-row--atrasado {
+  background: rgba(220, 38, 38, 0.04);
+}
+
+.pend-items-row--recebido td {
+  opacity: 0.55;
+}
+
+/* ── Column helpers ───────────────────────────────────── */
+
+.pend-th--center {
+  text-align: center;
+}
+.pend-th--actions {
+  width: 72px;
+  text-align: center;
+}
+
+.pend-td--nowrap {
+  white-space: nowrap;
+}
+.pend-td--desc {
+  min-width: 160px;
+}
+.pend-td--min {
+  min-width: 110px;
+}
+.pend-td--center {
+  text-align: center;
+  white-space: nowrap;
+}
+.pend-td--actions {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Status badges ────────────────────────────────────── */
+
+.pend-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pend-badge--pendente {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text-h);
+}
+.pend-badge--comprado {
+  background: rgba(32, 128, 197, 0.14);
+  color: #2080c5;
+}
+.pend-badge--atrasado {
+  background: rgba(220, 38, 38, 0.14);
+  color: #dc2626;
+}
+.pend-badge--recebido {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+
+/* ── Action buttons ───────────────────────────────────── */
+
+.pend-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+
+.pend-action-btn + .pend-action-btn {
+  margin-left: 4px;
+}
+
+.pend-action-btn--edit:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.pend-action-btn--delete:hover {
+  background: var(--accent2-bg);
+  border-color: rgba(190, 30, 30, 0.35);
+  color: var(--accent2);
+}
+
+/* ── Form actions row ─────────────────────────────────── */
+
+.pend-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}

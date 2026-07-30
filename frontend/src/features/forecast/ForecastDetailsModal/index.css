@@ -1,0 +1,195 @@
+/* ── Modal shell ──────────────────────────────────────── */
+
+.plan-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── Sections ─────────────────────────────────────────── */
+
+.plan-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.plan-modal__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.plan-modal__section-title {
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase;
+  color: var(--text) !important;
+  margin: 0 !important;
+  white-space: nowrap;
+}
+
+/* Standalone title (not inside section-header) gets its own border */
+.plan-modal__section > .plan-modal__section-title {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── Info grid ────────────────────────────────────────── */
+
+.plan-modal__info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .plan-modal__info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.plan-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.plan-field--span2 {
+  grid-column: span 2;
+}
+.plan-field--full {
+  grid-column: 1 / -1;
+}
+
+.plan-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.plan-field input[type="text"] {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  cursor: default;
+}
+
+/* ── Stages grid ──────────────────────────────────────── */
+
+.plan-modal__stages-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .plan-modal__stages-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .plan-modal__stages-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Observations textarea ────────────────────────────── */
+
+.plan-modal__textarea {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 9px 12px;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  resize: none;
+  line-height: 145%;
+  cursor: default;
+}
+
+/* ── Purchases table ──────────────────────────────────── */
+
+.plan-modal__empty {
+  font-size: 13px;
+  color: var(--text);
+  text-align: center;
+  padding: 12px 0;
+  margin: 0;
+}
+
+.plan-modal__purchases-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.plan-modal__purchases-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+.plan-modal__purchases-table th {
+  background: var(--code-bg);
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.plan-modal__purchases-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.plan-modal__purchases-table tr:last-child td {
+  border-bottom: none;
+}
+
+.plan-modal__purchases-table tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.plan-modal__recebido {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.plan-modal__recebido--ok {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.plan-modal__recebido--pending {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text);
+}

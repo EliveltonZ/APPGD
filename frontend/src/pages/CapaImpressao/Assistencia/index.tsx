@@ -1,0 +1,1 @@
+export { CapaAssistenciaPage } from "./CapaAssistencia";

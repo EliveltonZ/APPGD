@@ -1,0 +1,185 @@
+.prel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.prel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Shared form field styles ─────────────────────────── */
+
+.pfield {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pfield--span2 {
+  grid-column: span 2;
+}
+.pfield--span3 {
+  grid-column: span 3;
+}
+
+.pfield--span4 {
+  grid-column: span 4;
+}
+
+.pfield--full {
+  grid-column: 1 / -1;
+}
+
+.pfield label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.pfield input[type="text"],
+.pfield input[type="date"],
+.pfield input[type="number"],
+.pfield textarea,
+.pfield__select {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.pfield input:focus,
+.pfield textarea:focus,
+.pfield__select:focus {
+  border-color: var(--accent);
+}
+
+.pfield input:disabled {
+  background: var(--code-bg);
+  color: var(--text);
+  cursor: default;
+  opacity: 0.75;
+}
+
+.pinfo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.frow {
+  display: grid;
+  gap: 12px;
+}
+.frow--1 {
+  grid-template-columns: 1fr;
+}
+.frow--2 {
+  grid-template-columns: 1fr;
+}
+.frow--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.frow--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .frow--3,
+  .frow--4 {
+    display: block;
+  }
+}
+
+/* ── NumOC search row ─────────────────────────────────── */
+
+.prel-search-row {
+  display: flex;
+  gap: 6px;
+}
+
+.prel-search-row input {
+  flex: 1;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.prel-search-row input:focus {
+  border-color: var(--accent);
+}
+
+.prel-search-btn {
+  padding: 7px 14px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: 7px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.prel-search-btn:hover {
+  background: rgba(32, 128, 197, 0.18);
+}
+
+.prel-search-msg {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.prel-search-msg--ok {
+  color: #16a34a;
+}
+.prel-search-msg--err {
+  color: #dc2626;
+}
+
+/* ── Urgente toggle ───────────────────────────────────── */
+
+.prel-urgente-btn {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--sans);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.prel-urgente-btn--active {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #dc2626;
+  font-weight: 600;
+}

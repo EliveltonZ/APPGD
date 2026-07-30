@@ -1,0 +1,121 @@
+/* ── Dashboard shell ──────────────────────────────────────── */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ── Top bar ──────────────────────────────────────────────── */
+
+.dashboard__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dashboard__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dashboard__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.dashboard__subtitle {
+  font-size: 12px;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ── Stats row ────────────────────────────────────────────── */
+
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 960px) {
+  .dashboard__stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Content area ─────────────────────────────────────────── */
+
+.dashboard__area {
+  flex: 1;
+  min-height: 0;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px;
+  text-align: center;
+}
+
+.dashboard__placeholder-icon {
+  color: var(--text);
+  opacity: 0.35;
+}
+
+.dashboard__placeholder-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.dashboard__placeholder-desc {
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* ── Report modal list ────────────────────────────────────── */
+
+.report-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.report-item:hover { background: var(--accent-bg); }

@@ -1,0 +1,154 @@
+/* ── Card ──────────────────────────────────────────────── */
+
+.psc-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.psc-card--em_andamento {
+  border-color: rgba(234, 179, 8, 0.55);
+}
+.psc-card--concluido {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+.psc-card--pausado {
+  border-color: rgba(249, 22, 22, 0.45);
+}
+
+/* ── Header ────────────────────────────────────────────── */
+
+.psc-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--code-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.psc-card--em_andamento .psc-card__header {
+  background: rgba(234, 179, 8, 0.08);
+  border-bottom-color: rgba(234, 179, 8, 0.3);
+}
+
+.psc-card--concluido .psc-card__header {
+  background: rgba(34, 197, 94, 0.1);
+  border-bottom-color: rgba(34, 197, 94, 0.25);
+}
+
+.psc-card--pausado .psc-card__header {
+  background: rgba(249, 22, 22, 0.08);
+  border-bottom-color: rgba(249, 22, 22, 0.25);
+}
+
+.psc-card__index {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  min-width: 14px;
+  text-align: center;
+}
+
+.psc-card__label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-h);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Badge ─────────────────────────────────────────────── */
+
+.psc-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.psc-badge--nao_iniciado {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text);
+}
+.psc-badge--em_andamento {
+  background: rgba(234, 179, 8, 0.14);
+  color: #ca8a04;
+}
+.psc-badge--pausado {
+  background: rgba(249, 22, 22, 0.14);
+  color: #f91616;
+}
+.psc-badge--concluido {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+
+/* ── Body ──────────────────────────────────────────────── */
+
+.psc-card__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.psc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.psc-field:nth-child(2n) {
+  border-right: none;
+}
+
+.psc-field--full {
+  grid-column: 1 / -1;
+  border-right: none;
+  border-bottom: none;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 700px) {
+  .psc-field--full {
+    grid-column: 1 / -1;
+    border-right: none;
+    border-bottom: none;
+    flex-direction: column;
+    justify-content: none;
+    align-items: start;
+  }
+}
+
+.psc-field > span {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text);
+}
+
+.psc-field > strong {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-h);
+  line-height: 1.2;
+}
+
+.psc-field__time {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--mono);
+  line-height: 1;
+}

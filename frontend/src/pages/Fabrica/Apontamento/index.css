@@ -1,0 +1,113 @@
+.apt-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Estado vazio / não encontrado */
+.apt-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text);
+}
+
+.apt-empty__icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.apt-empty__msg {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.apt-empty__hint {
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+/* Seleção de múltiplos resultados */
+.apt-multi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.apt-multi__hint {
+  font-size: 0.8rem;
+  color: var(--text);
+  margin: 0;
+}
+
+.apt-multi__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.apt-multi__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 0.5rem 0.875rem;
+  background: var(--content-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.apt-multi__item:hover { border-color: var(--accent); background: var(--bg); }
+
+.apt-multi__oc   { font-size: 0.82rem; font-weight: 700; color: var(--text-h); }
+.apt-multi__info { font-size: 0.75rem; color: var(--text); }
+
+/* Banner de feedback de scan */
+.apt-feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  animation: apt-slide-in 0.2s ease;
+}
+
+.apt-feedback--ok  { background: color-mix(in srgb, var(--success) 15%, transparent); border: 1px solid color-mix(in srgb, var(--success) 40%, transparent); color: var(--success); }
+.apt-feedback--err { background: color-mix(in srgb, var(--danger)  15%, transparent); border: 1px solid color-mix(in srgb, var(--danger)  40%, transparent); color: var(--danger);  }
+
+@keyframes apt-slide-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Área principal com projeto carregado */
+.apt-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
