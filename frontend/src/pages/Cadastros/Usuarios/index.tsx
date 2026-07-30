@@ -75,7 +75,7 @@ function toRow(u: UserRecord): UserRow {
 export function CadastrosUsuariosPage() {
   const toast = useToast()
 
-  const { data: rawUsers = [], loading, reload } = useApiData(fetchAllUsers)
+  const { data: rawUsers = [], loading, refetch: reload } = useApiData(fetchAllUsers)
   const rows = rawUsers.map(toRow)
 
   // ── Modal criar ──────────────────────────────────────────────────────────

@@ -4,7 +4,9 @@ module.exports = function(sequelize, DataTypes) {
     id: {
       type: DataTypes.SMALLINT,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true,
+      autoIncrementIdentity: true,
     },
     login: {
       type: DataTypes.TEXT,
