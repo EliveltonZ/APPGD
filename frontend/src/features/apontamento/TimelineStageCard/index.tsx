@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Pause, Play, CheckCircle2, User, Clock } from "lucide-react";
-import { fmtDateTime } from "../../../utils/dateUtils";
+import { fmtDateTimeLocal } from "../../../utils/dateUtils";
 import { calcWorkMinutes, fmtWorkDuration } from "../../../utils/workTime";
 import type { Stage, StageStatus, StageAction, Operator } from "../types";
 import "./index.css";
@@ -105,7 +105,7 @@ export function TimelineStageCard({
           <Clock size={13} />
           <span>
             <span className="apt-stage__time-lbl">Início </span>
-            {stage.inicio ? fmtDateTime(stage.inicio) : "—"}
+            {stage.inicio ? fmtDateTimeLocal(stage.inicio) : "—"}
           </span>
         </div>
 
@@ -115,7 +115,7 @@ export function TimelineStageCard({
           <Clock size={13} />
           <span>
             <span className="apt-stage__time-lbl">Fim </span>
-            {stage.fim ? fmtDateTime(stage.fim) : "—"}
+            {stage.fim ? fmtDateTimeLocal(stage.fim) : "—"}
           </span>
         </div>
 

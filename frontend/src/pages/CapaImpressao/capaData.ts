@@ -1,5 +1,5 @@
 import { apiGet } from "../../services/api";
-import { fmtDate, fmtDateTime } from "../../utils/dateUtils";
+import { fmtDate, fmtDateTimeLocal } from "../../utils/dateUtils";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -102,10 +102,10 @@ export async function fetchCapaData(oc: number): Promise<CapaData> {
   function etapaInfo(prefix: string): EtapaInfo {
     return {
       inicio: d[`${prefix}inicio`]
-        ? fmtDateTime(str(d[`${prefix}inicio`]))
+        ? fmtDateTimeLocal(str(d[`${prefix}inicio`]))
         : undefined,
       fim: d[`${prefix}fim`]
-        ? fmtDateTime(str(d[`${prefix}fim`]))
+        ? fmtDateTimeLocal(str(d[`${prefix}fim`]))
         : undefined,
       responsavel: d[`${prefix}_resp`]
         ? str(d[`${prefix}_resp`])
