@@ -26,15 +26,15 @@ const STATUS_LABELS: Record<StageStatus, string> = {
 function DateValue({ iso }: { iso: string }) {
   if (!iso) return <strong>—</strong>;
   if (iso.includes("T")) {
-    // Parseia a string diretamente sem criar Date para evitar conversão de fuso.
-    // O banco armazena hora local (timestamp without time zone); o servidor UTC
-    // serializa com Z, e new Date() subtrairia 3h no browser em UTC-3.
-    const [datePart, timePart] = iso.split("T");
-    const [y, m, d] = datePart.split("-");
-    const [hh, min] = timePart.split(":");
+    const d    = new Date(iso);
+    const dd   = String(d.getDate()).padStart(2, "0");
+    const mm   = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const hh   = String(d.getHours()).padStart(2, "0");
+    const min  = String(d.getMinutes()).padStart(2, "0");
     return (
       <>
-        <strong>{`${d}/${m}/${y}`}</strong>
+        <strong>{`${dd}/${mm}/${yyyy}`}</strong>
         <span className="psc-field__time">{`${hh}:${min}`}</span>
       </>
     );
