@@ -264,6 +264,7 @@ export function ApontamentoPage() {
           saving={saving}
           onSave={handleSave}
           onClear={handleClear}
+          operators={operators}
         />
 
         {feedback && (

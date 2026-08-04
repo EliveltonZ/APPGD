@@ -1,5 +1,6 @@
-import { useRef, useEffect, useImperativeHandle, forwardRef, type KeyboardEvent } from 'react';
-import { Search, Barcode, Save, Loader2, X } from 'lucide-react';
+import { useRef, useEffect, useImperativeHandle, forwardRef, useState, type KeyboardEvent } from 'react';
+import { Search, Barcode, Save, Loader2, X, Users } from 'lucide-react';
+import type { Operator } from '../types';
 import './index.css';
 
 export interface ProductionHeaderHandle {
@@ -15,13 +16,16 @@ interface Props {
   saving:    boolean;
   onSave:    () => void;
   onClear:   () => void;
+  operators: Operator[];
 }
 
 export const ProductionHeader = forwardRef<ProductionHeaderHandle, Props>(function ProductionHeader(
-  { onPedido, onStage, hasPedido, loading, dirty, saving, onSave, onClear }, ref
+  { onPedido, onStage, hasPedido, loading, dirty, saving, onSave, onClear, operators }, ref
 ) {
   const pedidoRef = useRef<HTMLInputElement>(null);
   const stageRef  = useRef<HTMLInputElement>(null);
+  const [showOps, setShowOps] = useState(false);
+  const [opSearch, setOpSearch] = useState('');
 
   useImperativeHandle(ref, () => ({
     focusStage: () => stageRef.current?.focus(),
@@ -124,6 +128,15 @@ export const ProductionHeader = forwardRef<ProductionHeaderHandle, Props>(functi
       </div>
 
       <button
+        className="apt-header__ops-btn"
+        type="button"
+        title="Consultar operadores"
+        onClick={() => { setShowOps(true); setOpSearch(''); }}
+      >
+        <Users size={15} />
+      </button>
+
+      <button
         className={`apt-header__save-btn${dirty ? ' apt-header__save-btn--dirty' : ''}`}
         type="button"
         onClick={onSave}
@@ -137,6 +150,48 @@ export const ProductionHeader = forwardRef<ProductionHeaderHandle, Props>(functi
         <span>{saving ? 'Salvando…' : 'Salvar'}</span>
         {dirty && !saving && <span className="apt-header__dirty-dot" />}
       </button>
+
+      {showOps && (
+        <div className="apt-ops-backdrop" onClick={() => setShowOps(false)}>
+          <div className="apt-ops-modal" onClick={e => e.stopPropagation()}>
+            <div className="apt-ops-modal__header">
+              <span className="apt-ops-modal__title">Operadores</span>
+              <button className="apt-ops-modal__close" type="button" onClick={() => setShowOps(false)}>
+                <X size={14} />
+              </button>
+            </div>
+            <div className="apt-ops-modal__search-wrap">
+              <Search size={13} className="apt-ops-modal__search-icon" />
+              <input
+                className="apt-ops-modal__search"
+                type="text"
+                placeholder="Buscar por nome ou ID…"
+                autoFocus
+                value={opSearch}
+                onChange={e => setOpSearch(e.target.value)}
+              />
+            </div>
+            <div className="apt-ops-modal__list">
+              {operators
+                .filter(o =>
+                  !opSearch ||
+                  o.nome.toLowerCase().includes(opSearch.toLowerCase()) ||
+                  String(o.id).includes(opSearch)
+                )
+                .map(o => (
+                  <div key={o.id} className="apt-ops-modal__row">
+                    <span className="apt-ops-modal__id">{o.id}</span>
+                    <span className="apt-ops-modal__nome">{o.nome}</span>
+                  </div>
+                ))
+              }
+              {operators.length === 0 && (
+                <p className="apt-ops-modal__empty">Nenhum operador cadastrado</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 });
