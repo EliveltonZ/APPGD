@@ -12,6 +12,69 @@ const STATUS_LABELS: Record<StageStatus, string> = {
   finalizado: "Concluído",
 };
 
+const FLASH_CLASS: Partial<Record<StageStatus, string>> = {
+  em_andamento: "apt-stage--flash-iniciado",
+  pausado:      "apt-stage--flash-atrasado",
+  finalizado:   "apt-stage--flash-pronto",
+};
+
+// Sub-componente isolado para o campo de operador.
+// Recebe `key={stage.responsavelId}` do pai, então remonta sempre
+// que o ID salvo no banco mudar — garantindo que o input exiba o valor correto.
+function OperatorInput({
+  initialId,
+  operators,
+  responsavelNome,
+  onOperatorChange,
+}: {
+  initialId: string;
+  operators: Operator[];
+  responsavelNome: string | null;
+  onOperatorChange: (id: string, nome: string) => void;
+}) {
+  const [opInput, setOpInput] = useState(initialId);
+
+  function resolveOperator(value: string) {
+    const v = value.trim();
+    if (!v) { onOperatorChange("", ""); return; }
+
+    if (/^\d+$/.test(v)) {
+      const op = operators.find(o => Number(o.id) === Number(v));
+      if (op) { onOperatorChange(op.id, op.nome); return; }
+    }
+
+    const byName = operators.find(
+      o => o.nome.toLowerCase() === v.toLowerCase(),
+    );
+    if (byName) { onOperatorChange(byName.id, byName.nome); return; }
+
+    onOperatorChange("", "");
+  }
+
+  return (
+    <div className="apt-stage__operator-row">
+      <input
+        type="text"
+        inputMode="numeric"
+        className="apt-stage__operator-id"
+        placeholder="ID"
+        value={opInput}
+        onChange={(e) => setOpInput(e.target.value)}
+        onBlur={(e) => resolveOperator(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            resolveOperator((e.target as HTMLInputElement).value);
+          }
+        }}
+      />
+      <span className={`apt-stage__operator-name${!responsavelNome ? " apt-stage__operator-name--empty" : ""}`}>
+        {responsavelNome ?? "—"}
+      </span>
+    </div>
+  );
+}
+
 interface Props {
   stage: Stage;
   operators: Operator[];
@@ -20,12 +83,6 @@ interface Props {
   onOperatorChange: (id: string, nome: string) => void;
 }
 
-const FLASH_CLASS: Partial<Record<StageStatus, string>> = {
-  em_andamento: "apt-stage--flash-iniciado",
-  pausado: "apt-stage--flash-atrasado",
-  finalizado: "apt-stage--flash-pronto",
-};
-
 export function TimelineStageCard({
   stage,
   operators,
@@ -33,28 +90,7 @@ export function TimelineStageCard({
   onAction,
   onOperatorChange,
 }: Props) {
-  const [nowMs, setNowMs] = useState(Date.now());
-  const [opInput, setOpInput] = useState("");
-
-  function resolveOperator(value: string) {
-    const v = value.trim();
-    if (!v) { onOperatorChange("", ""); return; }
-
-    // Por ID numérico — aceita crachá escaneado (ex: "3" ou "003")
-    if (/^\d+$/.test(v)) {
-      const op = operators.find(o => Number(o.id) === Number(v));
-      if (op) { onOperatorChange(op.id, op.nome); return; }
-    }
-
-    // Por nome exato (case-insensitive) — seleção via datalist
-    const byName = operators.find(
-      o => o.nome.toLowerCase() === v.toLowerCase(),
-    );
-    if (byName) { onOperatorChange(byName.id, byName.nome); return; }
-
-    // Sem correspondência — limpa o responsável
-    onOperatorChange("", "");
-  }
+  const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
     if (stage.status !== "em_andamento") return;
@@ -62,19 +98,16 @@ export function TimelineStageCard({
     return () => clearInterval(id);
   }, [stage.status]);
 
-  const isDone = stage.status === "finalizado";
-  const canPause = stage.status === "em_andamento";
+  const isDone    = stage.status === "finalizado";
+  const canPause  = stage.status === "em_andamento";
   const canResume = stage.status === "pausado";
-  const isActive = canPause || canResume;
-  const flashCls = isDirty ? (FLASH_CLASS[stage.status] ?? "") : "";
+  const isActive  = canPause || canResume;
+  const flashCls  = isDirty ? (FLASH_CLASS[stage.status] ?? "") : "";
 
-  // Fim efetivo: usa stage.fim se concluída, caso contrário usa nowMs
-  // (para pausado: captura o instante em que a pausa ocorreu — sem ticking)
   const endForCalc =
     stage.fim ?? (stage.inicio ? new Date(nowMs).toISOString() : null);
   const elapsedStr = fmtWorkDuration(calcWorkMinutes(stage.inicio, endForCalc));
-  const isStoped = stage.pausa;
-  console.log(isStoped);
+  const isPaused = stage.pausa;
 
   return (
     <div
@@ -94,26 +127,13 @@ export function TimelineStageCard({
         <div className="apt-stage__info-row apt-stage__info-row--operator">
           <User size={13} />
           {isActive ? (
-            <div className="apt-stage__operator-row">
-              <input
-                type="text"
-                inputMode="numeric"
-                className="apt-stage__operator-id"
-                placeholder="ID"
-                value={opInput}
-                onChange={(e) => setOpInput(e.target.value)}
-                onBlur={(e) => resolveOperator(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    resolveOperator((e.target as HTMLInputElement).value);
-                  }
-                }}
-              />
-              <span className={`apt-stage__operator-name${!stage.responsavelNome ? " apt-stage__operator-name--empty" : ""}`}>
-                {stage.responsavelNome ?? "—"}
-              </span>
-            </div>
+            <OperatorInput
+              key={stage.responsavelId ?? ""}
+              initialId={stage.responsavelId ?? ""}
+              operators={operators}
+              responsavelNome={stage.responsavelNome}
+              onOperatorChange={onOperatorChange}
+            />
           ) : (
             <span className={!stage.responsavelNome ? "apt-stage__info-row--empty" : ""}>
               {stage.responsavelNome ?? "—"}
@@ -154,10 +174,7 @@ export function TimelineStageCard({
           {canPause && (
             <button
               className="apt-stage__btn apt-stage__btn--pause"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction("pausar");
-              }}
+              onClick={(e) => { e.stopPropagation(); onAction("pausar"); }}
             >
               <Pause size={13} /> Pausar
             </button>
@@ -165,10 +182,7 @@ export function TimelineStageCard({
           {canResume && (
             <button
               className="apt-stage__btn apt-stage__btn--resume"
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction("retomar");
-              }}
+              onClick={(e) => { e.stopPropagation(); onAction("retomar"); }}
             >
               <Play size={13} /> Retomar
             </button>
@@ -182,7 +196,7 @@ export function TimelineStageCard({
             <CheckCircle2 size={14} />
             <span>Concluído{elapsedStr ? ` em ${elapsedStr}` : ""}</span>
           </div>
-          {isStoped && (
+          {isPaused && (
             <div className="done-row-pause">
               <Pause size={18} />
             </div>
