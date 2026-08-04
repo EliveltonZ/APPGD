@@ -186,9 +186,17 @@
   border-color: var(--accent);
 }
 
-.apt-stage__operator-input {
+.apt-stage__operator-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   min-width: 0;
+}
+
+.apt-stage__operator-id {
+  width: 52px;
+  flex-shrink: 0;
   padding: 0.2rem 0.4rem;
   border: 1px solid var(--stage-border);
   border-radius: 5px;
@@ -197,16 +205,30 @@
   font: inherit;
   font-size: 0.75rem;
   outline: none;
+  text-align: center;
 }
 
-.apt-stage__operator-input::placeholder {
+.apt-stage__operator-id::placeholder {
   color: var(--text-muted);
-  font-size: 0.7rem;
 }
 
-.apt-stage__operator-input:focus {
+.apt-stage__operator-id:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
+.apt-stage__operator-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text-h);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apt-stage__operator-name--empty {
+  color: var(--text-muted);
 }
 
 .apt-stage__time-lbl {

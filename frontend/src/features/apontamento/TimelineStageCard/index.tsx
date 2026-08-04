@@ -35,11 +35,9 @@ export function TimelineStageCard({
 }: Props) {
   const [nowMs, setNowMs] = useState(Date.now());
   const [opInput, setOpInput] = useState("");
-  const [editingOp, setEditingOp] = useState(false);
 
   function resolveOperator(value: string) {
     const v = value.trim();
-    setEditingOp(false);
     if (!v) { onOperatorChange("", ""); return; }
 
     // Por ID numérico — aceita crachá escaneado (ex: "3" ou "003")
@@ -96,17 +94,14 @@ export function TimelineStageCard({
         <div className="apt-stage__info-row apt-stage__info-row--operator">
           <User size={13} />
           {isActive ? (
-            <>
+            <div className="apt-stage__operator-row">
               <input
-                list={`op-list-${stage.id}`}
-                className="apt-stage__operator-input"
-                placeholder="ID do crachá ou nome…"
-                value={editingOp ? opInput : (stage.responsavelNome ?? "")}
+                type="text"
+                inputMode="numeric"
+                className="apt-stage__operator-id"
+                placeholder="ID"
+                value={opInput}
                 onChange={(e) => setOpInput(e.target.value)}
-                onFocus={() => {
-                  setOpInput(stage.responsavelNome ?? "");
-                  setEditingOp(true);
-                }}
                 onBlur={(e) => resolveOperator(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -115,18 +110,12 @@ export function TimelineStageCard({
                   }
                 }}
               />
-              <datalist id={`op-list-${stage.id}`}>
-                {operators.map((op) => (
-                  <option key={op.id} value={op.nome} />
-                ))}
-              </datalist>
-            </>
+              <span className={`apt-stage__operator-name${!stage.responsavelNome ? " apt-stage__operator-name--empty" : ""}`}>
+                {stage.responsavelNome ?? "—"}
+              </span>
+            </div>
           ) : (
-            <span
-              className={
-                !stage.responsavelNome ? "apt-stage__info-row--empty" : ""
-              }
-            >
+            <span className={!stage.responsavelNome ? "apt-stage__info-row--empty" : ""}>
               {stage.responsavelNome ?? "—"}
             </span>
           )}
