@@ -69,7 +69,7 @@ async function setDado({ p_id, p_date }) {
 
 async function listarOperadores() {
   const rows = await Usuario.findAll({
-    where: { ativo: true },
+    where: { ativo: true, local: 'FABRICA' },
     order: [['login', 'ASC']],
   });
   return rows.map(r => ({ id: r.id, nome: r.login }));
