@@ -8,6 +8,8 @@
 // Para rodar: node src/server.js  (ou npm run dev para nodemon)
 // Variáveis de ambiente lidas de: src/client/.env
 
+process.env.TZ = 'America/Sao_Paulo'
+
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, 'client/.env') })
 
