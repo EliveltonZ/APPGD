@@ -48,6 +48,29 @@
   letter-spacing: 1px;
 }
 
+/* Back button */
+
+.proj-dash__back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: auto 10px 12px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.proj-dash__back:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
 /* Tabs */
 
 .proj-dash__tabs {

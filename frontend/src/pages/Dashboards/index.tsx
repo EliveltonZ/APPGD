@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Monitor, Factory, DollarSign } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Monitor, Factory, DollarSign, ArrowLeft } from "lucide-react";
 import { ProjetosProvider } from "./projetos/context";
 import { ProjetosFilters }  from "./projetos/filters";
 import { ProjetosCharts }   from "./projetos/charts";
@@ -19,6 +20,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 
 export function DashboardsPrincipalPage() {
   const [tab, setTab] = useState<Tab>("projetos");
+  const navigate = useNavigate();
 
   return (
     <ProjetosProvider>
@@ -48,6 +50,15 @@ export function DashboardsPrincipalPage() {
             {tab === "projetos"   && <ProjetosFilters />}
             {tab === "producao"   && <ProducaoFilters />}
             {tab === "financeiro" && <FinanceiroFilters />}
+
+            <button
+              type="button"
+              className="proj-dash__back"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={13} />
+              Voltar ao sistema
+            </button>
           </div>
 
           {/* ── Main content ── */}
