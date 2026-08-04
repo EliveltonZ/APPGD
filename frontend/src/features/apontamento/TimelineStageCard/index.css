@@ -186,6 +186,29 @@
   border-color: var(--accent);
 }
 
+.apt-stage__operator-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid var(--stage-border);
+  border-radius: 5px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.75rem;
+  outline: none;
+}
+
+.apt-stage__operator-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+
+.apt-stage__operator-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-bg);
+}
+
 .apt-stage__time-lbl {
   color: var(--text);
   font-size: 0.68rem;

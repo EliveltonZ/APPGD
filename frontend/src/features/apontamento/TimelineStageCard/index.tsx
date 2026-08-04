@@ -34,6 +34,29 @@ export function TimelineStageCard({
   onOperatorChange,
 }: Props) {
   const [nowMs, setNowMs] = useState(Date.now());
+  const [opInput, setOpInput] = useState("");
+  const [editingOp, setEditingOp] = useState(false);
+
+  function resolveOperator(value: string) {
+    const v = value.trim();
+    setEditingOp(false);
+    if (!v) { onOperatorChange("", ""); return; }
+
+    // Por ID numérico — aceita crachá escaneado (ex: "3" ou "003")
+    if (/^\d+$/.test(v)) {
+      const op = operators.find(o => Number(o.id) === Number(v));
+      if (op) { onOperatorChange(op.id, op.nome); return; }
+    }
+
+    // Por nome exato (case-insensitive) — seleção via datalist
+    const byName = operators.find(
+      o => o.nome.toLowerCase() === v.toLowerCase(),
+    );
+    if (byName) { onOperatorChange(byName.id, byName.nome); return; }
+
+    // Sem correspondência — limpa o responsável
+    onOperatorChange("", "");
+  }
 
   useEffect(() => {
     if (stage.status !== "em_andamento") return;
@@ -73,21 +96,31 @@ export function TimelineStageCard({
         <div className="apt-stage__info-row apt-stage__info-row--operator">
           <User size={13} />
           {isActive ? (
-            <select
-              className="apt-stage__operator-sel"
-              value={stage.responsavelId ?? ""}
-              onChange={(e) => {
-                const op = operators.find((o) => o.id === e.target.value);
-                onOperatorChange(e.target.value, op?.nome ?? "");
-              }}
-            >
-              <option value="">Selecionar operador…</option>
-              {operators.map((op) => (
-                <option key={op.id} value={op.id}>
-                  {op.nome}
-                </option>
-              ))}
-            </select>
+            <>
+              <input
+                list={`op-list-${stage.id}`}
+                className="apt-stage__operator-input"
+                placeholder="ID do crachá ou nome…"
+                value={editingOp ? opInput : (stage.responsavelNome ?? "")}
+                onChange={(e) => setOpInput(e.target.value)}
+                onFocus={() => {
+                  setOpInput(stage.responsavelNome ?? "");
+                  setEditingOp(true);
+                }}
+                onBlur={(e) => resolveOperator(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    resolveOperator((e.target as HTMLInputElement).value);
+                  }
+                }}
+              />
+              <datalist id={`op-list-${stage.id}`}>
+                {operators.map((op) => (
+                  <option key={op.id} value={op.nome} />
+                ))}
+              </datalist>
+            </>
           ) : (
             <span
               className={
