@@ -9,6 +9,8 @@ import { localDateStr } from '../../../utils/dateUtils';
 import type { ProjectValue } from '../../../types/financeiro';
 import './index.css';
 
+const STORAGE_KEY = 'fin-valores-period';
+
 function defaultDates(): { from: string; to: string } {
   const today = new Date();
   const from  = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -18,11 +20,22 @@ function defaultDates(): { from: string; to: string } {
   };
 }
 
+function loadSavedPeriod(): { from: string; to: string } {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const [from, to] = saved.split('|');
+      if (from && to) return { from, to };
+    }
+  } catch { /* ignorar */ }
+  return defaultDates();
+}
+
 export function FinanceiroValoresPage() {
-  const defaults = defaultDates();
-  const [dateFrom, setDateFrom] = useState(defaults.from);
-  const [dateTo,   setDateTo]   = useState(defaults.to);
-  const [activePeriod, setActivePeriod] = useState(`${defaults.from}|${defaults.to}`);
+  const initial = loadSavedPeriod();
+  const [dateFrom, setDateFrom] = useState(initial.from);
+  const [dateTo,   setDateTo]   = useState(initial.to);
+  const [activePeriod, setActivePeriod] = useState(`${initial.from}|${initial.to}`);
 
   const fetchPeriod = useCallback(
     (key: string): Promise<ProjectValue[]> => {
@@ -37,6 +50,7 @@ export function FinanceiroValoresPage() {
   function handleSearch() {
     const key = `${dateFrom}|${dateTo}`;
     if (key === activePeriod) return;
+    try { localStorage.setItem(STORAGE_KEY, key); } catch { /* ignorar */ }
     setActivePeriod(key);
   }
 
