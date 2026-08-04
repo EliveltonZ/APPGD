@@ -75,7 +75,9 @@ export async function fetchProjectByPedido(pedido: string): Promise<ApontamentoP
 
 export async function fetchApontamentoOperators(): Promise<Operator[]> {
   const rows = await apiGet<{ id: unknown; nome: unknown }[]>('/utils/operadores');
-  return rows.map(r => ({ id: String(r.id ?? ''), nome: String(r.nome ?? '') }));
+  return rows
+    .map(r => ({ id: String(r.id ?? ''), nome: String(r.nome ?? '') }))
+    .filter(r => Number(r.id) > 0);
 }
 
 export async function saveApontamento(project: ApontamentoProject): Promise<void> {
