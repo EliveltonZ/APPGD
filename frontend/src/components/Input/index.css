@@ -1,30 +1,31 @@
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
 }
 
 .input-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-h);
+  font-size: var(--label-font-size);
+  font-weight: var(--label-weight);
+  color: var(--label-color);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
 }
 
 .input-field {
-  padding: 10px 14px;
+  height: var(--field-height);
+  padding: var(--field-padding-y) var(--field-padding-x);
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--field-radius);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: var(--field-font-size);
   color: var(--text-h);
   width: 100%;
   box-sizing: border-box;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .input-field::placeholder {
@@ -46,7 +47,7 @@
 }
 
 .input-error-msg {
-  font-size: 13px;
+  font-size: 12px;
   color: #ef4444;
 }
 

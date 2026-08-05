@@ -24,6 +24,18 @@
   --heading: system-ui, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
+  /* ── Form tokens — altere aqui para afetar todos os campos ── */
+  --field-radius:     8px;
+  --field-font-size:  14px;
+  --field-height:     40px;
+  --field-padding-y:  9px;
+  --field-padding-x:  12px;
+  --label-font-size:  12px;
+  --label-weight:     600;
+  --label-color:      var(--text);
+  --label-transform:  uppercase;
+  --label-spacing:    0.3px;
+
   --transparence: 0.7;
 
   --pendencia: rgb(181, 44, 244, var(--transparence));

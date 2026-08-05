@@ -1,14 +1,16 @@
 .select-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   text-align: left;
 }
 
 .select-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-h);
+  font-size: var(--label-font-size);
+  font-weight: var(--label-weight);
+  color: var(--label-color);
+  text-transform: var(--label-transform);
+  letter-spacing: var(--label-spacing);
 }
 
 .select-wrapper {
@@ -31,13 +33,14 @@
 
 .select-field {
   width: 100%;
+  height: var(--field-height);
   appearance: none;
-  padding: 10px 36px 10px 14px;
+  padding: var(--field-padding-y) calc(var(--field-padding-x) * 3) var(--field-padding-y) var(--field-padding-x);
   background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--field-radius);
   font-family: var(--sans);
-  font-size: 15px;
+  font-size: var(--field-font-size);
   color: var(--text-h);
   outline: none;
   cursor: pointer;
@@ -65,6 +68,6 @@
 }
 
 .select-error-msg {
-  font-size: 13px;
+  font-size: 12px;
   color: #ef4444;
 }
