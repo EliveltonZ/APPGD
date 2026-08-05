@@ -1,9 +1,9 @@
-import type { AnalysisStatus } from '../../../../types/qualityControl';
-import './index.css';
+import type { AnalysisStatus } from "../../../../types/qualityControl";
+import "./index.css";
 
 const LABELS: Record<AnalysisStatus, string> = {
-  pendente:  'Pendente',
-  analisado: 'Analisado',
+  pendente: "Pendente",
+  analisado: "Analisado",
 };
 
 interface QualityStatusBadgeProps {
@@ -12,7 +12,7 @@ interface QualityStatusBadgeProps {
 
 export function QualityStatusBadge({ status }: QualityStatusBadgeProps) {
   return (
-    <span className={`qc-badge qc-badge--${status}`}>
+    <span className={`d-flex qc-badge qc-badge--${status}`}>
       <span className="qc-badge__dot" />
       {LABELS[status]}
     </span>

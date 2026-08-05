@@ -29,18 +29,8 @@ function StatusField({ data }: { data: AssistanceProduction }) {
       >
         Situação
       </span>
-      <div
-        style={{
-          paddingTop: 4,
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-        }}
-      >
+      <div style={{ paddingTop: 4 }}>
         <StatusBadge status={data.status} />
-        {data.urgente === "sim" && (
-          <span className="ap-urgente-tag">Urgente</span>
-        )}
       </div>
     </div>
   );
@@ -49,9 +39,16 @@ function StatusField({ data }: { data: AssistanceProduction }) {
 export function IdentificationSection({ data, onChange, readOnly }: Props) {
   return (
     <div className="ap-section">
-      <h4 className="ap-section__title">Identificação</h4>
+      <h4 className="ap-section__title">
+        <span>Identificação</span>
+        {data.urgente === "sim" && (
+          <span className="ap-urgente-tag">Urgente</span>
+        )}
+      </h4>
+
       <div className="ap-section__body">
         <StatusField data={data} />
+
         <div className="frow--4 ap-dates-row">
           <ReadField label="Nº Solicitação" value={data.numSolicitacao} />
           <ReadField label="Nº Contrato" value={data.numContrato} />
