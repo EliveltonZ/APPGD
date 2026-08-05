@@ -124,7 +124,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--text-h);
-  padding: 7px 10px;
+  padding: 0px 10px;
   background: var(--content-bg);
   border: 1px solid var(--border);
   border-radius: 5px;
@@ -179,14 +179,31 @@
   font-family: var(--sans);
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   white-space: nowrap;
 }
 
-.ap-op-pill--on {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-  color: var(--accent);
+.ap-op-pill--aguardando.ap-op-pill--on {
+  background: color-mix(in srgb, var(--aguardando) 15%, var(--bg));
+  border-color: var(--aguardando);
+  color: var(--aguardando);
+  font-weight: 600;
+}
+
+.ap-op-pill--atrasado.ap-op-pill--on {
+  background: color-mix(in srgb, var(--atrasado) 15%, var(--bg));
+  border-color: var(--atrasado);
+  color: var(--atrasado);
+  font-weight: 600;
+}
+
+.ap-op-pill--pendencia.ap-op-pill--on {
+  background: color-mix(in srgb, var(--pendencia) 15%, var(--bg));
+  border-color: var(--pendencia);
+  color: var(--pendencia);
   font-weight: 600;
 }
 
