@@ -20,17 +20,15 @@ export function OperationalStatusSection({ data, onChange, readOnly }: Props) {
       <div className="ap-section__body">
         <div className="ap-op-group">
           {FLAGS.map(({ key, label }) => (
-            <label key={key} className="ap-op-item">
-              <input
-                type="checkbox"
-                checked={data[key] as boolean}
-                onChange={(e) =>
-                  !readOnly && onChange(key, e.target.checked as AssistanceProduction[typeof key])
-                }
-                disabled={readOnly}
-              />
+            <button
+              key={key}
+              type="button"
+              className={`ap-op-pill${data[key] ? ' ap-op-pill--on' : ''}`}
+              onClick={() => !readOnly && onChange(key, !data[key] as AssistanceProduction[typeof key])}
+              disabled={readOnly}
+            >
               {label}
-            </label>
+            </button>
           ))}
         </div>
       </div>

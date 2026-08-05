@@ -70,7 +70,9 @@
   outline: none;
   width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 
 .ap-field__date:focus {
@@ -153,34 +155,39 @@
   resize: none;
 }
 
-/* ── Operational checkboxes ───────────────────────────── */
+/* ── Operational status pills ─────────────────────────── */
 
 .ap-op-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 24px;
-}
-
-.ap-op-item {
-  display: flex;
-  align-items: center;
   gap: 8px;
-  font-size: 13.5px;
-  color: var(--text-h);
-  cursor: pointer;
-  user-select: none;
 }
 
-.ap-op-item input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
+.ap-op-pill {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--content-bg);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--sans);
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
 }
 
-.ap-op-item input[type="checkbox"]:disabled {
+.ap-op-pill--on {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ap-op-pill:disabled {
   cursor: default;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 /* ── Urgente tag (modal identification) ───────────────── */
