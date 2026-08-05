@@ -1,5 +1,3 @@
-import { Input } from '../../../../components/Input';
-
 interface SectionFieldProps {
   label: string;
   value: string;
@@ -34,7 +32,7 @@ export function SectionField({ label, value, onChange, readOnly, placeholder, ty
       <div className="ap-field">
         <label className="ap-field__label">{label}</label>
         <input
-          className="ap-field__date"
+          className="ap-field__input"
           type="date"
           value={brToISO(value)}
           onChange={(e) => onChange?.(e.target.value ? isoToBR(e.target.value) : '')}
@@ -44,11 +42,15 @@ export function SectionField({ label, value, onChange, readOnly, placeholder, ty
   }
 
   return (
-    <Input
-      label={label}
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      placeholder={placeholder}
-    />
+    <div className="ap-field">
+      <label className="ap-field__label">{label}</label>
+      <input
+        className="ap-field__input"
+        type="text"
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
   );
 }
