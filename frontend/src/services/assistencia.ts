@@ -18,12 +18,12 @@ export async function fetchSolicitacaoConfig(): Promise<SolicitacaoTipo[]> {
 
 export async function fetchContratoAssist(
   contrato: number,
-): Promise<{ cliente: string; ambiente: string } | null> {
+): Promise<{ cliente: string; liberador: string } | null> {
   try {
     const rows = await apiGet<RawRow[]>('/solicitacao/contrato', { p_contrato: contrato });
     const r    = Array.isArray(rows) ? rows[0] : null;
     if (!r) return null;
-    return { cliente: String(r.cliente ?? ''), ambiente: String(r.ambiente ?? '') };
+    return { cliente: String(r.cliente ?? ''), liberador: String(r.liberador ?? '') };
   } catch {
     return null;
   }

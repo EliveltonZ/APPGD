@@ -10,7 +10,7 @@ import { SelectedPartsTable } from "../../../features/assistencias/nova/Selected
 import { TeamModal } from "../../../features/assistencias/nova/TeamModal";
 import { PartsModal } from "../../../features/assistencias/nova/PartsModal";
 import { buildInitialRequest } from "../../../data/assistenciaMocks";
-import { submitSolicitacaoCompleta } from "../../../services/assistencia";
+import { submitSolicitacaoCompleta, fetchContratoAssist } from "../../../services/assistencia";
 import { useToast } from "../../../context/ToastContext";
 import { useAuth } from "../../../context/AuthContext";
 import {
@@ -40,7 +40,8 @@ interface FormErrors {
 
 function validate(req: ServiceRequest): FormErrors {
   const e: FormErrors = {};
-  if (!req.numSolicitacao.trim()) e.numSolicitacao = "Informe o número da solicitação";
+  if (!req.numSolicitacao.trim())
+    e.numSolicitacao = "Informe o número da solicitação";
   if (!req.numContrato.trim()) e.numContrato = "Informe o número do contrato";
   if (!req.cliente.trim()) e.cliente = "Informe o cliente";
   if (!req.ambiente.trim()) e.ambiente = "Informe o ambiente";
@@ -57,12 +58,14 @@ function validate(req: ServiceRequest): FormErrors {
 export function AssistenciasNovaPage() {
   const toast = useToast();
   const { user } = useAuth();
-  const [req, setReq] = useState<ServiceRequest>(() => buildInitialRequest(user?.nome ?? ''));
+  const [req, setReq] = useState<ServiceRequest>(() =>
+    buildInitialRequest(user?.nome ?? ""),
+  );
   const [errors, setErrors] = useState<FormErrors>({});
   const [teamOpen, setTeamOpen] = useState(false);
   const [partsOpen, setPartsOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [generatedId, setGeneratedId] = useState('');
+  const [generatedId, setGeneratedId] = useState("");
   const [sending, setSending] = useState(false);
   const [clockNow, setClockNow] = useState(new Date());
   const clockRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -83,6 +86,25 @@ export function AssistenciasNovaPage() {
 
   function clearError(key: keyof FormErrors) {
     setErrors((prev) => ({ ...prev, [key]: undefined }));
+  }
+
+  function scrollToFirstError() {
+    requestAnimationFrame(() => {
+      const el = document.querySelector<HTMLElement>('.input-has-error, .select-has-error');
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }
+
+  async function handleContratoBlur() {
+    const num = Number(req.numContrato.trim());
+    if (!num) return;
+    const data = await fetchContratoAssist(num);
+    if (!data) return;
+    setReq((prev) => ({
+      ...prev,
+      cliente:   data.cliente   || prev.cliente,
+      liberador: data.liberador || prev.liberador,
+    }));
   }
 
   function addMember(member: TeamMember) {
@@ -111,6 +133,7 @@ export function AssistenciasNovaPage() {
     const errs = validate(req);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
+      scrollToFirstError();
       return;
     }
     setSending(true);
@@ -149,8 +172,14 @@ export function AssistenciasNovaPage() {
       );
       setGeneratedId(solicitacaoId);
       setSubmitted(true);
-    } catch {
-      toast.error("Erro ao enviar solicitação. Tente novamente.");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : null;
+      if (msg?.toLowerCase().includes('já cadastrado')) {
+        setErrors((prev) => ({ ...prev, numSolicitacao: msg }));
+        scrollToFirstError();
+      } else {
+        toast.error(msg ?? "Erro ao enviar solicitação. Tente novamente.");
+      }
     } finally {
       setSending(false);
     }
@@ -168,9 +197,9 @@ export function AssistenciasNovaPage() {
             <button
               className="as-btn as-btn--primary as-btn--lg"
               onClick={() => {
-                setReq(buildInitialRequest(user?.nome ?? ''));
+                setReq(buildInitialRequest(user?.nome ?? ""));
                 setErrors({});
-                setGeneratedId('');
+                setGeneratedId("");
                 setSubmitted(false);
               }}
               type="button"
@@ -199,7 +228,7 @@ export function AssistenciasNovaPage() {
 
         {/* ── Seção 1: Identificação ── */}
         <FormSection step={1} title="Identificação">
-          <div className="frow--4">
+          <div className="frow--4 ap-dates-row">
             <Input
               label="Nº Solicitação *"
               value={req.numSolicitacao}
@@ -217,6 +246,7 @@ export function AssistenciasNovaPage() {
                 patch("numContrato", e.target.value);
                 clearError("numContrato");
               }}
+              onBlur={handleContratoBlur}
               error={errors.numContrato}
               placeholder="Ex: 1901"
             />
@@ -235,7 +265,7 @@ export function AssistenciasNovaPage() {
 
         {/* ── Seção 2: Cliente ── */}
         <FormSection step={2} title="Cliente">
-          <div className="frow--3">
+          <div className="frow--3 ap-dates-row">
             <Input
               label="Cliente *"
               value={req.cliente}
@@ -248,14 +278,6 @@ export function AssistenciasNovaPage() {
               className="fcol--span2"
             />
             <Input
-              label="Bairro"
-              value={req.bairro}
-              onChange={(e) => patch("bairro", e.target.value)}
-              placeholder="Bairro / Localidade"
-            />
-          </div>
-          <div className="frow--2">
-            <Input
               label="Ambiente *"
               value={req.ambiente}
               onChange={(e) => {
@@ -264,6 +286,14 @@ export function AssistenciasNovaPage() {
               }}
               error={errors.ambiente}
               placeholder="Ex: Cozinha, Banheiro..."
+            />
+          </div>
+          <div className="frow--2 ap-dates-row">
+            <Input
+              label="Bairro"
+              value={req.bairro}
+              onChange={(e) => patch("bairro", e.target.value)}
+              placeholder="Bairro / Localidade"
             />
             <Input
               label="Supervisor *"
@@ -280,7 +310,7 @@ export function AssistenciasNovaPage() {
 
         {/* ── Seção 3: Tipo de Solicitação ── */}
         <FormSection step={3} title="Tipo de Solicitação">
-          <div className="frow--3">
+          <div className="frow--3 ap-dates-row">
             <Select
               label="Tipo *"
               value={req.tipoSolicitacao}
@@ -315,7 +345,7 @@ export function AssistenciasNovaPage() {
               options={URGENTE_OPTIONS}
             />
           </div>
-          <div className="frow--2">
+          <div className="frow--2 ap-dates-row">
             <Input
               label="Liberador *"
               value={req.liberador}
@@ -336,7 +366,7 @@ export function AssistenciasNovaPage() {
         </FormSection>
 
         {/* ── Seção 4: Origem do Problema ── */}
-        <FormSection step={4} title="Origem do Problema">
+        <FormSection step={4} title="Dados Complementares">
           <div className="as-checkbox-group">
             <label className="as-checkbox">
               <input
@@ -344,7 +374,7 @@ export function AssistenciasNovaPage() {
                 checked={req.origemMontagem}
                 onChange={(e) => patch("origemMontagem", e.target.checked)}
               />
-              Origem da Montagem
+              Montagem
             </label>
             <label className="as-checkbox">
               <input
@@ -352,7 +382,7 @@ export function AssistenciasNovaPage() {
                 checked={req.origemPromob}
                 onChange={(e) => patch("origemPromob", e.target.checked)}
               />
-              Origem Promob
+              Promob
             </label>
             <label className="as-checkbox">
               <input
@@ -360,7 +390,7 @@ export function AssistenciasNovaPage() {
                 checked={req.origemEntrega}
                 onChange={(e) => patch("origemEntrega", e.target.checked)}
               />
-              Origem da Entrega
+              Entrega
             </label>
             <label className="as-checkbox">
               <input
@@ -368,7 +398,7 @@ export function AssistenciasNovaPage() {
                 checked={req.origemCobrada}
                 onChange={(e) => patch("origemCobrada", e.target.checked)}
               />
-              Origem Cobrada
+              Cobrada
             </label>
           </div>
         </FormSection>
@@ -432,7 +462,7 @@ export function AssistenciasNovaPage() {
           <button
             className="as-btn as-btn--ghost"
             onClick={() => {
-              setReq(buildInitialRequest(user?.nome ?? ''));
+              setReq(buildInitialRequest(user?.nome ?? ""));
               setErrors({});
             }}
             type="button"
