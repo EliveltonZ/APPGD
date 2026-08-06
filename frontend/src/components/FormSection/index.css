@@ -55,11 +55,13 @@
 .frow--2 { grid-template-columns: repeat(2, 1fr); }
 .frow--3 { grid-template-columns: repeat(3, 1fr); }
 .frow--4 { grid-template-columns: repeat(4, 1fr); }
+.frow--5 { grid-template-columns: repeat(5, 1fr); }
 
 .fcol--span2 { grid-column: span 2; }
 .fcol--span3 { grid-column: span 3; }
 
 @media (max-width: 900px) {
+  .frow--5 { grid-template-columns: repeat(3, 1fr); }
   .frow--4 { grid-template-columns: repeat(2, 1fr); }
   .frow--3 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -67,7 +69,8 @@
 @media (max-width: 560px) {
   .frow--2,
   .frow--3,
-  .frow--4 {
+  .frow--4,
+  .frow--5 {
     grid-template-columns: 1fr;
   }
 

@@ -167,10 +167,6 @@ export function NovoProjetoPage() {
             </p>
           </div>
           <div className="projeto-page__top-actions">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <X size={14} />
-              Cancelar
-            </Button>
             <Button
               variant="primary"
               size="sm"
@@ -179,6 +175,10 @@ export function NovoProjetoPage() {
             >
               <Save size={14} />
               Salvar Projeto
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <X size={14} />
+              Cancelar
             </Button>
           </div>
         </div>
@@ -229,13 +229,13 @@ export function NovoProjetoPage() {
         </div>
 
         <div className="projeto-page__bottom">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <X size={14} />
-            Cancelar
-          </Button>
           <Button variant="primary" loading={saving} onClick={handleSave}>
             <Save size={14} />
             Salvar Projeto
+          </Button>
+          <Button variant="ghost" onClick={() => navigate(-1)}>
+            <X size={14} />
+            Cancelar
           </Button>
         </div>
       </div>

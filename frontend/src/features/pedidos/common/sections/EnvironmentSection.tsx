@@ -20,7 +20,11 @@ export function EnvironmentSection({
     <FormSection step={4} title="Ambiente do Projeto">
       <div className="frow frow--2 ap-dates-row">
         {readOnly ? (
-          <Input label="Tipo do Ambiente" value={String(form.tipoAmbiente)} readOnly />
+          <Input
+            label="Tipo do Ambiente"
+            value={String(form.tipoAmbiente)}
+            readOnly
+          />
         ) : (
           <Select
             label="Tipo do Ambiente"

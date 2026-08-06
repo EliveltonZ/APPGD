@@ -105,27 +105,13 @@ export function IdentificationSection({
 
   return (
     <FormSection step={1} title="Identificação do Projeto">
-      {isNovo ? (
-        <div className="frow frow--5">
-          {contratoInput}
-          {numOCInput}
-          {numProjetoInput}
-          {tipoContratoField}
-          {etapaField}
-        </div>
-      ) : (
-        <>
-          <div className="frow frow--3">
-            {numOCInput}
-            {contratoInput}
-            {numProjetoInput}
-          </div>
-          <div className="frow frow--2">
-            {tipoContratoField}
-            {etapaField}
-          </div>
-        </>
-      )}
+      <div className="frow frow--5">
+        {isNovo ? contratoInput : numOCInput}
+        {isNovo ? numOCInput : contratoInput}
+        {numProjetoInput}
+        {tipoContratoField}
+        {etapaField}
+      </div>
     </FormSection>
   );
 }

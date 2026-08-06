@@ -77,10 +77,6 @@ export function ExcluirProjetoPage() {
             </p>
           </div>
           <div className="projeto-page__top-actions">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-              <X size={14} />
-              Cancelar
-            </Button>
             <Button
               variant="danger"
               size="sm"
@@ -90,6 +86,10 @@ export function ExcluirProjetoPage() {
             >
               <Trash2 size={14} />
               Excluir Projeto
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <X size={14} />
+              Cancelar
             </Button>
           </div>
         </div>
@@ -112,10 +112,6 @@ export function ExcluirProjetoPage() {
         </div>
 
         <div className="projeto-page__bottom">
-          <Button variant="ghost" onClick={() => navigate(-1)}>
-            <X size={14} />
-            Cancelar
-          </Button>
           <Button
             variant="danger"
             loading={deleting}
@@ -124,6 +120,10 @@ export function ExcluirProjetoPage() {
           >
             <Trash2 size={14} />
             Excluir Projeto
+          </Button>
+          <Button variant="ghost" onClick={() => navigate(-1)}>
+            <X size={14} />
+            Cancelar
           </Button>
         </div>
       </div>
