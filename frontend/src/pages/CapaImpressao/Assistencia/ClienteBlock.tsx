@@ -23,18 +23,25 @@ function DivValue({ data, style }: { data: string; style: CSSProperties }) {
   );
 }
 
-function DivLabelAndValue({ header, data, center }: { header: string; data: string; center?: boolean }) {
-  const style: CSSProperties = {
+function DivLabelAndValue({
+  header,
+  data,
+  start,
+}: {
+  header: string;
+  data: string;
+  start?: boolean;
+}) {
+  const baseStyle: CSSProperties = {
     height: 35,
     borderLeft: B,
     borderBottom: B,
     display: "flex",
-    justifyContent: center ? "center" : undefined,
   };
   return (
     <>
-      <DivLabel header={header} style={style} />
-      <DivValue data={data} style={style} />
+      <DivLabel header={header} style={baseStyle} />
+      <DivValue data={data} style={{ ...baseStyle, justifyContent: start ? "start" : undefined }} />
     </>
   );
 }
@@ -47,16 +54,16 @@ export function ClienteBlock({ data }: { data: AssistData }) {
   return (
     <div style={{ marginTop: 10, borderTop: B, borderRight: B }}>
       <CreateGrid style={gridStyle}>
-        <DivLabelAndValue header="CLIENTE:" data={data.cliente} />
-        <DivLabelAndValue header="PEDIDO:" data={data.pedido} center />
+        <DivLabelAndValue header="CLIENTE:" data={data.cliente} start />
+        <DivLabelAndValue header="PEDIDO:" data={data.pedido} />
       </CreateGrid>
       <CreateGrid style={gridStyle}>
-        <DivLabelAndValue header="AMBIENTE:" data={data.ambiente} />
-        <DivLabelAndValue header="SOLICITANTE:" data={data.solicitante} center />
+        <DivLabelAndValue header="AMBIENTE:" data={data.ambiente} start />
+        <DivLabelAndValue header="SOLICITANTE:" data={data.solicitante} />
       </CreateGrid>
       <CreateGrid style={gridStyle}>
         <DivLabelAndValue header="MONTAGEM:" data={data.montador} />
-        <DivLabelAndValue header="RESPONSAVEL:" data={data.responsavel} center />
+        <DivLabelAndValue header="RESPONSAVEL:" data={data.responsavel} />
       </CreateGrid>
     </div>
   );

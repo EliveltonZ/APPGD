@@ -84,8 +84,8 @@ function assistenciaStatus(a) {
   if (a.pronto)       return "PRONTO";
   if (a.pendencia)    return "PENDENCIA";
   if (a.iniciado)     return "INICIADO";
-  if (a.producao)     return "PRODUCAO";
   if (a.semMaterial)  return "SEM MATERIAL";
+  if (a.producao)     return "PRODUCAO";
   if (a.escritorio)   return "ESCRITORIO";
   return "EM ABERTO";
 }
