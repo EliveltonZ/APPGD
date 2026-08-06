@@ -1,3 +1,4 @@
+export { IdentificationSection } from './IdentificationSection';
 export { ClientSection } from './ClientSection';
 export { CommercialSection } from './CommercialSection';
 export { EnvironmentSection } from './EnvironmentSection';

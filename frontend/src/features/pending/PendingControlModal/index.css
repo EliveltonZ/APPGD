@@ -96,6 +96,9 @@
 .frow--4 {
   grid-template-columns: repeat(4, 1fr);
 }
+.frow--5 {
+  grid-template-columns: repeat(5, 1fr);
+}
 
 @media (max-width: 640px) {
   .frow--3,

@@ -113,12 +113,16 @@ async function buscarParaEditar(ordemdecompra) {
       'idTipocontrato', 'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
     ],
+    include: [
+      { model: Clientes, as: 'tblCliente', attributes: ['name'], required: false },
+    ],
   });
   if (!p) return [];
   return [{
     ordemdecompra:          p.ordemdecompra,
     contrato:               p.contrato,
     id_cliente:             p.idCliente,
+    cliente:                p.tblCliente?.name ?? null,
     id_tipocliente:         p.idTipocliente,
     id_tipoambiente:        p.idTipoambiente,
     ambiente:               p.ambiente,

@@ -137,6 +137,7 @@ export function EditaProjetoPage() {
 
         <div className="novo-projeto__form">
           <IdentificationSection
+            mode="editar"
             form={form}
             onChange={handleChange}
             errors={errors}

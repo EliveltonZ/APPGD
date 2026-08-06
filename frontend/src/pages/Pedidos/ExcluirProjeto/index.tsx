@@ -66,8 +66,6 @@ export function ExcluirProjetoPage() {
     }
   }
 
-  const noop = () => {};
-
   return (
     <AppLayout pageTitle="Excluir Projeto">
       <div className="excluir-projeto">
@@ -98,17 +96,18 @@ export function ExcluirProjetoPage() {
 
         <div className="excluir-projeto__form">
           <IdentificationSection
+            mode="excluir"
             form={form}
             onChange={handleChange}
             onNumOCBlur={handleNumOCBlur}
             loadingProject={loadingProject}
           />
           <div className={`excluir-projeto__preview${loaded ? "" : " excluir-projeto__preview--empty"}`}>
-            <ClientSection form={form} onChange={noop} onOpenModal={noop} errors={{}} />
-            <CommercialSection form={form} />
-            <EnvironmentSection form={form} />
-            <ScheduleSection form={form} onChange={noop} />
-            <FinancialSection form={form} onChange={noop} />
+            <ClientSection form={form} onChange={handleChange} onOpenModal={() => {}} readOnly />
+            <CommercialSection form={form} onChange={handleChange} readOnly />
+            <EnvironmentSection form={form} onChange={handleChange} readOnly />
+            <ScheduleSection form={form} onChange={handleChange} readOnly />
+            <FinancialSection form={form} onChange={handleChange} readOnly />
           </div>
         </div>
 

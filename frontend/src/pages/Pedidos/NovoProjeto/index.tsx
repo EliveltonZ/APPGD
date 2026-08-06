@@ -185,6 +185,7 @@ export function NovoProjetoPage() {
 
         <div className="novo-projeto__form" onKeyDown={handleFormKeyDown}>
           <IdentificationSection
+            mode="novo"
             form={form}
             onChange={handleChange}
             errors={errors}
