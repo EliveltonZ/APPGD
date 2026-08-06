@@ -102,8 +102,9 @@
 
 @media (max-width: 640px) {
   .frow--3,
-  .frow--4 {
-    grid-template-columns: 1fr 1fr;
+  .frow--4,
+  .frow--5 {
+    grid-template-columns: 1fr;
   }
 }
 
