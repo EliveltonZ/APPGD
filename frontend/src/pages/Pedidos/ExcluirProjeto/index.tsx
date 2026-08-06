@@ -18,7 +18,7 @@ import {
   type ProjectFormData,
 } from "../../../types/project";
 import { fetchDeleteProject, deleteProject } from "../../../services/project";
-import "./index.css";
+import "../../../features/pedidos/common/projeto-page.css";
 
 export function ExcluirProjetoPage() {
   const navigate = useNavigate();
@@ -68,15 +68,15 @@ export function ExcluirProjetoPage() {
 
   return (
     <AppLayout pageTitle="Excluir Projeto">
-      <div className="excluir-projeto">
-        <div className="excluir-projeto__top">
+      <div className="projeto-page">
+        <div className="projeto-page__top">
           <div>
-            <h1 className="excluir-projeto__title">Excluir Projeto</h1>
-            <p className="excluir-projeto__subtitle">
+            <h1 className="projeto-page__title">Excluir Projeto</h1>
+            <p className="projeto-page__subtitle">
               Informe o Num. OC para carregar o projeto e confirmar a exclusão
             </p>
           </div>
-          <div className="excluir-projeto__top-actions">
+          <div className="projeto-page__top-actions">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <X size={14} />
               Cancelar
@@ -94,7 +94,7 @@ export function ExcluirProjetoPage() {
           </div>
         </div>
 
-        <div className="excluir-projeto__form">
+        <div className="projeto-page__form">
           <IdentificationSection
             mode="excluir"
             form={form}
@@ -102,7 +102,7 @@ export function ExcluirProjetoPage() {
             onNumOCBlur={handleNumOCBlur}
             loadingProject={loadingProject}
           />
-          <div className={`excluir-projeto__preview${loaded ? "" : " excluir-projeto__preview--empty"}`}>
+          <div className={`projeto-page__preview${loaded ? "" : " projeto-page__preview--empty"}`}>
             <ClientSection form={form} onChange={handleChange} onOpenModal={() => {}} readOnly />
             <CommercialSection form={form} onChange={handleChange} readOnly />
             <EnvironmentSection form={form} onChange={handleChange} readOnly />
@@ -111,7 +111,7 @@ export function ExcluirProjetoPage() {
           </div>
         </div>
 
-        <div className="excluir-projeto__bottom">
+        <div className="projeto-page__bottom">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <X size={14} />
             Cancelar

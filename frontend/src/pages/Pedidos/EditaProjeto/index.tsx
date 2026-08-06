@@ -32,7 +32,7 @@ import {
   fetchTiposAmbiente,
   fetchTiposCliente,
 } from "../../../services/utils";
-import "./index.css";
+import "../../../features/pedidos/common/projeto-page.css";
 
 
 export function EditaProjetoPage() {
@@ -110,15 +110,15 @@ export function EditaProjetoPage() {
 
   return (
     <AppLayout pageTitle="Editar Projeto">
-      <div className="novo-projeto">
-        <div className="novo-projeto__top">
+      <div className="projeto-page">
+        <div className="projeto-page__top">
           <div>
-            <h1 className="novo-projeto__title">Editar Projeto</h1>
-            <p className="novo-projeto__subtitle">
+            <h1 className="projeto-page__title">Editar Projeto</h1>
+            <p className="projeto-page__subtitle">
               Preencha os campos para Editar uma ordem
             </p>
           </div>
-          <div className="novo-projeto__top-actions">
+          <div className="projeto-page__top-actions">
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <X size={14} />
               Cancelar
@@ -135,7 +135,7 @@ export function EditaProjetoPage() {
           </div>
         </div>
 
-        <div className="novo-projeto__form">
+        <div className="projeto-page__form">
           <IdentificationSection
             mode="editar"
             form={form}
@@ -179,7 +179,7 @@ export function EditaProjetoPage() {
           />
         </div>
 
-        <div className="novo-projeto__bottom">
+        <div className="projeto-page__bottom">
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <X size={14} />
             Cancelar

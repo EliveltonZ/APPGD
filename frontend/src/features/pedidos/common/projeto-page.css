@@ -1,10 +1,10 @@
-.excluir-projeto {
+.projeto-page {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.excluir-projeto__top {
+.projeto-page__top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -12,43 +12,32 @@
   flex-wrap: wrap;
 }
 
-.excluir-projeto__title {
+.projeto-page__title {
   font-size: 22px !important;
   letter-spacing: -0.4px !important;
   margin: 0 0 2px !important;
 }
 
-.excluir-projeto__subtitle {
+.projeto-page__subtitle {
   font-size: 14px;
   color: var(--text);
   margin: 0;
 }
 
-.excluir-projeto__top-actions {
+.projeto-page__top-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
 }
 
-.excluir-projeto__form {
+.projeto-page__form {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.excluir-projeto__preview {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  pointer-events: none;
-}
-
-.excluir-projeto__preview--empty {
-  opacity: 0.4;
-}
-
-.excluir-projeto__bottom {
+.projeto-page__bottom {
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -57,4 +46,16 @@
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 12px;
+}
+
+/* Excluir — preview do projeto carregado */
+.projeto-page__preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.projeto-page__preview--empty {
+  opacity: 0.4;
 }
