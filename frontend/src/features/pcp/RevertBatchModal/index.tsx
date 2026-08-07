@@ -49,8 +49,11 @@ export function RevertBatchModal({ isOpen, projects, onClose, onRevert }: Props)
     [projects, lote],
   );
 
+  const loteValido = lote.trim() !== '' && availableLotes.includes(lote.trim());
+  const loteDigitado = lote.trim() !== '';
+
   function handleConfirm() {
-    onRevert(lote);
+    onRevert(lote.trim());
     dispatch({ type: 'set_confirm', value: false });
   }
 
@@ -66,24 +69,27 @@ export function RevertBatchModal({ isOpen, projects, onClose, onRevert }: Props)
             <>
               <div className="sbatch-fields">
                 <div className="pfield">
-                  <label>Lote em Produção</label>
-                  <select
+                  <label>Número do Lote</label>
+                  <input
+                    type="number"
                     className="pfield__select"
+                    placeholder="Ex: 142"
                     value={lote}
                     onChange={(e) => dispatch({ type: 'set_lote', value: e.target.value })}
-                  >
-                    <option value="">Selecione um lote...</option>
-                    {availableLotes.map((l) => (
-                      <option key={l} value={l}>{l}</option>
-                    ))}
-                  </select>
+                    autoFocus
+                  />
+                  {loteDigitado && !loteValido && (
+                    <span style={{ fontSize: 11, color: 'var(--error, #ef4444)', marginTop: 2 }}>
+                      Lote não encontrado em produção.
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {lote && loteProjects.length > 0 && (
+              {loteValido && loteProjects.length > 0 && (
                 <div className="sbatch-preview">
                   <p className="sbatch-preview__label">
-                    {loteProjects.length} projeto{loteProjects.length !== 1 ? 's' : ''} em {lote}
+                    {loteProjects.length} projeto{loteProjects.length !== 1 ? 's' : ''} no lote {lote}
                   </p>
                   <ul className="sbatch-preview__list">
                     {loteProjects.map((p) => (
@@ -104,7 +110,7 @@ export function RevertBatchModal({ isOpen, projects, onClose, onRevert }: Props)
               <Button
                 variant="danger"
                 size="sm"
-                disabled={!lote}
+                disabled={!loteValido}
                 onClick={() => dispatch({ type: 'set_confirm', value: true })}
               >
                 Reverter Lote
@@ -116,7 +122,7 @@ export function RevertBatchModal({ isOpen, projects, onClose, onRevert }: Props)
 
       <ConfirmModal
         isOpen={confirmOpen}
-        message={`Reverter o ${lote} para "Em Lote"? A data de início será removida.`}
+        message={`Reverter o lote ${lote} para "Em Lote"? A data de início será removida.`}
         confirmLabel="Reverter"
         cancelLabel="Cancelar"
         onConfirm={handleConfirm}
