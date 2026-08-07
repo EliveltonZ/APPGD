@@ -124,6 +124,71 @@
   border-color: var(--primary, #3b82f6);
 }
 
+/* ── Sidebar toggle (mobile only) ────────────────────────────────────────── */
+
+.cad-sidebar-toggle {
+  display: none;
+}
+
+/* ── Mobile layout ────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .cad-page {
+    flex-direction: column;
+  }
+
+  .cad-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 8px 0 10px;
+    /* Hidden by default on mobile */
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    transition: max-height 0.22s ease, padding 0.22s ease;
+  }
+
+  .cad-sidebar--open {
+    max-height: 300px;
+    padding: 8px 0 10px;
+  }
+
+  .cad-sidebar__nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0 12px;
+  }
+
+  .cad-sidebar__item {
+    width: auto;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .cad-sidebar-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    all: unset;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary, #3b82f6);
+    padding: 4px 0;
+    margin-bottom: 2px;
+  }
+
+  .cad-main__title {
+    display: none;
+  }
+
+  .cad-main {
+    padding: 14px 16px;
+  }
+}
+
 /* ── Modal footer ─────────────────────────────────────────────────────────── */
 
 .cad-modal-footer {

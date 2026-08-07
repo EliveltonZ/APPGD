@@ -1,6 +1,4 @@
-import { useState } from "react";
 import {
-  FileText,
   ShoppingBag,
   Factory,
   Truck,
@@ -9,61 +7,51 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppLayout } from "../../components/Layout/AppLayout";
-import { Modal } from "../../components/Modal";
-import { Button } from "../../components/Button";
 import { SummaryCard } from "../../components/SummaryCard";
 import "./index.css";
 
 interface StatCard {
   id: string;
   label: string;
-  value: string;
+  value: number;
   icon: LucideIcon;
   accent: string;
 }
+
+const valuesBase = [50, 49, 72, 12550.09];
 
 const stats: StatCard[] = [
   {
     id: "pedidos",
     label: "Pedidos Abertos",
-    value: "—",
+    value: valuesBase[0],
     icon: ShoppingBag,
     accent: "var(--accent)",
   },
   {
     id: "producao",
     label: "Em Produção",
-    value: "—",
+    value: valuesBase[1],
     icon: Factory,
     accent: "#f97316",
   },
   {
     id: "expedicao",
     label: "Em Expedição",
-    value: "—",
+    value: valuesBase[2],
     icon: Truck,
     accent: "#16a34a",
   },
   {
     id: "financeiro",
     label: "Valores Pendentes",
-    value: "—",
+    value: valuesBase[3],
     icon: DollarSign,
     accent: "var(--accent2)",
   },
 ];
 
-const reportItems = [
-  "Relatório de Pedidos",
-  "Relatório de Produção",
-  "Relatório Financeiro",
-  "Relatório de Expedição",
-  "Relatório de Assistências",
-];
-
 export function MenuPage() {
-  const [reportOpen, setReportOpen] = useState(false);
-
   return (
     <AppLayout pageTitle="Painel Principal">
       <div className="dashboard">

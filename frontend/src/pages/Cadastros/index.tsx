@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { AppLayout } from '../../components/Layout/AppLayout'
 import { DataTable } from '../../components/DataTable'
 import type { TableColumn } from '../../components/DataTable'
@@ -75,6 +75,7 @@ export function CadastrosPage() {
   const fetchFn = useCallback((entity: string) => listCadastro(entity), [])
   const { data: rows = [], loading, reload } = useParamData(fetchFn, activeKey)
 
+  const [sidebarOpen, setSidebarOpen]      = useState(false)
   const [modalOpen, setModalOpen]         = useState(false)
   const [confirmOpen, setConfirmOpen]     = useState(false)
   const [selected, setSelected]           = useState<CadastroRow | null>(null)
@@ -143,10 +144,12 @@ export function CadastrosPage() {
   }
 
   function handleEntitySelect(key: string) {
-    if (key === activeKey) return
-    setActiveKey(key)
-    closeModal()
-    setConfirmOpen(false)
+    if (key !== activeKey) {
+      setActiveKey(key)
+      closeModal()
+      setConfirmOpen(false)
+    }
+    setSidebarOpen(false)
   }
 
   const isEditing = selected !== null
@@ -155,7 +158,7 @@ export function CadastrosPage() {
     <AppLayout pageTitle="Cadastros">
       <div className="cad-page">
         {/* ── Seletor de entidades ── */}
-        <aside className="cad-sidebar">
+        <aside className={`cad-sidebar${sidebarOpen ? ' cad-sidebar--open' : ''}`}>
           <p className="cad-sidebar__title">{activeGroup.label}</p>
           <nav className="cad-sidebar__nav">
             {groupEntities.map((e) => (
@@ -174,6 +177,14 @@ export function CadastrosPage() {
         <div className="cad-main">
           <div className="cad-main__header">
             <div>
+              <button
+                className="cad-sidebar-toggle"
+                type="button"
+                onClick={() => setSidebarOpen((v) => !v)}
+              >
+                {activeConfig.label}
+                {sidebarOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
               <h2 className="cad-main__title">{activeConfig.label}</h2>
               {!loading && (
                 <p className="cad-main__count">

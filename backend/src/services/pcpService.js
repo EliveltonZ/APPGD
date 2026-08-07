@@ -4,6 +4,8 @@ const buscarProjetoPcp        = (ordemdecompra)          => repo.buscarProjetoPc
 const buscarUltimoLote        = ()                       => repo.buscarUltimoLote();
 const listarProjetosLote      = ()                       => repo.listarProjetosLote();
 const listarLotes             = ()                       => repo.listarLotes();
+const listarLotesIniciados    = ()                       => repo.listarLotesIniciados();
+const reverterLote            = (p_lote)                 => repo.reverterLote(p_lote);
 const atualizarIniciarLote    = (p_lote, p_iniciado)     => repo.atualizarIniciarLote(p_lote, p_iniciado);
 const atualizarLote           = (p_ordemdecompra, p_lote)=> repo.atualizarLote(p_ordemdecompra, p_lote);
 const atualizarProjetoPcp     = (body)                   => repo.atualizarProjetoPcp(body);
@@ -15,6 +17,8 @@ module.exports = {
   buscarUltimoLote,
   listarProjetosLote,
   listarLotes,
+  listarLotesIniciados,
+  reverterLote,
   atualizarIniciarLote,
   atualizarLote,
   atualizarProjetoPcp,

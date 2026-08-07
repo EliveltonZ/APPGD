@@ -53,22 +53,25 @@ export function ConfigSenhaPage() {
 
   async function handleSubmit() {
     const e = validate();
-    if (Object.keys(e).length > 0) { setErrors(e); return; }
+    if (Object.keys(e).length > 0) {
+      setErrors(e);
+      return;
+    }
     if (!user) return;
     setSaving(true);
     try {
       const valid = await checkPassword(Number(user.id), form.senhaAtual);
       if (!valid) {
-        setErrors({ senhaAtual: 'Senha atual incorreta.' });
+        setErrors({ senhaAtual: "Senha atual incorreta." });
         return;
       }
       await updateSenha(Number(user.id), form.novaSenha);
       setForm(emptyForm());
       setErrors({});
       setSuccess(true);
-      toast.success('Senha alterada com sucesso!');
+      toast.success("Senha alterada com sucesso!");
     } catch {
-      toast.error('Erro ao alterar senha.');
+      toast.error("Erro ao alterar senha.");
     } finally {
       setSaving(false);
     }
@@ -82,7 +85,7 @@ export function ConfigSenhaPage() {
           <div>
             <h1 className="cs-page__title">Alterar Senha</h1>
             <p className="cs-page__subtitle">
-              Somente a sua própria senha pode ser alterada nesta tela.
+              Somente a sua senha pode ser alterada nesta tela.
             </p>
           </div>
         </div>
@@ -150,7 +153,7 @@ export function ConfigSenhaPage() {
                 type="button"
               >
                 <KeyRound size={14} />
-                {saving ? 'Alterando...' : 'Alterar senha'}
+                {saving ? "Alterando..." : "Alterar senha"}
               </Button>
             </div>
           </div>

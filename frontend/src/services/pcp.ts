@@ -158,8 +158,18 @@ export async function fetchLotes(): Promise<number[]> {
   return rows.map((r) => Number(r.lote));
 }
 
+export async function fetchLotesIniciados(): Promise<number[]> {
+  type R = Record<string, unknown>;
+  const rows = await apiGet<R[]>("/pcp/lotes-iniciados");
+  return rows.map((r) => Number(r.lote));
+}
+
 export function startLote(lote: number, dataInicio: string): Promise<unknown> {
   return apiPost("/pcp/iniciar", { p_lote: lote, p_datainicio: dataInicio });
+}
+
+export function revertLote(lote: number): Promise<unknown> {
+  return apiPost("/pcp/reverter", { p_lote: lote });
 }
 
 export function updateProjectPcp(form: ProjectReleaseFormData): Promise<unknown> {

@@ -24,6 +24,18 @@ module.exports = {
     catch (e) { err(res, "Erro ao listar lotes", e); }
   },
 
+  async getLotesIniciados(req, res) {
+    try { ok(res, await service.listarLotesIniciados()); }
+    catch (e) { err(res, "Erro ao listar lotes iniciados", e); }
+  },
+
+  async reverterLote(req, res) {
+    try {
+      await service.reverterLote(req.body.p_lote);
+      ok(res, { success: true });
+    } catch (e) { err(res, "Erro ao reverter lote", e); }
+  },
+
   async setStartLote(req, res) {
     try {
       await service.atualizarIniciarLote(req.body.p_lote, req.body.p_iniciado ?? req.body.p_datainicio ?? null);

@@ -91,7 +91,7 @@ const COLUMNS: TableColumn<ForecastRow>[] = [
   },
   { key: "seq", label: "N°", sortable: false, filterable: false, minWidth: 48 },
   { key: "numOC", label: "OC", minWidth: 88 },
-  { key: "pedido", label: "Pedido", filterable: false },
+  { key: "pedido", label: "Pedido" },
   { key: "e", label: "E", minWidth: 32 },
   { key: "corteCC", label: "C.C." },
   { key: "lote", label: "Lote" },
@@ -112,7 +112,6 @@ const COLUMNS: TableColumn<ForecastRow>[] = [
   {
     key: "prazo",
     label: "Prazo",
-    filterable: false,
     render: (v) => fmtPrazo(v as number),
   },
   {
@@ -206,9 +205,9 @@ const COLUMNS: TableColumn<ForecastRow>[] = [
   {
     key: "previsao",
     label: "Previsão",
-    filterable: false,
     render: (v, row) => {
-      const diff = (v as string) && row.entrega && (v as string) !== row.entrega;
+      const diff =
+        (v as string) && row.entrega && (v as string) !== row.entrega;
       return (
         <span className={diff ? "row--previsao-alt" : ""}>
           {fmtDate(v as string)}

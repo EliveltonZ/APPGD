@@ -9,6 +9,25 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 400px) {
+  .apt-header {
+    display: grid;
+    align-items: flex-end;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+}
+
+.apt-header_buttons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
 .apt-header__brand {
   display: flex;
   align-items: baseline;
@@ -71,7 +90,9 @@
 }
 
 @keyframes apt-spin {
-  to { transform: translateY(-50%) rotate(360deg); }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
 }
 
 .apt-header__input {
@@ -88,9 +109,16 @@
   box-sizing: border-box;
 }
 
-.apt-header__input:focus { border-color: var(--accent); }
-.apt-header__input::placeholder { color: var(--text); opacity: 0.55; }
-.apt-header__input:disabled { cursor: not-allowed; }
+.apt-header__input:focus {
+  border-color: var(--accent);
+}
+.apt-header__input::placeholder {
+  color: var(--text);
+  opacity: 0.55;
+}
+.apt-header__input:disabled {
+  cursor: not-allowed;
+}
 
 .apt-header__select {
   cursor: pointer;
@@ -98,7 +126,9 @@
   padding-right: 0.75rem;
 }
 
-.apt-header__select:disabled { cursor: not-allowed; }
+.apt-header__select:disabled {
+  cursor: not-allowed;
+}
 
 .apt-header__field-wrap--operator {
   flex: 0 0 200px;
@@ -120,7 +150,9 @@
   color: var(--text);
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .apt-header__clear-btn:hover {
@@ -145,7 +177,10 @@
   flex-shrink: 0;
   white-space: nowrap;
   position: relative;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
   align-self: flex-end;
 }
 
@@ -156,9 +191,17 @@
   cursor: pointer;
 }
 
-.apt-header__save-btn--dirty:hover  { filter: brightness(0.92); }
-.apt-header__save-btn--dirty:active { filter: brightness(0.85); }
-.apt-header__save-btn:disabled { opacity: 0.55; cursor: default; filter: none; }
+.apt-header__save-btn--dirty:hover {
+  filter: brightness(0.92);
+}
+.apt-header__save-btn--dirty:active {
+  filter: brightness(0.85);
+}
+.apt-header__save-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  filter: none;
+}
 
 .apt-header__dirty-dot {
   width: 7px;
@@ -171,8 +214,13 @@
 }
 
 @keyframes apt-pulse-dot {
-  0%, 100% { opacity: 0.85; }
-  50%       { opacity: 0.4;  }
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 /* Botão operadores */
@@ -187,8 +235,9 @@
   color: var(--text);
   cursor: pointer;
   flex-shrink: 0;
-  align-self: flex-end;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .apt-header__ops-btn:hover {
@@ -216,7 +265,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
 }
 
 .apt-ops-modal__header {

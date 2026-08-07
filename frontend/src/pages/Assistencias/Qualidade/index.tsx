@@ -151,7 +151,7 @@ export function AssistenciasQualidadePage() {
   }
 
   return (
-    <AppLayout pageTitle="Assistências — Qualidade">
+    <AppLayout pageTitle="Assist — Qualidade">
       <div className="qcp-page">
         <header className="qcp-page__header">
           <div>

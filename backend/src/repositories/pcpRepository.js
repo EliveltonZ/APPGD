@@ -61,6 +61,23 @@ async function listarLotes() {
   return rows.map((p) => ({ lote: p.lote }));
 }
 
+async function listarLotesIniciados() {
+  const rows = await Projetos.findAll({
+    where: { iniciado: { [Op.ne]: null }, pronto: null, lote: { [Op.gt]: 0 } },
+    attributes: ['lote'],
+    group: ['lote'],
+    order: [['lote', 'ASC']],
+  });
+  return rows.map((p) => ({ lote: p.lote }));
+}
+
+async function reverterLote(p_lote) {
+  await Projetos.update(
+    { iniciado: null },
+    { where: { lote: Number(p_lote) } },
+  );
+}
+
 async function atualizarIniciarLote(p_lote, p_iniciado) {
   await Projetos.update(
     { iniciado: p_iniciado ?? null },
@@ -129,6 +146,8 @@ module.exports = {
   buscarUltimoLote,
   listarProjetosLote,
   listarLotes,
+  listarLotesIniciados,
+  reverterLote,
   atualizarIniciarLote,
   atualizarLote,
   atualizarProjetoPcp,

@@ -13,6 +13,13 @@
   gap: 16px;
 }
 
+@media (max-width: 500px) {
+  .acp-page__header {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
 .acp-page__title {
   font-size: 18px !important;
   font-weight: 700 !important;

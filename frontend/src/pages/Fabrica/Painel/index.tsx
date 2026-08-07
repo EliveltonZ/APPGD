@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useToast } from "../../../context/ToastContext";
 import type { ReactNode } from "react";
-import { FolderOpen, Layers, Play, Download, Factory, CheckCircle2 } from "lucide-react";
+import { FolderOpen, Layers, Play, RotateCcw, Download, Factory, CheckCircle2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { AppLayout } from "../../../components/Layout/AppLayout";
@@ -9,9 +9,10 @@ import { PcpActionCard } from "../../../features/pcp/PcpActionCard";
 import { ProjectReleaseModal } from "../../../features/pcp/ProjectReleaseModal";
 import { BatchGenerationModal } from "../../../features/pcp/BatchGenerationModal";
 import { StartBatchModal } from "../../../features/pcp/StartBatchModal";
+import { RevertBatchModal } from "../../../features/pcp/RevertBatchModal";
 import { ExportProjectsModal } from "../../../features/pcp/ExportProjectsModal";
 import { useApiData } from "../../../hooks/useApiData";
-import { fetchProductionProjects, fetchPcpCards, fetchLotes, startLote } from "../../../services/pcp";
+import { fetchProductionProjects, fetchPcpCards, fetchLotes, startLote, revertLote } from "../../../services/pcp";
 import { PROJECT_STATUS_LABELS } from "../../../data/pcpConfig";
 import type {
   ProductionProject,
@@ -19,7 +20,7 @@ import type {
 } from "../../../types/pcp";
 import "./index.css";
 
-type ModalKey = "release" | "batch" | "startbatch" | "export";
+type ModalKey = "release" | "batch" | "startbatch" | "revert" | "export";
 
 interface ActionDef {
   key: ModalKey;
@@ -56,6 +57,13 @@ const ACTIONS: ActionDef[] = [
     title: "Iniciar Lote",
     description: ({ lotesCount }) =>
       `Registre o início de produção de um lote. ${lotesCount} lote${lotesCount !== 1 ? "s" : ""} aguardando.`,
+  },
+  {
+    key: "revert",
+    icon: RotateCcw,
+    title: "Reverter Lote",
+    description: ({ em_producao }) =>
+      `Desfaça o início de um lote e retorne-o para Em Lote. ${em_producao} em produção.`,
   },
   {
     key: "export",
@@ -128,6 +136,21 @@ export function PcpPage() {
     }
   }
 
+  async function handleBatchRevert(lote: string) {
+    try {
+      await revertLote(Number(lote));
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.lote === lote && p.status === "em_producao" ? { ...p, status: "em_lote" } : p,
+        ),
+      );
+      setOpenModal(null);
+      toast.success(`Lote ${lote} revertido para Em Lote.`);
+    } catch {
+      toast.error(`Erro ao reverter o lote ${lote}. Tente novamente.`);
+    }
+  }
+
 
   return (
     <AppLayout pageTitle="PCP">
@@ -182,6 +205,12 @@ export function PcpPage() {
         projects={projects}
         onClose={() => setOpenModal(null)}
         onStart={handleBatchStart}
+      />
+      <RevertBatchModal
+        isOpen={openModal === "revert"}
+        projects={projects}
+        onClose={() => setOpenModal(null)}
+        onRevert={handleBatchRevert}
       />
       <ExportProjectsModal
         isOpen={openModal === "export"}

@@ -35,18 +35,24 @@ export function AssistenciasLogisticaPage() {
   const [filterDate, setFilterDate] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchConfigDate(5).then((d) => {
-      const date = d || todayMinus90();
-      setInputDate(date);
-      setFilterDate(date);
-    }).catch(() => {
-      const date = todayMinus90();
-      setInputDate(date);
-      setFilterDate(date);
-    });
+    fetchConfigDate(5)
+      .then((d) => {
+        const date = d || todayMinus90();
+        setInputDate(date);
+        setFilterDate(date);
+      })
+      .catch(() => {
+        const date = todayMinus90();
+        setInputDate(date);
+        setFilterDate(date);
+      });
   }, []);
 
-  const { data: rows = [], loading, reload } = useParamData(fetchAssistencias, filterDate);
+  const {
+    data: rows = [],
+    loading,
+    reload,
+  } = useParamData(fetchAssistencias, filterDate);
 
   function handleDateKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter" && inputDate) {
@@ -65,7 +71,7 @@ export function AssistenciasLogisticaPage() {
   const count = rows.length;
 
   return (
-    <AppLayout pageTitle="Assistências — Logística">
+    <AppLayout pageTitle="Assist — Logística">
       <div className="acp-page">
         <header className="acp-page__header">
           <div>
