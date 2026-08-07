@@ -72,14 +72,6 @@ export function MenuPage() {
             <h1 className="dashboard__title">Painel Principal</h1>
             <p className="dashboard__subtitle">Bem-vindo ao sistema GD</p>
           </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setReportOpen(true)}
-          >
-            <FileText size={14} />
-            Relatórios
-          </Button>
         </div>
 
         <div className="dashboard__stats">
@@ -107,24 +99,6 @@ export function MenuPage() {
           </div>
         </div>
       </div>
-
-      <Modal
-        title="Relatórios"
-        isOpen={reportOpen}
-        onClose={() => setReportOpen(false)}
-        maxWidth={440}
-      >
-        <ul className="report-list">
-          {reportItems.map((item) => (
-            <li key={item}>
-              <button className="report-item" type="button">
-                <FileText size={14} />
-                {item}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
     </AppLayout>
   );
 }
