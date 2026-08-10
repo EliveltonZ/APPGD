@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import "./index.css";
