@@ -20,19 +20,10 @@ export function Modal({
   footer,
   maxWidth = 520,
 }: ModalProps) {
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose} role="presentation">
+    <div className="modal-backdrop" role="presentation">
       <div
         className="modal"
         style={{ maxWidth }}
