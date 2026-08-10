@@ -1,5 +1,6 @@
 const { Op, literal } = require("sequelize");
 const {
+  sequelize,
   Assistencias,
   Projetos,
   Liberador,
@@ -192,33 +193,54 @@ async function inserirSolicitacao(body) {
 }
 
 async function inserirSolicitacaoCompleta(body) {
-  const result = await inserirSolicitacao(body);
-  const solicitacao = result[0].solicitacao;
+  return sequelize.transaction(async (t) => {
+    const solicitacao = String(body.solicitacao ?? '').trim();
+    if (!solicitacao) throw new Error('Número da solicitação é obrigatório');
 
-  const equipe = body.equipe ?? [];
-  for (const m of equipe) {
-    await EquipSat.create({
-      idSat: solicitacao,
-      idMontador: Number(m.id_montador ?? m.id),
-    });
-  }
+    await Assistencias.create({
+      solicitacao,
+      contrato:        body.contrato ? Number(body.contrato) : null,
+      cliente:         body.cliente ?? "",
+      ambiente:        body.ambiente ?? null,
+      datasolicitacao: body.datasolicitacao ? new Date(body.datasolicitacao) : new Date(),
+      solicitante:     body.solicitante ?? null,
+      urgente:         body.urgente ?? null,
+      observacoes2:    body.observacoes ?? null,
+      bairro:          body.bairro ?? null,
+      tempo:           body.tempo ?? null,
+      destino:         body.destino ?? null,
+      supervisor:      body.supervisor ?? null,
+      montador:        body.montador ?? null,
+      montagem:        body.montagem ?? false,
+      promob:          body.promob ?? false,
+      entrega:         body.entrega ?? false,
+      cobrada:         body.cobrada ?? false,
+      tipoassistencia: body.tipoassistencia ? Number(body.tipoassistencia) : 0,
+    }, { transaction: t });
 
-  const pecas = body.pecas ?? [];
-  for (const r of pecas) {
-    await Pecas.create({
-      idAssistencia: solicitacao,
-      qtd: Number(r.qtd) || 0,
-      peca: r.peca ?? null,
-      dimensoes: r.dimensoes ?? null,
-      cor: r.cor ?? null,
-      lado: r.lado ?? null,
-      idOcorrencia: r.id_ocorrencia ? Number(r.id_ocorrencia) : null,
-      idFalha: r.id_falha ? Number(r.id_falha) : null,
-      observacoes: r.observacoes ?? null,
-    });
-  }
+    for (const m of (body.equipe ?? [])) {
+      await EquipSat.create({
+        idSat: solicitacao,
+        idMontador: Number(m.id_montador ?? m.id),
+      }, { transaction: t });
+    }
 
-  return result;
+    for (const r of (body.pecas ?? [])) {
+      await Pecas.create({
+        idAssistencia: solicitacao,
+        qtd:          Number(r.qtd) || 0,
+        peca:         r.peca ?? null,
+        dimensoes:    r.dimensoes ?? null,
+        cor:          r.cor ?? null,
+        lado:         r.lado ?? null,
+        idOcorrencia: r.id_ocorrencia ? Number(r.id_ocorrencia) : null,
+        idFalha:      r.id_falha ? Number(r.id_falha) : null,
+        observacoes:  r.observacoes ?? null,
+      }, { transaction: t });
+    }
+
+    return [{ solicitacao }];
+  });
 }
 
 module.exports = {
