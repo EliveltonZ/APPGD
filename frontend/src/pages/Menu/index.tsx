@@ -13,12 +13,12 @@ import "./index.css";
 interface StatCard {
   id: string;
   label: string;
-  value: number;
+  value: number | string;
   icon: LucideIcon;
   accent: string;
 }
 
-const valuesBase = [50, 49, 72, 12550.09];
+const valuesBase = ["-", "-", "-", "-"];
 
 const stats: StatCard[] = [
   {
