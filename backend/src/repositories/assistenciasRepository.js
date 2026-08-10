@@ -226,6 +226,8 @@ async function inserirSolicitacaoCompleta(body) {
     }
 
     for (const r of (body.pecas ?? [])) {
+      if (!r.id_falha || Number(r.id_falha) === 0)
+        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui tipo de falha informado.`);
       await Pecas.create({
         idAssistencia: solicitacao,
         qtd:          Number(r.qtd) || 0,
@@ -234,7 +236,7 @@ async function inserirSolicitacaoCompleta(body) {
         cor:          r.cor ?? null,
         lado:         r.lado ?? null,
         idOcorrencia: r.id_ocorrencia ? Number(r.id_ocorrencia) : null,
-        idFalha:      r.id_falha ? Number(r.id_falha) : null,
+        idFalha:      Number(r.id_falha),
         observacoes:  r.observacoes ?? null,
       }, { transaction: t });
     }
