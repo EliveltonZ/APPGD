@@ -85,11 +85,11 @@ async function listarTipoCliente() {
 async function listarCausaFalha(p_id_falha) {
   const rows = await CausaFalha.findAll({
     where: { idFalha: Number(p_id_falha) },
-    attributes: ['id'],
+    attributes: ['idCausa'],
     include: [{ model: Causa, as: 'causa', attributes: ['descricao'] }],
     order: [[{ model: Causa, as: 'causa' }, 'descricao', 'ASC']],
   });
-  return rows.map(r => ({ id: r.id, descricao: r.causa?.descricao ?? null }));
+  return rows.map(r => ({ id: r.idCausa, descricao: r.causa?.descricao ?? null }));
 }
 
 async function buscarUsuario(p_id) {
