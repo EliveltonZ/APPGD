@@ -113,10 +113,10 @@ export function ParadasPage() {
   }, [filtroMaquina, filtroDe, filtroAte]);
 
   useEffect(() => {
-    carregarBase();
+    carregarBase().catch(() => toastErr("Erro ao carregar máquinas e tipos."));
   }, [carregarBase]);
   useEffect(() => {
-    carregarParadas();
+    carregarParadas().catch(() => toastErr("Erro ao carregar paradas."));
   }, [carregarParadas]);
 
   // ── Handlers do form ─────────────────────────────────────────────────────

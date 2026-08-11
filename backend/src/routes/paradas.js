@@ -12,6 +12,9 @@ function handler(fn) {
       if (err.code === 'MAQUINA_EM_PARADA' || err.code === 'SEM_PARADA_ABERTA') {
         return res.status(409).json({ error: err.message });
       }
+      if (err.code === 'VALIDACAO') {
+        return res.status(400).json({ error: err.message });
+      }
       console.error('[paradas]', err);
       res.status(500).json({ error: err.message });
     }
@@ -28,7 +31,7 @@ router.get('/tipos',    opPerm, handler(() => repo.listarTipos()));
 router.get('/buscar-pedido', opPerm, handler((req) => {
   const tipo = Number(req.query.tipo);
   const pedido = Number(req.query.pedido);
-  if (!tipo || isNaN(pedido)) return res.status(400).json({ error: 'Parâmetros inválidos' });
+  if (!tipo || isNaN(pedido)) throw Object.assign(new Error('Parâmetros inválidos'), { code: 'VALIDACAO' });
   return repo.buscarPedido(tipo, pedido);
 }));
 

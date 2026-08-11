@@ -59,8 +59,8 @@ export function ExcluirProjetoPage() {
       toast.success("Projeto excluído com sucesso.");
       setForm(emptyProjectForm());
       setLoaded(false);
-    } catch {
-      toast.error("Erro ao excluir projeto.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao excluir projeto.");
     } finally {
       setDeleting(false);
     }

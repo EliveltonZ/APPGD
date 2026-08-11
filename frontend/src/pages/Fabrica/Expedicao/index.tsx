@@ -83,8 +83,8 @@ export function ExpedicaoPage() {
       await saveExpeditionData(detail);
       toast.success("Expedição salva com sucesso!");
       reloadOrders();
-    } catch {
-      toast.error("Erro ao salvar expedição.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar expedição.");
     } finally {
       setSaving(false);
     }
@@ -112,7 +112,7 @@ export function ExpedicaoPage() {
               onChange={(e) => setInputDate(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && inputDate) {
-                  saveConfigDate(2, inputDate);
+                  saveConfigDate(2, inputDate).catch(() => {});
                   if (filterDate === inputDate) reloadOrders();
                   else setFilterDate(inputDate);
                 }

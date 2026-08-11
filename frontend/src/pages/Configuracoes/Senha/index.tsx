@@ -70,8 +70,8 @@ export function ConfigSenhaPage() {
       setErrors({});
       setSuccess(true);
       toast.success("Senha alterada com sucesso!");
-    } catch {
-      toast.error("Erro ao alterar senha.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao alterar senha.");
     } finally {
       setSaving(false);
     }

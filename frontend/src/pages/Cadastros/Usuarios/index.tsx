@@ -127,8 +127,8 @@ export function CadastrosUsuariosPage() {
       toast.success(`Usuário "${createForm.login}" cadastrado.`)
       setCreateOpen(false)
       reload()
-    } catch {
-      toast.error('Erro ao cadastrar usuário.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao cadastrar usuário.')
     } finally {
       setCreating(false)
     }
@@ -170,8 +170,8 @@ export function CadastrosUsuariosPage() {
       toast.success('Usuário atualizado.')
       setEditOpen(false)
       reload()
-    } catch {
-      toast.error('Erro ao salvar.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
     } finally {
       setSaving(false)
     }

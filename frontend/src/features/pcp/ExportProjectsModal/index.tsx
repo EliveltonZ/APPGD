@@ -4,6 +4,7 @@ import { Modal } from '../../../components/Modal';
 import { Button } from '../../../components/Button';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { exportarProjetos, type ExportedProject } from '../../../services/pcp';
+import { useToast } from '../../../context/ToastContext';
 import type { ExportProjectsFormData } from '../../../types/pcp';
 import './index.css';
 
@@ -31,6 +32,7 @@ function downloadXlsx(rows: ExportedProject[], dataInicial: string, dataFinal: s
 }
 
 export function ExportProjectsModal({ isOpen, onClose }: Props) {
+  const toast = useToast();
   const [form, setForm]     = useState(emptyForm());
   const [errors, setErrors] = useState({ dataInicial: '', dataFinal: '' });
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -66,8 +68,8 @@ export function ExportProjectsModal({ isOpen, onClose }: Props) {
       const rows = await exportarProjetos(form);
       downloadXlsx(rows, form.dataInicial, form.dataFinal);
       onClose();
-    } catch {
-      setErrors((prev) => ({ ...prev, dataFinal: 'Erro ao exportar. Tente novamente.' }));
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao exportar. Tente novamente.');
     } finally {
       setExporting(false);
     }

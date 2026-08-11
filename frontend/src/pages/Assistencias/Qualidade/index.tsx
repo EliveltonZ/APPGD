@@ -145,8 +145,8 @@ export function AssistenciasQualidadePage() {
       setCausaOptions([]);
 
       toast.success("Análise concluída com sucesso!");
-    } catch {
-      toast.error("Erro ao salvar análise. Tente novamente.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar análise. Tente novamente.");
     }
   }
 

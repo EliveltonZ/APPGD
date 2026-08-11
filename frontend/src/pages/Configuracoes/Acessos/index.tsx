@@ -95,8 +95,8 @@ export function ConfigAcessosPage() {
       setUsers((prev) => prev.map((u) => (u.id === editingUser.id ? updated : u)))
       toast.success('Acessos atualizados com sucesso!')
       closeEditor()
-    } catch {
-      toast.error('Erro ao salvar acessos.')
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao salvar acessos.')
     }
   }
 

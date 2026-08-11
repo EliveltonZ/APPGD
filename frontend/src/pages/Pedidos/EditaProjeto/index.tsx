@@ -101,8 +101,8 @@ export function EditaProjetoPage() {
     try {
       await saveEditProject(form);
       toast.success("Projeto atualizado com sucesso.");
-    } catch {
-      toast.error("Erro ao salvar projeto.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar projeto.");
     } finally {
       setSaving(false);
     }

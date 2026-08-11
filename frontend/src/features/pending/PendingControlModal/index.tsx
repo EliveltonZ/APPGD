@@ -132,6 +132,9 @@ export function PendingControlModal({
       });
       onItemsChanged?.(localProject.id, 1);
       handleClearForm();
+      toast.success("Item inserido com sucesso.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao inserir item.");
     } finally {
       setInserting(false);
     }

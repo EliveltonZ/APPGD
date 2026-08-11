@@ -141,8 +141,8 @@ export function Modal({
               await saveAssistencia(data);
               onSaved?.(data);
               toast.success("Projeto salvo com sucesso!");
-            } catch {
-              toast.error("Erro ao salvar assistência.");
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : "Erro ao salvar assistência.");
             }
           }}
           onCancel={() => setSaveConfirmOpen(false)}

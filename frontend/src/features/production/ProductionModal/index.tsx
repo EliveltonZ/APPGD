@@ -145,8 +145,8 @@ export function ProductionModal({
       setSaveConfirmOpen(false);
       onSave?.();
       onClose();
-    } catch {
-      toast.error("Erro ao salvar. Tente novamente.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar. Tente novamente.");
     } finally {
       setSaving(false);
     }

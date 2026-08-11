@@ -86,8 +86,8 @@ export function RelatorioComprasPage() {
       setModalOpen(false);
       toast.success("Compra atualizada com sucesso.");
       loadPurchases(filterDate);
-    } catch {
-      toast.error("Erro ao salvar compra.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao salvar compra.");
     }
   }
 
@@ -115,7 +115,7 @@ export function RelatorioComprasPage() {
               onKeyDown={(e) => {
                 if (e.key !== "Enter") return;
                 setFilterDate(inputDate);
-                if (inputDate) saveConfigDate(3, inputDate);
+                if (inputDate) saveConfigDate(3, inputDate).catch(() => {});
               }}
             />
           </label>

@@ -77,10 +77,12 @@ export function BatchGenerationModal({ isOpen, onClose, onGenerate }: Props) {
 
   useEffect(() => {
     if (isOpen) {
-      Promise.all([fetchLoteAvailable(), fetchLastLote()]).then(([rows, last]) => {
-        dispatch({ type: "set_available", value: rows });
-        dispatch({ type: "set_lote", value: String(last + 1) });
-      });
+      Promise.all([fetchLoteAvailable(), fetchLastLote()])
+        .then(([rows, last]) => {
+          dispatch({ type: "set_available", value: rows });
+          dispatch({ type: "set_lote", value: String(last + 1) });
+        })
+        .catch(() => toast.error("Erro ao carregar projetos disponíveis."));
     } else {
       dispatch({ type: "reset" });
     }
@@ -108,8 +110,8 @@ export function BatchGenerationModal({ isOpen, onClose, onGenerate }: Props) {
       toast.success(`Lote ${loteNum} gerado com ${selected.length} projeto${selected.length !== 1 ? "s" : ""}.`);
       onGenerate(lote.trim(), Array.from(selectedIds));
       dispatch({ type: "set_confirm", value: false });
-    } catch {
-      toast.error("Erro ao gerar lote. Tente novamente.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao gerar lote. Tente novamente.");
       dispatch({ type: "set_confirm", value: false });
     } finally {
       setSaving(false);
