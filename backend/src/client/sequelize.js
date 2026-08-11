@@ -5,7 +5,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
   timezone: "-03:00",
   dialectOptions: {
-    ssl: { require: true },
+    ssl: { require: true, rejectUnauthorized: false },
   },
   logging: process.env.NODE_ENV === "development" ? console.log : false,
   pool: {
