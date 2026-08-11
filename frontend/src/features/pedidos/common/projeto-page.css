@@ -37,6 +37,10 @@
   gap: 12px;
 }
 
+.projeto-page__form .input-field {
+  text-transform: uppercase;
+}
+
 .projeto-page__bottom {
   display: flex;
   align-items: center;

@@ -58,7 +58,7 @@ export function NovoProjetoPage() {
   const [contractModalOpen, setContractModalOpen] = useState(false);
 
   function handleChange(field: keyof ProjectFormData, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value.toUpperCase() }));
+    setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
@@ -143,8 +143,11 @@ export function NovoProjetoPage() {
   async function handleConfirm() {
     setConfirmOpen(false);
     setSaving(true);
+    const upperForm = Object.fromEntries(
+      Object.entries(form).map(([k, v]) => [k, typeof v === "string" ? v.toUpperCase() : v]),
+    ) as typeof form;
     try {
-      await saveProject(form);
+      await saveProject(upperForm);
       toast.success("Projeto salvo com sucesso.");
       setForm(emptyProjectForm());
       setErrors({});
