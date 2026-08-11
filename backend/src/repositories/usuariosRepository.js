@@ -1,4 +1,7 @@
+const bcrypt  = require('bcryptjs');
 const { Usuario } = require('../client/db');
+
+const BCRYPT_ROUNDS = 12;
 
 const ACESSO_ATTRS = [
   'id', 'login', 'setor',
@@ -56,12 +59,13 @@ async function buscarMaiorId() {
 }
 
 async function inserirUsuario(body) {
-  // Sequelize gera OVERRIDING SYSTEM VALUE automaticamente quando id é fornecido
-  // em colunas com autoIncrementIdentity: true no PostgreSQL
+  const senha = String(body.p_senha ?? '');
+  if (senha.length < 6) throw new Error('A senha deve ter ao menos 6 caracteres.');
+  const senhaHash = await bcrypt.hash(senha, BCRYPT_ROUNDS);
   await Usuario.create({
     id:       body.p_id,
     login:    body.p_login    ?? null,
-    senha:    body.p_senha    ?? null,
+    senha:    senhaHash,
     setor:    body.p_setor    ?? null,
     camiseta: body.p_camiseta ?? null,
     calca:    body.p_calca    ?? null,
@@ -146,7 +150,10 @@ async function atualizarUsuario(id, data) {
 }
 
 async function alterarSenha(p_id, p_senha) {
-  await Usuario.update({ senha: p_senha }, { where: { id: Number(p_id) } });
+  const senha = String(p_senha ?? '');
+  if (senha.length < 6) throw new Error('A senha deve ter ao menos 6 caracteres.');
+  const senhaHash = await bcrypt.hash(senha, BCRYPT_ROUNDS);
+  await Usuario.update({ senha: senhaHash }, { where: { id: Number(p_id) } });
 }
 
 module.exports = {

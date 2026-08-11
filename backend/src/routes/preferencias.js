@@ -1,17 +1,6 @@
-const router = require('express').Router()
-const { Pool } = require('pg')
-
-// Pool dedicado para a tabela de preferências.
-// DATABASE_URL já está no process.env (carregado pelo dotenv em sequelize.js).
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { require: true, rejectUnauthorized: false },
-  max: 3,
-})
-
-pool.on('error', (err) => {
-  console.error('[preferencias pool] erro inesperado:', err)
-})
+const router     = require('express').Router()
+const { QueryTypes } = require('sequelize')
+const { sequelize }  = require('../client/db')
 
 /**
  * GET /preferencias?chaves=key1,key2
@@ -27,21 +16,16 @@ router.get('/', async (req, res, next) => {
 
     if (!chaves.length) return res.json({})
 
-    // Parâmetros posicionais: $1 = userId, $2… = cada chave
-    const params = [userId, ...chaves]
-    const placeholders = chaves.map((_, i) => `$${i + 2}`).join(', ')
-
-    const { rows } = await pool.query(
+    const rows = await sequelize.query(
       `SELECT chave, valor
          FROM "tblPreferencias"
-        WHERE id_usuario = $1
-          AND chave IN (${placeholders})`,
-      params,
+        WHERE id_usuario = :userId
+          AND chave IN (:chaves)`,
+      { replacements: { userId, chaves }, type: QueryTypes.SELECT },
     )
 
     res.json(Object.fromEntries(rows.map(r => [r.chave, r.valor])))
   } catch (err) {
-    console.error('[preferencias GET]', err.message)
     next(err)
   }
 })
@@ -55,26 +39,23 @@ router.post('/', async (req, res, next) => {
   try {
     const userId  = Number(req.user.sub)
     const entries = Object.entries(req.body ?? {})
-    console.log('[preferencias POST] userId=%d entries=%j', userId, entries)
 
     if (!entries.length) return res.json({ ok: true })
 
     await Promise.all(
       entries.map(([chave, valor]) =>
-        pool.query(
+        sequelize.query(
           `INSERT INTO "tblPreferencias" (id_usuario, chave, valor)
-           VALUES ($1, $2, $3)
+           VALUES (:userId, :chave, :valor)
            ON CONFLICT (id_usuario, chave)
            DO UPDATE SET valor = EXCLUDED.valor, atualizado = now()`,
-          [userId, chave, String(valor)],
+          { replacements: { userId, chave, valor: String(valor) } },
         )
       )
     )
 
-    console.log('[preferencias POST] upsert ok userId=%d', userId)
     res.json({ ok: true })
   } catch (err) {
-    console.error('[preferencias POST] ERROR:', err.message)
     next(err)
   }
 })

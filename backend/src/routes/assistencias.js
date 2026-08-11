@@ -1,11 +1,12 @@
 const router = require('express').Router()
-const c = require('../controllers/assistenciasController')
+const c  = require('../controllers/assistenciasController')
+const rp = require('../middlewares/requirePermission')
 
-router.get('/',            c.getAssistencias)    // listar_assistencias
-router.get('/projeto',     c.getAssistencia)     // buscar_assistencia
-router.post('/',           c.setAssistencia)     // atualizar_assistencia
-router.get('/capa',        c.getCapaAssistencia) // buscar_capa_assistencia
-router.post('/solicitacao', c.setNewOrder)          // inserir_solicitacao
-router.post('/completa',   c.setNewOrderCompleta)  // inserir_solicitacao_completa
+router.get('/',             c.getAssistencias)
+router.get('/projeto',      c.getAssistencia)
+router.get('/capa',         c.getCapaAssistencia)
+router.post('/',            rp.any('producao_assistencia', 'logistica_assistencia'), c.setAssistencia)
+router.post('/solicitacao', rp('nova_solicitacao'), c.setNewOrder)
+router.post('/completa',    rp('nova_solicitacao'), c.setNewOrderCompleta)
 
 module.exports = router

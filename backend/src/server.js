@@ -10,27 +10,49 @@
 
 process.env.TZ = 'America/Sao_Paulo'
 
-const path = require('path')
+const path      = require('path')
 require('dotenv').config({ path: path.join(__dirname, 'client/.env') })
 
 const express      = require('express')
 const cors         = require('cors')
+const helmet       = require('helmet')
+const rateLimit    = require('express-rate-limit')
 const routes       = require('./routes')
 const errorHandler = require('./middlewares/errorHandler')
 
 const app    = express()
 const PORT   = process.env.PORT || 3001
-// Frontend compilado pelo Vite fica em backend/public (configurado em vite.config.ts)
 const PUBLIC = path.join(__dirname, '../public')
 
-app.use(cors())
+// Headers de segurança HTTP
+app.use(helmet())
+
+// CORS: permite apenas origens conhecidas.
+// Em produção defina ALLOWED_ORIGINS=https://app.suaempresa.com no .env.
+const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:5173').split(',').map(o => o.trim())
+app.use(cors({
+  origin: (origin, cb) => {
+    // Requisições sem Origin (mesma origem, ferramentas internas) são permitidas
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true)
+    cb(new Error('Bloqueado por CORS'))
+  },
+  credentials: true,
+}))
+
 app.use(express.json())
-// Serve os arquivos estáticos do frontend (index.html, JS, CSS, imagens)
 app.use(express.static(PUBLIC))
 
-// Todas as rotas da API passam pelo router principal (que aplica JWT middleware)
+// Rate limit no endpoint de login: máx. 20 tentativas por 15 min por IP
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Muitas tentativas de login. Tente novamente em 15 minutos.' },
+})
+
+app.use('/api/auth/login', loginLimiter)
 app.use('/api', routes)
-// Middleware centralizado de tratamento de erros (deve vir depois das rotas)
 app.use(errorHandler)
 
 // SPA fallback — todas as rotas não-API devolvem o index.html
