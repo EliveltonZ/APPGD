@@ -162,11 +162,11 @@ createRoot(document.getElementById("root")!).render(
               );
             })}
 
-            {/* Impressão — sem layout, mas requer autenticação */}
-            <Route path="/impressao/capa" element={<ProtectedRoute><CapaImpressaoPage /></ProtectedRoute>} />
-            <Route path="/impressao/capa-pendencias" element={<ProtectedRoute><CapaPendenciasPage /></ProtectedRoute>} />
-            <Route path="/impressao/capa-verificacao" element={<ProtectedRoute><CapaVerificacaoPage /></ProtectedRoute>} />
-            <Route path="/impressao/capa-assistencia" element={<ProtectedRoute><CapaAssistenciaPage /></ProtectedRoute>} />
+            {/* Impressão — sem layout, acesso livre (protegidas pela API autenticada) */}
+            <Route path="/impressao/capa" element={<CapaImpressaoPage />} />
+            <Route path="/impressao/capa-pendencias" element={<CapaPendenciasPage />} />
+            <Route path="/impressao/capa-verificacao" element={<CapaVerificacaoPage />} />
+            <Route path="/impressao/capa-assistencia" element={<CapaAssistenciaPage />} />
 
             {/* Sandbox — apenas em desenvolvimento */}
             {import.meta.env.DEV && <Route path="/sandbox" element={<SandboxPage />} />}
