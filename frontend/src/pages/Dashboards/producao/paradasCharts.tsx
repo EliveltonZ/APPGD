@@ -3,7 +3,7 @@ import { useParadas } from "./paradasContext";
 
 export function ParadasCharts() {
   const {
-    totalParadas, tempoTotalHoras, totalAbertas, topMaquina, topTipo,
+    totalParadas, tempoTotalHoras, topMaquina, topTipo,
     porTipo, porMaquina, porMesFormatted,
     stackedData, stackedSeries,
     maquinaFilter, handleMaquinaClick,
@@ -53,7 +53,6 @@ export function ParadasCharts() {
               xKey="name"
               variant="bar"
               height={260}
-              showLabels
               selectedValue={maquinaFilter ?? undefined}
               onBarClick={handleMaquinaClick}
               series={[{
