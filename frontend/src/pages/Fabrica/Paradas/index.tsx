@@ -20,22 +20,12 @@ import {
   type HistoricoRow,
   type EditarParadaPayload,
 } from "../../../services/paradas";
+import { toDatetimeLocal, fmtDateTime } from "../../../utils/dateUtils";
 import "./Paradas.css";
 
 function fmtDt(iso: string | null | undefined) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
-}
-
-function toInputDt(iso: string | null | undefined) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return fmtDateTime(iso) || "—";
 }
 
 function duracao(inicio: string | null, fim: string | null) {
@@ -617,7 +607,7 @@ export function ParadasPage() {
                 <label>Data/Hora Início</label>
                 <input
                   type="datetime-local"
-                  value={toInputDt(editForm.data_inicio)}
+                  value={toDatetimeLocal(editForm.data_inicio)}
                   onChange={(e) =>
                     setEditForm((f) => ({
                       ...f,
@@ -632,7 +622,7 @@ export function ParadasPage() {
                 <label>Data/Hora Fim</label>
                 <input
                   type="datetime-local"
-                  value={toInputDt(editForm.data_fim)}
+                  value={toDatetimeLocal(editForm.data_fim)}
                   onChange={(e) =>
                     setEditForm((f) => ({
                       ...f,
