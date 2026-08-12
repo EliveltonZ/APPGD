@@ -32,7 +32,10 @@ function fmtDt(iso: string | null | undefined) {
 
 function toInputDt(iso: string | null | undefined) {
   if (!iso) return "";
-  return new Date(iso).toISOString().slice(0, 16);
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 function duracao(inicio: string | null, fim: string | null) {

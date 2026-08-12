@@ -150,8 +150,8 @@ async function editarParada(id, changes, id_usuario) {
   const campos = ['pedido', 'data_inicio', 'data_fim', 'id_maquina'];
   const historico = [];
 
-  if (changes.data_inicio) changes.data_inicio = fmtDate(new Date(changes.data_inicio));
-  if (changes.data_fim)    changes.data_fim    = fmtDate(new Date(changes.data_fim));
+  if (changes.data_inicio) changes.data_inicio = new Date(changes.data_inicio);
+  if (changes.data_fim)    changes.data_fim    = new Date(changes.data_fim);
 
   for (const campo of campos) {
     if (!(campo in changes)) continue;
