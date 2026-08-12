@@ -23,6 +23,17 @@ import {
 import { toDatetimeLocal, fmtDateTime } from "../../../utils/dateUtils";
 import "./Paradas.css";
 
+function mesAtualRange() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const inicio = `${y}-${pad(m + 1)}-01`;
+  const fim    = `${y}-${pad(m + 1)}-${pad(new Date(y, m + 1, 0).getDate())}`;
+  return { inicio, fim };
+}
+const { inicio: MES_INICIO, fim: MES_FIM } = mesAtualRange();
+
 function fmtDt(iso: string | null | undefined) {
   if (!iso) return "—";
   return fmtDateTime(iso) || "—";
@@ -72,8 +83,8 @@ export function ParadasPage() {
 
   // ── Filtros da tabela ────────────────────────────────────────────────────
   const [filtroMaquina, setFiltroMaquina] = useState("");
-  const [filtroDe, setFiltroDe] = useState("");
-  const [filtroAte, setFiltroAte] = useState("");
+  const [filtroDe, setFiltroDe] = useState(MES_INICIO);
+  const [filtroAte, setFiltroAte] = useState(MES_FIM);
 
   // ── Modal edição (admin) ─────────────────────────────────────────────────
   const [editando, setEditando] = useState<ParadaRow | null>(null);
