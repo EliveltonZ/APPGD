@@ -80,7 +80,7 @@ export const ROUTE_ITEMS = [
   { permissionKey: 'compras_lista',            path: '/compras/lista',           groupId: 'compras',       menuLabel: 'Compras',           isGroupRoot: true },
   { permissionKey: 'compras_pendencias',       path: '/compras/pendencias',      groupId: 'compras',       menuLabel: 'Pendências'         },
   // ── PCP ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  { permissionKey: 'pcp_painel',               path: '/fabrica/pcp',             groupId: 'fabrica',       menuLabel: 'Painel PCP',        isGroupRoot: true },
+  { permissionKey: 'pcp_painel',               path: '/fabrica/pcp',             groupId: 'fabrica',       menuLabel: 'Painel PCP'         },
   { permissionKey: 'pcp_producao',             path: '/fabrica/producao',        groupId: 'fabrica',       menuLabel: 'Produção'           },
   { permissionKey: 'pcp_apontamento',          path: '/fabrica/apontamento',     groupId: 'fabrica',       menuLabel: 'Apontamento'        },
   { permissionKey: 'pcp_expedicao',            path: '/fabrica/expedicao',       groupId: 'fabrica',       menuLabel: 'Expedição'          },
