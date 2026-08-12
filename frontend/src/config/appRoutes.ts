@@ -103,7 +103,7 @@ export const ROUTE_ITEMS = [
   { permissionKey: 'config_senha',             path: '/configuracoes/senha',     groupId: 'configuracoes', menuLabel: 'Senha'              },
   { permissionKey: 'config_acessos',           path: '/configuracoes/acessos',   groupId: 'configuracoes', menuLabel: 'Acessos'            },
   // ── Cadastros ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  { permissionKey: 'cadastros_equipe',           path: '/cadastros/equipe',        groupId: 'cadastros',     menuLabel: 'Equipe',            isGroupRoot: true },
+  { permissionKey: 'cadastros_equipe',           path: '/cadastros/equipe',        groupId: 'cadastros',     menuLabel: 'Equipe'             },
   { permissionKey: 'cadastros_qualidade',       path: '/cadastros/qualidade',     groupId: 'cadastros',     menuLabel: 'Qualidade'          },
   { permissionKey: 'cadastros_comercial',       path: '/cadastros/comercial',     groupId: 'cadastros',     menuLabel: 'Comercial'          },
   { permissionKey: 'cadastros_clientes',        path: '/cadastros/clientes',      groupId: 'cadastros',     menuLabel: 'Clientes'           },
