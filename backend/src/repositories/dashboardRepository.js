@@ -203,7 +203,8 @@ async function getParadasDash(start, end) {
               ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
          FROM "tblParadas" p
          JOIN "tblTipoRequisicao" t ON t.id = p.id_tipo
-        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
+        WHERE p.data_inicio::date >= :start::date
+          AND p.data_inicio::date <= :end::date
         GROUP BY t.descricao
         ORDER BY value DESC`,
       { replacements: rep, type: QueryTypes.SELECT },
@@ -214,7 +215,8 @@ async function getParadasDash(start, end) {
               ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
          FROM "tblParadas" p
          JOIN "tblMaquinas" m ON m.id = p.id_maquina
-        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
+        WHERE p.data_inicio::date >= :start::date
+          AND p.data_inicio::date <= :end::date
         GROUP BY m.nome
         ORDER BY value DESC`,
       { replacements: rep, type: QueryTypes.SELECT },
@@ -224,9 +226,10 @@ async function getParadasDash(start, end) {
               COUNT(*)::int AS total,
               ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(data_fim, NOW()) - data_inicio))/3600)::numeric, 1) AS horas
          FROM "tblParadas"
-        WHERE data_inicio >= :start AND data_inicio <= :end
-        GROUP BY mes
-        ORDER BY mes`,
+        WHERE data_inicio::date >= :start::date
+          AND data_inicio::date <= :end::date
+        GROUP BY TO_CHAR(data_inicio, 'YYYY-MM')
+        ORDER BY 1`,
       { replacements: rep, type: QueryTypes.SELECT },
     ),
     sequelize.query(
@@ -235,9 +238,10 @@ async function getParadasDash(start, end) {
               ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
          FROM "tblParadas" p
          JOIN "tblMaquinas" m ON m.id = p.id_maquina
-        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
-        GROUP BY mes, m.nome
-        ORDER BY mes`,
+        WHERE p.data_inicio::date >= :start::date
+          AND p.data_inicio::date <= :end::date
+        GROUP BY TO_CHAR(p.data_inicio, 'YYYY-MM'), m.nome
+        ORDER BY 1`,
       { replacements: rep, type: QueryTypes.SELECT },
     ),
     sequelize.query(
