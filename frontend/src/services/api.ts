@@ -47,9 +47,14 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 // GET com query string. Ex.: apiGet('/assistencias', { p_solicitacao: '123' })
 export function apiGet<T>(
   path: string,
-  params?: Record<string, string | number | boolean>,
+  params?: Record<string, string | number | boolean | undefined | null>,
 ): Promise<T> {
-  const qs = params ? `?${new URLSearchParams(params as Record<string, string>)}` : ''
+  const clean = params
+    ? Object.fromEntries(
+        Object.entries(params).filter(([, v]) => v !== undefined && v !== null),
+      ) as Record<string, string>
+    : null
+  const qs = clean && Object.keys(clean).length ? `?${new URLSearchParams(clean)}` : ''
   return request<T>(`${path}${qs}`)
 }
 
