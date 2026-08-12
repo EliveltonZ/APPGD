@@ -1,5 +1,13 @@
 import { ChartBar, ChartArea, ChartDonut } from "../../../components/Charts";
 import { useProducao } from "./context";
+import { ParadasCharts } from "./paradasCharts";
+
+export type ProducaoSubTab = "geral" | "nova";
+
+const SUBTABS: { id: ProducaoSubTab; label: string }[] = [
+  { id: "geral", label: "Visão Geral" },
+  { id: "nova",  label: "Análise Detalhada" },
+];
 
 const STATUS_COLORS: Record<string, string> = {
   AGUARDANDO: "var(--aguardando)",
@@ -12,7 +20,13 @@ const STATUS_COLORS: Record<string, string> = {
   PRONTO:     "var(--pronto)",
 };
 
-export function ProducaoCharts() {
+interface Props {
+  subtab: ProducaoSubTab;
+  onSubtabChange: (v: ProducaoSubTab) => void;
+}
+
+export function ProducaoCharts({ subtab, onSubtabChange }: Props) {
+
   const {
     totalEmProd, urgentesEmProd,
     avgLeadTime, pctNoPrazo,
@@ -24,6 +38,23 @@ export function ProducaoCharts() {
 
   return (
     <>
+      {/* Sub-tabs */}
+      <div className="proj-dash__subtabs">
+        {SUBTABS.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            className={`proj-dash__subtab${subtab === id ? " proj-dash__subtab--active" : ""}`}
+            onClick={() => onSubtabChange(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {subtab === "nova" && <ParadasCharts />}
+
+      {subtab === "geral" && <>
       {/* KPIs */}
       <div className="proj-dash__kpis">
         <div className="proj-kpi">
@@ -192,6 +223,7 @@ export function ProducaoCharts() {
           </div>
         </div>
       </div>
+      </>}
     </>
   );
 }

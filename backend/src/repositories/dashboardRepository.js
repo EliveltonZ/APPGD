@@ -191,4 +191,70 @@ async function getProducaoDashDetalhada(start, end) {
   };
 }
 
-module.exports = { getProjetosDash, getProducaoDash, getProducaoDashDetalhada };
+async function getParadasDash(start, end) {
+  const s = start || '2020-01-01';
+  const e = end   || new Date().toISOString().slice(0, 10);
+  const rep = { start: s, end: e };
+
+  const [porTipo, porMaquina, porMes, porMaquinaMes, [abertas]] = await Promise.all([
+    sequelize.query(
+      `SELECT t.descricao AS name,
+              COUNT(*)::int AS value,
+              ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
+         FROM "tblParadas" p
+         JOIN "tblTipoRequisicao" t ON t.id = p.id_tipo
+        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
+        GROUP BY t.descricao
+        ORDER BY value DESC`,
+      { replacements: rep, type: QueryTypes.SELECT },
+    ),
+    sequelize.query(
+      `SELECT m.nome AS name,
+              COUNT(*)::int AS value,
+              ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
+         FROM "tblParadas" p
+         JOIN "tblMaquinas" m ON m.id = p.id_maquina
+        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
+        GROUP BY m.nome
+        ORDER BY value DESC`,
+      { replacements: rep, type: QueryTypes.SELECT },
+    ),
+    sequelize.query(
+      `SELECT TO_CHAR(data_inicio, 'YYYY-MM') AS mes,
+              COUNT(*)::int AS total,
+              ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(data_fim, NOW()) - data_inicio))/3600)::numeric, 1) AS horas
+         FROM "tblParadas"
+        WHERE data_inicio >= :start AND data_inicio <= :end
+        GROUP BY mes
+        ORDER BY mes`,
+      { replacements: rep, type: QueryTypes.SELECT },
+    ),
+    sequelize.query(
+      `SELECT TO_CHAR(p.data_inicio, 'YYYY-MM') AS mes,
+              m.nome AS maquina,
+              ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(p.data_fim, NOW()) - p.data_inicio))/3600)::numeric, 1) AS horas
+         FROM "tblParadas" p
+         JOIN "tblMaquinas" m ON m.id = p.id_maquina
+        WHERE p.data_inicio >= :start AND p.data_inicio <= :end
+        GROUP BY mes, m.nome
+        ORDER BY mes`,
+      { replacements: rep, type: QueryTypes.SELECT },
+    ),
+    sequelize.query(
+      `SELECT COUNT(*)::int AS total FROM "tblParadas" WHERE data_fim IS NULL`,
+      { type: QueryTypes.SELECT },
+    ),
+  ]);
+
+  return {
+    totalParadas:    porTipo.reduce((s, r) => s + Number(r.value), 0),
+    tempoTotalHoras: Math.round(porMaquina.reduce((s, r) => s + Number(r.horas), 0) * 10) / 10,
+    totalAbertas:    Number(abertas?.total ?? 0),
+    porTipo:       porTipo.map(r => ({ name: r.name, value: Number(r.value), horas: Number(r.horas) })),
+    porMaquina:    porMaquina.map(r => ({ name: r.name, value: Number(r.value), horas: Number(r.horas) })),
+    porMes:        porMes.map(r => ({ mes: r.mes, total: Number(r.total), horas: Number(r.horas) })),
+    porMaquinaMes: porMaquinaMes.map(r => ({ mes: r.mes, maquina: r.maquina, horas: Number(r.horas) })),
+  };
+}
+
+module.exports = { getProjetosDash, getProducaoDash, getProducaoDashDetalhada, getParadasDash };

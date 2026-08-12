@@ -49,3 +49,17 @@ export interface ProducaoDetalhada {
 export async function fetchDashProducaoDetalhada(start: string, end: string): Promise<ProducaoDetalhada> {
   return apiGet<ProducaoDetalhada>('/dashboard/producao-detalhada', { start, end });
 }
+
+export interface ParadasDashboard {
+  totalParadas:    number;
+  tempoTotalHoras: number;
+  totalAbertas:    number;
+  porTipo:         { name: string; value: number; horas: number }[];
+  porMaquina:      { name: string; value: number; horas: number }[];
+  porMes:          { mes: string; total: number; horas: number }[];
+  porMaquinaMes:   { mes: string; maquina: string; horas: number }[];
+}
+
+export async function fetchDashParadas(start: string, end: string): Promise<ParadasDashboard> {
+  return apiGet<ParadasDashboard>('/dashboard/paradas', { start, end });
+}

@@ -239,6 +239,47 @@
   padding: 16px;
 }
 
+/* Sub-tabs horizontais (dentro da área de conteúdo) */
+
+.proj-dash__subtabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin: -16px -16px 0;
+  padding: 0 16px;
+  background: var(--bg);
+  flex-shrink: 0;
+  position: sticky;
+  top: -16px;
+  z-index: 2;
+}
+
+.proj-dash__subtab {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.proj-dash__subtab:hover {
+  color: var(--text-h);
+}
+
+.proj-dash__subtab--active {
+  color: var(--accent2);
+  border-bottom-color: var(--accent2);
+  font-weight: 600;
+}
+
 /* KPI cards */
 
 .proj-dash__kpis {

@@ -18,5 +18,6 @@ const dash = rp('dashboard');
 router.get('/projetos',           dash, handler(() => repo.getProjetosDash()));
 router.get('/producao',           dash, handler(() => repo.getProducaoDash()));
 router.get('/producao-detalhada', dash, handler((req) => repo.getProducaoDashDetalhada(req.query.start, req.query.end)));
+router.get('/paradas',            dash, handler((req) => repo.getParadasDash(req.query.start, req.query.end)));
 
 module.exports = router;

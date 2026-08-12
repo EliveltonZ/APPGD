@@ -6,7 +6,9 @@ import { ProjetosFilters }  from "./projetos/filters";
 import { ProjetosCharts }   from "./projetos/charts";
 import { ProducaoProvider } from "./producao/context";
 import { ProducaoFilters }  from "./producao/filters";
-import { ProducaoCharts }   from "./producao/charts";
+import { ProducaoCharts, type ProducaoSubTab } from "./producao/charts";
+import { ParadasProvider }  from "./producao/paradasContext";
+import { ParadasFilters }   from "./producao/paradasFilters";
 import { FinanceiroFilters, FinanceiroCharts } from "./financeiro";
 import "./index.css";
 
@@ -20,11 +22,13 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 
 export function DashboardsPrincipalPage() {
   const [tab, setTab] = useState<Tab>("projetos");
+  const [producaoSubtab, setProducaoSubtab] = useState<ProducaoSubTab>("geral");
   const navigate = useNavigate();
 
   return (
     <ProjetosProvider>
       <ProducaoProvider>
+        <ParadasProvider>
         <div className="proj-dash">
           {/* ── Left panel ── */}
           <div className="proj-dash__panel">
@@ -48,7 +52,8 @@ export function DashboardsPrincipalPage() {
             </div>
 
             {tab === "projetos"   && <ProjetosFilters />}
-            {tab === "producao"   && <ProducaoFilters />}
+            {tab === "producao"   && producaoSubtab === "geral" && <ProducaoFilters />}
+            {tab === "producao"   && producaoSubtab === "nova"  && <ParadasFilters />}
             {tab === "financeiro" && <FinanceiroFilters />}
 
             <button
@@ -64,10 +69,11 @@ export function DashboardsPrincipalPage() {
           {/* ── Main content ── */}
           <div className="proj-dash__main">
             {tab === "projetos"   && <ProjetosCharts />}
-            {tab === "producao"   && <ProducaoCharts />}
+            {tab === "producao"   && <ProducaoCharts subtab={producaoSubtab} onSubtabChange={setProducaoSubtab} />}
             {tab === "financeiro" && <FinanceiroCharts />}
           </div>
         </div>
+        </ParadasProvider>
       </ProducaoProvider>
     </ProjetosProvider>
   );
