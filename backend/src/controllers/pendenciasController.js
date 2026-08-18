@@ -3,7 +3,7 @@ const service = require("../services/pendenciasService");
 module.exports = {
   async getContratoPendencias(req, res) {
     try {
-      const data = await service.buscarContratoPendencia(req.query.p_contrato);
+      const data = await service.buscarContratoPendencia(req.query.contrato);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao buscar contrato", error: err.message });
@@ -12,7 +12,7 @@ module.exports = {
 
   async fillTableAPendencia(req, res) {
     try {
-      const data = await service.getAcessoriosPendencias(req.query.p_ordemdecompra);
+      const data = await service.getAcessoriosPendencias(req.query.ordemdecompra);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao listar acessórios pendências", error: err.message });
@@ -21,7 +21,7 @@ module.exports = {
 
   async listAcessoriosPendencias(req, res) {
     try {
-      const data = await service.listarAcessoriosPendencias(req.query.p_ordemdecompra);
+      const data = await service.listarAcessoriosPendencias(req.query.ordemdecompra);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao listar acessórios", error: err.message });
@@ -39,7 +39,7 @@ module.exports = {
 
   async delAcessorios(req, res) {
     try {
-      await service.deletarAcessorio(req.body.p_id);
+      await service.deletarAcessorio(req.body.id);
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ message: "Erro ao deletar acessório", error: err.message });

@@ -1,8 +1,8 @@
 const { Pecas, Ocorrencia, Falhas } = require('../client/db');
 
-async function listarPecas(p_id_assistencia) {
+async function listarPecas(idAssistencia) {
   const rows = await Pecas.findAll({
-    where: { idAssistencia: String(p_id_assistencia) },
+    where: { idAssistencia: String(idAssistencia) },
     attributes: ['codigo', 'qtd', 'peca', 'dimensoes', 'cor', 'lado', 'idOcorrencia', 'idFalha', 'observacoes'],
     include: [
       { model: Ocorrencia, as: 'ocorrencia', attributes: ['descricao'], required: true },
@@ -24,13 +24,13 @@ async function listarPecas(p_id_assistencia) {
   }));
 }
 
-async function inserirPecas(p_id_assistencia, p_pecas) {
+async function inserirPecas(idAssistencia, pecas) {
   await Pecas.bulkCreate(
-    p_pecas.map(r => ({
+    pecas.map(r => ({
       qtd:           Number(r.qtd) || 0,
       cor:           r.cor                        ?? null,
       peca:          r.peca                       ?? null,
-      idAssistencia: String(p_id_assistencia),
+      idAssistencia: String(idAssistencia),
       dimensoes:     r.dimensoes                  ?? null,
       lado:          r.lado                       ?? null,
       idOcorrencia:  r.id_ocorrencia ? Number(r.id_ocorrencia) : null,

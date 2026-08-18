@@ -35,20 +35,20 @@ export function fetchPurchaseFilterDate(): Promise<string> {
 
 export async function savePurchase(p: Purchase): Promise<void> {
   await apiPost('/compras', {
-    p_id:           p.id,
-    p_descricao:    p.descricao,
-    p_medida:       p.medida,
-    p_parcelamento: p.parcelas   || null,
-    p_numcard:      p.cartao     || null,
-    p_qtd:          p.qtd,
-    p_fornecedor:   p.fornecedor || null,
-    p_datacompra:   p.compra     || null,
-    p_previsao:     p.previsao   || null,
-    p_recebido:     p.recebido   || null,
+    id:           p.id,
+    descricao:    p.descricao,
+    medida:       p.medida,
+    parcelamento: p.parcelas   || null,
+    numcard:      p.cartao     || null,
+    qtd:          p.qtd,
+    fornecedor:   p.fornecedor || null,
+    datacompra:   p.compra     || null,
+    previsao:     p.previsao   || null,
+    recebido:     p.recebido   || null,
   })
 }
 
 export async function fetchPurchases(dataentrega = '1970-01-01'): Promise<Purchase[]> {
-  const rows = await apiGet<RawRow[]>('/compras', { p_dataentrega: dataentrega })
+  const rows = await apiGet<RawRow[]>('/compras', { dataentrega })
   return rows.map(toPurchase)
 }

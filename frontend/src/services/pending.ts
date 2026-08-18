@@ -15,7 +15,7 @@ export async function fetchPendingItems(
   ordemdecompra: number,
 ): Promise<PendingItem[]> {
   const rows = await apiGet<RawRow[]>('/pendencias/acessorios', {
-    p_ordemdecompra: ordemdecompra,
+    ordemdecompra,
   })
   return rows.map((r) => ({
     id:          Number(r.id),
@@ -34,7 +34,7 @@ export async function fetchPendingItems(
 export async function fetchPendingByContract(
   contrato: string,
 ): Promise<PendingProject[]> {
-  const rows = await apiGet<RawRow[]>('/pendencias/contrato', { p_contrato: contrato })
+  const rows = await apiGet<RawRow[]>('/pendencias/contrato', { contrato })
   return rows.map((r) => ({
     id:        Number(r.ordemdecompra),
     numOC:     String(r.ordemdecompra ?? ''),
@@ -51,22 +51,22 @@ export async function fetchPendingByContract(
 
 export async function updatePendingItem(item: PendingItem): Promise<void> {
   await apiPut('/pendencias/acessorios', {
-    p_id:           item.id,
-    p_id_categoria: item.categoriaId || null,
-    p_descricao:    item.descricao,
-    p_medida:       item.medida      || null,
-    p_parcelamento: null,
-    p_numcard:      null,
-    p_qtd:          item.qtd,
-    p_fornecedor:   item.fornecedor  || null,
-    p_datacompra:   item.compra      || null,
-    p_previsao:     item.previsao    || null,
-    p_recebido:     item.recebido    || null,
+    id:           item.id,
+    id_categoria: item.categoriaId || null,
+    descricao:    item.descricao,
+    medida:       item.medida      || null,
+    parcelamento: null,
+    numcard:      null,
+    qtd:          item.qtd,
+    fornecedor:   item.fornecedor  || null,
+    datacompra:   item.compra      || null,
+    previsao:     item.previsao    || null,
+    recebido:     item.recebido    || null,
   })
 }
 
 export async function deletePendingItem(id: number): Promise<void> {
-  await apiPost('/pendencias/del-acessorio', { p_id: id })
+  await apiPost('/pendencias/del-acessorio', { id })
 }
 
 export async function insertPendingItem(
@@ -74,14 +74,14 @@ export async function insertPendingItem(
   item: PendingItem,
 ): Promise<void> {
   await apiPost('/pendencias/acessorios', {
-    p_ordemdecompra: ordemdecompra,
-    p_id_categoria:  item.categoriaId,
-    p_descricao:     item.descricao,
-    p_medida:        item.medida   || null,
-    p_quantidade:    item.qtd,
-    p_fornecedor:    item.fornecedor || null,
-    p_compra:        item.compra   || null,
-    p_previsao:      item.previsao || null,
-    p_recebido:      item.recebido || null,
+    ordemdecompra,
+    id_categoria:  item.categoriaId,
+    descricao:     item.descricao,
+    medida:        item.medida   || null,
+    quantidade:    item.qtd,
+    fornecedor:    item.fornecedor || null,
+    compra:        item.compra   || null,
+    previsao:      item.previsao || null,
+    recebido:      item.recebido || null,
   })
 }

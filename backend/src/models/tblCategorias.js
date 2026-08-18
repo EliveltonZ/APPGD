@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const T = require('../config/tables');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('tblCategorias', {
     id: {
@@ -14,7 +15,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'tblCategorias',
+    tableName: T.categorias.name,
     schema: 'public',
     timestamps: false,
     indexes: [

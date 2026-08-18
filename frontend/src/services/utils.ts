@@ -18,13 +18,13 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 export async function fetchConfigDate(id: number): Promise<string> {
-  const rows = await apiGet<RawRow[]>('/utils/table-data', { p_id: id })
+  const rows = await apiGet<RawRow[]>('/utils/table-data', { id })
   const raw = Array.isArray(rows) ? rows[0] : null
   return toDateInput(raw?.data)
 }
 
 export async function saveConfigDate(id: number, date: string): Promise<void> {
-  await apiPost('/utils/data', { p_id: id, p_date: date })
+  await apiPost('/utils/data', { id, date })
 }
 
 export async function fetchLiberadores(): Promise<SelectOption[]> {
@@ -80,5 +80,13 @@ export async function fetchTiposAmbiente(): Promise<SelectOption[]> {
   return rows.map((r) => ({
     value: r.id as number,
     label: r.tipo_ambiente as string,
+  }))
+}
+
+export async function fetchTiposAssistencia(): Promise<SelectOption[]> {
+  const rows = await apiGet<RawRow[]>('/utils/tipos-assistencia')
+  return rows.map((r) => ({
+    value: r.id as number,
+    label: r.name as string,
   }))
 }

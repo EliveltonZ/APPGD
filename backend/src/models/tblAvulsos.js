@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const T = require('../config/tables');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('tblAvulsos', {
     ordemdecompra: {
@@ -159,7 +160,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'tblAvulsos',
+    tableName: T.avulsos.name,
     schema: 'public',
     timestamps: false,
     indexes: [

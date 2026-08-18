@@ -5,7 +5,11 @@
   "type": "commonjs",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "migrate:status": "sequelize-cli db:migrate:status",
+    "migration:create": "sequelize-cli migration:generate --name"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

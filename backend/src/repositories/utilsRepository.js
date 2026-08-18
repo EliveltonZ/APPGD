@@ -1,8 +1,9 @@
 const { Op, QueryTypes } = require('sequelize');
+const T = require('../config/tables');
 const {
   sequelize,
   Projetos, Liberador, TipoAmbiente, Vendedor, Loja,
-  Etapa, TipoContrato, TipoCliente, Categorias,
+  Etapa, TipoContrato, TipoCliente, TipoAssistencia, Categorias,
   Datas, Usuario, CausaFalha, Causa,
   Montador, EquipSat, Acessorios,
   Falhas, Ocorrencia, Producao,
@@ -58,13 +59,13 @@ async function maxOrder() {
   return [{ max: max ?? 0 }];
 }
 
-async function getDado(p_id) {
-  const row = await Datas.findByPk(Number(p_id));
+async function getDado(id) {
+  const row = await Datas.findByPk(Number(id));
   return row ? [{ data: row.data }] : [];
 }
 
-async function setDado({ p_id, p_date }) {
-  await Datas.update({ data: p_date || null }, { where: { id: Number(p_id) } });
+async function setDado({ id, date }) {
+  await Datas.update({ data: date || null }, { where: { id: Number(id) } });
 }
 
 async function listarOperadores() {
@@ -80,11 +81,16 @@ async function listarTipoCliente() {
   return rows.map(r => ({ id: r.id, tipo_cliente: r.name }));
 }
 
+async function listarTiposAssistencia() {
+  const rows = await TipoAssistencia.findAll({ order: [['id', 'ASC']] });
+  return rows.map(r => ({ id: r.id, name: r.name }));
+}
+
 // ─── Convertidos de raw SQL ───────────────────────────────────────────────────
 
-async function listarCausaFalha(p_id_falha) {
+async function listarCausaFalha(idFalha) {
   const rows = await CausaFalha.findAll({
-    where: { idFalha: Number(p_id_falha) },
+    where: { idFalha: Number(idFalha) },
     attributes: ['idCausa'],
     include: [{ model: Causa, as: 'causa', attributes: ['descricao'] }],
     order: [[{ model: Causa, as: 'causa' }, 'descricao', 'ASC']],
@@ -92,22 +98,22 @@ async function listarCausaFalha(p_id_falha) {
   return rows.map(r => ({ id: r.idCausa, descricao: r.causa?.descricao ?? null }));
 }
 
-async function buscarUsuario(p_id) {
-  const row = await Usuario.findByPk(Number(p_id), { attributes: ['login', 'ativo'] });
+async function buscarUsuario(id) {
+  const row = await Usuario.findByPk(Number(id), { attributes: ['login', 'ativo'] });
   return row ? [{ nome: row.login, ativo: row.ativo }] : [];
 }
 
-async function getAcessorios(p_ordemdecompra) {
+async function getAcessorios(ordemdecompra) {
   return Acessorios.findAll({
-    where: { ordemdecompra: Number(p_ordemdecompra) },
+    where: { ordemdecompra: Number(ordemdecompra) },
     attributes: ['id', 'categoria', 'descricao', 'medida', 'qtd', 'datacompra', 'previsao', 'recebido'],
     order: [['id', 'ASC']],
     raw: true,
   });
 }
 
-async function buscarData(p_id) {
-  const row = await Datas.findByPk(Number(p_id), { attributes: ['data', 'email'] });
+async function buscarData(id) {
+  const row = await Datas.findByPk(Number(id), { attributes: ['data', 'email'] });
   return row ? [{ data: row.data, email: row.email }] : [];
 }
 
@@ -121,12 +127,12 @@ const ETAPA_MAP = {
   81: 'embalageminicio',   82: 'embalagemfim',
 };
 
-async function setEtapa(p_pedido, p_codigo) {
-  const campo = ETAPA_MAP[Number(p_codigo)];
+async function setEtapa(pedido, codigo) {
+  const campo = ETAPA_MAP[Number(codigo)];
   if (!campo) return null;
 
   const projeto = await Projetos.findOne({
-    where: { pedido: Number(p_pedido) },
+    where: { pedido: Number(pedido) },
     attributes: ['ordemdecompra'],
   });
   if (!projeto) return null;
@@ -138,9 +144,9 @@ async function setEtapa(p_pedido, p_codigo) {
   return `Campo "${campo}" atualizado para ordemdecompra "${projeto.ordemdecompra}".`;
 }
 
-async function getProjetoCodigoBarras(p_pedido) {
+async function getProjetoCodigoBarras(pedido) {
   return Projetos.findAll({
-    where: { pedido: Number(p_pedido) },
+    where: { pedido: Number(pedido) },
     attributes: ['contrato', 'cliente', 'ambiente'],
     raw: true,
   });
@@ -153,21 +159,21 @@ async function getMontadores() {
 
 // Mantido em raw SQL: a tabela tblMontador tem colunas `codigo` e `senha`
 // que não estão definidas no modelo Sequelize
-async function validateLogin(p_codigo, p_senha) {
+async function validateLogin(codigo, senha) {
   return sequelize.query(
-    `SELECT codigo, nome FROM "tblMontador" WHERE codigo = :codigo AND senha = :senha`,
-    { replacements: { codigo: p_codigo, senha: p_senha }, type: QueryTypes.SELECT }
+    `SELECT codigo, nome FROM "${T.montador.name}" WHERE codigo = :codigo AND senha = :senha`,
+    { replacements: { codigo, senha }, type: QueryTypes.SELECT }
   );
 }
 
 // Mantido em raw SQL: tblPecas não tem as colunas `id_montador`, `cliente`, `ambiente`
 // no modelo Sequelize
-async function getSolicitacoes(p_id_montador) {
+async function getSolicitacoes(idMontador) {
   return sequelize.query(
     `SELECT codigo, qtd, cor, peca, dimensoes, cliente, ambiente
-     FROM "tblPecas"
+     FROM "${T.pecas.name}"
      WHERE id_montador = :id_montador AND id_assistencia IS NULL`,
-    { replacements: { id_montador: Number(p_id_montador) }, type: QueryTypes.SELECT }
+    { replacements: { id_montador: Number(idMontador) }, type: QueryTypes.SELECT }
   );
 }
 
@@ -175,8 +181,8 @@ async function getSolicitacoes(p_id_montador) {
 async function totalPecas() {
   return sequelize.query(
     `SELECT codigo, qtd, cor, peca, dimensoes, lado, cliente, ambiente,
-            (SELECT descricao FROM "tblOcorrencia" WHERE cod = id_ocorrencia) AS tipo
-     FROM "tblPecas"
+            (SELECT descricao FROM "${T.ocorrencia.name}" WHERE cod = id_ocorrencia) AS tipo
+     FROM "${T.pecas.name}"
      WHERE id_assistencia IS NULL`,
     { type: QueryTypes.SELECT }
   );
@@ -197,19 +203,19 @@ async function getFalhas() {
   return rows.map(r => ({ codigo: r.codigo, descricao: r.descricao }));
 }
 
-async function setTipo(p_ordemdecompra, p_tipo, p_urgente) {
+async function setTipo(ordemdecompra, tipo, urgente) {
   await Projetos.update(
     {
-      tipo:    p_tipo    ?? null,
-      urgente: p_urgente === true || p_urgente === 'true',
+      tipo:    tipo    ?? null,
+      urgente: urgente === true || urgente === 'true',
     },
-    { where: { ordemdecompra: Number(p_ordemdecompra) } }
+    { where: { ordemdecompra: Number(ordemdecompra) } }
   );
 }
 
-async function listarEquipSat(p_id_sat) {
+async function listarEquipSat(idSat) {
   const rows = await EquipSat.findAll({
-    where: { idSat: String(p_id_sat) },
+    where: { idSat: String(idSat) },
     attributes: ['idMontador'],
     include: [{ model: Montador, as: 'montador', attributes: ['name'] }],
   });
@@ -224,6 +230,7 @@ module.exports = {
   listarEtapas,
   listarTipoContrato,
   listarTipoCliente,
+  listarTiposAssistencia,
   listarCategorias,
   maxOrder,
   getDado,

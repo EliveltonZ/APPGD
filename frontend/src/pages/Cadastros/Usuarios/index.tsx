@@ -115,14 +115,14 @@ export function CadastrosUsuariosPage() {
     setCreating(true)
     try {
       await insertUser({
-        p_id:       Number(createForm.id),
-        p_login:    createForm.login.trim(),
-        p_senha:    createForm.senha,
-        p_setor:    createForm.setor.trim(),
-        p_local:    createForm.local.trim(),
-        p_camiseta: createForm.camiseta.trim(),
-        p_calca:    createForm.calca.trim(),
-        p_sapato:   createForm.sapato.trim(),
+        id:       Number(createForm.id),
+        login:    createForm.login.trim(),
+        senha:    createForm.senha,
+        setor:    createForm.setor.trim(),
+        local:    createForm.local.trim(),
+        camiseta: createForm.camiseta.trim(),
+        calca:    createForm.calca.trim(),
+        sapato:   createForm.sapato.trim(),
       })
       toast.success(`Usuário "${createForm.login}" cadastrado.`)
       setCreateOpen(false)

@@ -4,3 +4,4 @@ export { CommercialSection } from './CommercialSection';
 export { EnvironmentSection } from './EnvironmentSection';
 export { ScheduleSection } from './ScheduleSection';
 export { FinancialSection } from './FinancialSection';
+export { AssistenciaSection } from './AssistenciaSection';

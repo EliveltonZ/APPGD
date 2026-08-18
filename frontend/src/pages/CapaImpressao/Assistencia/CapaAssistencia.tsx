@@ -20,7 +20,7 @@ import { RetiradaBlock } from "./RetiradaBlock";
 async function fetchAssistData(id: string): Promise<AssistData> {
   type R = Record<string, unknown>;
   const rows = await apiGet<R[]>("/assistencias/projeto", {
-    p_solicitacao: id,
+    solicitacao: id,
   });
   if (!rows.length) throw new Error("Assistência não encontrada");
   const r = rows[0];
@@ -46,7 +46,7 @@ async function fetchAssistData(id: string): Promise<AssistData> {
 
 async function fetchPecas(id: string): Promise<Peca[]> {
   try {
-    return await apiGet<Peca[]>("/pecas", { p_id_assistencia: id });
+    return await apiGet<Peca[]>("/pecas", { id_assistencia: id });
   } catch {
     return [];
   }

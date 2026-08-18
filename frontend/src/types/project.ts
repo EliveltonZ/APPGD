@@ -55,6 +55,20 @@ export interface ProjectFormData {
   valorNegociado: string;
   custoMaterial: string;
   custoAdicional: string;
+  // 7 — Tipo de projeto
+  tipoProjeto: string;
+  ocOrigem: string;
+  motivoAssistencia: string;
+  // 8 — Dados da Assistência
+  supervisor: string;
+  tipoSolicitacaoAssist: string | number;
+  origemMontagem: boolean;
+  origemPromob: boolean;
+  origemCobrada: boolean;
+  observacoesAssist: string;
+  solicitante: string;
+  idSolicitante: number | null;
+  urgente: boolean;
 }
 
 export function emptyProjectForm(): ProjectFormData {
@@ -80,6 +94,18 @@ export function emptyProjectForm(): ProjectFormData {
     valorNegociado: "",
     custoMaterial: "",
     custoAdicional: "",
+    tipoProjeto: "PROJETO",
+    ocOrigem: "",
+    motivoAssistencia: "",
+    supervisor: "",
+    tipoSolicitacaoAssist: '',
+    origemMontagem: false,
+    origemPromob: false,
+    origemCobrada: false,
+    observacoesAssist: "",
+    solicitante: "",
+    idSolicitante: null,
+    urgente: false,
   };
 }
 
@@ -87,6 +113,6 @@ export type ProjectFormErrors = Partial<Record<keyof ProjectFormData, string>>;
 
 export interface SectionProps {
   form: ProjectFormData;
-  onChange: (field: keyof ProjectFormData, value: string) => void;
+  onChange: (field: keyof ProjectFormData, value: string | boolean | number) => void;
   errors?: ProjectFormErrors;
 }

@@ -11,13 +11,13 @@ module.exports = {
 
   async setEquipSat(req, res) {
     try {
-      await service.inserirEquipeSat(req.body.p_id_sat, req.body.p_id_montador);
+      await service.inserirEquipeSat(req.body.id_sat, req.body.id_montador);
       ok(res, { success: true });
     } catch (e) { err(res, "Erro ao inserir equipe", e); }
   },
 
   async getPecas(req, res) {
-    try { ok(res, await service.getPecas(req.query.p_id_assistencia)); }
+    try { ok(res, await service.getPecas(req.query.id_assistencia)); }
     catch (e) { err(res, "Erro ao buscar peças", e); }
   },
 
@@ -37,7 +37,7 @@ module.exports = {
   },
 
   async getContratoAssist(req, res) {
-    try { ok(res, await service.buscarContratoAssistencia(req.query.p_contrato)); }
+    try { ok(res, await service.buscarContratoAssistencia(req.query.contrato)); }
     catch (e) { err(res, "Erro ao buscar contrato assistência", e); }
   },
 };

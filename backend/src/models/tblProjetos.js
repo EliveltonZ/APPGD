@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const T = require('../config/tables');
 module.exports = function (sequelize, DataTypes) {
   return sequelize.define(
     "tblProjetos",
@@ -194,10 +195,63 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
         field: "id_etapa",
       },
+      tipoProjeto: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        defaultValue: 'PROJETO',
+        field: "tipo_projeto",
+      },
+      ocOrigem: {
+        type: DataTypes.BIGINT,
+        allowNull: true,
+        field: "oc_origem",
+      },
+      motivoAssistencia: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: "motivo_assistencia",
+      },
+      supervisor: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      tipoSolicitacao: {
+        type: DataTypes.SMALLINT,
+        allowNull: true,
+        field: "tipo_solicitacao",
+      },
+      origemMontagem: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: "origem_montagem",
+      },
+      origemPromob: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: "origem_promob",
+      },
+      origemCobrada: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: "origem_cobrada",
+      },
+      observacoes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      solicitante: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      idSolicitante: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: "id_solicitante",
+      },
     },
     {
       sequelize,
-      tableName: "tblProjetos",
+      tableName: T.projetos.name,
       schema: "public",
       timestamps: false,
       indexes: [

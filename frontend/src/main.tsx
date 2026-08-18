@@ -64,9 +64,14 @@ import { DashboardsPrincipalPage } from "./pages/Dashboards";
 import { ConfigSenhaPage } from "./pages/Configuracoes/Senha";
 import { ConfigAcessosPage } from "./pages/Configuracoes/Acessos";
 
+// ── Almoxarifado ──────────────────────────────────────────────────────────────
+import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
+
 // ── Cadastros ─────────────────────────────────────────────────────────────────
 import { CadastrosPage } from "./pages/Cadastros";
 import { CadastrosUsuariosPage } from "./pages/Cadastros/Usuarios";
+import { CadastrosMateriaisPage } from "./pages/Cadastros/Materiais";
+import { CadastrosLocalizacoesPage } from "./pages/Cadastros/Localizacoes";
 
 // ── Impressão (iframe, sem layout) ────────────────────────────────────────────
 import {
@@ -115,8 +120,11 @@ const PAGE_MAP: Record<string, ComponentType> = {
   cadastros_comercial: CadastrosPage,
   cadastros_clientes:  CadastrosPage,
   cadastros_usuarios:  CadastrosUsuariosPage,
+  cadastros_materiais:    CadastrosMateriaisPage,
+  cadastros_localizacoes: CadastrosLocalizacoesPage,
   paradas_maquina:     ParadasPage,
   paradas_admin:       ParadasPage,
+  almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
 };
 
 createRoot(document.getElementById("root")!).render(

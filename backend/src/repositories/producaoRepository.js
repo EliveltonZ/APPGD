@@ -153,18 +153,18 @@ async function listarAcessorios(ordemdecompra) {
 }
 
 async function atualizarDadosProducao(body) {
-  const values = { observacoes: body.p_observacoes ?? null };
+  const values = { observacoes: body.observacoes ?? null };
   for (const s of STAGES) {
-    values[`${s}inicio`] = body[`p_${s}inicio`] ?? null;
-    values[`${s}fim`]    = body[`p_${s}fim`]    ?? null;
-    values[`${s}resp`]   = body[`p_${s}resp`]   ?? null;
-    values[`${s}pausa`]  = body[`p_${s}pausa`]  ?? false;
+    values[`${s}inicio`] = body[`${s}inicio`] ?? null;
+    values[`${s}fim`]    = body[`${s}fim`]    ?? null;
+    values[`${s}resp`]   = body[`${s}resp`]   ?? null;
+    values[`${s}pausa`]  = body[`${s}pausa`]  ?? false;
   }
 
-  await Producao.update(values, { where: { ordemdecompra: body.p_ordemdecompra } });
+  await Producao.update(values, { where: { ordemdecompra: body.ordemdecompra } });
   await Projetos.update(
-    { previsao: body.p_previsao ?? null },
-    { where: { ordemdecompra: body.p_ordemdecompra } },
+    { previsao: body.previsao ?? null },
+    { where: { ordemdecompra: body.ordemdecompra } },
   );
 }
 

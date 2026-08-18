@@ -71,39 +71,39 @@ async function listarLotesIniciados() {
   return rows.map((p) => ({ lote: p.lote }));
 }
 
-async function reverterLote(p_lote) {
+async function reverterLote(lote) {
   await Projetos.update(
     { iniciado: null },
-    { where: { lote: Number(p_lote) } },
+    { where: { lote: Number(lote) } },
   );
 }
 
-async function atualizarIniciarLote(p_lote, p_iniciado) {
+async function atualizarIniciarLote(lote, iniciado) {
   await Projetos.update(
-    { iniciado: p_iniciado ?? null },
-    { where: { lote: Number(p_lote) } },
+    { iniciado: iniciado ?? null },
+    { where: { lote: Number(lote) } },
   );
 }
 
-async function atualizarLote(p_ordemdecompra, p_lote) {
+async function atualizarLote(ordemdecompra, lote) {
   await Projetos.update(
-    { lote: Number(p_lote) },
-    { where: { ordemdecompra: Number(p_ordemdecompra) } },
+    { lote: Number(lote) },
+    { where: { ordemdecompra: Number(ordemdecompra) } },
   );
 }
 
 async function atualizarProjetoPcp(body) {
   await Projetos.update(
     {
-      urgente: body.p_urgente ?? false,
-      codcc:   body.p_codcc   ? Number(body.p_codcc)   : 0,
-      lote:    body.p_lote    ? Number(body.p_lote)    : 0,
-      pedido:  body.p_pedido  ? Number(body.p_pedido)  : 0,
-      tipo:    body.p_tipo    ?? null,
-      pecas:   body.p_pecas   ? Number(body.p_pecas)   : 0,
-      area:    body.p_area    ? Number(body.p_area)    : 0,
+      urgente: body.urgente ?? false,
+      codcc:   body.codcc   ? Number(body.codcc)   : 0,
+      lote:    body.lote    ? Number(body.lote)    : 0,
+      pedido:  body.pedido  ? Number(body.pedido)  : 0,
+      tipo:    body.tipo    ?? null,
+      pecas:   body.pecas   ? Number(body.pecas)   : 0,
+      area:    body.area    ? Number(body.area)    : 0,
     },
-    { where: { ordemdecompra: body.p_ordemdecompra } },
+    { where: { ordemdecompra: body.ordemdecompra } },
   );
 }
 

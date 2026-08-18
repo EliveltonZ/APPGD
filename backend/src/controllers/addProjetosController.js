@@ -45,4 +45,13 @@ module.exports = {
       res.status(500).json({ message: "Erro ao criar cliente", error: err.message });
     }
   },
+
+  async getProximoOcAssistencia(req, res) {
+    try {
+      const oc = await service.gerarOcAssistencia();
+      res.json({ oc });
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao gerar OC de assistência", error: err.message });
+    }
+  },
 };

@@ -12,6 +12,7 @@ import {
   EnvironmentSection,
   ScheduleSection,
   FinancialSection,
+  AssistenciaSection,
   ClientModal,
   validate,
 } from "../../../features/pedidos/editar";
@@ -32,6 +33,8 @@ import {
   fetchTiposAmbiente,
   fetchTiposCliente,
 } from "../../../services/utils";
+import { FormSection } from "../../../components/FormSection";
+import { Input } from "../../../components/Input";
 import "../../../features/pedidos/common/projeto-page.css";
 
 
@@ -53,7 +56,7 @@ export function EditaProjetoPage() {
   const [loadingProject, setLoadingProject] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  function handleChange(field: keyof ProjectFormData, value: string) {
+  function handleChange(field: keyof ProjectFormData, value: string | boolean | number) {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
@@ -136,47 +139,87 @@ export function EditaProjetoPage() {
         </div>
 
         <div className="projeto-page__form">
-          <IdentificationSection
-            mode="editar"
-            form={form}
-            onChange={handleChange}
-            errors={errors}
-            onNumOCBlur={handleNumOCBlur}
-            loadingProject={loadingProject}
-            optionsTipoContrato={optionsTipoContrato}
-            optionsEtapa={optionsEtapa}
-          />
-          <ClientSection
-            form={form}
-            onChange={handleChange}
-            onOpenModal={() => setClientModalOpen(true)}
-            optionsTipoCliente={optionsTipoCliente}
-            errors={errors}
-          />
-          <CommercialSection
-            form={form}
-            onChange={handleChange}
-            errors={errors}
-            optionsVendedor={optionsVendedor}
-            optionsLiberador={optionsLiberador}
-            optionsLoja={optionsLoja}
-          />
-          <EnvironmentSection
-            form={form}
-            onChange={handleChange}
-            errors={errors}
-            optionsTipoAmbiente={optionsTipoAmbiente}
-          />
-          <ScheduleSection
-            form={form}
-            onChange={handleChange}
-            errors={errors}
-          />
-          <FinancialSection
-            form={form}
-            onChange={handleChange}
-            errors={errors}
-          />
+          {form.tipoProjeto === 'ASSISTENCIA' ? (
+            <>
+              <FormSection step={1} title="Identificação da Assistência">
+                <div className="frow frow--3">
+                  <Input label="Nº OC" value={form.numOC} readOnly />
+                  <Input
+                    label="Cliente *"
+                    value={form.clienteNome}
+                    onChange={(e) => handleChange("clienteNome", e.target.value)}
+                    error={errors.clienteNome}
+                    placeholder="Nome do cliente"
+                  />
+                  <Input
+                    label="Ambiente *"
+                    value={form.ambiente}
+                    onChange={(e) => handleChange("ambiente", e.target.value)}
+                    error={errors.ambiente}
+                    placeholder="Ex: Cozinha, Dormitório..."
+                  />
+                </div>
+                <div className="frow frow--3">
+                  <Input
+                    label="Data de Entrega *"
+                    type="date"
+                    value={form.dataEntrega}
+                    onChange={(e) => handleChange("dataEntrega", e.target.value)}
+                    error={errors.dataEntrega}
+                  />
+                </div>
+              </FormSection>
+              <AssistenciaSection
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+              />
+            </>
+          ) : (
+            <>
+              <IdentificationSection
+                mode="editar"
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+                onNumOCBlur={handleNumOCBlur}
+                loadingProject={loadingProject}
+                optionsTipoContrato={optionsTipoContrato}
+                optionsEtapa={optionsEtapa}
+              />
+              <ClientSection
+                form={form}
+                onChange={handleChange}
+                onOpenModal={() => setClientModalOpen(true)}
+                optionsTipoCliente={optionsTipoCliente}
+                errors={errors}
+              />
+              <CommercialSection
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+                optionsVendedor={optionsVendedor}
+                optionsLiberador={optionsLiberador}
+                optionsLoja={optionsLoja}
+              />
+              <EnvironmentSection
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+                optionsTipoAmbiente={optionsTipoAmbiente}
+              />
+              <ScheduleSection
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+              />
+              <FinancialSection
+                form={form}
+                onChange={handleChange}
+                errors={errors}
+              />
+            </>
+          )}
         </div>
 
         <div className="projeto-page__bottom">

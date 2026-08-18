@@ -67,7 +67,7 @@ function mapRow(row: ApiRow, pedido: number): ApontamentoProject {
 }
 
 export async function fetchProjectByPedido(pedido: string): Promise<ApontamentoProject[] | null> {
-  const rows = await apiGet<ApiRow[]>('/apontamento/pedido', { p_pedido: pedido });
+  const rows = await apiGet<ApiRow[]>('/apontamento/pedido', { pedido });
   if (!rows.length) return null;
   const num = parseInt(pedido, 10);
   return rows.map(r => mapRow(r, num));
@@ -80,17 +80,17 @@ export async function fetchApontamentoOperators(): Promise<Operator[]> {
 
 export async function saveApontamento(project: ApontamentoProject): Promise<void> {
   const payload: Record<string, unknown> = {
-    p_ordemdecompra: project.ordemdecompra,
-    p_previsao:      project.previsao    ?? null,
-    p_observacoes:   project.observacoes ?? null,
+    ordemdecompra: project.ordemdecompra,
+    previsao:      project.previsao    ?? null,
+    observacoes:   project.observacoes ?? null,
   };
 
   for (const id of STAGE_ORDER) {
     const s = project.etapas[id];
-    payload[`p_${id}inicio`] = toDatetimeLocal(s.inicio) || null;
-    payload[`p_${id}fim`]    = toDatetimeLocal(s.fim)    || null;
-    payload[`p_${id}resp`]   = s.responsavelId != null ? Number(s.responsavelId) : null;
-    payload[`p_${id}pausa`]  = s.pausa;
+    payload[`${id}inicio`] = toDatetimeLocal(s.inicio) || null;
+    payload[`${id}fim`]    = toDatetimeLocal(s.fim)    || null;
+    payload[`${id}resp`]   = s.responsavelId != null ? Number(s.responsavelId) : null;
+    payload[`${id}pausa`]  = s.pausa;
   }
 
   await apiPost('/apontamento/dados', payload);

@@ -149,7 +149,7 @@ export function createLote(lote: string, ids: number[]): Promise<unknown> {
 }
 
 export function atualizarLote(ordemDeCompra: number, lote: number): Promise<unknown> {
-  return apiPost("/pcp/lote", { p_ordemdecompra: ordemDeCompra, p_lote: lote });
+  return apiPost("/pcp/lote", { ordemdecompra: ordemDeCompra, lote });
 }
 
 export async function fetchLotes(): Promise<number[]> {
@@ -165,22 +165,22 @@ export async function fetchLotesIniciados(): Promise<number[]> {
 }
 
 export function startLote(lote: number, dataInicio: string): Promise<unknown> {
-  return apiPost("/pcp/iniciar", { p_lote: lote, p_datainicio: dataInicio });
+  return apiPost("/pcp/iniciar", { lote, datainicio: dataInicio });
 }
 
 export function revertLote(lote: number): Promise<unknown> {
-  return apiPost("/pcp/reverter", { p_lote: lote });
+  return apiPost("/pcp/reverter", { lote });
 }
 
 export function updateProjectPcp(form: ProjectReleaseFormData): Promise<unknown> {
   return apiPost("/pcp/projeto", {
-    p_ordemdecompra: Number(form.numOC),
-    p_urgente:       form.urgente,
-    p_codcc:         Number(form.corteCC) || 0,
-    p_lote:          Number(form.lote) || 0,
-    p_pedido:        Number(form.pedido) || 0,
-    p_tipo:          form.tipo,
-    p_pecas:         Number(form.pecas),
-    p_area:          Number(form.area),
+    ordemdecompra: Number(form.numOC),
+    urgente:       form.urgente,
+    codcc:         Number(form.corteCC) || 0,
+    lote:          Number(form.lote) || 0,
+    pedido:        Number(form.pedido) || 0,
+    tipo:          form.tipo,
+    pecas:         Number(form.pecas),
+    area:          Number(form.area),
   });
 }

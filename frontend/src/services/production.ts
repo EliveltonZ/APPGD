@@ -98,18 +98,18 @@ export async function fetchProductionDetail(
 
 function toSavePayload(detail: ProductionDetail): Record<string, unknown> {
   const payload: Record<string, unknown> = {
-    p_ordemdecompra: detail.orderId,
-    p_observacoes: detail.observacoes,
-    p_previsao: detail.previsao || null,
+    ordemdecompra: detail.orderId,
+    observacoes: detail.observacoes,
+    previsao: detail.previsao || null,
   };
   for (const s of SECTORS) {
     const sec = detail.setores[s] ?? {};
-    payload[`p_${s}inicio`] = (sec.inicio as string) || null;
-    payload[`p_${s}fim`] = (sec.fim as string) || null;
-    payload[`p_${s}resp`] = sec.responsavelId
+    payload[`${s}inicio`] = (sec.inicio as string) || null;
+    payload[`${s}fim`] = (sec.fim as string) || null;
+    payload[`${s}resp`] = sec.responsavelId
       ? Number(sec.responsavelId)
       : null;
-    payload[`p_${s}pausa`] = Boolean(sec.pausa);
+    payload[`${s}pausa`] = Boolean(sec.pausa);
   }
   return payload;
 }
@@ -150,5 +150,5 @@ export async function fetchCapaRelatorio(id: number): Promise<CapaRelatorioResul
 }
 
 export async function saveTipoUrgente(oc: string, tipo: string, urgente: boolean): Promise<void> {
-  await apiPost('/utils/tipo', { p_ordemdecompra: oc, p_tipo: tipo, p_urgente: urgente });
+  await apiPost('/utils/tipo', { ordemdecompra: oc, tipo, urgente });
 }

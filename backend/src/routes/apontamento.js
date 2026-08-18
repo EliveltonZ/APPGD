@@ -7,8 +7,8 @@ const apt = rp('apontamento')
 // Busca pedido pelo número (leitura de barcode)
 router.get('/pedido', apt, async (req, res, next) => {
   try {
-    const pedido = req.query.p_pedido
-    if (!pedido) return res.status(400).json({ error: 'p_pedido obrigatório' })
+    const pedido = req.query.pedido
+    if (!pedido) return res.status(400).json({ error: 'pedido obrigatório' })
     const rows = await repo.buscarProducaoPorPedido(pedido)
     res.json(rows)
   } catch (err) {

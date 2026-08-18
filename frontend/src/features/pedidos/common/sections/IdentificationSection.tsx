@@ -19,6 +19,7 @@ interface IdentificationSectionProps extends SectionProps {
   loadingProject?: boolean;
   optionsTipoContrato?: SelectOption[];
   optionsEtapa?: SelectOption[];
+  numOCReadOnly?: boolean;
 }
 
 export function IdentificationSection({
@@ -33,6 +34,7 @@ export function IdentificationSection({
   loadingProject,
   optionsTipoContrato = [],
   optionsEtapa = [],
+  numOCReadOnly = false,
 }: IdentificationSectionProps) {
   const isNovo = mode === "novo";
   const readOnly = mode === "excluir";
@@ -42,10 +44,11 @@ export function IdentificationSection({
       label="Num. OC"
       value={form.numOC}
       onChange={(e) => onChange("numOC", e.target.value)}
-      onBlur={onNumOCBlur}
-      onDoubleClick={isNovo ? onNumOCDoubleClick : undefined}
-      disabled={loadingContract || loadingProject}
-      error={errors?.numOC}
+      onBlur={numOCReadOnly ? undefined : onNumOCBlur}
+      onDoubleClick={isNovo && !numOCReadOnly ? onNumOCDoubleClick : undefined}
+      disabled={!numOCReadOnly && (loadingContract || loadingProject)}
+      readOnly={numOCReadOnly}
+      error={numOCReadOnly ? undefined : errors?.numOC}
       placeholder="Ex: 1234567890"
     />
   );

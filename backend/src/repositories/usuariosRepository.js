@@ -11,8 +11,9 @@ const ACESSO_ATTRS = [
   'qualidade', 'valores', 'dashboard', 'password',
   'acesso', 'relatorios', 'ativo',
   'cadastrosEquipe', 'cadastrosQualidade', 'cadastrosComercial',
-  'cadastrosClientes', 'cadastrosUsuarios', 'apontamento',
+  'cadastrosClientes', 'cadastrosUsuarios', 'cadastrosMateriais', 'cadastrosLocalizacoes', 'apontamento',
   'paradasMaquina', 'paradasAdmin',
+  'almoxarifadoTransferencias',
 ];
 
 // Converte instância Sequelize (camelCase) para plain object com chaves snake_case
@@ -47,9 +48,12 @@ function rowToSnake(r) {
     cadastros_comercial:   r.cadastrosComercial   ?? false,
     cadastros_clientes:    r.cadastrosClientes    ?? false,
     cadastros_usuarios:    r.cadastrosUsuarios    ?? false,
-    apontamento:           r.apontamento          ?? false,
+    cadastros_materiais:   r.cadastrosMateriais    ?? false,
+    cadastros_localizacoes:r.cadastrosLocalizacoes ?? false,
+    apontamento:           r.apontamento           ?? false,
     paradas_maquina:       r.paradasMaquina       ?? false,
     paradas_admin:         r.paradasAdmin         ?? false,
+    almoxarifado_transferencias: r.almoxarifadoTransferencias ?? false,
   };
 }
 
@@ -59,18 +63,18 @@ async function buscarMaiorId() {
 }
 
 async function inserirUsuario(body) {
-  const senha = String(body.p_senha ?? '');
+  const senha = String(body.senha ?? '');
   if (senha.length < 6) throw new Error('A senha deve ter ao menos 6 caracteres.');
   const senhaHash = await bcrypt.hash(senha, BCRYPT_ROUNDS);
   await Usuario.create({
-    id:       body.p_id,
-    login:    body.p_login    ?? null,
+    id:       body.id,
+    login:    body.login    ?? null,
     senha:    senhaHash,
-    setor:    body.p_setor    ?? null,
-    camiseta: body.p_camiseta ?? null,
-    calca:    body.p_calca    ?? null,
-    sapato:   body.p_sapato   ?? null,
-    local:    body.p_local    ?? null,
+    setor:    body.setor    ?? null,
+    camiseta: body.camiseta ?? null,
+    calca:    body.calca    ?? null,
+    sapato:   body.sapato   ?? null,
+    local:    body.local    ?? null,
   });
 }
 
@@ -83,9 +87,9 @@ async function listarAcessos() {
   return rows.map(rowToSnake);
 }
 
-async function buscarAcesso(p_id) {
+async function buscarAcesso(id) {
   const rows = await Usuario.findAll({
-    where:      { id: Number(p_id) },
+    where:      { id: Number(id) },
     attributes: ACESSO_ATTRS,
   });
   return rows.map(rowToSnake);
@@ -94,35 +98,38 @@ async function buscarAcesso(p_id) {
 async function atualizarAcessos(body) {
   await Usuario.update(
     {
-      novoPedido:           body.p_novo_pedido           ?? false,
-      editarPedido:         body.p_editar_pedido         ?? false,
-      excluirPedido:        body.p_excluir_pedido        ?? false,
-      compras:              body.p_compras               ?? false,
-      pendencia:            body.p_pendencia             ?? false,
-      pcp:                  body.p_pcp                   ?? false,
-      producao:             body.p_producao              ?? false,
-      expedicao:            body.p_expedicao             ?? false,
-      status:               body.p_status                ?? false,
-      planejamento:         body.p_planejamento          ?? false,
-      novaSolicitacao:      body.p_nova_solicitacao      ?? false,
-      producaoAssistencia:  body.p_producao_assistencia  ?? false,
-      logisticaAssistencia: body.p_logistica_assistencia ?? false,
-      qualidade:            body.p_qualidade             ?? false,
-      valores:              body.p_valores               ?? false,
-      dashboard:            body.p_dashboard             ?? false,
-      password:             body.p_password              ?? false,
-      acesso:               body.p_acesso                ?? false,
-      relatorios:           body.p_relatorios            ?? false,
-      cadastrosEquipe:      body.p_cadastros_equipe      ?? false,
-      cadastrosQualidade:   body.p_cadastros_qualidade   ?? false,
-      cadastrosComercial:   body.p_cadastros_comercial   ?? false,
-      cadastrosClientes:    body.p_cadastros_clientes    ?? false,
-      cadastrosUsuarios:    body.p_cadastros_usuarios    ?? false,
-      apontamento:          body.p_apontamento           ?? false,
-      paradasMaquina:       body.p_paradas_maquina       ?? false,
-      paradasAdmin:         body.p_paradas_admin         ?? false,
+      novoPedido:           body.novo_pedido           ?? false,
+      editarPedido:         body.editar_pedido         ?? false,
+      excluirPedido:        body.excluir_pedido        ?? false,
+      compras:              body.compras               ?? false,
+      pendencia:            body.pendencia             ?? false,
+      pcp:                  body.pcp                   ?? false,
+      producao:             body.producao              ?? false,
+      expedicao:            body.expedicao             ?? false,
+      status:               body.status                ?? false,
+      planejamento:         body.planejamento          ?? false,
+      novaSolicitacao:      body.nova_solicitacao      ?? false,
+      producaoAssistencia:  body.producao_assistencia  ?? false,
+      logisticaAssistencia: body.logistica_assistencia ?? false,
+      qualidade:            body.qualidade             ?? false,
+      valores:              body.valores               ?? false,
+      dashboard:            body.dashboard             ?? false,
+      password:             body.password              ?? false,
+      acesso:               body.acesso                ?? false,
+      relatorios:           body.relatorios            ?? false,
+      cadastrosEquipe:      body.cadastros_equipe      ?? false,
+      cadastrosQualidade:   body.cadastros_qualidade   ?? false,
+      cadastrosComercial:   body.cadastros_comercial   ?? false,
+      cadastrosClientes:    body.cadastros_clientes    ?? false,
+      cadastrosUsuarios:    body.cadastros_usuarios    ?? false,
+      cadastrosMateriais:    body.cadastros_materiais    ?? false,
+      cadastrosLocalizacoes: body.cadastros_localizacoes ?? false,
+      apontamento:           body.apontamento            ?? false,
+      paradasMaquina:       body.paradas_maquina       ?? false,
+      paradasAdmin:         body.paradas_admin         ?? false,
+      almoxarifadoTransferencias: body.almoxarifado_transferencias ?? false,
     },
-    { where: { id: body.p_id } }
+    { where: { id: body.id } }
   );
 }
 

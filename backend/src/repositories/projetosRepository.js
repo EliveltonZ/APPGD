@@ -1,4 +1,5 @@
 const {
+  sequelize,
   Projetos, Producao, Avulsos, Acessorios,
   Clientes, TipoCliente, Vendedor, Liberador,
   Loja, TipoAmbiente, TipoContrato, Etapa,
@@ -45,14 +46,14 @@ async function listarTiposCliente() {
 async function _resolverLookups(body) {
   const [cliente, vendedor, liberador, loja, tipoCliente, tipoAmbiente, tipoContrato, etapa] =
     await Promise.all([
-      body.p_id_cliente      ? Clientes.findByPk(body.p_id_cliente)         : null,
-      body.p_id_vendedor     ? Vendedor.findByPk(body.p_id_vendedor)         : null,
-      body.p_id_liberador    ? Liberador.findByPk(body.p_id_liberador)       : null,
-      body.p_id_loja         ? Loja.findByPk(body.p_id_loja)                 : null,
-      body.p_id_tipocliente  ? TipoCliente.findByPk(body.p_id_tipocliente)   : null,
-      body.p_id_tipoambiente ? TipoAmbiente.findByPk(body.p_id_tipoambiente) : null,
-      body.p_id_tipocontrato ? TipoContrato.findByPk(body.p_id_tipocontrato) : null,
-      body.p_id_etapa        ? Etapa.findByPk(body.p_id_etapa)               : null,
+      body.id_cliente      ? Clientes.findByPk(body.id_cliente)         : null,
+      body.id_vendedor     ? Vendedor.findByPk(body.id_vendedor)         : null,
+      body.id_liberador    ? Liberador.findByPk(body.id_liberador)       : null,
+      body.id_loja         ? Loja.findByPk(body.id_loja)                 : null,
+      body.id_tipocliente  ? TipoCliente.findByPk(body.id_tipocliente)   : null,
+      body.id_tipoambiente ? TipoAmbiente.findByPk(body.id_tipoambiente) : null,
+      body.id_tipocontrato ? TipoContrato.findByPk(body.id_tipocontrato) : null,
+      body.id_etapa        ? Etapa.findByPk(body.id_etapa)               : null,
     ]);
   return { cliente, vendedor, liberador, loja, tipoCliente, tipoAmbiente, tipoContrato, etapa };
 }
@@ -62,38 +63,50 @@ async function inserirProjeto(body) {
     await _resolverLookups(body);
 
   await Projetos.create({
-    ordemdecompra:          body.p_ordemdecompra,
-    contrato:               body.p_contrato               ?? null,
-    idCliente:              body.p_id_cliente             ?? null,
-    cliente:                cliente?.name                 ?? null,
-    idTipoambiente:         body.p_id_tipoambiente        ?? null,
+    ordemdecompra:          body.ordemdecompra,
+    contrato:               body.contrato               ?? null,
+    idCliente:              body.id_cliente             ?? null,
+    cliente:                body.cliente_nome           ?? cliente?.name ?? null,
+    idTipoambiente:         body.id_tipoambiente        ?? null,
     tipoambiente:           tipoAmbiente?.name            ?? null,
-    ambiente:               body.p_ambiente               ?? null,
-    numproj:                body.p_numproj                ?? null,
-    idVendedor:             body.p_id_vendedor            ?? null,
+    ambiente:               body.ambiente               ?? null,
+    numproj:                body.numproj                ?? null,
+    idVendedor:             body.id_vendedor            ?? null,
     vendedor:               vendedor?.name                ?? null,
-    idLiberador:            body.p_id_liberador           ?? null,
+    idLiberador:            body.id_liberador           ?? null,
     liberador:              liberador?.name               ?? null,
-    datacontrato:           body.p_datacontrato           ?? null,
-    dataassinatura:         body.p_dataassinatura         ?? null,
-    chegoufabrica:          body.p_chegoufabrica          ?? null,
-    dataentrega:            body.p_dataentrega            ?? null,
-    previsao:               body.p_dataentrega            ?? null,
-    idLoja:                 body.p_id_loja                ?? null,
+    datacontrato:           body.datacontrato           ?? null,
+    dataassinatura:         body.dataassinatura         ?? null,
+    chegoufabrica:          body.chegoufabrica          ?? null,
+    dataentrega:            body.dataentrega            ?? null,
+    previsao:               body.dataentrega            ?? null,
+    idLoja:                 body.id_loja                ?? null,
     loja:                   loja?.name                    ?? null,
-    idTipocliente:          body.p_id_tipocliente         ?? null,
+    idTipocliente:          body.id_tipocliente         ?? null,
     tipocliente:            tipoCliente?.name             ?? null,
-    idEtapa:                body.p_id_etapa               ?? null,
+    idEtapa:                body.id_etapa               ?? null,
     etapa:                  etapa?.name                   ?? null,
-    idTipocontrato:         body.p_id_tipocontrato        ?? null,
+    idTipocontrato:         body.id_tipocontrato        ?? null,
     tipocontrato:           tipoContrato?.name            ?? null,
-    valorbruto:             body.p_valorbruto             ?? 0,
-    valornegociado:         body.p_valornegociado         ?? 0,
-    customaterial:          body.p_customaterial          ?? 0,
-    customaterialadicional: body.p_custoadicional         ?? 0,
+    valorbruto:             body.valorbruto             ?? 0,
+    valornegociado:         body.valornegociado         ?? 0,
+    customaterial:          body.customaterial          ?? 0,
+    customaterialadicional: body.custoadicional         ?? 0,
+    tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
+    ocOrigem:               body.oc_origem              ?? null,
+    motivoAssistencia:      body.motivo_assistencia     ?? null,
+    supervisor:             body.supervisor             ?? null,
+    tipoSolicitacao:        body.tipo_solicitacao       ?? null,
+    origemMontagem:         body.origem_montagem        ?? null,
+    origemPromob:           body.origem_promob          ?? null,
+    origemCobrada:          body.origem_cobrada         ?? null,
+    observacoes:            body.observacoes            ?? null,
+    solicitante:            body.solicitante            ?? null,
+    idSolicitante:          body.id_solicitante         ?? null,
+    urgente:                body.urgente                ?? false,
   });
 
-  const oc = body.p_ordemdecompra;
+  const oc = body.ordemdecompra;
   await Promise.all([
     Producao.findOrCreate({ where: { ordemdecompra: oc } }),
     Avulsos.findOrCreate({ where: { ordemdecompra: oc } }),
@@ -101,7 +114,7 @@ async function inserirProjeto(body) {
 }
 
 async function inserirCliente(body) {
-  return Clientes.create({ name: body.p_nome_cliente });
+  return Clientes.create({ name: body.nome_cliente });
 }
 
 async function buscarParaEditar(ordemdecompra) {
@@ -112,6 +125,9 @@ async function buscarParaEditar(ordemdecompra) {
       'ambiente', 'numproj', 'idVendedor', 'idLiberador', 'idLoja', 'idEtapa',
       'idTipocontrato', 'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
+      'tipoProjeto', 'ocOrigem', 'motivoAssistencia',
+      'urgente', 'supervisor', 'tipoSolicitacao', 'origemMontagem',
+      'origemPromob', 'origemCobrada', 'observacoes', 'solicitante', 'idSolicitante',
     ],
     include: [
       { model: Clientes, as: 'tblCliente', attributes: ['name'], required: false },
@@ -140,6 +156,18 @@ async function buscarParaEditar(ordemdecompra) {
     valornegociado:         p.valornegociado,
     customaterial:          p.customaterial,
     customaterialadicional: p.customaterialadicional,
+    tipo_projeto:           p.tipoProjeto,
+    oc_origem:              p.ocOrigem,
+    motivo_assistencia:     p.motivoAssistencia,
+    urgente:                p.urgente,
+    supervisor:             p.supervisor,
+    tipo_solicitacao:       p.tipoSolicitacao,
+    origem_montagem:        p.origemMontagem,
+    origem_promob:          p.origemPromob,
+    origem_cobrada:         p.origemCobrada,
+    observacoes:            p.observacoes,
+    solicitante:            p.solicitante,
+    id_solicitante:         p.idSolicitante,
   }];
 }
 
@@ -149,35 +177,47 @@ async function atualizarProjeto(body) {
 
   await Projetos.update(
     {
-      contrato:               body.p_contrato               ?? null,
-      idCliente:              body.p_id_cliente             ?? null,
-      cliente:                cliente?.name                 ?? null,
-      idTipoambiente:         body.p_id_tipoambiente        ?? null,
+      contrato:               body.contrato               ?? null,
+      idCliente:              body.id_cliente             ?? null,
+      cliente:                body.cliente_nome           ?? cliente?.name ?? null,
+      idTipoambiente:         body.id_tipoambiente        ?? null,
       tipoambiente:           tipoAmbiente?.name            ?? null,
-      ambiente:               body.p_ambiente               ?? null,
-      numproj:                body.p_numproj                ?? null,
-      idVendedor:             body.p_id_vendedor            ?? null,
+      ambiente:               body.ambiente               ?? null,
+      numproj:                body.numproj                ?? null,
+      idVendedor:             body.id_vendedor            ?? null,
       vendedor:               vendedor?.name                ?? null,
-      idLiberador:            body.p_id_liberador           ?? null,
+      idLiberador:            body.id_liberador           ?? null,
       liberador:              liberador?.name               ?? null,
-      datacontrato:           body.p_datacontrato           ?? null,
-      dataassinatura:         body.p_dataassinatura         ?? null,
-      chegoufabrica:          body.p_chegoufabrica          ?? null,
-      dataentrega:            body.p_dataentrega            ?? null,
-      idLoja:                 body.p_id_loja                ?? null,
+      datacontrato:           body.datacontrato           ?? null,
+      dataassinatura:         body.dataassinatura         ?? null,
+      chegoufabrica:          body.chegoufabrica          ?? null,
+      dataentrega:            body.dataentrega            ?? null,
+      idLoja:                 body.id_loja                ?? null,
       loja:                   loja?.name                    ?? null,
-      idTipocliente:          body.p_id_tipocliente         ?? null,
+      idTipocliente:          body.id_tipocliente         ?? null,
       tipocliente:            tipoCliente?.name             ?? null,
-      idEtapa:                body.p_id_etapa               ?? null,
+      idEtapa:                body.id_etapa               ?? null,
       etapa:                  etapa?.name                   ?? null,
-      idTipocontrato:         body.p_id_tipocontrato        ?? null,
+      idTipocontrato:         body.id_tipocontrato        ?? null,
       tipocontrato:           tipoContrato?.name            ?? null,
-      valorbruto:             body.p_valorbruto             ?? 0,
-      valornegociado:         body.p_valornegociado         ?? 0,
-      customaterial:          body.p_customaterial          ?? 0,
-      customaterialadicional: body.p_customaterialadicional ?? 0,
+      valorbruto:             body.valorbruto             ?? 0,
+      valornegociado:         body.valornegociado         ?? 0,
+      customaterial:          body.customaterial          ?? 0,
+      customaterialadicional: body.customaterialadicional ?? 0,
+      tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
+      ocOrigem:               body.oc_origem              ?? null,
+      motivoAssistencia:      body.motivo_assistencia     ?? null,
+      supervisor:             body.supervisor             ?? null,
+      tipoSolicitacao:        body.tipo_solicitacao       ?? null,
+      origemMontagem:         body.origem_montagem        ?? null,
+      origemPromob:           body.origem_promob          ?? null,
+      origemCobrada:          body.origem_cobrada         ?? null,
+      observacoes:            body.observacoes            ?? null,
+      solicitante:            body.solicitante            ?? null,
+      idSolicitante:          body.id_solicitante         ?? null,
+      urgente:                body.urgente                ?? false,
     },
-    { where: { ordemdecompra: body.p_ordemdecompra } },
+    { where: { ordemdecompra: body.ordemdecompra } },
   );
 }
 
@@ -196,7 +236,7 @@ async function buscarParaDeletar(ordemdecompra) {
 }
 
 async function deletarProjeto(body) {
-  const oc = Number(body.p_ordemdecompra);
+  const oc = Number(body.ordemdecompra);
   await Acessorios.destroy({ where: { ordemdecompra: oc } });
   await Promise.all([
     Producao.destroy({ where: { ordemdecompra: oc } }),
@@ -336,6 +376,11 @@ async function buscarCapaProducao(ordemdecompra) {
   }];
 }
 
+async function gerarOcAssistencia() {
+  const [rows] = await sequelize.query("SELECT NEXTVAL('seq_assistencia_oc') AS oc");
+  return Number(rows[0].oc);
+}
+
 module.exports = {
   buscarPorContrato,
   listarClientes,
@@ -347,4 +392,5 @@ module.exports = {
   buscarParaDeletar,
   deletarProjeto,
   buscarCapaProducao,
+  gerarOcAssistencia,
 };

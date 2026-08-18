@@ -6,27 +6,28 @@ const listarVendedores   = () => repo.listarVendedores();
 const listarLojas        = () => repo.listarLojas();
 const listarEtapas       = () => repo.listarEtapas();
 const listarTipoContrato = () => repo.listarTipoContrato();
-const listarTipoCliente  = () => repo.listarTipoCliente();
+const listarTipoCliente      = () => repo.listarTipoCliente();
+const listarTiposAssistencia = () => repo.listarTiposAssistencia();
 const listarCategorias   = () => repo.listarCategorias();
 const maxOrder           = () => repo.maxOrder();
-const getDado            = (p_id) => repo.getDado(p_id);
+const getDado            = (id) => repo.getDado(id);
 const setDado            = (body) => repo.setDado(body);
 const listarOperadores   = () => repo.listarOperadores();
-const listarCausaFalha   = (p_id_falha) => repo.listarCausaFalha(p_id_falha);
+const listarCausaFalha   = (idFalha) => repo.listarCausaFalha(idFalha);
 
-const buscarUsuario        = (p_id)                      => repo.buscarUsuario(p_id);
-const getAcessorios        = (p_ordemdecompra)            => repo.getAcessorios(p_ordemdecompra);
-const buscarData           = (p_id)                      => repo.buscarData(p_id);
-const setEtapa             = (p_pedido, p_codigo)         => repo.setEtapa(p_pedido, p_codigo);
-const getProjetoCodigoBarras = (p_pedido)                => repo.getProjetoCodigoBarras(p_pedido);
+const buscarUsuario        = (id)                        => repo.buscarUsuario(id);
+const getAcessorios        = (ordemdecompra)              => repo.getAcessorios(ordemdecompra);
+const buscarData           = (id)                        => repo.buscarData(id);
+const setEtapa             = (pedido, codigo)             => repo.setEtapa(pedido, codigo);
+const getProjetoCodigoBarras = (pedido)                  => repo.getProjetoCodigoBarras(pedido);
 const getMontadores        = ()                           => repo.getMontadores();
-const validateLogin        = (p_codigo, p_senha)          => repo.validateLogin(p_codigo, p_senha);
-const getSolicitacoes      = (p_id_montador)              => repo.getSolicitacoes(p_id_montador);
+const validateLogin        = (codigo, senha)              => repo.validateLogin(codigo, senha);
+const getSolicitacoes      = (idMontador)                 => repo.getSolicitacoes(idMontador);
 const totalPecas           = ()                           => repo.totalPecas();
 const getOcorrencias       = ()                           => repo.getOcorrencias();
 const getFalhas            = ()                           => repo.getFalhas();
 const setTipo              = (oc, tipo, urgente)          => repo.setTipo(oc, tipo, urgente);
-const listarEquipSat       = (p_id_sat)                   => repo.listarEquipSat(p_id_sat);
+const listarEquipSat       = (idSat)                      => repo.listarEquipSat(idSat);
 
 module.exports = {
   listarLiberadores,
@@ -36,6 +37,7 @@ module.exports = {
   listarEtapas,
   listarTipoContrato,
   listarTipoCliente,
+  listarTiposAssistencia,
   listarCategorias,
   maxOrder,
   getDado,

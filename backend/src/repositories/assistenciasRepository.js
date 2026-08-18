@@ -9,9 +9,9 @@ const {
 } = require("../client/db");
 const { assistenciaStatus, diasRestantes } = require("../utils/calcStatus");
 
-async function listarAssistencias(p_data) {
+async function listarAssistencias(data) {
   const rows = await Assistencias.findAll({
-    where: { datasolicitacao: { [Op.gte]: p_data } },
+    where: { datasolicitacao: { [Op.gte]: data } },
     attributes: [
       "solicitacao",
       "corte",
@@ -53,9 +53,9 @@ async function listarAssistencias(p_data) {
   }));
 }
 
-async function buscarAssistencia(p_solicitacao) {
+async function buscarAssistencia(solicitacao) {
   const a = await Assistencias.findOne({
-    where: { solicitacao: p_solicitacao },
+    where: { solicitacao },
   });
   if (!a) return [];
 
@@ -107,29 +107,29 @@ async function buscarAssistencia(p_solicitacao) {
 async function atualizarAssistencia(body) {
   await Assistencias.update(
     {
-      pedido: body.p_pedido != null && body.p_pedido !== '' ? Number(body.p_pedido) : null,
-      corte:  body.p_corte  != null && body.p_corte  !== '' ? Number(body.p_corte)  : null,
-      observacoes: body.p_observacao ?? null,
-      observacoes2: body.p_observacao2 ?? null,
-      iniciado: body.p_iniciado || null,
-      pronto: body.p_pronto || null,
-      previsao: body.p_previsao || null,
-      conferente: body.p_conferente ?? null,
-      responsavel: body.p_responsavel ?? null,
-      liberacao: body.p_liberacao ?? null,
-      dataentrega: body.p_dataentrega || null,
-      escritorio: body.p_escritorio ?? false,
-      producao: body.p_producao ?? false,
-      semMaterial: body.p_sem_material ?? false,
-      pendencia: body.p_pendencia ?? false,
+      pedido: body.pedido != null && body.pedido !== '' ? Number(body.pedido) : null,
+      corte:  body.corte  != null && body.corte  !== '' ? Number(body.corte)  : null,
+      observacoes: body.observacao ?? null,
+      observacoes2: body.observacao2 ?? null,
+      iniciado: body.iniciado || null,
+      pronto: body.pronto || null,
+      previsao: body.previsao || null,
+      conferente: body.conferente ?? null,
+      responsavel: body.responsavel ?? null,
+      liberacao: body.liberacao ?? null,
+      dataentrega: body.dataentrega || null,
+      escritorio: body.escritorio ?? false,
+      producao: body.producao ?? false,
+      semMaterial: body.sem_material ?? false,
+      pendencia: body.pendencia ?? false,
     },
-    { where: { solicitacao: body.p_solicitacao } },
+    { where: { solicitacao: body.solicitacao } },
   );
 }
 
-async function buscarCapaAssistencia(p_solicitacao) {
+async function buscarCapaAssistencia(solicitacao) {
   const a = await Assistencias.findOne({
-    where: { solicitacao: p_solicitacao },
+    where: { solicitacao },
     attributes: [
       "contrato",
       "solicitacao",

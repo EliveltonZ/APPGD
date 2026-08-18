@@ -5,10 +5,10 @@ module.exports = {
     try {
       await Projetos.update(
         {
-          tipo:    req.query.p_tipo    ?? null,
-          urgente: req.query.p_urgente === 'true',
+          tipo:    req.query.tipo    ?? null,
+          urgente: req.query.urgente === 'true',
         },
-        { where: { ordemdecompra: Number(req.query.p_ordemdecompra) } }
+        { where: { ordemdecompra: Number(req.query.ordemdecompra) } }
       );
       res.json({ success: true });
     } catch (err) {

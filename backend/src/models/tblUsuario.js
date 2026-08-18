@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const T = require('../config/tables');
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('tblUsuario', {
     id: {
@@ -216,10 +217,28 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: false,
       field: 'cadastros_usuarios'
+    },
+    cadastrosMateriais: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'cadastros_materiais'
+    },
+    cadastrosLocalizacoes: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'cadastros_localizacoes'
+    },
+    almoxarifadoTransferencias: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_transferencias'
     }
   }, {
     sequelize,
-    tableName: 'tblUsuario',
+    tableName: T.usuarios.name,
     schema: 'public',
     timestamps: false,
     indexes: [

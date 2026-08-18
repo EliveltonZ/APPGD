@@ -10,11 +10,11 @@ export function saveQualityAnalysis(item: {
   causaRaiz: string;
 }): Promise<unknown> {
   return apiPost('/qualidade/causa', {
-    p_id:      Number(item.id),
-    p_id_erp:  Number(item.idErp) || null,
-    p_falha:   Number(item.falha)  || null,
-    p_causa:   Number(item.causa)  || null,
-    p_analise: item.causaRaiz,
+    id:      Number(item.id),
+    id_erp:  Number(item.idErp) || null,
+    falha:   Number(item.falha)  || null,
+    causa:   Number(item.causa)  || null,
+    analise: item.causaRaiz,
   });
 }
 
@@ -22,7 +22,7 @@ export async function fetchCausaFalha(
   falhaId: number,
 ): Promise<Array<{ value: string; label: string }>> {
   type Row = Record<string, unknown>;
-  const rows = await apiGet<Row[]>('/utils/causa-falha', { p_id_falha: falhaId });
+  const rows = await apiGet<Row[]>('/utils/causa-falha', { id_falha: falhaId });
   return rows.map((r) => ({
     value: String(r.id       ?? ''),
     label: String(r.descricao ?? ''),

@@ -43,15 +43,15 @@ async function listarPecasQualidade() {
   }));
 }
 
-async function updateCausaRaiz({ p_id, p_id_erp, p_falha, p_causa, p_analise }) {
+async function updateCausaRaiz({ id, id_erp, falha, causa, analise }) {
   await Pecas.update(
     {
-      idFalha: p_falha  != null ? Number(p_falha)  : null,
-      idCausa: p_causa  != null ? Number(p_causa)  : null,
-      analise: p_analise ?? null,
-      idErp:   p_id_erp != null ? Number(p_id_erp) : null,
+      idFalha: falha  != null ? Number(falha)  : null,
+      idCausa: causa  != null ? Number(causa)  : null,
+      analise: analise ?? null,
+      idErp:   id_erp != null ? Number(id_erp) : null,
     },
-    { where: { codigo: Number(p_id) } },
+    { where: { codigo: Number(id) } },
   );
 }
 

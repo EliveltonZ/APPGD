@@ -58,8 +58,8 @@ function toAssistencia(r: RawRow, index: number): AssistanceProduction {
   };
 }
 
-export async function fetchAssistencias(p_data: string): Promise<AssistanceProduction[]> {
-  const rows = await apiGet<RawRow[]>('/assistencias/', { p_data });
+export async function fetchAssistencias(data: string): Promise<AssistanceProduction[]> {
+  const rows = await apiGet<RawRow[]>('/assistencias/', { data });
   return rows.map(toAssistencia);
 }
 
@@ -98,10 +98,10 @@ function toAssistenciaDetail(r: RawRow): AssistanceProduction {
   };
 }
 
-export async function fetchAssistanciaDetail(p_solicitacao: string): Promise<AssistanceProduction> {
+export async function fetchAssistanciaDetail(solicitacao: string): Promise<AssistanceProduction> {
   const [rows, equipeRaw] = await Promise.all([
-    apiGet<RawRow[]>('/assistencias/projeto', { p_solicitacao }),
-    apiGet<RawRow[]>('/utils/equip-sat', { p_id_sat: p_solicitacao }),
+    apiGet<RawRow[]>('/assistencias/projeto', { solicitacao }),
+    apiGet<RawRow[]>('/utils/equip-sat', { id_sat: solicitacao }),
   ]);
   if (!rows.length) throw new Error('Assistência não encontrada');
   const detail = toAssistenciaDetail(rows[0]);
@@ -118,21 +118,21 @@ function brToISO(val: string): string | null {
 
 export async function saveAssistencia(data: AssistanceProduction): Promise<void> {
   await apiPost('/assistencias/', {
-    p_solicitacao:  data.id,
-    p_pedido:       data.pedido !== '' ? Number(data.pedido) : null,
-    p_corte:        data.corte  !== '' ? Number(data.corte)  : null,
-    p_observacao:   data.obsFactory,
-    p_observacao2:  data.obsLogistics,
-    p_iniciado:     brToISO(data.iniciado),
-    p_pronto:       brToISO(data.pronto),
-    p_previsao:     brToISO(data.previsao),
-    p_conferente:   data.conferente,
-    p_responsavel:  data.motorista,
-    p_escritorio:   data.flagEscritorio,
-    p_producao:     data.flagProducao,
-    p_sem_material: data.flagSemMaterial,
-    p_pendencia:    data.flagPendencia,
-    p_liberacao:    data.despachante,
-    p_dataentrega:  brToISO(data.entregue),
+    solicitacao:  data.id,
+    pedido:       data.pedido !== '' ? Number(data.pedido) : null,
+    corte:        data.corte  !== '' ? Number(data.corte)  : null,
+    observacao:   data.obsFactory,
+    observacao2:  data.obsLogistics,
+    iniciado:     brToISO(data.iniciado),
+    pronto:       brToISO(data.pronto),
+    previsao:     brToISO(data.previsao),
+    conferente:   data.conferente,
+    responsavel:  data.motorista,
+    escritorio:   data.flagEscritorio,
+    producao:     data.flagProducao,
+    sem_material: data.flagSemMaterial,
+    pendencia:    data.flagPendencia,
+    liberacao:    data.despachante,
+    dataentrega:  brToISO(data.entregue),
   });
 }

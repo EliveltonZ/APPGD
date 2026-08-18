@@ -31,21 +31,21 @@ module.exports = {
 
   async reverterLote(req, res) {
     try {
-      await service.reverterLote(req.body.p_lote);
+      await service.reverterLote(req.body.lote);
       ok(res, { success: true });
     } catch (e) { err(res, "Erro ao reverter lote", e); }
   },
 
   async setStartLote(req, res) {
     try {
-      await service.atualizarIniciarLote(req.body.p_lote, req.body.p_iniciado ?? req.body.p_datainicio ?? null);
+      await service.atualizarIniciarLote(req.body.lote, req.body.iniciado ?? req.body.datainicio ?? null);
       ok(res, { success: true });
     } catch (e) { err(res, "Erro ao iniciar lote", e); }
   },
 
   async setLote(req, res) {
     try {
-      await service.atualizarLote(req.body.p_ordemdecompra, req.body.p_lote);
+      await service.atualizarLote(req.body.ordemdecompra, req.body.lote);
       ok(res, { success: true });
     } catch (e) { err(res, "Erro ao atualizar lote", e); }
   },

@@ -21,6 +21,7 @@ import {
   type EditarParadaPayload,
 } from "../../../services/paradas";
 import { toDatetimeLocal, fmtDateTime } from "../../../utils/dateUtils";
+import { validateParadaEdit } from "../../../validation/parada";
 import "./Paradas.css";
 
 function mesAtualRange() {
@@ -235,6 +236,11 @@ export function ParadasPage() {
 
   async function salvarEdicao() {
     if (!editando) return;
+    const { valid, errors } = validateParadaEdit(editForm);
+    if (!valid) {
+      toastErr(Object.values(errors)[0]);
+      return;
+    }
     setEditSaving(true);
     try {
       await editarParada(editando.id, editForm);

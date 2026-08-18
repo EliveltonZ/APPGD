@@ -5,12 +5,12 @@ function err(res, msg, e)   { res.status(500).json({ message: msg, error: e.mess
 
 module.exports = {
   async getAssistencias(req, res) {
-    try { ok(res, await service.listarAssistencias(req.query.p_data)); }
+    try { ok(res, await service.listarAssistencias(req.query.data)); }
     catch (e) { err(res, "Erro ao listar assistências", e); }
   },
 
   async getAssistencia(req, res) {
-    try { ok(res, await service.buscarAssistencia(req.query.p_solicitacao)); }
+    try { ok(res, await service.buscarAssistencia(req.query.solicitacao)); }
     catch (e) { err(res, "Erro ao buscar assistência", e); }
   },
 
@@ -22,7 +22,7 @@ module.exports = {
   },
 
   async getCapaAssistencia(req, res) {
-    try { ok(res, await service.buscarCapaAssistencia(req.query.p_solicitacao)); }
+    try { ok(res, await service.buscarCapaAssistencia(req.query.solicitacao)); }
     catch (e) { err(res, "Erro ao buscar capa assistência", e); }
   },
 

@@ -22,6 +22,7 @@ import {
   BarChart2,
   Settings,
   Database,
+  Package,
 } from "lucide-react";
 
 // ─── Grupos do menu lateral ───────────────────────────────────────────────────
@@ -42,6 +43,7 @@ export const ROUTE_GROUPS = [
   { id: "dashboards", label: "Dashboards", icon: BarChart2 },
   { id: "configuracoes", label: "Configurações", icon: Settings },
   { id: "cadastros",     label: "Cadastros",     icon: Database  },
+  { id: "almoxarifado",  label: "Almoxarifado",  icon: Package   },
 ] as const satisfies RouteGroup[];
 
 export type GroupId = (typeof ROUTE_GROUPS)[number]["id"];
@@ -108,6 +110,10 @@ export const ROUTE_ITEMS = [
   { permissionKey: 'cadastros_comercial',       path: '/cadastros/comercial',     groupId: 'cadastros',     menuLabel: 'Comercial'          },
   { permissionKey: 'cadastros_clientes',        path: '/cadastros/clientes',      groupId: 'cadastros',     menuLabel: 'Clientes'           },
   { permissionKey: 'cadastros_usuarios',        path: '/cadastros/usuarios',      groupId: 'cadastros',     menuLabel: 'Usuários'           },
+  { permissionKey: 'cadastros_materiais',       path: '/cadastros/materiais',     groupId: 'cadastros',     menuLabel: 'Materiais'          },
+  { permissionKey: 'cadastros_localizacoes',    path: '/cadastros/localizacoes',  groupId: 'cadastros',     menuLabel: 'Localizações'       },
+  // ── Almoxarifado ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  { permissionKey: 'almoxarifado_transferencias', path: '/almoxarifado/transferencias', groupId: 'almoxarifado', menuLabel: 'Transferências' },
 ] as const satisfies ReadonlyArray<RouteItem>
 
 /** União de todas as chaves de permissão válidas do sistema */

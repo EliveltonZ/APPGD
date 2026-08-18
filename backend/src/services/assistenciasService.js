@@ -1,9 +1,9 @@
 const repo = require("../repositories/assistenciasRepository");
 
-const listarAssistencias       = (p_data)        => repo.listarAssistencias(p_data);
-const buscarAssistencia        = (p_solicitacao)  => repo.buscarAssistencia(p_solicitacao);
+const listarAssistencias       = (data)           => repo.listarAssistencias(data);
+const buscarAssistencia        = (solicitacao)    => repo.buscarAssistencia(solicitacao);
 const atualizarAssistencia     = (body)           => repo.atualizarAssistencia(body);
-const buscarCapaAssistencia    = (p_solicitacao)  => repo.buscarCapaAssistencia(p_solicitacao);
+const buscarCapaAssistencia    = (solicitacao)    => repo.buscarCapaAssistencia(solicitacao);
 const inserirSolicitacao       = (body)           => repo.inserirSolicitacao(body);
 const inserirSolicitacaoCompleta = (body)         => repo.inserirSolicitacaoCompleta(body);
 

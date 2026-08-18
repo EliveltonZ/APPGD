@@ -21,7 +21,7 @@ module.exports = {
 
   async getUserAccess(req, res) {
     try {
-      const data = await service.buscarAcesso(req.query.p_id);
+      const data = await service.buscarAcesso(req.query.id);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao buscar acesso", error: err.message });

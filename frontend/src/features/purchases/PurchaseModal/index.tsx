@@ -10,6 +10,8 @@ import { DatesSection } from "./sections/DatesSection";
 import { StatusSection } from "./sections/StatusSection";
 import type { Purchase } from "../../../types/purchases";
 import type { Category } from "../../../services/utils";
+import { useToast } from "../../../context/ToastContext";
+import { validateCompra } from "../../../validation/compra";
 import "./index.css";
 
 interface PurchaseModalProps {
@@ -20,13 +22,13 @@ interface PurchaseModalProps {
   onSave: (purchase: Purchase) => void;
 }
 
-function footer(onClick_: (v: boolean) => void, onClose: () => void) {
+function footer(onSave: () => void, onClose: () => void) {
   return (
     <div className="pur-modal__footer">
       <Button variant="ghost" size="sm" onClick={onClose}>
         Cancelar
       </Button>
-      <Button variant="primary" size="sm" onClick={() => onClick_(true)}>
+      <Button variant="primary" size="sm" onClick={onSave}>
         Salvar
       </Button>
     </div>
@@ -40,6 +42,7 @@ export function PurchaseModal({
   onClose,
   onSave,
 }: PurchaseModalProps) {
+  const { error: toastErr } = useToast();
   const [form, setForm] = useState<Purchase | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -51,6 +54,16 @@ export function PurchaseModal({
       setConfirmOpen(false);
     }
   }, [isOpen, purchase]);
+
+  function handleSalvarClick() {
+    if (!form) return;
+    const { valid, errors } = validateCompra(form);
+    if (!valid) {
+      toastErr(Object.values(errors)[0]);
+      return;
+    }
+    setConfirmOpen(true);
+  }
 
   function handleSaveConfirm() {
     if (!form) return;
@@ -67,7 +80,7 @@ export function PurchaseModal({
         isOpen={isOpen}
         onClose={onClose}
         maxWidth={860}
-        footer={footer(setConfirmOpen, onClose)}
+        footer={footer(handleSalvarClick, onClose)}
       >
         {form && (
           <div className="pur-modal__content">

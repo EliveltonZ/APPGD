@@ -22,7 +22,7 @@ module.exports = {
 
   async getCausaFalha(req, res) {
     try {
-      const data = await utilsService.listarCausaFalha(req.query.p_id_falha);
+      const data = await utilsService.listarCausaFalha(req.query.id_falha);
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao buscar causas de falha", error: err.message });

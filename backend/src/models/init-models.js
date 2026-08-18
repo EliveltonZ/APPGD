@@ -1,5 +1,16 @@
 var DataTypes = require("sequelize").DataTypes;
-var _Acessorios         = require("./tblAcessorios");
+var _Localizacoes            = require("./tblLocalizacoes");
+var _Materiais               = require("./tblMateriais");
+var _MateriaisCodigoNF       = require("./tblMateriaisCodigoNF");
+var _NotasFiscais            = require("./tblNotasFiscais");
+var _NotasFiscaisItens       = require("./tblNotasFiscaisItens");
+var _XmlImportacoes          = require("./tblXmlImportacoes");
+var _XmlConsumo              = require("./tblXmlConsumo");
+var _Transferencias          = require("./tblTransferencias");
+var _EstoqueMovimentos       = require("./tblEstoqueMovimentos");
+var _SolicitacaoCompras      = require("./tblSolicitacaoCompras");
+var _SolicitacaoComprasItens = require("./tblSolicitacaoComprasItens");
+var _Acessorios              = require("./tblAcessorios");
 var _Maquinas           = require("./tblMaquinas");
 var _TipoRequisicao     = require("./tblTipoRequisicao");
 var _Paradas            = require("./tblParadas");
@@ -33,7 +44,18 @@ var _Usuario       = require("./tblUsuario");
 var _Vendedor      = require("./tblVendedor");
 
 function initModels(sequelize) {
-  var Acessorios         = _Acessorios(sequelize, DataTypes);
+  var Localizacoes            = _Localizacoes(sequelize, DataTypes);
+  var Materiais               = _Materiais(sequelize, DataTypes);
+  var MateriaisCodigoNF       = _MateriaisCodigoNF(sequelize, DataTypes);
+  var NotasFiscais            = _NotasFiscais(sequelize, DataTypes);
+  var NotasFiscaisItens       = _NotasFiscaisItens(sequelize, DataTypes);
+  var XmlImportacoes          = _XmlImportacoes(sequelize, DataTypes);
+  var XmlConsumo              = _XmlConsumo(sequelize, DataTypes);
+  var Transferencias          = _Transferencias(sequelize, DataTypes);
+  var EstoqueMovimentos       = _EstoqueMovimentos(sequelize, DataTypes);
+  var SolicitacaoCompras      = _SolicitacaoCompras(sequelize, DataTypes);
+  var SolicitacaoComprasItens = _SolicitacaoComprasItens(sequelize, DataTypes);
+  var Acessorios              = _Acessorios(sequelize, DataTypes);
   var Maquinas           = _Maquinas(sequelize, DataTypes);
   var TipoRequisicao     = _TipoRequisicao(sequelize, DataTypes);
   var Paradas            = _Paradas(sequelize, DataTypes);
@@ -90,6 +112,35 @@ function initModels(sequelize) {
   Pecas.belongsTo(Falhas,       { as: "falha",       foreignKey: "idFalha",      targetKey: "codigo"   });
   Pecas.belongsTo(Assistencias, { as: "assistencia", foreignKey: "idAssistencia", targetKey: "solicitacao" });
 
+  // Estoque de Matéria Prima
+  MateriaisCodigoNF.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });
+  MateriaisCodigoNF.belongsTo(Fornecedores, { as: "fornecedor", foreignKey: "fornecedorId" });
+
+  NotasFiscaisItens.belongsTo(NotasFiscais, { as: "notaFiscal", foreignKey: "notaFiscalId" });
+  NotasFiscaisItens.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });
+  NotasFiscais.hasMany(NotasFiscaisItens,   { as: "itens",      foreignKey: "notaFiscalId" });
+
+  XmlConsumo.belongsTo(XmlImportacoes, { as: "importacao",    foreignKey: "importacaoId"    });
+  XmlConsumo.belongsTo(Materiais,      { as: "material",      foreignKey: "materialId"      });
+  XmlImportacoes.hasMany(XmlConsumo,   { as: "consumos",      foreignKey: "importacaoId"    });
+
+  Transferencias.belongsTo(Materiais,     { as: "material",          foreignKey: "materialId"          });
+  Transferencias.belongsTo(Localizacoes,  { as: "localizacaoOrigem", foreignKey: "localizacaoOrigemId" });
+  Transferencias.belongsTo(Localizacoes,  { as: "localizacaoDestino",foreignKey: "localizacaoDestinoId"});
+
+  EstoqueMovimentos.belongsTo(Materiais,       { as: "material",     foreignKey: "materialId"     });
+  EstoqueMovimentos.belongsTo(Localizacoes,    { as: "localizacao",  foreignKey: "localizacaoId"  });
+  EstoqueMovimentos.belongsTo(Fornecedores,    { as: "fornecedor",   foreignKey: "fornecedorId"   });
+  EstoqueMovimentos.belongsTo(NotasFiscaisItens,{ as: "nfItem",      foreignKey: "nfItemId"       });
+  EstoqueMovimentos.belongsTo(XmlConsumo,      { as: "xmlConsumo",   foreignKey: "xmlConsumoId"   });
+  EstoqueMovimentos.belongsTo(Transferencias,  { as: "transferencia",foreignKey: "transferenciaId"});
+
+  SolicitacaoComprasItens.belongsTo(SolicitacaoCompras,  { as: "solicitacao", foreignKey: "solicitacaoId" });
+  SolicitacaoComprasItens.belongsTo(Materiais,           { as: "material",    foreignKey: "materialId"    });
+  SolicitacaoComprasItens.belongsTo(Fornecedores,        { as: "fornecedor",  foreignKey: "fornecedorId"  });
+  SolicitacaoComprasItens.belongsTo(NotasFiscaisItens,   { as: "nfItem",      foreignKey: "nfItemId"      });
+  SolicitacaoCompras.hasMany(SolicitacaoComprasItens,    { as: "itens",       foreignKey: "solicitacaoId" });
+
   return {
     Acessorios,
     Assistencias,
@@ -123,6 +174,17 @@ function initModels(sequelize) {
     TipoRequisicao,
     Paradas,
     ParadasHistorico,
+    Localizacoes,
+    Materiais,
+    MateriaisCodigoNF,
+    NotasFiscais,
+    NotasFiscaisItens,
+    XmlImportacoes,
+    XmlConsumo,
+    Transferencias,
+    EstoqueMovimentos,
+    SolicitacaoCompras,
+    SolicitacaoComprasItens,
   };
 }
 module.exports = initModels;

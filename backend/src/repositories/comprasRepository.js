@@ -2,8 +2,8 @@ const { Op } = require("sequelize");
 const { Acessorios, Projetos, Clientes } = require("../client/db");
 const { compraStatus } = require("../utils/calcStatus");
 
-async function listarAcessoriosCompras({ p_dataentrega } = {}) {
-  const cutoff = p_dataentrega || '1970-01-01';
+async function listarAcessoriosCompras({ dataentrega } = {}) {
+  const cutoff = dataentrega || '1970-01-01';
 
   const rows = await Acessorios.findAll({
     attributes: [
@@ -67,18 +67,18 @@ async function listarAcessoriosCompras({ p_dataentrega } = {}) {
 async function atualizarAcessorios(dados) {
   await Acessorios.update(
     {
-      categoria:    dados.p_categoria    ?? null,
-      descricao:    dados.p_descricao    ?? null,
-      medida:       dados.p_medida       ?? null,
-      parcelamento: dados.p_parcelamento ?? null,
-      numcard:      dados.p_numcard      ?? null,
-      qtd:          dados.p_qtd          ?? null,
-      fornecedor:   dados.p_fornecedor   ?? null,
-      datacompra:   dados.p_datacompra   ?? null,
-      previsao:     dados.p_previsao     ?? null,
-      recebido:     dados.p_recebido     ?? null,
+      categoria:    dados.categoria    ?? null,
+      descricao:    dados.descricao    ?? null,
+      medida:       dados.medida       ?? null,
+      parcelamento: dados.parcelamento ?? null,
+      numcard:      dados.numcard      ?? null,
+      qtd:          dados.qtd          ?? null,
+      fornecedor:   dados.fornecedor   ?? null,
+      datacompra:   dados.datacompra   ?? null,
+      previsao:     dados.previsao     ?? null,
+      recebido:     dados.recebido     ?? null,
     },
-    { where: { id: dados.p_id } },
+    { where: { id: dados.id } },
   );
 }
 

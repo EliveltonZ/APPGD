@@ -40,6 +40,10 @@ async function buscarCapaProducao(ordemdecompra) {
   return repo.buscarCapaProducao(ordemdecompra);
 }
 
+async function gerarOcAssistencia() {
+  return repo.gerarOcAssistencia();
+}
+
 module.exports = {
   buscarPorContrato,
   listarClientes,
@@ -51,4 +55,5 @@ module.exports = {
   buscarParaDeletar,
   deletarProjeto,
   buscarCapaProducao,
+  gerarOcAssistencia,
 };

@@ -11,13 +11,13 @@ async function getConfig() {
   return rows.map(r => ({ cod: r.cod, descricao: r.descricao }));
 }
 
-async function inserirEquipeSat(p_id_sat, p_id_montador) {
-  await EquipSat.create({ idSat: String(p_id_sat), idMontador: Number(p_id_montador) });
+async function inserirEquipeSat(idSat, idMontador) {
+  await EquipSat.create({ idSat: String(idSat), idMontador: Number(idMontador) });
 }
 
-async function getPecas(p_id_assistencia) {
+async function getPecas(idAssistencia) {
   const rows = await Pecas.findAll({
-    where: { idAssistencia: String(p_id_assistencia) },
+    where: { idAssistencia: String(idAssistencia) },
     attributes: ['codigo', 'qtd', 'peca', 'dimensoes', 'cor', 'lado', 'idOcorrencia', 'idFalha', 'observacoes'],
     include: [
       { model: Ocorrencia, as: 'ocorrencia', attributes: ['descricao'], required: true },
@@ -59,9 +59,9 @@ async function listarMontadores() {
   return rows.map(r => ({ codigo: r.id, nome: r.name }));
 }
 
-async function buscarContratoAssistencia(p_contrato) {
+async function buscarContratoAssistencia(contrato) {
   const rows = await Projetos.findAll({
-    where: { contrato: Number(p_contrato) },
+    where: { contrato: Number(contrato) },
     attributes: [],
     include: [
       { model: Clientes,  as: 'tblCliente',   attributes: ['name'], required: true  },

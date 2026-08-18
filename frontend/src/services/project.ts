@@ -21,28 +21,50 @@ function toContractData(raw: RawRow): Partial<ProjectFormData> {
   }
 }
 
-function toInsertPayload(form: ProjectFormData) {
+function assistenciaFields(form: ProjectFormData) {
   return {
-    p_contrato:        Number(form.contrato),
-    p_ordemdecompra:   Number(form.numOC),
-    p_id_cliente:      Number(form.clienteId),
-    p_id_tipoambiente: form.tipoAmbiente,
-    p_ambiente:        form.ambiente,
-    p_numproj:         form.numeroProjeto,
-    p_id_vendedor:     Number(form.vendedor),
-    p_id_liberador:    Number(form.liberador),
-    p_datacontrato:    form.dataContrato    || null,
-    p_dataassinatura:  form.dataAssinatura  || null,
-    p_chegoufabrica:   form.chegouFabrica   || null,
-    p_dataentrega:     form.dataEntrega     || null,
-    p_id_loja:         Number(form.loja),
-    p_id_tipocliente:  Number(form.clienteTipo),
-    p_id_etapa:        Number(form.etapa),
-    p_id_tipocontrato: Number(form.tipoContrato),
-    p_valorbruto:      parseCurrencyToNumber(form.valorBruto),
-    p_valornegociado:  parseCurrencyToNumber(form.valorNegociado),
-    p_customaterial:   parseCurrencyToNumber(form.custoMaterial),
-    p_custoadicional:  parseCurrencyToNumber(form.custoAdicional),
+    oc_origem:          form.ocOrigem ? Number(form.ocOrigem) : null,
+    motivo_assistencia: form.motivoAssistencia || null,
+    supervisor:         form.supervisor || null,
+    tipo_solicitacao:   form.tipoSolicitacaoAssist ? Number(form.tipoSolicitacaoAssist) : null,
+    origem_montagem:    form.origemMontagem || null,
+    origem_promob:      form.origemPromob   || null,
+    origem_cobrada:     form.origemCobrada  || null,
+    observacoes:        form.observacoesAssist || null,
+    solicitante:        form.solicitante || null,
+    id_solicitante:     form.idSolicitante ?? null,
+    urgente:            form.urgente,
+  }
+}
+
+function toInsertPayload(form: ProjectFormData) {
+  const isAssistencia = form.tipoProjeto === 'ASSISTENCIA'
+  return {
+    tipo_projeto:    form.tipoProjeto || 'PROJETO',
+    ordemdecompra:   Number(form.numOC),
+    // campos compartilhados
+    cliente_nome:    form.clienteNome || null,
+    ambiente:        form.ambiente    || null,
+    dataentrega:     form.dataEntrega || null,
+    // campos apenas de projeto (null para assistência)
+    contrato:        isAssistencia ? null : Number(form.contrato),
+    id_cliente:      isAssistencia ? null : Number(form.clienteId),
+    id_tipoambiente: isAssistencia ? null : form.tipoAmbiente,
+    numproj:         isAssistencia ? null : form.numeroProjeto,
+    id_vendedor:     isAssistencia ? null : Number(form.vendedor),
+    id_liberador:    isAssistencia ? null : Number(form.liberador),
+    datacontrato:    isAssistencia ? null : (form.dataContrato   || null),
+    dataassinatura:  isAssistencia ? null : (form.dataAssinatura || null),
+    chegoufabrica:   isAssistencia ? null : (form.chegouFabrica  || null),
+    id_loja:         isAssistencia ? null : Number(form.loja),
+    id_tipocliente:  isAssistencia ? null : Number(form.clienteTipo),
+    id_etapa:        isAssistencia ? null : Number(form.etapa),
+    id_tipocontrato: isAssistencia ? null : Number(form.tipoContrato),
+    valorbruto:      isAssistencia ? 0    : parseCurrencyToNumber(form.valorBruto),
+    valornegociado:  isAssistencia ? 0    : parseCurrencyToNumber(form.valorNegociado),
+    customaterial:   isAssistencia ? 0    : parseCurrencyToNumber(form.custoMaterial),
+    custoadicional:  isAssistencia ? 0    : parseCurrencyToNumber(form.custoAdicional),
+    ...assistenciaFields(form),
   }
 }
 
@@ -51,7 +73,7 @@ export async function saveProject(form: ProjectFormData): Promise<void> {
 }
 
 export async function saveClient(nome: string): Promise<void> {
-  await apiPost('/projetos/cliente', { p_nome_cliente: nome })
+  await apiPost('/projetos/cliente', { nome_cliente: nome })
 }
 
 export async function fetchClients(): Promise<{ id: string; nome: string; tipo: string }[]> {
@@ -109,6 +131,18 @@ function toEditData(raw: RawRow): Partial<ProjectFormData> {
     valorNegociado: formatCurrencyFromDB(raw.valornegociado        as number),
     custoMaterial:  formatCurrencyFromDB(raw.customaterial         as number),
     custoAdicional: formatCurrencyFromDB(raw.customaterialadicional as number),
+    tipoProjeto:           (raw.tipo_projeto as string)       ?? 'PROJETO',
+    ocOrigem:              raw.oc_origem ? String(raw.oc_origem) : '',
+    motivoAssistencia:     (raw.motivo_assistencia as string) ?? '',
+    urgente:               Boolean(raw.urgente),
+    supervisor:            (raw.supervisor  as string)        ?? '',
+    tipoSolicitacaoAssist: raw.tipo_solicitacao != null ? Number(raw.tipo_solicitacao) : '',
+    origemMontagem:        Boolean(raw.origem_montagem),
+    origemPromob:          Boolean(raw.origem_promob),
+    origemCobrada:         Boolean(raw.origem_cobrada),
+    observacoesAssist:     (raw.observacoes  as string)       ?? '',
+    solicitante:           (raw.solicitante     as string)  ?? '',
+    idSolicitante:         raw.id_solicitante != null ? Number(raw.id_solicitante) : null,
   }
 }
 
@@ -122,27 +156,33 @@ export async function fetchEditProject(
 }
 
 function toUpdatePayload(form: ProjectFormData) {
+  const isAssistencia = form.tipoProjeto === 'ASSISTENCIA'
   return {
-    p_ordemdecompra:        Number(form.numOC),
-    p_contrato:             Number(form.contrato),
-    p_id_cliente:           Number(form.clienteId),
-    p_id_tipoambiente:      Number(form.tipoAmbiente),
-    p_ambiente:             form.ambiente,
-    p_numproj:              form.numeroProjeto,
-    p_id_vendedor:          Number(form.vendedor),
-    p_id_liberador:         Number(form.liberador),
-    p_datacontrato:         form.dataContrato    || null,
-    p_dataassinatura:       form.dataAssinatura  || null,
-    p_chegoufabrica:        form.chegouFabrica   || null,
-    p_dataentrega:          form.dataEntrega     || null,
-    p_id_loja:              Number(form.loja),
-    p_id_tipocliente:       Number(form.clienteTipo),
-    p_id_etapa:             Number(form.etapa),
-    p_id_tipocontrato:      Number(form.tipoContrato),
-    p_valorbruto:           parseCurrencyToNumber(form.valorBruto),
-    p_valornegociado:       parseCurrencyToNumber(form.valorNegociado),
-    p_customaterial:        parseCurrencyToNumber(form.custoMaterial),
-    p_customaterialadicional: parseCurrencyToNumber(form.custoAdicional),
+    tipo_projeto:    form.tipoProjeto || 'PROJETO',
+    ordemdecompra:   Number(form.numOC),
+    // campos compartilhados
+    cliente_nome:    form.clienteNome || null,
+    ambiente:        form.ambiente    || null,
+    dataentrega:     form.dataEntrega || null,
+    // campos apenas de projeto (null para assistência)
+    contrato:              isAssistencia ? null : Number(form.contrato),
+    id_cliente:            isAssistencia ? null : Number(form.clienteId),
+    id_tipoambiente:       isAssistencia ? null : Number(form.tipoAmbiente),
+    numproj:               isAssistencia ? null : form.numeroProjeto,
+    id_vendedor:           isAssistencia ? null : Number(form.vendedor),
+    id_liberador:          isAssistencia ? null : Number(form.liberador),
+    datacontrato:          isAssistencia ? null : (form.dataContrato   || null),
+    dataassinatura:        isAssistencia ? null : (form.dataAssinatura || null),
+    chegoufabrica:         isAssistencia ? null : (form.chegouFabrica  || null),
+    id_loja:               isAssistencia ? null : Number(form.loja),
+    id_tipocliente:        isAssistencia ? null : Number(form.clienteTipo),
+    id_etapa:              isAssistencia ? null : Number(form.etapa),
+    id_tipocontrato:       isAssistencia ? null : Number(form.tipoContrato),
+    valorbruto:            isAssistencia ? 0    : parseCurrencyToNumber(form.valorBruto),
+    valornegociado:        isAssistencia ? 0    : parseCurrencyToNumber(form.valorNegociado),
+    customaterial:         isAssistencia ? 0    : parseCurrencyToNumber(form.custoMaterial),
+    customaterialadicional: isAssistencia ? 0   : parseCurrencyToNumber(form.custoAdicional),
+    ...assistenciaFields(form),
   }
 }
 
@@ -177,12 +217,17 @@ function toDeleteData(raw: RawRow): Partial<ProjectFormData> {
 export async function fetchDeleteProject(
   ordemdecompra: string,
 ): Promise<Partial<ProjectFormData> | null> {
-  const rows = await apiGet<RawRow[]>('/projetos/deletar', { p_ordemdecompra: ordemdecompra })
+  const rows = await apiGet<RawRow[]>('/projetos/deletar', { ordemdecompra })
   const raw = Array.isArray(rows) ? rows[0] : null
   if (!raw) return null
   return toDeleteData(raw)
 }
 
 export async function deleteProject(numOC: string): Promise<void> {
-  await apiPost('/projetos/deletar', { p_ordemdecompra: Number(numOC) })
+  await apiPost('/projetos/deletar', { ordemdecompra: Number(numOC) })
+}
+
+export async function fetchProximoOcAssistencia(): Promise<number> {
+  const result = await apiGet<{ oc: number }>('/projetos/assistencia/proximo-oc')
+  return result.oc
 }

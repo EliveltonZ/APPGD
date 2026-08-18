@@ -11,6 +11,9 @@ router.get("/clientes", add.listClients);
 router.get("/tipos-cliente", add.listTiposCliente);
 router.get("/capa", capa.fillElements);
 
+// OC para assistência (sequence atômica — segura contra concorrência)
+router.get("/assistencia/proximo-oc", rp("nova_solicitacao"), add.getProximoOcAssistencia);
+
 // Cadastro
 router.post("/", rp("novo_pedido"), add.createProject);
 router.post("/cliente", rp("novo_pedido"), add.createClient);

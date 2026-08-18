@@ -10,14 +10,14 @@ export async function fetchMaxUserId(): Promise<number> {
 }
 
 export interface NewUserPayload {
-  p_id:        number;
-  p_login:     string;
-  p_senha:     string;
-  p_setor:     string;
-  p_camiseta:  string;
-  p_calca:     string;
-  p_sapato:    string;
-  p_local:     string;
+  id:        number;
+  login:     string;
+  senha:     string;
+  setor:     string;
+  camiseta:  string;
+  calca:     string;
+  sapato:    string;
+  local:     string;
 }
 
 export async function insertUser(payload: NewUserPayload): Promise<void> {
@@ -53,9 +53,12 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     cadastros_comercial:       Boolean(r.cadastros_comercial),
     cadastros_clientes:        Boolean(r.cadastros_clientes),
     cadastros_usuarios:        Boolean(r.cadastros_usuarios),
+    cadastros_materiais:       Boolean(r.cadastros_materiais),
+    cadastros_localizacoes:    Boolean(r.cadastros_localizacoes),
     pcp_apontamento:           Boolean(r.apontamento),
     paradas_maquina:           Boolean(r.paradas_maquina),
     paradas_admin:             Boolean(r.paradas_admin),
+    almoxarifado_transferencias: Boolean(r.almoxarifado_transferencias),
   };
   return {
     id:          String(r.id    ?? ''),
@@ -66,7 +69,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
 }
 
 export async function fetchUserName(id: number): Promise<{ nome: string; ativo: boolean } | null> {
-  const rows = await apiGet<{ nome: string; ativo: boolean }[]>('/auth/usuario', { p_id: id });
+  const rows = await apiGet<{ nome: string; ativo: boolean }[]>('/auth/usuario', { id });
   if (!rows.length || !rows[0].nome) return null;
   return { nome: rows[0].nome, ativo: Boolean(rows[0].ativo) };
 }
@@ -126,38 +129,41 @@ export async function updateUser(id: number, data: Omit<UserRecord, 'id'>): Prom
 }
 
 export async function updateSenha(id: number, senha: string): Promise<void> {
-  await apiPost('/senha/', { p_id: id, p_senha: senha });
+  await apiPost('/senha/', { id, senha });
 }
 
 export async function saveAcessos(id: number, permissions: UserPermissions): Promise<void> {
   await apiPost('/usuarios/acessos', {
-    p_id:                    id,
-    p_novo_pedido:           permissions.pedidos_novo,
-    p_editar_pedido:         permissions.pedidos_editar,
-    p_excluir_pedido:        permissions.pedidos_excluir,
-    p_compras:               permissions.compras_lista,
-    p_pendencia:             permissions.compras_pendencias,
-    p_pcp:                   permissions.pcp_painel,
-    p_producao:              permissions.pcp_producao,
-    p_expedicao:             permissions.pcp_expedicao,
-    p_status:                permissions.logistica_status,
-    p_planejamento:          permissions.logistica_planejamento,
-    p_nova_solicitacao:      permissions.assistencias_nova,
-    p_producao_assistencia:  permissions.assistencias_producao,
-    p_logistica_assistencia: permissions.assistencias_logistica,
-    p_qualidade:             permissions.assistencias_qualidade,
-    p_valores:               permissions.financeiro_valores,
-    p_dashboard:             permissions.dashboards_principal,
-    p_password:              permissions.config_senha,
-    p_acesso:                permissions.config_acessos,
-    p_relatorios:            permissions.pcp_relatorios,
-    p_cadastros_equipe:      permissions.cadastros_equipe,
-    p_cadastros_qualidade:   permissions.cadastros_qualidade,
-    p_cadastros_comercial:   permissions.cadastros_comercial,
-    p_cadastros_clientes:    permissions.cadastros_clientes,
-    p_cadastros_usuarios:    permissions.cadastros_usuarios,
-    p_apontamento:           permissions.pcp_apontamento,
-    p_paradas_maquina:       permissions.paradas_maquina,
-    p_paradas_admin:         permissions.paradas_admin,
+    id,
+    novo_pedido:           permissions.pedidos_novo,
+    editar_pedido:         permissions.pedidos_editar,
+    excluir_pedido:        permissions.pedidos_excluir,
+    compras:               permissions.compras_lista,
+    pendencia:             permissions.compras_pendencias,
+    pcp:                   permissions.pcp_painel,
+    producao:              permissions.pcp_producao,
+    expedicao:             permissions.pcp_expedicao,
+    status:                permissions.logistica_status,
+    planejamento:          permissions.logistica_planejamento,
+    nova_solicitacao:      permissions.assistencias_nova,
+    producao_assistencia:  permissions.assistencias_producao,
+    logistica_assistencia: permissions.assistencias_logistica,
+    qualidade:             permissions.assistencias_qualidade,
+    valores:               permissions.financeiro_valores,
+    dashboard:             permissions.dashboards_principal,
+    password:              permissions.config_senha,
+    acesso:                permissions.config_acessos,
+    relatorios:            permissions.pcp_relatorios,
+    cadastros_equipe:      permissions.cadastros_equipe,
+    cadastros_qualidade:   permissions.cadastros_qualidade,
+    cadastros_comercial:   permissions.cadastros_comercial,
+    cadastros_clientes:    permissions.cadastros_clientes,
+    cadastros_usuarios:    permissions.cadastros_usuarios,
+    cadastros_materiais:    permissions.cadastros_materiais,
+    cadastros_localizacoes: permissions.cadastros_localizacoes,
+    apontamento:            permissions.pcp_apontamento,
+    paradas_maquina:       permissions.paradas_maquina,
+    paradas_admin:         permissions.paradas_admin,
+    almoxarifado_transferencias: permissions.almoxarifado_transferencias,
   });
 }

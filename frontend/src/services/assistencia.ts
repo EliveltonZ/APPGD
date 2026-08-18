@@ -20,7 +20,7 @@ export async function fetchContratoAssist(
   contrato: number,
 ): Promise<{ cliente: string; liberador: string } | null> {
   try {
-    const rows = await apiGet<RawRow[]>('/solicitacao/contrato', { p_contrato: contrato });
+    const rows = await apiGet<RawRow[]>('/solicitacao/contrato', { contrato });
     const r    = Array.isArray(rows) ? rows[0] : null;
     if (!r) return null;
     return { cliente: String(r.cliente ?? ''), liberador: String(r.liberador ?? '') };

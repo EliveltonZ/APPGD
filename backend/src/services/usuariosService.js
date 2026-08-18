@@ -3,7 +3,7 @@ const repo = require("../repositories/usuariosRepository");
 const buscarMaiorId   = ()       => repo.buscarMaiorId();
 const inserirUsuario  = (dados)  => repo.inserirUsuario(dados);
 const listarAcessos   = ()       => repo.listarAcessos();
-const buscarAcesso    = (p_id)   => repo.buscarAcesso(p_id);
+const buscarAcesso    = (id)     => repo.buscarAcesso(id);
 const atualizarAcessos = (dados) => repo.atualizarAcessos(dados);
 
 const alterarSenha        = (id, senha)   => repo.alterarSenha(id, senha);

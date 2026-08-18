@@ -1,6 +1,6 @@
 const repo = require("../repositories/pecasRepository");
 
-const listarPecas  = (id_assistencia)          => repo.listarPecas(id_assistencia);
-const inserirPecas = (id_assistencia, p_pecas) => repo.inserirPecas(id_assistencia, p_pecas);
+const listarPecas  = (idAssistencia)           => repo.listarPecas(idAssistencia);
+const inserirPecas = (idAssistencia, pecas)    => repo.inserirPecas(idAssistencia, pecas);
 
 module.exports = { listarPecas, inserirPecas };

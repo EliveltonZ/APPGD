@@ -22,7 +22,7 @@ module.exports = {
 
   async getProducaoBarcode(req, res) {
     try {
-      const data = await prdService.buscarProducaoPorPedido(Number(req.query.p_pedido));
+      const data = await prdService.buscarProducaoPorPedido(Number(req.query.pedido));
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao buscar por pedido", error: err.message });

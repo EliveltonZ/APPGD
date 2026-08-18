@@ -31,7 +31,10 @@ router.use('/senha',        require('./senha'))
 router.use('/solicitacao',  require('./solicitacao'))
 router.use('/paradas',      require('./paradas'))
 router.use('/cadastros',    require('./cadastros'))
-router.use('/dashboard',    require('./dashboard'))
-router.use('/preferencias', require('./preferencias'))
+router.use('/materiais',    require('./materiais'))
+router.use('/localizacoes', require('./localizacoes'))
+router.use('/dashboard',      require('./dashboard'))
+router.use('/preferencias',   require('./preferencias'))
+router.use('/transferencias', require('./transferencias'))
 
 module.exports = router

@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
 const { Acessorios, Projetos, Clientes, Categorias } = require('../client/db');
 
-async function buscarContratoPendencia(p_contrato) {
+async function buscarContratoPendencia(contrato) {
   const rows = await Projetos.findAll({
-    where: { contrato: Number(p_contrato) },
+    where: { contrato: Number(contrato) },
     attributes: ['ordemdecompra', 'ambiente', 'dataentrega'],
     include: [{ model: Clientes, as: 'tblCliente', attributes: ['name'], required: true }],
   });
@@ -41,17 +41,17 @@ async function buscarContratoPendencia(p_contrato) {
   });
 }
 
-async function getAcessoriosPendencias(p_ordemdecompra) {
+async function getAcessoriosPendencias(ordemdecompra) {
   return Acessorios.findAll({
-    where: { ordemdecompra: Number(p_ordemdecompra) },
+    where: { ordemdecompra: Number(ordemdecompra) },
     attributes: ['id', 'categoria', 'descricao', 'medida', 'qtd', 'fornecedor', 'datacompra', 'previsao', 'recebido'],
     raw: true,
   });
 }
 
-async function listarAcessoriosPendencias(p_ordemdecompra) {
+async function listarAcessoriosPendencias(ordemdecompra) {
   const rows = await Acessorios.findAll({
-    where: { ordemdecompra: Number(p_ordemdecompra) },
+    where: { ordemdecompra: Number(ordemdecompra) },
     attributes: ['id', 'idCategoria', 'descricao', 'medida', 'qtd', 'fornecedor', 'datacompra', 'previsao', 'recebido'],
     include: [{ model: Categorias, as: 'tblCategoria', attributes: ['name'] }],
   });
@@ -71,37 +71,37 @@ async function listarAcessoriosPendencias(p_ordemdecompra) {
 
 async function inserirAcessorios(body) {
   await Acessorios.create({
-    ordemdecompra: body.p_ordemdecompra,
-    idCategoria:   body.p_id_categoria ? Number(body.p_id_categoria) : null,
-    descricao:     body.p_descricao    ?? null,
-    medida:        body.p_medida       ?? null,
-    qtd:           body.p_quantidade ? Number(body.p_quantidade) : 0,
-    fornecedor:    body.p_fornecedor   ?? null,
-    datacompra:    body.p_compra       ?? null,
-    previsao:      body.p_previsao     ?? null,
-    recebido:      body.p_recebido     ?? null,
+    ordemdecompra: body.ordemdecompra,
+    idCategoria:   body.id_categoria ? Number(body.id_categoria) : null,
+    descricao:     body.descricao    ?? null,
+    medida:        body.medida       ?? null,
+    qtd:           body.quantidade ? Number(body.quantidade) : 0,
+    fornecedor:    body.fornecedor   ?? null,
+    datacompra:    body.compra       ?? null,
+    previsao:      body.previsao     ?? null,
+    recebido:      body.recebido     ?? null,
   });
 }
 
-async function deletarAcessorio(p_id) {
-  await Acessorios.destroy({ where: { id: Number(p_id) } });
+async function deletarAcessorio(id) {
+  await Acessorios.destroy({ where: { id: Number(id) } });
 }
 
 async function atualizarAcessorios(body) {
   await Acessorios.update(
     {
-      idCategoria:  body.p_id_categoria ? Number(body.p_id_categoria) : null,
-      descricao:    body.p_descricao    ?? null,
-      medida:       body.p_medida       ?? null,
-      parcelamento: body.p_parcelamento ? Number(body.p_parcelamento) : null,
-      numcard:      body.p_numcard      ?? null,
-      qtd:          body.p_qtd         ? Number(body.p_qtd)          : 0,
-      fornecedor:   body.p_fornecedor   ?? null,
-      datacompra:   body.p_datacompra   ?? null,
-      previsao:     body.p_previsao     ?? null,
-      recebido:     body.p_recebido     ?? null,
+      idCategoria:  body.id_categoria ? Number(body.id_categoria) : null,
+      descricao:    body.descricao    ?? null,
+      medida:       body.medida       ?? null,
+      parcelamento: body.parcelamento ? Number(body.parcelamento) : null,
+      numcard:      body.numcard      ?? null,
+      qtd:          body.qtd         ? Number(body.qtd)          : 0,
+      fornecedor:   body.fornecedor   ?? null,
+      datacompra:   body.datacompra   ?? null,
+      previsao:     body.previsao     ?? null,
+      recebido:     body.recebido     ?? null,
     },
-    { where: { id: Number(body.p_id) } }
+    { where: { id: Number(body.id) } }
   );
 }
 
