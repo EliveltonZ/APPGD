@@ -61,7 +61,7 @@ export function EditaProjetoPage() {
   const [loadingProject, setLoadingProject] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  function handleChange(field: keyof ProjectFormData, value: string | boolean | number) {
+  function handleChange(field: keyof ProjectFormData, value: ProjectFormData[keyof ProjectFormData]) {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }

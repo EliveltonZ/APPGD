@@ -62,7 +62,7 @@ async function listarMontadores() {
 async function buscarContratoAssistencia(contrato) {
   const rows = await Projetos.findAll({
     where: { contrato: Number(contrato) },
-    attributes: [],
+    attributes: ['idCliente'],
     include: [
       { model: Clientes,  as: 'tblCliente',   attributes: ['name'], required: true  },
       { model: Liberador, as: 'tblLiberador',  attributes: ['name'], required: false },
@@ -71,9 +71,9 @@ async function buscarContratoAssistencia(contrato) {
 
   const seen = new Set();
   return rows
-    .map(p => ({ cliente: p.tblCliente.name, liberador: p.tblLiberador?.name ?? null }))
+    .map(p => ({ id_cliente: p.idCliente, cliente: p.tblCliente.name, liberador: p.tblLiberador?.name ?? null }))
     .filter(item => {
-      const key = `${item.cliente}|${item.liberador}`;
+      const key = `${item.id_cliente}|${item.cliente}|${item.liberador}`;
       if (seen.has(key)) return false;
       seen.add(key);
       return true;

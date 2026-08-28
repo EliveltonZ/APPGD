@@ -5,14 +5,11 @@ export function validatePedido(form: ProjectFormData): ProjectFormErrors {
   const errors: ProjectFormErrors = {};
 
   if (form.tipoProjeto === "ASSISTENCIA") {
+    if (required(form.numeroSolicitacao, "Nº Solicitação")) errors.numeroSolicitacao = "Obrigatório";
     if (required(form.clienteNome, "Cliente"))              errors.clienteNome       = "Selecione um cliente";
     if (required(form.ambiente, "Ambiente"))                errors.ambiente          = "Obrigatório";
     if (required(form.supervisor, "Supervisor"))            errors.supervisor        = "Obrigatório";
     if (required(form.motivoAssistencia, "Motivo"))         errors.motivoAssistencia = "Descreva o motivo da assistência";
-    const ocOrigem = form.ocOrigem.trim();
-    if (ocOrigem && (ocOrigem.length < 10 || isNaN(Number(ocOrigem)))) {
-      errors.ocOrigem = "OC de origem inválida";
-    }
   } else {
     const numOC = form.numOC.trim();
     if (required(form.contrato, "Contrato"))              errors.contrato       = "Obrigatório";

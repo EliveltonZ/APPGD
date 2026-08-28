@@ -15,6 +15,9 @@ module.exports = {
       await service.atualizarProjeto(req.body);
       res.json({ success: true });
     } catch (err) {
+      if (err.name === 'SequelizeUniqueConstraintError' && err.fields?.numero_solicitacao) {
+        return res.status(409).json({ message: 'Número de solicitação já cadastrado.' });
+      }
       res.status(500).json({ message: "Erro ao atualizar projeto", error: err.message });
     }
   },

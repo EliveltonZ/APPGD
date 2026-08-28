@@ -1,3 +1,5 @@
+import type { TeamMember, ServicePart } from './assistencia';
+
 export interface Client {
   id: string;
   nome: string;
@@ -37,19 +39,26 @@ export interface ProjectFormData {
   custoAdicional: string;
   // 7 — Tipo de projeto
   tipoProjeto: string;
-  ocOrigem: string;
   motivoAssistencia: string;
+  numeroSolicitacao: string;
   // 8 — Dados da Assistência
   supervisor: string;
   tipoSolicitacaoAssist: string | number;
   origemMontagem: boolean;
   origemPromob: boolean;
+  origemEntrega: boolean;
   origemCobrada: boolean;
   observacoesAssist: string;
   responsavel: string;
   idResponsavel: number | null;
   dataCriacao?: string;
   urgente: boolean;
+  bairro: string;
+  tempo: string;
+  destino: string;
+  liberadorNome: string;
+  equipe: TeamMember[];
+  pecas: ServicePart[];
 }
 
 export function emptyProjectForm(): ProjectFormData {
@@ -76,24 +85,33 @@ export function emptyProjectForm(): ProjectFormData {
     custoMaterial: "",
     custoAdicional: "",
     tipoProjeto: "PROJETO",
-    ocOrigem: "",
     motivoAssistencia: "",
+    numeroSolicitacao: "",
     supervisor: "",
     tipoSolicitacaoAssist: '',
     origemMontagem: false,
     origemPromob: false,
+    origemEntrega: false,
     origemCobrada: false,
     observacoesAssist: "",
     responsavel: "",
     idResponsavel: null,
     urgente: false,
+    bairro: "",
+    tempo: "",
+    destino: "",
+    liberadorNome: "",
+    equipe: [],
+    pecas: [],
   };
 }
 
 export type ProjectFormErrors = Partial<Record<keyof ProjectFormData, string>>;
 
+export type ProjectFormFieldValue = string | boolean | number | TeamMember[] | ServicePart[];
+
 export interface SectionProps {
   form: ProjectFormData;
-  onChange: (field: keyof ProjectFormData, value: string | boolean | number) => void;
+  onChange: (field: keyof ProjectFormData, value: ProjectFormFieldValue) => void;
   errors?: ProjectFormErrors;
 }

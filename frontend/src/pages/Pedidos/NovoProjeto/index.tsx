@@ -27,7 +27,7 @@ import {
   type ProjectFormErrors,
   type Client,
 } from "../../../types/project";
-import { fetchContractOptions, saveProject, fetchProximoOcAssistencia, type ContractOption } from "../../../services/project";
+import { fetchContractOptions, saveProject, type ContractOption } from "../../../services/project";
 import { fetchMaxOrder } from "../../../services/pcp";
 import {
   fetchLiberadores,
@@ -64,7 +64,6 @@ export function NovoProjetoPage() {
   );
 
   const [form, setForm] = useState<ProjectFormData>(emptyProjectForm);
-  const [loadingOc, setLoadingOc] = useState(false);
   const [errors, setErrors] = useState<ProjectFormErrors>({});
   const [clientModalOpen, setClientModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -73,43 +72,18 @@ export function NovoProjetoPage() {
   const [contractOptions, setContractOptions] = useState<ContractOption[]>([]);
   const [contractModalOpen, setContractModalOpen] = useState(false);
 
-  async function gerarOcAssistencia(): Promise<number | null> {
-    setLoadingOc(true);
-    try {
-      return await fetchProximoOcAssistencia();
-    } catch {
-      toast.error('Erro ao gerar número da assistência.');
-      return null;
-    } finally {
-      setLoadingOc(false);
-    }
-  }
-
-  async function handlePickType(tipo: TipoProjeto) {
-    if (tipo === 'ASSISTENCIA') {
-      const oc = await gerarOcAssistencia();
-      if (oc === null) return;
-      setTipoProjeto('ASSISTENCIA');
-      setForm((prev) => ({ ...prev, tipoProjeto: 'ASSISTENCIA', numOC: String(oc), responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
-    } else {
-      setTipoProjeto('PROJETO');
-      setForm((prev) => ({ ...prev, tipoProjeto: 'PROJETO', responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
-    }
+  function handlePickType(tipo: TipoProjeto) {
+    setTipoProjeto(tipo);
+    setForm((prev) => ({ ...prev, tipoProjeto: tipo, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
   }
 
   // Inicializa responsavel com o usuário logado ao montar (para usuários sem picker)
   useEffect(() => {
-    if (tipoProjeto === 'ASSISTENCIA' && !form.numOC) {
-      gerarOcAssistencia().then((oc) => {
-        if (oc !== null) setForm((prev) => ({ ...prev, numOC: String(oc), responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
-      });
-    } else if (tipoProjeto === 'PROJETO') {
-      setForm((prev) => ({ ...prev, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
-    }
+    setForm((prev) => ({ ...prev, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleChange(field: keyof ProjectFormData, value: string | boolean | number) {
+  function handleChange(field: keyof ProjectFormData, value: ProjectFormData[keyof ProjectFormData]) {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
@@ -199,8 +173,12 @@ export function NovoProjetoPage() {
       Object.entries(form).map(([k, v]) => [k, typeof v === "string" ? v.toUpperCase() : v]),
     ) as typeof form;
     try {
-      await saveProject(upperForm);
-      toast.success(tipoProjeto === 'ASSISTENCIA' ? "Assistência salva com sucesso." : "Projeto salvo com sucesso.");
+      const { ordemdecompra } = await saveProject(upperForm);
+      toast.success(
+        tipoProjeto === 'ASSISTENCIA'
+          ? `Assistência salva com sucesso. Nº OC: ${ordemdecompra}`
+          : "Projeto salvo com sucesso."
+      );
       setForm({ ...emptyProjectForm(), tipoProjeto: tipoProjeto! });
       setErrors({});
     } catch (err) {
@@ -295,7 +273,7 @@ export function NovoProjetoPage() {
             <>
               <FormSection step={1} title="Identificação da Assistência">
                 <div className="frow frow--3">
-                  <Input label="Nº OC" value={form.numOC} readOnly />
+                  <Input label="Nº OC" value={form.numOC} placeholder="Gerado ao salvar" readOnly />
                   <div className="ffield-with-action">
                     <Input
                       label="Cliente *"
@@ -332,7 +310,7 @@ export function NovoProjetoPage() {
                 errors={errors}
                 onContractBlur={handleContractBlur}
                 onNumOCDoubleClick={handleNumOCDoubleClick}
-                loadingContract={loadingContract || loadingOc}
+                loadingContract={loadingContract}
                 numOCReadOnly={false}
                 optionsTipoContrato={optionsTipoContrato}
                 optionsEtapa={optionsEtapa}

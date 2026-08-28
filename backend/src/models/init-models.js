@@ -100,6 +100,7 @@ function initModels(sequelize) {
   Avulsos.belongsTo(Projetos,      { as: "ordemdecompraTblProjeto", foreignKey: "ordemdecompra" });
   Projetos.hasOne(Avulsos,         { as: "tblAvulso",               foreignKey: "ordemdecompra" });
   Projetos.belongsTo(Clientes,     { as: "tblCliente",              foreignKey: "idCliente"     });
+  Projetos.belongsTo(Usuario,      { as: "usuarioResponsavel",      foreignKey: "idResponsavel" });
   Projetos.belongsTo(Etapa,        { as: "tblEtapum",               foreignKey: "idEtapa"       });
   Projetos.belongsTo(Liberador,    { as: "tblLiberador",            foreignKey: "idLiberador"   });
   Projetos.hasOne(Producao,        { as: "tblProducao",             foreignKey: "ordemdecompra" });

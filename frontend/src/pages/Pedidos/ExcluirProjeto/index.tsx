@@ -35,7 +35,7 @@ export function ExcluirProjetoPage() {
   const [deleting, setDeleting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  function handleChange(field: keyof ProjectFormData, value: string) {
+  function handleChange(field: keyof ProjectFormData, value: ProjectFormData[keyof ProjectFormData]) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 

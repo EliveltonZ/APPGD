@@ -16,6 +16,8 @@ const T = {
       tipoPedido:  'tipo_pedido',
       idResponsavel: 'id_responsavel',
       dataCriacao:   'data_criacao',
+      origemEntrega: 'origem_entrega',
+      numeroSolicitacao: 'numero_solicitacao',
     },
   },
   producao:   { name: 'tblProducao',   pk: 'ordemdecompra' },

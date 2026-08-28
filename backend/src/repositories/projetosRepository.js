@@ -3,13 +3,75 @@ const {
   Projetos, Producao, Avulsos, Acessorios,
   Clientes, TipoCliente, Vendedor, Liberador,
   Loja, TipoAmbiente, TipoContrato, Etapa,
-  Usuario,
+  Usuario, EquipSat, Pecas, Montador, Falhas, Ocorrencia,
 } = require("../client/db");
 
 // A sessão do banco roda em UTC — usar CURRENT_DATE/NOW() do Postgres erra
 // a data entre 21h e 23h59 no horário de Brasília. Calcula em America/Sao_Paulo.
 function dataAtualBrasil() {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+}
+
+// Equipe (tblEquipSat) e Peças (tblPecas) são compartilhadas com o módulo
+// de Assistências antigo — id_sat/id_assistencia são colunas TEXT soltas,
+// então usamos o ordemdecompra (como string) no lugar do "solicitacao".
+async function _salvarEquipePecas(ordemdecompra, equipe, pecas, t) {
+  const oc = String(ordemdecompra);
+
+  if (Array.isArray(equipe)) {
+    for (const m of equipe) {
+      await EquipSat.create({ idSat: oc, idMontador: Number(m.id) }, { transaction: t });
+    }
+  }
+
+  if (Array.isArray(pecas)) {
+    for (const p of pecas) {
+      if (!p.id_falha || Number(p.id_falha) === 0)
+        throw new Error(`Peça "${p.peca ?? 'sem nome'}" não possui tipo de falha informado.`);
+      await Pecas.create({
+        idAssistencia: oc,
+        qtd:          Number(p.qtd) || 0,
+        peca:         p.peca ?? null,
+        dimensoes:    p.dimensoes ?? null,
+        cor:          p.cor ?? null,
+        lado:         p.lado ?? null,
+        idOcorrencia: p.id_ocorrencia ? Number(p.id_ocorrencia) : null,
+        idFalha:      Number(p.id_falha),
+        observacoes:  p.observacoes ?? null,
+      }, { transaction: t });
+    }
+  }
+}
+
+async function _buscarEquipe(ordemdecompra) {
+  const rows = await EquipSat.findAll({
+    where: { idSat: String(ordemdecompra) },
+    include: [{ model: Montador, as: 'montador', attributes: ['name'], required: false }],
+  });
+  return rows.map(r => ({ id: r.idMontador, nome: r.montador?.name ?? '' }));
+}
+
+async function _buscarPecas(ordemdecompra) {
+  const rows = await Pecas.findAll({
+    where: { idAssistencia: String(ordemdecompra) },
+    include: [
+      { model: Ocorrencia, as: 'ocorrencia', attributes: ['descricao'], required: false },
+      { model: Falhas,     as: 'falha',      attributes: ['descricao'], required: false },
+    ],
+  });
+  return rows.map(r => ({
+    id:           String(r.codigo),
+    qtd:          r.qtd,
+    peca:         r.peca ?? '',
+    dimensoes:    r.dimensoes ?? '',
+    cor:          r.cor ?? '',
+    lado:         r.lado ?? '',
+    falha:        r.falha?.descricao ?? '',
+    falhaId:      r.idFalha,
+    tipo:         r.ocorrencia?.descricao ?? '',
+    ocorrenciaId: r.idOcorrencia,
+    observacoes:  r.observacoes ?? '',
+  }));
 }
 
 async function buscarPorContrato(contrato) {
@@ -68,56 +130,70 @@ async function inserirProjeto(body) {
   const { cliente, vendedor, liberador, loja, tipoCliente, tipoAmbiente, tipoContrato, etapa } =
     await _resolverLookups(body);
 
-  await Projetos.create({
-    ordemdecompra:          body.ordemdecompra,
-    contrato:               body.contrato               ?? null,
-    idCliente:              body.id_cliente             ?? null,
-    cliente:                body.cliente_nome           ?? cliente?.name ?? null,
-    idTipoambiente:         body.id_tipoambiente        ?? null,
-    tipoambiente:           tipoAmbiente?.name            ?? null,
-    ambiente:               body.ambiente               ?? null,
-    numproj:                body.numproj                ?? null,
-    idVendedor:             body.id_vendedor            ?? null,
-    vendedor:               vendedor?.name                ?? null,
-    idLiberador:            body.id_liberador           ?? null,
-    liberador:              liberador?.name               ?? null,
-    datacontrato:           body.datacontrato           ?? null,
-    dataassinatura:         body.dataassinatura         ?? null,
-    chegoufabrica:          body.chegoufabrica          ?? null,
-    dataentrega:            body.dataentrega            ?? null,
-    previsao:               body.dataentrega            ?? null,
-    idLoja:                 body.id_loja                ?? null,
-    loja:                   loja?.name                    ?? null,
-    idTipocliente:          body.id_tipocliente         ?? null,
-    tipocliente:            tipoCliente?.name             ?? null,
-    idEtapa:                body.id_etapa               ?? null,
-    etapa:                  etapa?.name                   ?? null,
-    idTipocontrato:         body.id_tipocontrato        ?? null,
-    tipocontrato:           tipoContrato?.name            ?? null,
-    valorbruto:             body.valorbruto             ?? 0,
-    valornegociado:         body.valornegociado         ?? 0,
-    customaterial:          body.customaterial          ?? 0,
-    customaterialadicional: body.custoadicional         ?? 0,
-    tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
-    ocOrigem:               body.oc_origem              ?? null,
-    motivoAssistencia:      body.motivo_assistencia     ?? null,
-    supervisor:             body.supervisor             ?? null,
-    tipoSolicitacao:        body.tipo_solicitacao       ?? null,
-    origemMontagem:         body.origem_montagem        ?? null,
-    origemPromob:           body.origem_promob          ?? null,
-    origemCobrada:          body.origem_cobrada         ?? null,
-    observacoes:            body.observacoes            ?? null,
-    responsavel:            body.responsavel            ?? null,
-    idResponsavel:          body.id_responsavel         ?? null,
-    dataCriacao:            dataAtualBrasil(),
-    urgente:                body.urgente                ?? false,
+  // Assistência: OC gerada só agora, no momento real de salvar — não mais
+  // ao abrir a tela, pra não "queimar" números de quem abre e desiste.
+  const oc = body.tipo_projeto === 'ASSISTENCIA'
+    ? await gerarOcAssistencia()
+    : body.ordemdecompra;
+
+  await sequelize.transaction(async (t) => {
+    await Projetos.create({
+      ordemdecompra:          oc,
+      contrato:               body.contrato               ?? null,
+      idCliente:              body.id_cliente             ?? null,
+      cliente:                body.cliente_nome           ?? cliente?.name ?? null,
+      idTipoambiente:         body.id_tipoambiente        ?? null,
+      tipoambiente:           tipoAmbiente?.name            ?? null,
+      ambiente:               body.ambiente               ?? null,
+      numproj:                body.numproj                ?? null,
+      idVendedor:             body.id_vendedor            ?? null,
+      vendedor:               vendedor?.name                ?? null,
+      idLiberador:            body.id_liberador           ?? null,
+      liberador:              body.liberador_nome         ?? liberador?.name ?? null,
+      datacontrato:           body.datacontrato           ?? null,
+      dataassinatura:         body.dataassinatura         ?? null,
+      chegoufabrica:          body.chegoufabrica          ?? null,
+      dataentrega:            body.dataentrega            ?? null,
+      previsao:               body.dataentrega            ?? null,
+      idLoja:                 body.id_loja                ?? null,
+      loja:                   loja?.name                    ?? null,
+      idTipocliente:          body.id_tipocliente         ?? null,
+      tipocliente:            tipoCliente?.name             ?? null,
+      idEtapa:                body.id_etapa               ?? null,
+      etapa:                  etapa?.name                   ?? null,
+      idTipocontrato:         body.id_tipocontrato        ?? null,
+      tipocontrato:           tipoContrato?.name            ?? null,
+      valorbruto:             body.valorbruto             ?? 0,
+      valornegociado:         body.valornegociado         ?? 0,
+      customaterial:          body.customaterial          ?? 0,
+      customaterialadicional: body.custoadicional         ?? 0,
+      tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
+      motivoAssistencia:      body.motivo_assistencia     ?? null,
+      numeroSolicitacao:      body.numero_solicitacao     ?? null,
+      supervisor:             body.supervisor             ?? null,
+      tipoSolicitacao:        body.tipo_solicitacao       ?? null,
+      origemMontagem:         body.origem_montagem        ?? null,
+      origemPromob:           body.origem_promob          ?? null,
+      origemCobrada:          body.origem_cobrada         ?? null,
+      origemEntrega:          body.origem_entrega         ?? null,
+      bairro:                 body.bairro                 ?? null,
+      tempo:                  body.tempo                  ?? null,
+      destino:                body.destino                ?? null,
+      observacoes:            body.observacoes            ?? null,
+      idResponsavel:          body.id_responsavel         ?? null,
+      dataCriacao:            dataAtualBrasil(),
+      urgente:                body.urgente                ?? false,
+    }, { transaction: t });
+
+    await _salvarEquipePecas(oc, body.equipe, body.pecas, t);
   });
 
-  const oc = body.ordemdecompra;
   await Promise.all([
     Producao.findOrCreate({ where: { ordemdecompra: oc } }),
     Avulsos.findOrCreate({ where: { ordemdecompra: oc } }),
   ]);
+
+  return oc;
 }
 
 async function inserirCliente(body) {
@@ -132,15 +208,23 @@ async function buscarParaEditar(ordemdecompra) {
       'ambiente', 'numproj', 'idVendedor', 'idLiberador', 'idLoja', 'idEtapa',
       'idTipocontrato', 'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
-      'tipoProjeto', 'ocOrigem', 'motivoAssistencia',
+      'tipoProjeto', 'motivoAssistencia', 'numeroSolicitacao',
       'urgente', 'supervisor', 'tipoSolicitacao', 'origemMontagem',
-      'origemPromob', 'origemCobrada', 'observacoes', 'responsavel', 'idResponsavel', 'dataCriacao',
+      'origemPromob', 'origemCobrada', 'origemEntrega', 'bairro', 'tempo', 'destino',
+      'observacoes', 'idResponsavel', 'dataCriacao', 'liberador',
     ],
     include: [
-      { model: Clientes, as: 'tblCliente', attributes: ['name'], required: false },
+      { model: Clientes, as: 'tblCliente',     attributes: ['name'],  required: false },
+      { model: Usuario,  as: 'usuarioResponsavel', attributes: ['login'], required: false },
     ],
   });
   if (!p) return [];
+
+  const isAssistencia = p.tipoProjeto === 'ASSISTENCIA';
+  const [equipe, pecas] = isAssistencia
+    ? await Promise.all([_buscarEquipe(p.ordemdecompra), _buscarPecas(p.ordemdecompra)])
+    : [[], []];
+
   return [{
     ordemdecompra:          p.ordemdecompra,
     contrato:               p.contrato,
@@ -164,18 +248,25 @@ async function buscarParaEditar(ordemdecompra) {
     customaterial:          p.customaterial,
     customaterialadicional: p.customaterialadicional,
     tipo_projeto:           p.tipoProjeto,
-    oc_origem:              p.ocOrigem,
     motivo_assistencia:     p.motivoAssistencia,
+    numero_solicitacao:     p.numeroSolicitacao,
     urgente:                p.urgente,
     supervisor:             p.supervisor,
     tipo_solicitacao:       p.tipoSolicitacao,
     origem_montagem:        p.origemMontagem,
     origem_promob:          p.origemPromob,
     origem_cobrada:         p.origemCobrada,
+    origem_entrega:         p.origemEntrega,
+    bairro:                 p.bairro,
+    tempo:                  p.tempo,
+    destino:                p.destino,
+    liberador_nome:         p.liberador,
     observacoes:            p.observacoes,
-    responsavel:            p.responsavel,
+    responsavel:            p.usuarioResponsavel?.login ?? null,
     id_responsavel:         p.idResponsavel,
     data_criacao:           p.dataCriacao,
+    equipe,
+    pecas,
   }];
 }
 
@@ -183,50 +274,63 @@ async function atualizarProjeto(body) {
   const { cliente, vendedor, liberador, loja, tipoCliente, tipoAmbiente, tipoContrato, etapa } =
     await _resolverLookups(body);
 
-  await Projetos.update(
-    {
-      contrato:               body.contrato               ?? null,
-      idCliente:              body.id_cliente             ?? null,
-      cliente:                body.cliente_nome           ?? cliente?.name ?? null,
-      idTipoambiente:         body.id_tipoambiente        ?? null,
-      tipoambiente:           tipoAmbiente?.name            ?? null,
-      ambiente:               body.ambiente               ?? null,
-      numproj:                body.numproj                ?? null,
-      idVendedor:             body.id_vendedor            ?? null,
-      vendedor:               vendedor?.name                ?? null,
-      idLiberador:            body.id_liberador           ?? null,
-      liberador:              liberador?.name               ?? null,
-      datacontrato:           body.datacontrato           ?? null,
-      dataassinatura:         body.dataassinatura         ?? null,
-      chegoufabrica:          body.chegoufabrica          ?? null,
-      dataentrega:            body.dataentrega            ?? null,
-      idLoja:                 body.id_loja                ?? null,
-      loja:                   loja?.name                    ?? null,
-      idTipocliente:          body.id_tipocliente         ?? null,
-      tipocliente:            tipoCliente?.name             ?? null,
-      idEtapa:                body.id_etapa               ?? null,
-      etapa:                  etapa?.name                   ?? null,
-      idTipocontrato:         body.id_tipocontrato        ?? null,
-      tipocontrato:           tipoContrato?.name            ?? null,
-      valorbruto:             body.valorbruto             ?? 0,
-      valornegociado:         body.valornegociado         ?? 0,
-      customaterial:          body.customaterial          ?? 0,
-      customaterialadicional: body.customaterialadicional ?? 0,
-      tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
-      ocOrigem:               body.oc_origem              ?? null,
-      motivoAssistencia:      body.motivo_assistencia     ?? null,
-      supervisor:             body.supervisor             ?? null,
-      tipoSolicitacao:        body.tipo_solicitacao       ?? null,
-      origemMontagem:         body.origem_montagem        ?? null,
-      origemPromob:           body.origem_promob          ?? null,
-      origemCobrada:          body.origem_cobrada         ?? null,
-      observacoes:            body.observacoes            ?? null,
-      responsavel:            body.responsavel            ?? null,
-      idResponsavel:          body.id_responsavel         ?? null,
-      urgente:                body.urgente                ?? false,
-    },
-    { where: { ordemdecompra: body.ordemdecompra } },
-  );
+  const oc = body.ordemdecompra;
+
+  await sequelize.transaction(async (t) => {
+    await Projetos.update(
+      {
+        contrato:               body.contrato               ?? null,
+        idCliente:              body.id_cliente             ?? null,
+        cliente:                body.cliente_nome           ?? cliente?.name ?? null,
+        idTipoambiente:         body.id_tipoambiente        ?? null,
+        tipoambiente:           tipoAmbiente?.name            ?? null,
+        ambiente:               body.ambiente               ?? null,
+        numproj:                body.numproj                ?? null,
+        idVendedor:             body.id_vendedor            ?? null,
+        vendedor:               vendedor?.name                ?? null,
+        idLiberador:            body.id_liberador           ?? null,
+        liberador:              body.liberador_nome         ?? liberador?.name ?? null,
+        datacontrato:           body.datacontrato           ?? null,
+        dataassinatura:         body.dataassinatura         ?? null,
+        chegoufabrica:          body.chegoufabrica          ?? null,
+        dataentrega:            body.dataentrega            ?? null,
+        idLoja:                 body.id_loja                ?? null,
+        loja:                   loja?.name                    ?? null,
+        idTipocliente:          body.id_tipocliente         ?? null,
+        tipocliente:            tipoCliente?.name             ?? null,
+        idEtapa:                body.id_etapa               ?? null,
+        etapa:                  etapa?.name                   ?? null,
+        idTipocontrato:         body.id_tipocontrato        ?? null,
+        tipocontrato:           tipoContrato?.name            ?? null,
+        valorbruto:             body.valorbruto             ?? 0,
+        valornegociado:         body.valornegociado         ?? 0,
+        customaterial:          body.customaterial          ?? 0,
+        customaterialadicional: body.customaterialadicional ?? 0,
+        tipoProjeto:            body.tipo_projeto           ?? 'PROJETO',
+        motivoAssistencia:      body.motivo_assistencia     ?? null,
+        numeroSolicitacao:      body.numero_solicitacao     ?? null,
+        supervisor:             body.supervisor             ?? null,
+        tipoSolicitacao:        body.tipo_solicitacao       ?? null,
+        origemMontagem:         body.origem_montagem        ?? null,
+        origemPromob:           body.origem_promob          ?? null,
+        origemCobrada:          body.origem_cobrada         ?? null,
+        origemEntrega:          body.origem_entrega         ?? null,
+        bairro:                 body.bairro                 ?? null,
+        tempo:                  body.tempo                  ?? null,
+        destino:                body.destino                ?? null,
+        observacoes:            body.observacoes            ?? null,
+        idResponsavel:          body.id_responsavel         ?? null,
+        urgente:                body.urgente                ?? false,
+      },
+      { where: { ordemdecompra: oc }, transaction: t },
+    );
+
+    if (body.tipo_projeto === 'ASSISTENCIA') {
+      await EquipSat.destroy({ where: { idSat: String(oc) }, transaction: t });
+      await Pecas.destroy({ where: { idAssistencia: String(oc) }, transaction: t });
+      await _salvarEquipePecas(oc, body.equipe, body.pecas, t);
+    }
+  });
 }
 
 async function buscarParaDeletar(ordemdecompra) {
@@ -237,10 +341,21 @@ async function buscarParaDeletar(ordemdecompra) {
       'numproj', 'vendedor', 'liberador', 'loja', 'etapa', 'tipocontrato',
       'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
-      'responsavel', 'supervisor', 'ocOrigem', 'motivoAssistencia',
+      'idResponsavel', 'supervisor', 'motivoAssistencia', 'numeroSolicitacao',
+      'tipoSolicitacao', 'origemMontagem', 'origemPromob', 'origemCobrada', 'origemEntrega',
+      'bairro', 'tempo', 'destino',
+    ],
+    include: [
+      { model: Usuario, as: 'usuarioResponsavel', attributes: ['login'], required: false },
     ],
   });
   if (!p) return [];
+
+  const isAssistencia = p.tipoProjeto === 'ASSISTENCIA';
+  const [equipe, pecas] = isAssistencia
+    ? await Promise.all([_buscarEquipe(p.ordemdecompra), _buscarPecas(p.ordemdecompra)])
+    : [[], []];
+
   return [{
     ordemdecompra:          p.ordemdecompra,
     tipo_projeto:           p.tipoProjeto,
@@ -263,10 +378,20 @@ async function buscarParaDeletar(ordemdecompra) {
     valornegociado:         p.valornegociado,
     customaterial:          p.customaterial,
     customaterialadicional: p.customaterialadicional,
-    responsavel:            p.responsavel,
+    responsavel:            p.usuarioResponsavel?.login ?? null,
     supervisor:             p.supervisor,
-    oc_origem:              p.ocOrigem,
     motivo_assistencia:     p.motivoAssistencia,
+    numero_solicitacao:     p.numeroSolicitacao,
+    tipo_solicitacao:       p.tipoSolicitacao,
+    origem_montagem:        p.origemMontagem,
+    origem_promob:          p.origemPromob,
+    origem_cobrada:         p.origemCobrada,
+    origem_entrega:         p.origemEntrega,
+    bairro:                 p.bairro,
+    tempo:                  p.tempo,
+    destino:                p.destino,
+    equipe,
+    pecas,
   }];
 }
 
@@ -276,6 +401,8 @@ async function deletarProjeto(body) {
   await Promise.all([
     Producao.destroy({ where: { ordemdecompra: oc } }),
     Avulsos.destroy({ where: { ordemdecompra: oc } }),
+    EquipSat.destroy({ where: { idSat: String(oc) } }),
+    Pecas.destroy({ where: { idAssistencia: String(oc) } }),
   ]);
   await Projetos.destroy({ where: { ordemdecompra: oc } });
 }
@@ -427,5 +554,4 @@ module.exports = {
   buscarParaDeletar,
   deletarProjeto,
   buscarCapaProducao,
-  gerarOcAssistencia,
 };

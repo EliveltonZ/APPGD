@@ -30,9 +30,12 @@ module.exports = {
 
   async createProject(req, res) {
     try {
-      await service.inserirProjeto(req.body);
-      res.json({ success: true });
+      const ordemdecompra = await service.inserirProjeto(req.body);
+      res.json({ success: true, ordemdecompra });
     } catch (err) {
+      if (err.name === 'SequelizeUniqueConstraintError' && err.fields?.numero_solicitacao) {
+        return res.status(409).json({ message: 'Número de solicitação já cadastrado.' });
+      }
       res.status(500).json({ message: "Erro ao criar projeto", error: err.message });
     }
   },
@@ -43,15 +46,6 @@ module.exports = {
       res.json(data);
     } catch (err) {
       res.status(500).json({ message: "Erro ao criar cliente", error: err.message });
-    }
-  },
-
-  async getProximoOcAssistencia(req, res) {
-    try {
-      const oc = await service.gerarOcAssistencia();
-      res.json({ oc });
-    } catch (err) {
-      res.status(500).json({ message: "Erro ao gerar OC de assistência", error: err.message });
     }
   },
 };

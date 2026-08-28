@@ -201,15 +201,16 @@ module.exports = function (sequelize, DataTypes) {
         defaultValue: 'PROJETO',
         field: "tipo_pedido",
       },
-      ocOrigem: {
-        type: DataTypes.BIGINT,
-        allowNull: true,
-        field: "oc_origem",
-      },
       motivoAssistencia: {
         type: DataTypes.TEXT,
         allowNull: true,
         field: "motivo_assistencia",
+      },
+      numeroSolicitacao: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        unique: true,
+        field: "numero_solicitacao",
       },
       supervisor: {
         type: DataTypes.TEXT,
@@ -252,6 +253,23 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.DATEONLY,
         allowNull: true,
         field: "data_criacao",
+      },
+      bairro: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      tempo: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      destino: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      origemEntrega: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: "origem_entrega",
       },
     },
     {

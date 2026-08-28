@@ -2,8 +2,22 @@ import { apiGet, apiPost } from './api'
 import { toDateInput } from '../utils/dateUtils'
 import { formatCurrencyFromDB, parseCurrencyToNumber } from '../utils/currencyUtils'
 import type { ProjectFormData } from '../types/project'
+import type { TeamMember, ServicePart } from '../types/assistencia'
 
 type RawRow = Record<string, unknown>
+
+export async function fetchContratoInfo(
+  contrato: string,
+): Promise<{ clienteId: string; clienteNome: string; liberadorNome: string } | null> {
+  const rows = await apiGet<RawRow[]>('/solicitacao/contrato', { contrato })
+  const r = Array.isArray(rows) ? rows[0] : null
+  if (!r) return null
+  return {
+    clienteId:     String(r.id_cliente ?? ''),
+    clienteNome:   (r.cliente as string) ?? '',
+    liberadorNome: (r.liberador as string) ?? '',
+  }
+}
 
 function toContractData(raw: RawRow): Partial<ProjectFormData> {
   return {
@@ -23,17 +37,32 @@ function toContractData(raw: RawRow): Partial<ProjectFormData> {
 
 function assistenciaFields(form: ProjectFormData) {
   return {
-    oc_origem:          form.ocOrigem ? Number(form.ocOrigem) : null,
     motivo_assistencia: form.motivoAssistencia || null,
+    numero_solicitacao: form.numeroSolicitacao || null,
     supervisor:         form.supervisor || null,
     tipo_solicitacao:   form.tipoSolicitacaoAssist ? Number(form.tipoSolicitacaoAssist) : null,
     origem_montagem:    form.origemMontagem || null,
     origem_promob:      form.origemPromob   || null,
     origem_cobrada:     form.origemCobrada  || null,
+    origem_entrega:     form.origemEntrega  || null,
     observacoes:        form.observacoesAssist || null,
-    responsavel:        form.responsavel || null,
     id_responsavel:     form.idResponsavel ?? null,
     urgente:            form.urgente,
+    bairro:             form.bairro || null,
+    tempo:              form.tempo || null,
+    destino:            form.destino || null,
+    liberador_nome:     form.liberadorNome || null,
+    equipe:             form.equipe.map((m) => ({ id: m.id })),
+    pecas:              form.pecas.map((p) => ({
+      qtd:           p.qtd,
+      cor:           p.cor,
+      peca:          p.peca,
+      dimensoes:     p.dimensoes,
+      lado:          p.lado,
+      id_ocorrencia: p.ocorrenciaId,
+      observacoes:   p.observacoes,
+      id_falha:      p.falhaId,
+    })),
   }
 }
 
@@ -47,8 +76,8 @@ function toInsertPayload(form: ProjectFormData) {
     ambiente:        form.ambiente    || null,
     dataentrega:     form.dataEntrega || null,
     id_cliente:      Number(form.clienteId) || null,
+    contrato:        form.contrato ? Number(form.contrato) : null,
     // campos apenas de projeto (null para assistência)
-    contrato:        isAssistencia ? null : Number(form.contrato),
     id_tipoambiente: isAssistencia ? null : form.tipoAmbiente,
     numproj:         isAssistencia ? null : form.numeroProjeto,
     id_vendedor:     isAssistencia ? null : Number(form.vendedor),
@@ -68,8 +97,8 @@ function toInsertPayload(form: ProjectFormData) {
   }
 }
 
-export async function saveProject(form: ProjectFormData): Promise<void> {
-  await apiPost('/projetos', toInsertPayload(form))
+export async function saveProject(form: ProjectFormData): Promise<{ ordemdecompra: number }> {
+  return apiPost('/projetos', toInsertPayload(form))
 }
 
 export async function saveClient(nome: string): Promise<void> {
@@ -123,18 +152,25 @@ function toEditData(raw: RawRow): Partial<ProjectFormData> {
     custoMaterial:  formatCurrencyFromDB(raw.customaterial         as number),
     custoAdicional: formatCurrencyFromDB(raw.customaterialadicional as number),
     tipoProjeto:           (raw.tipo_projeto as string)       ?? 'PROJETO',
-    ocOrigem:              raw.oc_origem ? String(raw.oc_origem) : '',
     motivoAssistencia:     (raw.motivo_assistencia as string) ?? '',
+    numeroSolicitacao:     (raw.numero_solicitacao as string) ?? '',
     urgente:               Boolean(raw.urgente),
     supervisor:            (raw.supervisor  as string)        ?? '',
     tipoSolicitacaoAssist: raw.tipo_solicitacao != null ? Number(raw.tipo_solicitacao) : '',
     origemMontagem:        Boolean(raw.origem_montagem),
     origemPromob:          Boolean(raw.origem_promob),
+    origemEntrega:         Boolean(raw.origem_entrega),
     origemCobrada:         Boolean(raw.origem_cobrada),
     observacoesAssist:     (raw.observacoes  as string)       ?? '',
     responsavel:           (raw.responsavel     as string)  ?? '',
     idResponsavel:         raw.id_responsavel != null ? Number(raw.id_responsavel) : null,
     dataCriacao:           (raw.data_criacao as string) ?? undefined,
+    bairro:                (raw.bairro as string) ?? '',
+    tempo:                 (raw.tempo as string) ?? '',
+    destino:               (raw.destino as string) ?? '',
+    liberadorNome:         (raw.liberador_nome as string) ?? '',
+    equipe:                (raw.equipe as TeamMember[]) ?? [],
+    pecas:                 (raw.pecas as ServicePart[]) ?? [],
   }
 }
 
@@ -157,8 +193,8 @@ function toUpdatePayload(form: ProjectFormData) {
     ambiente:        form.ambiente    || null,
     dataentrega:     form.dataEntrega || null,
     id_cliente:            Number(form.clienteId) || null,
+    contrato:              form.contrato ? Number(form.contrato) : null,
     // campos apenas de projeto (null para assistência)
-    contrato:              isAssistencia ? null : Number(form.contrato),
     id_tipoambiente:       isAssistencia ? null : Number(form.tipoAmbiente),
     numproj:               isAssistencia ? null : form.numeroProjeto,
     id_vendedor:           isAssistencia ? null : Number(form.vendedor),
@@ -206,8 +242,18 @@ function toDeleteData(raw: RawRow): Partial<ProjectFormData> {
     custoAdicional:    formatCurrencyFromDB(raw.customaterialadicional as number),
     responsavel:       (raw.responsavel         as string) ?? '',
     supervisor:        (raw.supervisor          as string) ?? '',
-    ocOrigem:          raw.oc_origem ? String(raw.oc_origem) : '',
     motivoAssistencia: (raw.motivo_assistencia  as string) ?? '',
+    numeroSolicitacao: (raw.numero_solicitacao  as string) ?? '',
+    tipoSolicitacaoAssist: raw.tipo_solicitacao != null ? Number(raw.tipo_solicitacao) : '',
+    origemMontagem:    Boolean(raw.origem_montagem),
+    origemPromob:      Boolean(raw.origem_promob),
+    origemEntrega:     Boolean(raw.origem_entrega),
+    origemCobrada:     Boolean(raw.origem_cobrada),
+    bairro:            (raw.bairro as string) ?? '',
+    tempo:             (raw.tempo as string) ?? '',
+    destino:           (raw.destino as string) ?? '',
+    equipe:            (raw.equipe as TeamMember[]) ?? [],
+    pecas:             (raw.pecas as ServicePart[]) ?? [],
   }
 }
 
@@ -222,9 +268,4 @@ export async function fetchDeleteProject(
 
 export async function deleteProject(numOC: string): Promise<void> {
   await apiPost('/projetos/deletar', { ordemdecompra: Number(numOC) })
-}
-
-export async function fetchProximoOcAssistencia(): Promise<number> {
-  const result = await apiGet<{ oc: number }>('/projetos/assistencia/proximo-oc')
-  return result.oc
 }
