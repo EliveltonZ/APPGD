@@ -153,22 +153,29 @@ createRoot(document.getElementById("root")!).render(
               }
             />
 
-            {/* Rotas protegidas — geradas automaticamente a partir de appRoutes.ts */}
-            {ROUTE_ITEMS.map((route) => {
-              const Page = PAGE_MAP[route.permissionKey];
-              if (!Page) return null;
-              return (
-                <Route
-                  key={route.path}
-                  path={route.path}
-                  element={
-                    <ProtectedRoute>
-                      <Page />
-                    </ProtectedRoute>
-                  }
-                />
-              );
-            })}
+            {/* Rotas protegidas — geradas automaticamente a partir de appRoutes.ts.
+                Vários itens podem compartilhar o mesmo path (permissões alternativas
+                para a mesma página) — gera-se apenas uma <Route> por path. */}
+            {(() => {
+              const seenPaths = new Set<string>();
+              return ROUTE_ITEMS.map((route) => {
+                if (seenPaths.has(route.path)) return null;
+                const Page = PAGE_MAP[route.permissionKey];
+                if (!Page) return null;
+                seenPaths.add(route.path);
+                return (
+                  <Route
+                    key={route.path}
+                    path={route.path}
+                    element={
+                      <ProtectedRoute>
+                        <Page />
+                      </ProtectedRoute>
+                    }
+                  />
+                );
+              });
+            })()}
 
             {/* Impressão — sem layout, acesso livre (protegidas pela API autenticada) */}
             <Route path="/impressao/capa" element={<CapaImpressaoPage />} />

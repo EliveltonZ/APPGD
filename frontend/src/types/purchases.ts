@@ -5,14 +5,6 @@ export type PurchaseStatus =
   | "A VENCER"
   | "ENTREGUE";
 
-export type PurchaseCategory =
-  | "ferragens"
-  | "madeira"
-  | "acabamento"
-  | "vidro"
-  | "eletrico"
-  | "outros";
-
 export interface Purchase {
   id: number;
   ordemdecompra: number;

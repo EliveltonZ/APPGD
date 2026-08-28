@@ -51,10 +51,6 @@ export async function fetchParadaAberta(id_maquina: number): Promise<ParadaAbert
   return result ?? null;
 }
 
-export async function fetchAbertas(): Promise<(ParadaRow & ParadaAberta)[]> {
-  return apiGet('/paradas/abertas');
-}
-
 export async function iniciarParada(payload: {
   pedido: number; id_maquina: number; id_tipo: number;
 }): Promise<ParadaRow> {

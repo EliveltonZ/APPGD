@@ -27,7 +27,6 @@ module.exports = {
   setDate:            handler((req) => service.setDado(req.body)),
   getOperadores:      handler(() => service.listarOperadores()),
   getCausa:           handler((req) => service.listarCausaFalha(req.query.id_falha)),
-  getLojas:           handler(() => service.listarLojas()),
 
   // ── Migrados de RPC ───────────────────────────────────────────────────────────
   getUsuario:          handler((req) => service.buscarUsuario(req.query.id)),
@@ -36,7 +35,6 @@ module.exports = {
   setEtapa:            handler((req) => service.setEtapa(req.body.pedido, req.body.codigo)),
   getCodigoBarras:     handler((req) => service.getProjetoCodigoBarras(req.query.pedido)),
   getMontador:         handler(() => service.getMontadores()),
-  validateLogin:       handler((req) => service.validateLogin(req.query.codigo, req.query.senha)),
   getSolicitacoes:     handler((req) => service.getSolicitacoes(req.query.id_montador)),
   getPecas:            handler(() => service.totalPecas()),
   getOcorrencia:       handler(() => service.getOcorrencias()),

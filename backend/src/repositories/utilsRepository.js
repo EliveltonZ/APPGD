@@ -157,15 +157,6 @@ async function getMontadores() {
   return rows.map(r => ({ codigo: r.id, nome: r.name }));
 }
 
-// Mantido em raw SQL: a tabela tblMontador tem colunas `codigo` e `senha`
-// que não estão definidas no modelo Sequelize
-async function validateLogin(codigo, senha) {
-  return sequelize.query(
-    `SELECT codigo, nome FROM "${T.montador.name}" WHERE codigo = :codigo AND senha = :senha`,
-    { replacements: { codigo, senha }, type: QueryTypes.SELECT }
-  );
-}
-
 // Mantido em raw SQL: tblPecas não tem as colunas `id_montador`, `cliente`, `ambiente`
 // no modelo Sequelize
 async function getSolicitacoes(idMontador) {
@@ -243,7 +234,6 @@ module.exports = {
   setEtapa,
   getProjetoCodigoBarras,
   getMontadores,
-  validateLogin,
   getSolicitacoes,
   totalPecas,
   getOcorrencias,

@@ -29,17 +29,22 @@ APP/
 └── backend/    → Node.js + Express (API REST + serve o frontend compilado)
 ```
 
-**Banco de dados:** Supabase (PostgreSQL). Toda a lógica de negócio fica em **funções RPC** no Supabase. O backend Node.js funciona como uma camada de proxy autenticada: recebe a requisição do frontend, valida o JWT, repassa os parâmetros para a função RPC correspondente e devolve o resultado.
+**Banco de dados:** PostgreSQL hospedado no Supabase, mas acessado via conexão direta (não pela API/RPC do Supabase). Toda a lógica de negócio fica no backend Node.js, em camadas: `routes` → `controllers` → `services` → `repositories`, usando **Sequelize** como ORM sobre a conexão `DATABASE_URL`.
 
 ```
 [Navegador]
     │  HTTP + JWT
     ▼
 [Express :3001]
-    │  supabase.rpc("nome_da_funcao", params)
+    │  controller → service → repository
     ▼
-[Supabase / PostgreSQL]
+[Sequelize]
+    │  SQL
+    ▼
+[PostgreSQL (Supabase)]
 ```
+
+Nomes de tabela e colunas críticas são centralizados em [`backend/src/config/tables.js`](backend/src/config/tables.js) — ver [`docs/schema-renames.md`](docs/schema-renames.md) antes de renomear algo no banco.
 
 O frontend compilado (`vite build`) é colocado em `backend/public` e servido pelo próprio Express, então **não há servidor web separado em produção**.
 
@@ -66,8 +71,12 @@ O frontend compilado (`vite build`) é colocado em `backend/public` e servido pe
 |---|---|---|
 | Node.js | LTS | Runtime |
 | Express | 4.18 | Framework HTTP |
-| Supabase JS Client | 2 | Acesso ao banco via RPC |
+| Sequelize | 6 | ORM (acesso ao PostgreSQL) |
+| pg / pg-hstore | — | Driver PostgreSQL |
+| sequelize-cli | — | Migrations e seeders |
 | jsonwebtoken | 9 | Geração e validação de JWT |
+| bcryptjs | — | Hash de senha |
+| helmet / cors / express-rate-limit | — | Segurança HTTP |
 | dotenv | — | Variáveis de ambiente |
 | nodemon | — | Recarregamento automático (dev) |
 
@@ -175,52 +184,55 @@ src/
 ├── server.js                       ← Entry point: Express, rotas, SPA fallback
 │
 ├── client/
-│   └── clientSupabase.js           ← Instância do cliente Supabase (singleton)
+│   ├── db.js                       ← Exporta a instância Sequelize + todos os models
+│   └── sequelize.js                ← Configuração da conexão (DATABASE_URL)
+│
+├── config/
+│   ├── database.js                 ← Config usada pelo sequelize-cli
+│   └── tables.js                   ← Registro central de nomes de tabela/coluna (ver docs/schema-renames.md)
 │
 ├── middlewares/
 │   ├── auth.js                     ← Valida JWT em todas as rotas protegidas
 │   ├── errorHandler.js             ← Tratamento centralizado de erros Express
-│   └── requirePermission.js        ← Verifica permissão específica via RPC
+│   └── requirePermission.js        ← Verifica permissão específica do usuário
 │
-├── routes/
+├── routes/                         ← Só define os endpoints e liga ao controller
 │   ├── index.js                    ← Router raiz: une todas as sub-rotas
 │   ├── auth.js                     ← POST /api/auth/login
 │   ├── assistencias.js             ← GET /api/assistencias, /api/assistencias/projeto
-│   ├── pcp.js                      ← GET/POST /api/pcp/*
-│   ├── producao.js                 ← GET/PUT /api/producao/*
-│   ├── expedicao.js
-│   ├── compras.js
-│   ├── pendencias.js
-│   ├── pecas.js                    ← GET /api/pecas (peças de assistência)
-│   ├── qualidade.js
-│   ├── valores.js
-│   ├── projetos.js
-│   ├── usuarios.js
-│   ├── solicitacao.js
-│   ├── previsao.js
-│   ├── status.js
-│   ├── menu.js
-│   └── senha.js
+│   ├── pcp.js, producao.js, expedicao.js, compras.js, pendencias.js
+│   ├── pecas.js, qualidade.js, valores.js, projetos.js, usuarios.js
+│   ├── solicitacao.js, previsao.js, status.js, menu.js, senha.js
+│   ├── paradas.js, cadastros.js, materiais.js, localizacoes.js
+│   ├── dashboard.js, preferencias.js, transferencias.js, apontamento.js, utils.js
+│   └── ...
 │
-└── controllers/
-    ├── rpcHandlerFactory.js        ← PADRÃO CENTRAL: fábrica de handlers RPC
-    ├── assistenciasController.js
-    ├── pcpController.js
-    ├── projetosProdController.js   ← Produção
-    ├── projetosExpController.js    ← Expedição
-    ├── projetosPrevController.js   ← Previsão
-    ├── projetosSttsController.js   ← Status
-    ├── addProjetosController.js    ← Criação de projetos
-    ├── editProjetosController.js   ← Edição de projetos
-    ├── deleteController.js
-    ├── capaController.js           ← Dados para capas de impressão
-    ├── usuariosController.js
-    ├── valoresController.js
-    ├── comprasController.js
-    ├── qualidadeController.js
-    ├── pecasController.js
-    ├── pendenciasController.js
-    └── ...
+├── controllers/                    ← Extrai parâmetros da request, chama o service, devolve JSON
+│   ├── assistenciasController.js
+│   ├── pcpController.js
+│   ├── projetosPrdController.js    ← Produção
+│   ├── projetosExpController.js    ← Expedição
+│   ├── projetosPrevController.js   ← Previsão
+│   ├── projetosSttsController.js   ← Status
+│   ├── addProjetosController.js    ← Criação de projetos
+│   ├── editProjetosController.js   ← Edição de projetos
+│   ├── deleteController.js
+│   ├── capaController.js           ← Dados para capas de impressão
+│   ├── comprasController.js, qualidadeController.js, pecasController.js
+│   ├── pendenciasController.js, valoresController.js, senhaController.js
+│   ├── acessosController.js, addUsersController.js, menuController.js
+│   ├── solicitacaoController.js, ultilsController.js, indexController.js
+│   └── ...
+│
+├── services/                       ← Regra de negócio; orquestra 1+ repositories
+│   └── *Service.js                 ← 1 arquivo por domínio (assistenciasService.js, pcpService.js, ...)
+│
+├── repositories/                   ← Único lugar que fala com o Sequelize/SQL
+│   └── *Repository.js              ← 1 arquivo por domínio; usa os models ou, quando necessário, sequelize.query()
+│
+├── models/                         ← Definições Sequelize (1 arquivo por tabela) + init-models.js (associações)
+│
+└── migrations/                     ← Uma migration por alteração de schema (sequelize-cli)
 ```
 
 ---
@@ -269,10 +281,12 @@ Essas rotas abrem em iframe e disparam `window.print()` automaticamente:
 ### `backend/src/client/.env`
 
 ```env
-SUPABASE_URL=https://<projeto>.supabase.co
-SUPABASE_ANON_KEY=<chave-anon>
+DATABASE_URL=postgresql://<usuario>:<senha>@<host>:5432/postgres
+SESSION_SECRET=<segredo-forte>
 JWT_SECRET=<segredo-forte>
 JWT_EXPIRES_IN=3d
+NODE_ENV=production
+ALLOWED_ORIGINS=http://localhost:5173,<url-de-producao>
 PORT=3001
 ```
 
@@ -325,28 +339,40 @@ const { data: projetos, loading, refetch } = useApiData(fetchProductionProjects)
 
 > **Importante:** o `useApiData` usa um `ref` interno para guardar `fetchFn`, então alterar a referência da função não causa refetch desnecessário.
 
-### 6.3 Padrão RPC no Backend — `rpcHandlerFactory`
+### 6.3 Padrão de Camadas no Backend — Route → Controller → Service → Repository
 
-Quase todos os endpoints seguem o mesmo padrão:
+Todos os endpoints seguem o mesmo fluxo:
 
 ```javascript
-// controllers/assistenciasController.js
-const { createRpcHandler } = require('./rpcHandlerFactory');
+// repositories/assistenciasRepository.js — único lugar que fala com o Sequelize
+async function listar() {
+  return Assistencias.findAll({ order: [['solicitacao', 'DESC']] });
+}
+module.exports = { listar };
 
-const getAssistencias = createRpcHandler('listar_assistencias', 'query');
+// services/assistenciasService.js — regra de negócio (se houver)
+const repo = require('../repositories/assistenciasRepository');
+const listarAssistencias = () => repo.listar();
+module.exports = { listarAssistencias };
+
+// controllers/assistenciasController.js — extrai request, chama o service, devolve JSON
+const service = require('../services/assistenciasService');
+const getAssistencias = async (req, res) => {
+  try {
+    res.json(await service.listarAssistencias());
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 module.exports = { getAssistencias };
 
 // routes/assistencias.js
 router.get('/', getAssistencias);
 ```
 
-O factory `createRpcHandler(nomeFuncao, origem, opcoes)`:
-1. Extrai parâmetros de `req.query` ou `req.body`
-2. Sanitiza (remove caracteres perigosos)
-3. Renomeia campos quando o frontend usa nomes diferentes das stored procedures
-4. Chama `supabase.rpc(nomeFuncao, params)`
-5. Aplica transformação opcional (`opts.transform`)
-6. Retorna JSON ou erro HTTP 500
+- O **repository** é a única camada que importa models Sequelize ou roda `sequelize.query()`. Nomes de tabela/coluna sensíveis a rename devem vir de `config/tables.js` (ver [`docs/schema-renames.md`](docs/schema-renames.md)).
+- O **service** concentra regra de negócio que envolve mais de um repository, ou lógica que não é puramente acesso a dados. Para endpoints simples de leitura, o controller pode chamar o service diretamente sem transformação extra.
+- O **controller** nunca acessa o banco diretamente — só extrai parâmetros da request e formata a resposta/erro.
 
 ### 6.4 Fonte Única de Verdade — `appRoutes.ts`
 
@@ -389,7 +415,7 @@ features/modulo/
 
 ```
 1. Usuário envia login/senha → POST /api/auth/login
-2. Backend valida no Supabase (RPC check_password)
+2. Backend busca o usuário via Sequelize e valida a senha com bcrypt (`controllers/indexController.js`)
 3. Backend gera JWT com { sub: id, nome, permissoes: { chave: bool } }
 4. Frontend salva JWT em localStorage (chave: gd_auth_token)
 5. AuthContext decodifica o payload e popula o estado global `user`
@@ -492,17 +518,35 @@ export async function fetchMeusDados(): Promise<MinhaInterface[]> {
 }
 ```
 
-### Passo 5 — Criar a rota e o controller no backend
+### Passo 5 — Criar repository, service, controller e rota no backend
 
 ```javascript
-// backend/src/controllers/meuController.js
-const { createRpcHandler } = require('./rpcHandlerFactory');
-const getMeusDados = createRpcHandler('nome_da_funcao_supabase', 'query');
+// backend/src/repositories/meuModuloRepository.js
+const { MeuModelo } = require('../client/db');
+async function listar() {
+  return MeuModelo.findAll();
+}
+module.exports = { listar };
+
+// backend/src/services/meuModuloService.js
+const repo = require('../repositories/meuModuloRepository');
+const listarMeusDados = () => repo.listar();
+module.exports = { listarMeusDados };
+
+// backend/src/controllers/meuModuloController.js
+const service = require('../services/meuModuloService');
+const getMeusDados = async (req, res) => {
+  try {
+    res.json(await service.listarMeusDados());
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 module.exports = { getMeusDados };
 
 // backend/src/routes/meuModulo.js
 const router = require('express').Router();
-const { getMeusDados } = require('../controllers/meuController');
+const { getMeusDados } = require('../controllers/meuModuloController');
 router.get('/', getMeusDados);
 module.exports = router;
 
@@ -510,9 +554,9 @@ module.exports = router;
 router.use('/meu-endpoint', require('./meuModulo'));
 ```
 
-### Passo 6 — Criar a função RPC no Supabase
+### Passo 6 — Se precisar de tabela/coluna nova no banco
 
-Crie a stored procedure PostgreSQL no painel do Supabase (`Database > Functions`).
+Crie uma migration com `sequelize-cli` (`npx sequelize-cli migration:generate --name nome-da-mudanca`), registre a tabela em `config/tables.js` e crie/atualize o model correspondente em `backend/src/models/`.
 
 ---
 
@@ -535,7 +579,8 @@ O Express serve `backend/public` como arquivos estáticos. Qualquer rota não re
 
 ## Notas para Novos Desenvolvedores
 
-- **Nunca altere nomes de colunas em TypeScript** sem verificar o nome correspondente no banco e no backend — o mapeamento é feito manualmente no `rpcHandlerFactory.js`.
+- **Antes de renomear qualquer tabela ou coluna do banco**, siga o checklist em [`docs/schema-renames.md`](docs/schema-renames.md) — evita quebrar SQL raw que ainda não passa pelo registro central `config/tables.js`.
+- **Nunca altere nomes de colunas em TypeScript** sem verificar o nome correspondente no banco e no backend — o mapeamento entre coluna do banco e campo da API é feito manualmente dentro de cada repository (funções `toXxx`/mappers).
 - **Mocks** (`data/*Mocks.ts`) são apenas para desenvolvimento local. Verifique se o serviço real existe antes de usar dados mockados em produção.
 - **Permissões** são verificadas tanto no frontend (via `hasPermission`) quanto no backend (middleware `auth.js`). Se uma rota não aparece no menu, verifique `appRoutes.ts` e o JWT do usuário.
 - **Impressão** funciona via iframe oculto: o modal abre a URL `/impressao/*` em um `<iframe>`, aguarda a mensagem `"capa-ready"` via `postMessage` e então chama `iframeWin.print()`.

@@ -46,9 +46,9 @@ function toInsertPayload(form: ProjectFormData) {
     cliente_nome:    form.clienteNome || null,
     ambiente:        form.ambiente    || null,
     dataentrega:     form.dataEntrega || null,
+    id_cliente:      Number(form.clienteId) || null,
     // campos apenas de projeto (null para assistência)
     contrato:        isAssistencia ? null : Number(form.contrato),
-    id_cliente:      isAssistencia ? null : Number(form.clienteId),
     id_tipoambiente: isAssistencia ? null : form.tipoAmbiente,
     numproj:         isAssistencia ? null : form.numeroProjeto,
     id_vendedor:     isAssistencia ? null : Number(form.vendedor),
@@ -83,15 +83,6 @@ export async function fetchClients(): Promise<{ id: string; nome: string; tipo: 
     nome: (r.nome as string) ?? '',
     tipo: '',
   }))
-}
-
-export async function fetchContractData(
-  contrato: string,
-): Promise<Partial<ProjectFormData> | null> {
-  const rows = await apiGet<RawRow[]>('/projetos/contrato', { contrato })
-  const raw = Array.isArray(rows) ? rows[0] : null
-  if (!raw) return null
-  return toContractData(raw)
 }
 
 export type ContractOption = Partial<ProjectFormData> & {
@@ -164,9 +155,9 @@ function toUpdatePayload(form: ProjectFormData) {
     cliente_nome:    form.clienteNome || null,
     ambiente:        form.ambiente    || null,
     dataentrega:     form.dataEntrega || null,
+    id_cliente:            Number(form.clienteId) || null,
     // campos apenas de projeto (null para assistência)
     contrato:              isAssistencia ? null : Number(form.contrato),
-    id_cliente:            isAssistencia ? null : Number(form.clienteId),
     id_tipoambiente:       isAssistencia ? null : Number(form.tipoAmbiente),
     numproj:               isAssistencia ? null : form.numeroProjeto,
     id_vendedor:           isAssistencia ? null : Number(form.vendedor),
@@ -192,25 +183,30 @@ export async function saveEditProject(form: ProjectFormData): Promise<void> {
 
 function toDeleteData(raw: RawRow): Partial<ProjectFormData> {
   return {
-    contrato:       String(raw.contrato      ?? ''),
-    clienteNome:    String(raw.cliente       ?? ''),
-    clienteTipo:    String(raw.tipocliente   ?? ''),
-    tipoAmbiente:   String(raw.tipoambiente  ?? ''),
-    ambiente:       String(raw.ambiente      ?? ''),
-    numeroProjeto:  String(raw.numproj       ?? ''),
-    vendedor:       String(raw.vendedor      ?? ''),
-    liberador:      String(raw.liberador     ?? ''),
-    loja:           String(raw.loja          ?? ''),
-    etapa:          String(raw.etapa         ?? ''),
-    tipoContrato:   String(raw.tipocontrato  ?? ''),
-    dataContrato:   toDateInput(raw.datacontrato),
-    dataAssinatura: toDateInput(raw.dataassinatura),
-    chegouFabrica:  toDateInput(raw.chegoufabrica),
-    dataEntrega:    toDateInput(raw.dataentrega),
-    valorBruto:     formatCurrencyFromDB(raw.valorbruto             as number),
-    valorNegociado: formatCurrencyFromDB(raw.valornegociado         as number),
-    custoMaterial:  formatCurrencyFromDB(raw.customaterial          as number),
-    custoAdicional: formatCurrencyFromDB(raw.customaterialadicional as number),
+    tipoProjeto:       (raw.tipo_projeto as string) ?? 'PROJETO',
+    contrato:          String(raw.contrato      ?? ''),
+    clienteNome:       String(raw.cliente       ?? ''),
+    clienteTipo:       String(raw.tipocliente   ?? ''),
+    tipoAmbiente:      String(raw.tipoambiente  ?? ''),
+    ambiente:          String(raw.ambiente      ?? ''),
+    numeroProjeto:     String(raw.numproj       ?? ''),
+    vendedor:          String(raw.vendedor      ?? ''),
+    liberador:         String(raw.liberador     ?? ''),
+    loja:              String(raw.loja          ?? ''),
+    etapa:             String(raw.etapa         ?? ''),
+    tipoContrato:      String(raw.tipocontrato  ?? ''),
+    dataContrato:      toDateInput(raw.datacontrato),
+    dataAssinatura:    toDateInput(raw.dataassinatura),
+    chegouFabrica:     toDateInput(raw.chegoufabrica),
+    dataEntrega:       toDateInput(raw.dataentrega),
+    valorBruto:        formatCurrencyFromDB(raw.valorbruto             as number),
+    valorNegociado:    formatCurrencyFromDB(raw.valornegociado         as number),
+    custoMaterial:     formatCurrencyFromDB(raw.customaterial          as number),
+    custoAdicional:    formatCurrencyFromDB(raw.customaterialadicional as number),
+    solicitante:       (raw.solicitante         as string) ?? '',
+    supervisor:        (raw.supervisor          as string) ?? '',
+    ocOrigem:          raw.oc_origem ? String(raw.oc_origem) : '',
+    motivoAssistencia: (raw.motivo_assistencia  as string) ?? '',
   }
 }
 

@@ -51,16 +51,6 @@ export interface LoteAvailableProject {
   entrega: string;
 }
 
-export interface BatchGenerationFormData {
-  lote: string;
-  selectedIds: number[];
-}
-
-export interface StartBatchFormData {
-  lote: string;
-  dataInicio: string;
-}
-
 export interface ExportProjectsFormData {
   dataInicial: string;
   dataFinal: string;

@@ -21,10 +21,6 @@ export async function fetchDashProjetos(): Promise<DashboardRecord[]> {
   return apiGet<DashboardRecord[]>('/dashboard/projetos');
 }
 
-export async function fetchDashProducao(): Promise<ProductionRecord[]> {
-  return apiGet<ProductionRecord[]>('/dashboard/producao');
-}
-
 export interface EtapaRow {
   corteinicio:        string | null; cortefim:        string | null;
   customizacaoinicio: string | null; customizacaofim: string | null;

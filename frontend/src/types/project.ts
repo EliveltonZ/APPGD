@@ -7,26 +7,6 @@ export interface Client {
   email?: string;
 }
 
-export interface ContractLookupResult {
-  numOC?: string;
-  numeroProjeto?: string;
-  tipoContrato?: number;
-  etapa?: string;
-  clienteId?: string;
-  clienteNome?: string;
-  clienteTipo?: string;
-  vendedor?: number;
-  liberador?: number;
-  loja?: number;
-  tipoAmbiente?: number;
-  ambiente?: string;
-  dataContrato?: string;
-  dataAssinatura?: string;
-  dataEntrega?: string;
-  valorBruto?: string;
-  valorNegociado?: string;
-}
-
 export interface ProjectFormData {
   // 1 — Identificação
   contrato: string;

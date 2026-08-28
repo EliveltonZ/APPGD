@@ -13,6 +13,7 @@ const T = {
       idLiberador: 'id_liberador',
       idLoja:      'id_loja',
       idTipoAmb:   'id_tipoambiente',
+      tipoPedido:  'tipo_pedido',
     },
   },
   producao:   { name: 'tblProducao',   pk: 'ordemdecompra' },

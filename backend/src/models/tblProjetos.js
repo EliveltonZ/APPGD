@@ -199,7 +199,7 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.STRING(20),
         allowNull: false,
         defaultValue: 'PROJETO',
-        field: "tipo_projeto",
+        field: "tipo_pedido",
       },
       ocOrigem: {
         type: DataTypes.BIGINT,

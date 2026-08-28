@@ -79,11 +79,6 @@ export async function fetchAcessos(): Promise<AuthUser[]> {
   return rows.map(toAuthUser);
 }
 
-export async function fetchUserAccess(id: number): Promise<AuthUser | null> {
-  const users = await fetchAcessos();
-  return users.find((u) => u.id === String(id)) ?? null;
-}
-
 export async function checkPassword(id: number, senha: string): Promise<boolean> {
   try {
     const resp = await apiPost<{ token: string }>('/auth/login', { id, senha });

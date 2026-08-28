@@ -60,6 +60,17 @@
 .fcol--span2 { grid-column: span 2; }
 .fcol--span3 { grid-column: span 3; }
 
+.ffield-with-action {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.ffield-with-action > .input-group {
+  flex: 1;
+  min-width: 0;
+}
+
 @media (max-width: 900px) {
   .frow--5 { grid-template-columns: repeat(3, 1fr); }
   .frow--4 { grid-template-columns: repeat(2, 1fr); }

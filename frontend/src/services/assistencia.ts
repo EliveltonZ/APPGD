@@ -3,19 +3,6 @@ import type { ServicePart } from '../types/assistencia';
 
 type RawRow = Record<string, unknown>;
 
-export interface SolicitacaoTipo {
-  cod:   number;
-  label: string;
-}
-
-export async function fetchSolicitacaoConfig(): Promise<SolicitacaoTipo[]> {
-  const rows = await apiGet<RawRow[]>('/solicitacao/config');
-  return rows.map(r => ({
-    cod:   Number(r.cod),
-    label: String(r.descricao ?? ''),
-  }));
-}
-
 export async function fetchContratoAssist(
   contrato: number,
 ): Promise<{ cliente: string; liberador: string } | null> {

@@ -21,7 +21,6 @@ const buscarData           = (id)                        => repo.buscarData(id);
 const setEtapa             = (pedido, codigo)             => repo.setEtapa(pedido, codigo);
 const getProjetoCodigoBarras = (pedido)                  => repo.getProjetoCodigoBarras(pedido);
 const getMontadores        = ()                           => repo.getMontadores();
-const validateLogin        = (codigo, senha)              => repo.validateLogin(codigo, senha);
 const getSolicitacoes      = (idMontador)                 => repo.getSolicitacoes(idMontador);
 const totalPecas           = ()                           => repo.totalPecas();
 const getOcorrencias       = ()                           => repo.getOcorrencias();
@@ -50,7 +49,6 @@ module.exports = {
   setEtapa,
   getProjetoCodigoBarras,
   getMontadores,
-  validateLogin,
   getSolicitacoes,
   totalPecas,
   getOcorrencias,

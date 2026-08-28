@@ -121,7 +121,7 @@ async function buscarParaEditar(ordemdecompra) {
   const p = await Projetos.findOne({
     where: { ordemdecompra: Number(ordemdecompra) },
     attributes: [
-      'ordemdecompra', 'contrato', 'idCliente', 'idTipocliente', 'idTipoambiente',
+      'ordemdecompra', 'contrato', 'idCliente', 'cliente', 'idTipocliente', 'idTipoambiente',
       'ambiente', 'numproj', 'idVendedor', 'idLiberador', 'idLoja', 'idEtapa',
       'idTipocontrato', 'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
@@ -138,7 +138,7 @@ async function buscarParaEditar(ordemdecompra) {
     ordemdecompra:          p.ordemdecompra,
     contrato:               p.contrato,
     id_cliente:             p.idCliente,
-    cliente:                p.tblCliente?.name ?? null,
+    cliente:                p.cliente ?? p.tblCliente?.name ?? null,
     id_tipocliente:         p.idTipocliente,
     id_tipoambiente:        p.idTipoambiente,
     ambiente:               p.ambiente,
@@ -225,14 +225,41 @@ async function buscarParaDeletar(ordemdecompra) {
   const p = await Projetos.findOne({
     where: { ordemdecompra: Number(ordemdecompra) },
     attributes: [
-      'ordemdecompra', 'contrato', 'cliente', 'tipocliente', 'tipoambiente', 'ambiente',
+      'ordemdecompra', 'tipoProjeto', 'contrato', 'cliente', 'tipocliente', 'tipoambiente', 'ambiente',
       'numproj', 'vendedor', 'liberador', 'loja', 'etapa', 'tipocontrato',
       'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
+      'solicitante', 'supervisor', 'ocOrigem', 'motivoAssistencia',
     ],
   });
   if (!p) return [];
-  return [p.toJSON()];
+  return [{
+    ordemdecompra:          p.ordemdecompra,
+    tipo_projeto:           p.tipoProjeto,
+    contrato:               p.contrato,
+    cliente:                p.cliente,
+    tipocliente:            p.tipocliente,
+    tipoambiente:           p.tipoambiente,
+    ambiente:               p.ambiente,
+    numproj:                p.numproj,
+    vendedor:               p.vendedor,
+    liberador:              p.liberador,
+    loja:                   p.loja,
+    etapa:                  p.etapa,
+    tipocontrato:           p.tipocontrato,
+    datacontrato:           p.datacontrato,
+    dataassinatura:         p.dataassinatura,
+    chegoufabrica:          p.chegoufabrica,
+    dataentrega:            p.dataentrega,
+    valorbruto:             p.valorbruto,
+    valornegociado:         p.valornegociado,
+    customaterial:          p.customaterial,
+    customaterialadicional: p.customaterialadicional,
+    solicitante:            p.solicitante,
+    supervisor:             p.supervisor,
+    oc_origem:              p.ocOrigem,
+    motivo_assistencia:     p.motivoAssistencia,
+  }];
 }
 
 async function deletarProjeto(body) {

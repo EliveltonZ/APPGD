@@ -21,7 +21,11 @@ function toCapitalize(str: string) {
   return str.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export function AppLayout({ children, pageTitle, groups: groupsProp }: AppLayoutProps) {
+export function AppLayout({
+  children,
+  pageTitle,
+  groups: groupsProp,
+}: AppLayoutProps) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -81,7 +85,9 @@ export function AppLayout({ children, pageTitle, groups: groupsProp }: AppLayout
 
           {user && (
             <div className="app-header__user">
-              <span className="app-header__user-name">{toCapitalize(user.nome)}</span>
+              <span className="app-header__user-name">
+                {toCapitalize(user.nome)}
+              </span>
               <span className="app-header__user-role">{user.role}</span>
             </div>
           )}

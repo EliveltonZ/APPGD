@@ -5,7 +5,7 @@ export function validatePedido(form: ProjectFormData): ProjectFormErrors {
   const errors: ProjectFormErrors = {};
 
   if (form.tipoProjeto === "ASSISTENCIA") {
-    if (required(form.clienteNome, "Cliente"))              errors.clienteNome       = "Obrigatório";
+    if (required(form.clienteNome, "Cliente"))              errors.clienteNome       = "Selecione um cliente";
     if (required(form.ambiente, "Ambiente"))                errors.ambiente          = "Obrigatório";
     if (required(form.dataEntrega, "Data de entrega"))      errors.dataEntrega       = "Obrigatório";
     if (required(form.supervisor, "Supervisor"))            errors.supervisor        = "Obrigatório";

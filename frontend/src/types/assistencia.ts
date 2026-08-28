@@ -1,9 +1,3 @@
-// kept for reference; select values are now numeric codes (smallint) from get_config
-export type RequestType =
-  | 'montagem_finalizacao'
-  | 'asteca_garantia'
-  | 'itens_especiais_terceiro';
-
 export type RequestDestination = 'fabrica' | 'logistica';
 
 export type RequestSituation =

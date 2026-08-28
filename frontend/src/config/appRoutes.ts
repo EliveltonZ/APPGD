@@ -93,7 +93,9 @@ export const ROUTE_ITEMS = [
   { permissionKey: 'logistica_status',         path: '/logistica/status',        groupId: 'logistica',     menuLabel: 'Status'             },
   { permissionKey: 'logistica_planejamento',   path: '/logistica/planejamento',  groupId: 'logistica',     menuLabel: 'Planejamento'       },
   // ── Assistências ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  { permissionKey: 'assistencias_nova',        path: '/assistencias/novo',       groupId: 'assistencias',  menuLabel: 'Nova Solicitação'   },
+  { permissionKey: 'assistencias_nova',        path: '/assistencias/novo',       groupId: 'assistencias',  menuLabel: 'Nova Solicitação'      },
+  { permissionKey: 'assistencias_nova',        path: '/pedidos/editar',          groupId: 'assistencias',  menuLabel: 'Editar Assistência',   hidden: true },
+  { permissionKey: 'assistencias_nova',        path: '/pedidos/excluir',         groupId: 'assistencias',  menuLabel: 'Excluir Assistência',  hidden: true },
   { permissionKey: 'assistencias_producao',    path: '/assistencias/producao',   groupId: 'assistencias',  menuLabel: 'Produção'           },
   { permissionKey: 'assistencias_logistica',   path: '/assistencias/logistica',  groupId: 'assistencias',  menuLabel: 'Logística'          },
   { permissionKey: 'assistencias_qualidade',   path: '/assistencias/qualidade',  groupId: 'assistencias',  menuLabel: 'Qualidade'          },

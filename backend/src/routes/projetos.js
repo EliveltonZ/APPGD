@@ -18,12 +18,12 @@ router.get("/assistencia/proximo-oc", rp("nova_solicitacao"), add.getProximoOcAs
 router.post("/", rp("novo_pedido"), add.createProject);
 router.post("/cliente", rp("novo_pedido"), add.createClient);
 
-// Edição
-router.get("/editar", rp("editar_pedido"), edit.getEditProjetos);
-router.post("/editar", rp("editar_pedido"), edit.setEditProjetos);
+// Edição — aceita pedidos_editar OU assistencias_nova (mesma lógica do lançamento)
+router.get("/editar", rp.any("editar_pedido", "nova_solicitacao"), edit.getEditProjetos);
+router.post("/editar", rp.any("editar_pedido", "nova_solicitacao"), edit.setEditProjetos);
 
-// Exclusão
-router.get("/deletar", rp("excluir_pedido"), del.getDeleteProjetos);
-router.post("/deletar", rp("excluir_pedido"), del.setDeleteProjeto);
+// Exclusão — aceita pedidos_excluir OU assistencias_nova
+router.get("/deletar", rp.any("excluir_pedido", "nova_solicitacao"), del.getDeleteProjetos);
+router.post("/deletar", rp.any("excluir_pedido", "nova_solicitacao"), del.setDeleteProjeto);
 
 module.exports = router;

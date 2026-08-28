@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
-import { Save, X } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
+import { Save, X, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { Button } from "../../../components/Button";
@@ -41,6 +42,10 @@ import "../../../features/pedidos/common/projeto-page.css";
 export function EditaProjetoPage() {
   const navigate = useNavigate();
   const toast = useToast();
+  const { user } = useAuth();
+  const hasProjeto     = user?.permissions.pedidos_editar   ?? false;
+  const hasAssistencia = user?.permissions.assistencias_nova ?? false;
+
   const { data: optionsLiberador    = [] } = useApiData(fetchLiberadores);
   const { data: optionsVendedor     = [] } = useApiData(fetchVendedores);
   const { data: optionsLoja         = [] } = useApiData(fetchLojas);
@@ -79,6 +84,15 @@ export function EditaProjetoPage() {
     try {
       const result = await fetchEditProject(numOC);
       if (!result) { toast.error('Projeto não encontrado.'); return; }
+      const tipo = (result.tipoProjeto ?? 'PROJETO') as string;
+      if (tipo === 'PROJETO' && !hasProjeto) {
+        toast.error('Sem permissão para editar projetos.');
+        return;
+      }
+      if (tipo === 'ASSISTENCIA' && !hasAssistencia) {
+        toast.error('Sem permissão para editar assistências.');
+        return;
+      }
       setForm((prev) => ({ ...prev, ...result }));
       setErrors({});
     } catch {
@@ -111,14 +125,21 @@ export function EditaProjetoPage() {
     }
   }
 
+  const isAssistencia = form.tipoProjeto === 'ASSISTENCIA';
+  const pageTitle     = isAssistencia ? 'Editar Assistência' : 'Editar Projeto';
+  const saveLabel     = isAssistencia ? 'Salvar Assistência' : 'Salvar Projeto';
+  const confirmMsg    = isAssistencia
+    ? 'Deseja salvar as alterações na assistência?'
+    : 'Deseja salvar as alterações no projeto?';
+
   return (
-    <AppLayout pageTitle="Editar Projeto">
+    <AppLayout pageTitle={pageTitle}>
       <div className="projeto-page">
         <div className="projeto-page__top">
           <div>
-            <h1 className="projeto-page__title">Editar Projeto</h1>
+            <h1 className="projeto-page__title">{pageTitle}</h1>
             <p className="projeto-page__subtitle">
-              Preencha os campos para Editar uma ordem
+              Preencha os campos para editar a ordem
             </p>
           </div>
           <div className="projeto-page__top-actions">
@@ -129,7 +150,7 @@ export function EditaProjetoPage() {
               onClick={handleSave}
             >
               <Save size={14} />
-              Salvar Projeto
+              {saveLabel}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
               <X size={14} />
@@ -144,13 +165,18 @@ export function EditaProjetoPage() {
               <FormSection step={1} title="Identificação da Assistência">
                 <div className="frow frow--3">
                   <Input label="Nº OC" value={form.numOC} readOnly />
-                  <Input
-                    label="Cliente *"
-                    value={form.clienteNome}
-                    onChange={(e) => handleChange("clienteNome", e.target.value)}
-                    error={errors.clienteNome}
-                    placeholder="Nome do cliente"
-                  />
+                  <div className="ffield-with-action">
+                    <Input
+                      label="Cliente *"
+                      value={form.clienteNome}
+                      readOnly
+                      placeholder="Selecione um cliente..."
+                      error={errors.clienteNome}
+                    />
+                    <Button type="button" variant="secondary" size="md" onClick={() => setClientModalOpen(true)}>
+                      <Search size={14} />
+                    </Button>
+                  </div>
                   <Input
                     label="Ambiente *"
                     value={form.ambiente}
@@ -225,7 +251,7 @@ export function EditaProjetoPage() {
         <div className="projeto-page__bottom">
           <Button variant="primary" loading={saving} onClick={handleSave}>
             <Save size={14} />
-            Salvar Projeto
+            {saveLabel}
           </Button>
           <Button variant="ghost" onClick={() => navigate(-1)}>
             <X size={14} />
@@ -242,7 +268,7 @@ export function EditaProjetoPage() {
 
       <ConfirmModal
         isOpen={confirmOpen}
-        message="Deseja salvar as alterações no projeto?"
+        message={confirmMsg}
         confirmLabel="Salvar"
         cancelLabel="Cancelar"
         onConfirm={handleConfirmSave}

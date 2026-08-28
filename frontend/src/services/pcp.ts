@@ -36,13 +36,6 @@ export async function fetchProductionProjects(): Promise<ProductionProject[]> {
   return rows.map((r) => toPcpProject(r));
 }
 
-export async function fetchProjectPcp(ordemdecompra: number): Promise<ProductionProject | null> {
-  const rows = await apiGet<RawPcpProject[]>("/pcp/", { id: ordemdecompra });
-  const raw = Array.isArray(rows) ? rows[0] : (rows as RawPcpProject | null);
-  if (!raw) return null;
-  return toPcpProject(raw, ordemdecompra);
-}
-
 export async function searchProjectForRelease(
   ordemdecompra: number,
 ): Promise<import("../types/pcp").ProjectReleaseFormData | null> {
@@ -142,10 +135,6 @@ export async function fetchMaxOrder(): Promise<number> {
   type R = Record<string, unknown>;
   const rows = await apiGet<R[]>("/utils/max-order");
   return Number(rows[0]?.max ?? 0);
-}
-
-export function createLote(lote: string, ids: number[]): Promise<unknown> {
-  return apiPost("/pcp/lote", { lote, ids });
 }
 
 export function atualizarLote(ordemDeCompra: number, lote: number): Promise<unknown> {

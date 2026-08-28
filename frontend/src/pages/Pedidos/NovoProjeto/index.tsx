@@ -3,7 +3,7 @@ import { ConfirmModal } from "../../../components/ConfirmModal";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { useAuth } from "../../../context/AuthContext";
-import { ClipboardList, Wrench, Save, X } from "lucide-react";
+import { ClipboardList, Wrench, Save, X, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { Button } from "../../../components/Button";
@@ -93,16 +93,18 @@ export function NovoProjetoPage() {
       setForm((prev) => ({ ...prev, tipoProjeto: 'ASSISTENCIA', numOC: String(oc), solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
     } else {
       setTipoProjeto('PROJETO');
-      setForm((prev) => ({ ...prev, tipoProjeto: 'PROJETO' }));
+      setForm((prev) => ({ ...prev, tipoProjeto: 'PROJETO', solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
     }
   }
 
-  // Para usuários com apenas assistencias_nova: gera OC ao montar
+  // Inicializa solicitante com o usuário logado ao montar (para usuários sem picker)
   useEffect(() => {
     if (tipoProjeto === 'ASSISTENCIA' && !form.numOC) {
       gerarOcAssistencia().then((oc) => {
         if (oc !== null) setForm((prev) => ({ ...prev, numOC: String(oc), solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
       });
+    } else if (tipoProjeto === 'PROJETO') {
+      setForm((prev) => ({ ...prev, solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -294,13 +296,18 @@ export function NovoProjetoPage() {
               <FormSection step={1} title="Identificação da Assistência">
                 <div className="frow frow--3">
                   <Input label="Nº OC" value={form.numOC} readOnly />
-                  <Input
-                    label="Cliente *"
-                    value={form.clienteNome}
-                    onChange={(e) => handleChange("clienteNome", e.target.value)}
-                    error={errors.clienteNome}
-                    placeholder="Nome do cliente"
-                  />
+                  <div className="ffield-with-action">
+                    <Input
+                      label="Cliente *"
+                      value={form.clienteNome}
+                      readOnly
+                      placeholder="Selecione um cliente..."
+                      error={errors.clienteNome}
+                    />
+                    <Button type="button" variant="secondary" size="md" onClick={() => setClientModalOpen(true)}>
+                      <Search size={14} />
+                    </Button>
+                  </div>
                   <Input
                     label="Ambiente *"
                     value={form.ambiente}
