@@ -6,6 +6,12 @@ const {
   Usuario,
 } = require("../client/db");
 
+// A sessão do banco roda em UTC — usar CURRENT_DATE/NOW() do Postgres erra
+// a data entre 21h e 23h59 no horário de Brasília. Calcula em America/Sao_Paulo.
+function dataAtualBrasil() {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+}
+
 async function buscarPorContrato(contrato) {
   const rows = await Projetos.findAll({
     where: { contrato: Number(contrato) },
@@ -101,8 +107,9 @@ async function inserirProjeto(body) {
     origemPromob:           body.origem_promob          ?? null,
     origemCobrada:          body.origem_cobrada         ?? null,
     observacoes:            body.observacoes            ?? null,
-    solicitante:            body.solicitante            ?? null,
-    idSolicitante:          body.id_solicitante         ?? null,
+    responsavel:            body.responsavel            ?? null,
+    idResponsavel:          body.id_responsavel         ?? null,
+    dataCriacao:            dataAtualBrasil(),
     urgente:                body.urgente                ?? false,
   });
 
@@ -127,7 +134,7 @@ async function buscarParaEditar(ordemdecompra) {
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
       'tipoProjeto', 'ocOrigem', 'motivoAssistencia',
       'urgente', 'supervisor', 'tipoSolicitacao', 'origemMontagem',
-      'origemPromob', 'origemCobrada', 'observacoes', 'solicitante', 'idSolicitante',
+      'origemPromob', 'origemCobrada', 'observacoes', 'responsavel', 'idResponsavel', 'dataCriacao',
     ],
     include: [
       { model: Clientes, as: 'tblCliente', attributes: ['name'], required: false },
@@ -166,8 +173,9 @@ async function buscarParaEditar(ordemdecompra) {
     origem_promob:          p.origemPromob,
     origem_cobrada:         p.origemCobrada,
     observacoes:            p.observacoes,
-    solicitante:            p.solicitante,
-    id_solicitante:         p.idSolicitante,
+    responsavel:            p.responsavel,
+    id_responsavel:         p.idResponsavel,
+    data_criacao:           p.dataCriacao,
   }];
 }
 
@@ -213,8 +221,8 @@ async function atualizarProjeto(body) {
       origemPromob:           body.origem_promob          ?? null,
       origemCobrada:          body.origem_cobrada         ?? null,
       observacoes:            body.observacoes            ?? null,
-      solicitante:            body.solicitante            ?? null,
-      idSolicitante:          body.id_solicitante         ?? null,
+      responsavel:            body.responsavel            ?? null,
+      idResponsavel:          body.id_responsavel         ?? null,
       urgente:                body.urgente                ?? false,
     },
     { where: { ordemdecompra: body.ordemdecompra } },
@@ -229,7 +237,7 @@ async function buscarParaDeletar(ordemdecompra) {
       'numproj', 'vendedor', 'liberador', 'loja', 'etapa', 'tipocontrato',
       'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
-      'solicitante', 'supervisor', 'ocOrigem', 'motivoAssistencia',
+      'responsavel', 'supervisor', 'ocOrigem', 'motivoAssistencia',
     ],
   });
   if (!p) return [];
@@ -255,7 +263,7 @@ async function buscarParaDeletar(ordemdecompra) {
     valornegociado:         p.valornegociado,
     customaterial:          p.customaterial,
     customaterialadicional: p.customaterialadicional,
-    solicitante:            p.solicitante,
+    responsavel:            p.responsavel,
     supervisor:             p.supervisor,
     oc_origem:              p.ocOrigem,
     motivo_assistencia:     p.motivoAssistencia,

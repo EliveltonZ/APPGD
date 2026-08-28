@@ -185,15 +185,6 @@ export function EditaProjetoPage() {
                     placeholder="Ex: Cozinha, Dormitório..."
                   />
                 </div>
-                <div className="frow frow--3">
-                  <Input
-                    label="Data de Entrega *"
-                    type="date"
-                    value={form.dataEntrega}
-                    onChange={(e) => handleChange("dataEntrega", e.target.value)}
-                    error={errors.dataEntrega}
-                  />
-                </div>
               </FormSection>
               <AssistenciaSection
                 form={form}

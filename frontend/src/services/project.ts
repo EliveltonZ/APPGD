@@ -31,8 +31,8 @@ function assistenciaFields(form: ProjectFormData) {
     origem_promob:      form.origemPromob   || null,
     origem_cobrada:     form.origemCobrada  || null,
     observacoes:        form.observacoesAssist || null,
-    solicitante:        form.solicitante || null,
-    id_solicitante:     form.idSolicitante ?? null,
+    responsavel:        form.responsavel || null,
+    id_responsavel:     form.idResponsavel ?? null,
     urgente:            form.urgente,
   }
 }
@@ -132,8 +132,9 @@ function toEditData(raw: RawRow): Partial<ProjectFormData> {
     origemPromob:          Boolean(raw.origem_promob),
     origemCobrada:         Boolean(raw.origem_cobrada),
     observacoesAssist:     (raw.observacoes  as string)       ?? '',
-    solicitante:           (raw.solicitante     as string)  ?? '',
-    idSolicitante:         raw.id_solicitante != null ? Number(raw.id_solicitante) : null,
+    responsavel:           (raw.responsavel     as string)  ?? '',
+    idResponsavel:         raw.id_responsavel != null ? Number(raw.id_responsavel) : null,
+    dataCriacao:           (raw.data_criacao as string) ?? undefined,
   }
 }
 
@@ -203,7 +204,7 @@ function toDeleteData(raw: RawRow): Partial<ProjectFormData> {
     valorNegociado:    formatCurrencyFromDB(raw.valornegociado         as number),
     custoMaterial:     formatCurrencyFromDB(raw.customaterial          as number),
     custoAdicional:    formatCurrencyFromDB(raw.customaterialadicional as number),
-    solicitante:       (raw.solicitante         as string) ?? '',
+    responsavel:       (raw.responsavel         as string) ?? '',
     supervisor:        (raw.supervisor          as string) ?? '',
     ocOrigem:          raw.oc_origem ? String(raw.oc_origem) : '',
     motivoAssistencia: (raw.motivo_assistencia  as string) ?? '',

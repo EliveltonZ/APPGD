@@ -90,21 +90,21 @@ export function NovoProjetoPage() {
       const oc = await gerarOcAssistencia();
       if (oc === null) return;
       setTipoProjeto('ASSISTENCIA');
-      setForm((prev) => ({ ...prev, tipoProjeto: 'ASSISTENCIA', numOC: String(oc), solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
+      setForm((prev) => ({ ...prev, tipoProjeto: 'ASSISTENCIA', numOC: String(oc), responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
     } else {
       setTipoProjeto('PROJETO');
-      setForm((prev) => ({ ...prev, tipoProjeto: 'PROJETO', solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
+      setForm((prev) => ({ ...prev, tipoProjeto: 'PROJETO', responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
     }
   }
 
-  // Inicializa solicitante com o usuário logado ao montar (para usuários sem picker)
+  // Inicializa responsavel com o usuário logado ao montar (para usuários sem picker)
   useEffect(() => {
     if (tipoProjeto === 'ASSISTENCIA' && !form.numOC) {
       gerarOcAssistencia().then((oc) => {
-        if (oc !== null) setForm((prev) => ({ ...prev, numOC: String(oc), solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
+        if (oc !== null) setForm((prev) => ({ ...prev, numOC: String(oc), responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
       });
     } else if (tipoProjeto === 'PROJETO') {
-      setForm((prev) => ({ ...prev, solicitante: user?.nome ?? '', idSolicitante: user?.id ? Number(user.id) : null }));
+      setForm((prev) => ({ ...prev, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -314,15 +314,6 @@ export function NovoProjetoPage() {
                     onChange={(e) => handleChange("ambiente", e.target.value)}
                     error={errors.ambiente}
                     placeholder="Ex: Cozinha, Dormitório..."
-                  />
-                </div>
-                <div className="frow frow--3">
-                  <Input
-                    label="Data de Entrega *"
-                    type="date"
-                    value={form.dataEntrega}
-                    onChange={(e) => handleChange("dataEntrega", e.target.value)}
-                    error={errors.dataEntrega}
                   />
                 </div>
               </FormSection>

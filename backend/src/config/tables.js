@@ -14,6 +14,8 @@ const T = {
       idLoja:      'id_loja',
       idTipoAmb:   'id_tipoambiente',
       tipoPedido:  'tipo_pedido',
+      idResponsavel: 'id_responsavel',
+      dataCriacao:   'data_criacao',
     },
   },
   producao:   { name: 'tblProducao',   pk: 'ordemdecompra' },

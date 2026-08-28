@@ -239,14 +239,19 @@ module.exports = function (sequelize, DataTypes) {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      solicitante: {
+      responsavel: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
-      idSolicitante: {
+      idResponsavel: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        field: "id_solicitante",
+        field: "id_responsavel",
+      },
+      dataCriacao: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: "data_criacao",
       },
     },
     {

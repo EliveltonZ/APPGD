@@ -21,10 +21,10 @@ export function AssistenciaSection({ form, onChange, errors, readOnly }: Section
           readOnly={readOnly}
         />
         <Input
-          label="Solicitante"
-          value={form.solicitante}
-          onChange={(e) => onChange("solicitante", e.target.value)}
-          placeholder="Nome do solicitante"
+          label="Responsável"
+          value={form.responsavel}
+          onChange={(e) => onChange("responsavel", e.target.value)}
+          placeholder="Nome do responsável"
           readOnly={readOnly}
         />
       </div>

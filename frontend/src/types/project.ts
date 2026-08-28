@@ -46,8 +46,9 @@ export interface ProjectFormData {
   origemPromob: boolean;
   origemCobrada: boolean;
   observacoesAssist: string;
-  solicitante: string;
-  idSolicitante: number | null;
+  responsavel: string;
+  idResponsavel: number | null;
+  dataCriacao?: string;
   urgente: boolean;
 }
 
@@ -83,8 +84,8 @@ export function emptyProjectForm(): ProjectFormData {
     origemPromob: false,
     origemCobrada: false,
     observacoesAssist: "",
-    solicitante: "",
-    idSolicitante: null,
+    responsavel: "",
+    idResponsavel: null,
     urgente: false,
   };
 }
