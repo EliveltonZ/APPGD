@@ -49,6 +49,7 @@ function _mapStageRow(projeto, prod, userMap) {
 async function listarProjetosProducao() {
   const rows = await Projetos.findAll({
     where: {
+      tipoProjeto: 'PROJETO',
       [Op.or]: [
         { entrega: null },
         { parceado: true },

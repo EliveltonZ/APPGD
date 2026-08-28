@@ -9,7 +9,7 @@ const {
 
 async function listarProjetosLogistica(data_condition) {
   const rows = await Projetos.findAll({
-    where: { dataentrega: { [Op.gt]: data_condition } },
+    where: { tipoProjeto: 'PROJETO', dataentrega: { [Op.gt]: data_condition } },
     attributes: [
       "ordemdecompra",
       "pedido",

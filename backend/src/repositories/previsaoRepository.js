@@ -11,7 +11,7 @@ const ACTIVE_STATUSES = new Set([
 
 async function listarProjetosPrevisoes() {
   const rows = await Projetos.findAll({
-    where: { codcc: { [Op.ne]: null } },
+    where: { tipoProjeto: 'PROJETO', codcc: { [Op.ne]: null } },
     attributes: [
       'ordemdecompra', 'idEtapa', 'codcc', 'cliente', 'contrato', 'ambiente',
       'dataentrega', 'previsao', 'urgente', 'pedido', 'lote', 'numproj',

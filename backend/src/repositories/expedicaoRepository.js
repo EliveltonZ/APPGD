@@ -13,7 +13,7 @@ async function _getLoginName(id) {
 
 async function listarProjetosExpedicao(data_condition) {
   const rows = await Projetos.findAll({
-    where: { dataentrega: { [Op.gt]: data_condition } },
+    where: { tipoProjeto: 'PROJETO', dataentrega: { [Op.gt]: data_condition } },
     attributes: [
       'ordemdecompra', 'pedido', 'codcc', 'contrato', 'numproj', 'ambiente',
       'tipo', 'chegoufabrica', 'dataentrega', 'lote',
