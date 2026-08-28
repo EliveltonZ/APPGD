@@ -4,7 +4,7 @@ const { formatDateBR } = require("../utils/calcStatus");
 
 async function buscarProjetoPcp(ordemdecompra) {
   const found = await Projetos.findOne({
-    where: { ordemdecompra: Number(ordemdecompra) },
+    where: { ordemdecompra: Number(ordemdecompra), tipoProjeto: 'PROJETO' },
     attributes: [
       'contrato', 'urgente', 'codcc', 'ambiente', 'numproj', 'lote',
       'pedido', 'chegoufabrica', 'dataentrega', 'tipo', 'pecas', 'area',
@@ -36,7 +36,7 @@ async function buscarUltimoLote() {
 
 async function listarProjetosLote() {
   const rows = await Projetos.findAll({
-    where: { codcc: { [Op.gt]: 0 }, lote: 0 },
+    where: { tipoProjeto: 'PROJETO', codcc: { [Op.gt]: 0 }, lote: 0 },
     attributes: ['ordemdecompra', 'pedido', 'codcc', 'ambiente', 'dataentrega'],
     include: [{ model: Clientes, as: 'tblCliente', attributes: ['name'] }],
     order: [['codcc', 'ASC']],
@@ -53,7 +53,7 @@ async function listarProjetosLote() {
 
 async function listarLotes() {
   const rows = await Projetos.findAll({
-    where: { iniciado: null, lote: { [Op.gt]: 0 } },
+    where: { tipoProjeto: 'PROJETO', iniciado: null, lote: { [Op.gt]: 0 } },
     attributes: ['lote'],
     group: ['lote'],
     order: [['lote', 'ASC']],
@@ -63,7 +63,7 @@ async function listarLotes() {
 
 async function listarLotesIniciados() {
   const rows = await Projetos.findAll({
-    where: { iniciado: { [Op.ne]: null }, pronto: null, lote: { [Op.gt]: 0 } },
+    where: { tipoProjeto: 'PROJETO', iniciado: { [Op.ne]: null }, pronto: null, lote: { [Op.gt]: 0 } },
     attributes: ['lote'],
     group: ['lote'],
     order: [['lote', 'ASC']],
@@ -110,6 +110,7 @@ async function atualizarProjetoPcp(body) {
 async function exportarProjetosPeriodo(data_inicio, data_fim) {
   const rows = await Projetos.findAll({
     where: {
+      tipoProjeto: 'PROJETO',
       chegoufabrica: { [Op.gte]: data_inicio, [Op.lte]: data_fim },
     },
     attributes: ['ordemdecompra', 'contrato', 'ambiente', 'numproj', 'chegoufabrica', 'dataentrega'],
@@ -133,10 +134,10 @@ async function exportarProjetosPeriodo(data_inicio, data_fim) {
 
 async function buscarPcpCard() {
   const [disponivel, em_lote, em_producao, concluido] = await Promise.all([
-    Projetos.count({ where: { lote: 0 } }),
-    Projetos.count({ where: { lote: { [Op.gt]: 0 }, iniciado: null, entrega: null } }),
-    Projetos.count({ where: { lote: { [Op.gt]: 0 }, iniciado: { [Op.ne]: null }, pronto: null, entrega: null } }),
-    Projetos.count({ where: { lote: { [Op.gt]: 0 }, iniciado: { [Op.ne]: null }, pronto: { [Op.ne]: null }, entrega: null } }),
+    Projetos.count({ where: { tipoProjeto: 'PROJETO', lote: 0 } }),
+    Projetos.count({ where: { tipoProjeto: 'PROJETO', lote: { [Op.gt]: 0 }, iniciado: null, entrega: null } }),
+    Projetos.count({ where: { tipoProjeto: 'PROJETO', lote: { [Op.gt]: 0 }, iniciado: { [Op.ne]: null }, pronto: null, entrega: null } }),
+    Projetos.count({ where: { tipoProjeto: 'PROJETO', lote: { [Op.gt]: 0 }, iniciado: { [Op.ne]: null }, pronto: { [Op.ne]: null }, entrega: null } }),
   ]);
   return [{ disponivel, em_lote, em_producao, concluido }];
 }
