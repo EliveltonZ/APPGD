@@ -5,6 +5,7 @@ import { ConfirmModal } from "../../../components/ConfirmModal";
 import { fetchLoteAvailable, atualizarLote, fetchLastLote } from "../../../services/pcp";
 import { useToast } from "../../../context/ToastContext";
 import { exportLoteExcel, fmtEntrega, type LoteExportRow } from "../../../utils/exportExcel";
+import { localDateStr } from "../../../utils/dateUtils";
 import type { LoteAvailableProject } from "../../../types/pcp";
 import "./index.css";
 
@@ -65,7 +66,7 @@ function fmt(dateStr: string): string {
 
 function isDeadlineNear(entrega: string): boolean {
   if (!entrega) return false;
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateStr();
   const diff = (new Date(entrega).getTime() - new Date(today).getTime()) / 86_400_000;
   return diff >= 0 && diff <= 7;
 }

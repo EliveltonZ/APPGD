@@ -8,6 +8,7 @@ import { Select } from '../../../components/Select';
 import { Input } from '../../../components/Input';
 import { useApiData } from '../../../hooks/useApiData';
 import { useToast } from '../../../context/ToastContext';
+import { localDateStr } from '../../../utils/dateUtils';
 import { fetchMateriais } from '../../../services/materiais';
 import { fetchLocalizacoes } from '../../../services/localizacoes';
 import {
@@ -58,7 +59,7 @@ const HIST_COLUMNS: TableColumn<Transferencia>[] = [
   { key: 'usuario_login', label: 'Usuário', type: 'text', sortable: true, filterable: true, minWidth: 100 },
 ];
 
-const today = new Date().toISOString().slice(0, 10);
+const today = localDateStr();
 
 interface FormState {
   materialId:  string;

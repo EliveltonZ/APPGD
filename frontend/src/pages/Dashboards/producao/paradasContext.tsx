@@ -5,9 +5,10 @@ import { getPreferencias, setPreferencias } from "../../../services/preferencias
 import { fmtMes } from "./context";
 import { SERIES_COLORS } from "../../../components/Charts";
 import type { BarSeriesConfig } from "../../../components/Charts";
+import { localDateStr } from "../../../utils/dateUtils";
 
 const DEFAULT_INICIO = "2024-01-01";
-const DEFAULT_FIM    = new Date().toISOString().slice(0, 10);
+const DEFAULT_FIM    = localDateStr();
 const PREF_START = "paradas_dash_start";
 const PREF_END   = "paradas_dash_end";
 

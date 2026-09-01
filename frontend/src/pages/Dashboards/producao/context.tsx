@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import { fetchDashProducaoDetalhada, type ProducaoDetalhada, type EtapaRow } from "../../../services/dashboard";
 import { calcWorkMinutes } from "../../../utils/workTime";
 import { getPreferencias, setPreferencias } from "../../../services/preferencias";
+import { localDateStr } from "../../../utils/dateUtils";
 
 const DEFAULT_INICIO = "2024-01-01";
-const DEFAULT_FIM    = new Date().toISOString().slice(0, 10);
+const DEFAULT_FIM    = localDateStr();
 
 const PREF_START = "dash_start";
 const PREF_END   = "dash_end";

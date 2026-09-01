@@ -2,9 +2,10 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { fetchDashProjetos, type DashboardRecord } from "../../../services/dashboard";
 import { getPreferencias, setPreferencias } from "../../../services/preferencias";
+import { localDateStr } from "../../../utils/dateUtils";
 
 const DEFAULT_INICIO = "2024-01-01";
-const DEFAULT_FIM    = new Date().toISOString().slice(0, 10);
+const DEFAULT_FIM    = localDateStr();
 
 const PREF_START = "dash_start";
 const PREF_END   = "dash_end";

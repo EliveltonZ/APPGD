@@ -1,4 +1,5 @@
 import type { PendingStatus, PendingItem } from '../types/pending';
+import { localDateStr } from '../utils/dateUtils';
 
 export const PEND_STATUS_LABELS: Record<PendingStatus, string> = {
   pendente:  'Pendente',
@@ -8,7 +9,7 @@ export const PEND_STATUS_LABELS: Record<PendingStatus, string> = {
 };
 
 export function computeItemStatus(item: PendingItem): PendingStatus {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   if (item.recebido) return 'recebido';
   if (item.previsao && item.previsao < today) return 'atrasado';
   if (item.compra) return 'comprado';
