@@ -21,9 +21,7 @@ export function Sidebar({
   onItemClick,
   isOpen = false,
 }: SidebarProps) {
-  const active = groups.find((g) =>
-    g.items.some((i) => i.path === activeItem),
-  );
+  const active = groups.find((g) => g.items.some((i) => i.path === activeItem));
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
     active ? [active.id] : [],
   );
