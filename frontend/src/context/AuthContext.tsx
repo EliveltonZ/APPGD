@@ -15,6 +15,7 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import type { AuthUser } from "../types/auth";
 import { toAuthUser } from "../services/usuarios";
+import { STORAGE_KEYS } from "../utils/storageKeys";
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -23,8 +24,6 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-const STORAGE_KEY_TOKEN = "gd_auth_token";
 
 // Decodifica a parte do payload do JWT (segunda parte, separada por ".")
 // sem verificar a assinatura — apenas para ler os dados do usuário no cliente.
@@ -39,18 +38,18 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 // Chamada uma vez na inicialização do AuthProvider.
 // Se houver token válido e não expirado no localStorage, restaura o usuário automaticamente.
 function loadUserFromToken(): AuthUser | null {
-  const token = localStorage.getItem(STORAGE_KEY_TOKEN);
+  const token = localStorage.getItem(STORAGE_KEYS.authToken);
   if (!token) return null;
 
   const payload = decodeJwtPayload(token);
   if (!payload) {
-    localStorage.removeItem(STORAGE_KEY_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.authToken);
     return null;
   }
 
   // Verifica expiração pelo campo `exp` do JWT (Unix timestamp em segundos)
   if (typeof payload.exp === "number" && Date.now() / 1000 > payload.exp) {
-    localStorage.removeItem(STORAGE_KEY_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.authToken);
     return null;
   }
 
@@ -59,7 +58,7 @@ function loadUserFromToken(): AuthUser | null {
     const permissoes = payload.permissoes as Record<string, unknown>;
     // JWT com formato inválido (pré-migração com p_ prefix, ou pós-migração com camelCase): força re-login
     if ('p_novo_pedido' in permissoes || 'p_id' in permissoes || 'novoPedido' in permissoes) {
-      localStorage.removeItem(STORAGE_KEY_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.authToken);
       return null;
     }
     return toAuthUser({
@@ -68,7 +67,7 @@ function loadUserFromToken(): AuthUser | null {
       login: payload.nome,
     });
   } catch {
-    localStorage.removeItem(STORAGE_KEY_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.authToken);
     return null;
   }
 }
@@ -78,12 +77,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(loadUserFromToken);
 
   function login(u: AuthUser, token: string) {
-    localStorage.setItem(STORAGE_KEY_TOKEN, token);
+    localStorage.setItem(STORAGE_KEYS.authToken, token);
     setUser(u);
   }
 
   function logout() {
-    localStorage.removeItem(STORAGE_KEY_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.authToken);
     setUser(null);
   }
 

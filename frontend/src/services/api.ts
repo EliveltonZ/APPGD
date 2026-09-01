@@ -5,13 +5,13 @@
 //   - Redirecionar para /login se o token expirar (HTTP 401)
 //   - Lançar Error com a mensagem do servidor em caso de falha
 
+import { STORAGE_KEYS } from '../utils/storageKeys'
+
 // Em produção, VITE_API_URL é vazio e o frontend usa o mesmo host (Express serve os dois)
-const BASE            = import.meta.env.VITE_API_URL ?? ''
-const TOKEN_STORAGE   = 'gd_auth_token'
-const USER_STORAGE    = 'gd_auth_user'
+const BASE = import.meta.env.VITE_API_URL ?? ''
 
 function getToken(): string | null {
-  return localStorage.getItem(TOKEN_STORAGE)
+  return localStorage.getItem(STORAGE_KEYS.authToken)
 }
 
 // Função interna — não exportada. Use apiGet/apiPost/apiPut.
@@ -30,8 +30,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   // 401 significa token ausente ou expirado — limpa o storage e redireciona para login
   if (res.status === 401) {
-    localStorage.removeItem(USER_STORAGE)
-    localStorage.removeItem(TOKEN_STORAGE)
+    localStorage.removeItem(STORAGE_KEYS.authToken)
     window.location.href = '/login'
     throw new Error('Sessão expirada')
   }

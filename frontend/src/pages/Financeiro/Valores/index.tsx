@@ -6,10 +6,9 @@ import { useParamData } from '../../../hooks/useParamData';
 import { fetchProjectValues } from '../../../services/financeiro';
 import { calcSummary } from '../../../utils/financeiroUtils';
 import { localDateStr } from '../../../utils/dateUtils';
+import { STORAGE_KEYS } from '../../../utils/storageKeys';
 import type { ProjectValue } from '../../../types/financeiro';
 import './index.css';
-
-const STORAGE_KEY = 'fin-valores-period';
 
 function defaultDates(): { from: string; to: string } {
   const today = new Date();
@@ -22,7 +21,7 @@ function defaultDates(): { from: string; to: string } {
 
 function loadSavedPeriod(): { from: string; to: string } {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const saved = localStorage.getItem(STORAGE_KEYS.valoresPeriodo);
     if (saved) {
       const [from, to] = saved.split('|');
       if (from && to) return { from, to };
@@ -50,7 +49,7 @@ export function FinanceiroValoresPage() {
   function handleSearch() {
     const key = `${dateFrom}|${dateTo}`;
     if (key === activePeriod) return;
-    try { localStorage.setItem(STORAGE_KEY, key); } catch { /* ignorar */ }
+    try { localStorage.setItem(STORAGE_KEYS.valoresPeriodo, key); } catch { /* ignorar */ }
     setActivePeriod(key);
   }
 

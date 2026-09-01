@@ -3,6 +3,7 @@ import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import logo from "../../assets/logo.png";
 import type { MenuGroup } from "../../types/menu";
 import { SidebarGroup } from "./SidebarGroup";
+import { STORAGE_KEYS } from "../../utils/storageKeys";
 import "./index.css";
 
 interface SidebarProps {
@@ -27,7 +28,7 @@ export function Sidebar({
   );
 
   const [collapsed, setCollapsed] = useState(() => {
-    return localStorage.getItem("sidebar-collapsed") === "true";
+    return localStorage.getItem(STORAGE_KEYS.sidebarCollapsed) === "true";
   });
 
   function toggleGroup(groupId: string) {
@@ -40,7 +41,7 @@ export function Sidebar({
 
   function toggleCollapsed() {
     setCollapsed((v) => {
-      localStorage.setItem("sidebar-collapsed", String(!v));
+      localStorage.setItem(STORAGE_KEYS.sidebarCollapsed, String(!v));
       return !v;
     });
   }
