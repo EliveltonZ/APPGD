@@ -1,15 +1,9 @@
-const { Projetos } = require('../client/db');
+const service = require('../services/utilsService');
 
 module.exports = {
   async setInfoCapa(req, res) {
     try {
-      await Projetos.update(
-        {
-          tipo:    req.query.tipo    ?? null,
-          urgente: req.query.urgente === 'true',
-        },
-        { where: { ordemdecompra: Number(req.query.ordemdecompra) } }
-      );
+      await service.setTipo(req.query.ordemdecompra, req.query.tipo, req.query.urgente);
       res.json({ success: true });
     } catch (err) {
       res.status(500).json({ message: 'Erro ao atualizar capa', error: err.message });
