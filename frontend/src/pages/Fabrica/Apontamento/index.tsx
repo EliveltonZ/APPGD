@@ -39,7 +39,10 @@ export function ApontamentoPage() {
   useEffect(() => {
     fetchApontamentoOperators()
       .then(setOperators)
-      .catch(() => {});
+      .catch(() => {
+        message("Erro ao carregar operadores.", false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function message(msg: string, ok: boolean) {

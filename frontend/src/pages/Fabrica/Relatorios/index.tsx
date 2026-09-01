@@ -5,6 +5,7 @@ import {
   fetchCapaRelatorio,
   saveTipoUrgente,
 } from "../../../services/production";
+import { useToast } from "../../../context/ToastContext";
 import "./index.css";
 
 interface ReportCard {
@@ -41,6 +42,7 @@ const REPORTS: ReportCard[] = [
 ];
 
 export function RelatoriosPcpPage() {
+  const toast = useToast();
   const [oc, setOc] = useState("");
   const [tipo, setTipo] = useState("");
   const [urgente, setUrgente] = useState(false);
@@ -89,16 +91,30 @@ export function RelatoriosPcpPage() {
   }
 
   async function handleTipoChange(value: string) {
+    const previous = tipo;
     setTipo(value);
     setTipoError(false);
-    if (found && oc.trim())
-      await saveTipoUrgente(oc.trim(), value, urgente).catch(() => {});
+    if (found && oc.trim()) {
+      try {
+        await saveTipoUrgente(oc.trim(), value, urgente);
+      } catch {
+        setTipo(previous);
+        toast.error("Erro ao salvar tipo — alteração não foi gravada.");
+      }
+    }
   }
 
   async function handleUrgenteChange(value: boolean) {
+    const previous = urgente;
     setUrgente(value);
-    if (found && oc.trim())
-      await saveTipoUrgente(oc.trim(), tipo, value).catch(() => {});
+    if (found && oc.trim()) {
+      try {
+        await saveTipoUrgente(oc.trim(), tipo, value);
+      } catch {
+        setUrgente(previous);
+        toast.error("Erro ao salvar urgente — alteração não foi gravada.");
+      }
+    }
   }
 
   function handleReport(report: ReportCard) {

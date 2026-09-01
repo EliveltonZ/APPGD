@@ -184,11 +184,13 @@ export function ParadasPage() {
       setSaving(false);
       return;
     }
-    // Refreshes silenciosos — não afetam o feedback da operação
+    // Refreshes silenciosos — não afetam o feedback da operação (ela já teve
+    // seu próprio toast de sucesso/erro acima), mas deixam rastro no console
+    // se a atualização da lista falhar.
     fetchParadaAberta(Number(maquinaId))
       .then(setParadaAberta)
-      .catch(() => {});
-    carregarParadas().catch(() => {});
+      .catch((err) => console.error("Erro ao atualizar parada aberta:", err));
+    carregarParadas().catch((err) => console.error("Erro ao recarregar paradas:", err));
     setSaving(false);
   }
 
@@ -214,7 +216,7 @@ export function ParadasPage() {
       setSaving(false);
       return;
     }
-    carregarParadas().catch(() => {});
+    carregarParadas().catch((err) => console.error("Erro ao recarregar paradas:", err));
     setSaving(false);
   }
 

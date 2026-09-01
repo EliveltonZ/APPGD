@@ -14,6 +14,7 @@ import {
   fetchFalhasConfig,
   fetchOcorrenciasConfig,
 } from "../../../../services/assistencia";
+import { useToast } from "../../../../context/ToastContext";
 import "./index.css";
 
 // ── Helpers ──────────────────────────────────────────────
@@ -52,6 +53,7 @@ export function PartsModal({
   onAdd,
   onRemove,
 }: PartsModalProps) {
+  const toast = useToast();
   const [form, setForm] = useState<PartFormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<PartErrors>({});
   const [falhaOptions, setFalhaOptions] = useState<
@@ -68,14 +70,19 @@ export function PartsModal({
           items.map((f) => ({ value: String(f.id), label: f.label })),
         ),
       )
-      .catch(() => {});
+      .catch(() => {
+        toast.error("Erro ao carregar tipos de falha.");
+      });
     fetchOcorrenciasConfig()
       .then((items) =>
         setOcorrenciaOptions(
           items.map((o) => ({ value: String(o.id), label: o.label })),
         ),
       )
-      .catch(() => {});
+      .catch(() => {
+        toast.error("Erro ao carregar ocorrências.");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function set<K extends keyof PartFormData>(key: K, value: PartFormData[K]) {

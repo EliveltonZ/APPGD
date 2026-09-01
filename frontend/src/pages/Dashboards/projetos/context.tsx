@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { fetchDashProjetos, type DashboardRecord } from "../../../services/dashboard";
 import { getPreferencias, setPreferencias } from "../../../services/preferencias";
 import { localDateStr } from "../../../utils/dateUtils";
+import { useToast } from "../../../context/ToastContext";
 
 const DEFAULT_INICIO = "2024-01-01";
 const DEFAULT_FIM    = localDateStr();
@@ -70,6 +71,7 @@ function topKey(records: DashboardRecord[], key: keyof DashboardRecord): string 
 }
 
 export function ProjetosProvider({ children }: { children: ReactNode }) {
+  const toast = useToast();
   const [records, setRecords] = useState<DashboardRecord[]>([]);
 
   const [startDate, setStartDate] = useState(DEFAULT_INICIO);
@@ -91,7 +93,10 @@ export function ProjetosProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    fetchDashProjetos().then(setRecords).catch(() => {});
+    fetchDashProjetos().then(setRecords).catch(() => {
+      toast.error("Erro ao carregar dados do dashboard.");
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -100,7 +105,9 @@ export function ProjetosProvider({ children }: { children: ReactNode }) {
       const e = prefs[PREF_END]   ?? DEFAULT_FIM;
       setStartDate(s); setEndDate(e);
       setAppliedStart(s); setAppliedEnd(e);
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Erro ao carregar preferências do dashboard:", err);
+    });
   }, []);
 
   const filtered = useMemo(
@@ -207,7 +214,9 @@ export function ProjetosProvider({ children }: { children: ReactNode }) {
   function handleApply() {
     setAppliedStart(startDate);
     setAppliedEnd(endDate);
-    setPreferencias({ [PREF_START]: startDate, [PREF_END]: endDate }).catch(() => {});
+    setPreferencias({ [PREF_START]: startDate, [PREF_END]: endDate }).catch((err) => {
+      console.error("Erro ao salvar preferência de período:", err);
+    });
   }
 
   function handleClear() {
@@ -215,7 +224,9 @@ export function ProjetosProvider({ children }: { children: ReactNode }) {
     setAppliedStart(DEFAULT_INICIO); setAppliedEnd(DEFAULT_FIM);
     setVendedor(""); setLiberador(""); setAmbiente(""); setLoja("");
     setCrossFilter(null);
-    setPreferencias({ [PREF_START]: DEFAULT_INICIO, [PREF_END]: DEFAULT_FIM }).catch(() => {});
+    setPreferencias({ [PREF_START]: DEFAULT_INICIO, [PREF_END]: DEFAULT_FIM }).catch((err) => {
+      console.error("Erro ao salvar preferência de período:", err);
+    });
   }
 
   return (

@@ -32,7 +32,10 @@ export function RelatorioComprasPage() {
   useEffect(() => {
     fetchCategories()
       .then(setCategories)
-      .catch(() => {});
+      .catch(() => {
+        toast.error("Erro ao carregar categorias.");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch the configured filter date (id=3) before loading the table
@@ -115,7 +118,9 @@ export function RelatorioComprasPage() {
               onKeyDown={(e) => {
                 if (e.key !== "Enter") return;
                 setFilterDate(inputDate);
-                if (inputDate) saveConfigDate(3, inputDate).catch(() => {});
+                if (inputDate) saveConfigDate(3, inputDate).catch((err) => {
+                  console.error("Erro ao salvar data de filtro:", err);
+                });
               }}
             />
           </label>

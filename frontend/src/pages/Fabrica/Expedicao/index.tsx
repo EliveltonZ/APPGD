@@ -112,7 +112,9 @@ export function ExpedicaoPage() {
               onChange={(e) => setInputDate(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && inputDate) {
-                  saveConfigDate(2, inputDate).catch(() => {});
+                  saveConfigDate(2, inputDate).catch((err) => {
+                    console.error("Erro ao salvar data de filtro:", err);
+                  });
                   if (filterDate === inputDate) reloadOrders();
                   else setFilterDate(inputDate);
                 }

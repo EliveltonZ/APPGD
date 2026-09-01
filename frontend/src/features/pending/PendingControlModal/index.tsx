@@ -69,7 +69,9 @@ export function PendingControlModal({
       if (categories.length === 0) {
         fetchPendingCategories()
           .then(setCategories)
-          .catch(() => {});
+          .catch(() => {
+            toast.error("Erro ao carregar categorias de pendência.");
+          });
       }
 
       setLoadingItems(true);

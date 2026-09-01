@@ -6,6 +6,7 @@ import { fmtMes } from "./context";
 import { SERIES_COLORS } from "../../../components/Charts";
 import type { BarSeriesConfig } from "../../../components/Charts";
 import { localDateStr } from "../../../utils/dateUtils";
+import { useToast } from "../../../context/ToastContext";
 
 const DEFAULT_INICIO = "2024-01-01";
 const DEFAULT_FIM    = localDateStr();
@@ -51,6 +52,7 @@ interface ParadasContextValue {
 const ParadasContext = createContext<ParadasContextValue | null>(null);
 
 export function ParadasProvider({ children }: { children: ReactNode }) {
+  const toast = useToast();
   const [data, setData] = useState<ParadasDashboard>(EMPTY);
 
   const [startDate,    setStartDate]    = useState(DEFAULT_INICIO);
@@ -69,11 +71,16 @@ export function ParadasProvider({ children }: { children: ReactNode }) {
       const e = prefs[PREF_END]   ?? DEFAULT_FIM;
       setStartDate(s); setEndDate(e);
       setAppliedStart(s); setAppliedEnd(e);
-    }).catch(() => {});
+    }).catch((err) => {
+      console.error("Erro ao carregar preferências do dashboard de paradas:", err);
+    });
   }, []);
 
   useEffect(() => {
-    fetchDashParadas(appliedStart, appliedEnd).then(setData).catch(() => {});
+    fetchDashParadas(appliedStart, appliedEnd).then(setData).catch(() => {
+      toast.error("Erro ao carregar dados de paradas.");
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedStart, appliedEnd]);
 
   const porMesFormatted = useMemo(() =>
@@ -106,13 +113,17 @@ export function ParadasProvider({ children }: { children: ReactNode }) {
 
   function handleApply() {
     setAppliedStart(startDate); setAppliedEnd(endDate);
-    setPreferencias({ [PREF_START]: startDate, [PREF_END]: endDate }).catch(() => {});
+    setPreferencias({ [PREF_START]: startDate, [PREF_END]: endDate }).catch((err) => {
+      console.error("Erro ao salvar preferência de período:", err);
+    });
   }
   function handleClear() {
     setStartDate(DEFAULT_INICIO); setEndDate(DEFAULT_FIM);
     setAppliedStart(DEFAULT_INICIO); setAppliedEnd(DEFAULT_FIM);
     setMaquinaFilter(null);
-    setPreferencias({ [PREF_START]: DEFAULT_INICIO, [PREF_END]: DEFAULT_FIM }).catch(() => {});
+    setPreferencias({ [PREF_START]: DEFAULT_INICIO, [PREF_END]: DEFAULT_FIM }).catch((err) => {
+      console.error("Erro ao salvar preferência de período:", err);
+    });
   }
 
   return (

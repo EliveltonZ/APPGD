@@ -4,6 +4,7 @@ import { fetchDashProducaoDetalhada, type ProducaoDetalhada, type EtapaRow } fro
 import { calcWorkMinutes } from "../../../utils/workTime";
 import { getPreferencias, setPreferencias } from "../../../services/preferencias";
 import { localDateStr } from "../../../utils/dateUtils";
+import { useToast } from "../../../context/ToastContext";
 
 const DEFAULT_INICIO = "2024-01-01";
 const DEFAULT_FIM    = localDateStr();
@@ -63,6 +64,7 @@ interface ProducaoContextValue {
 const ProducaoContext = createContext<ProducaoContextValue | null>(null);
 
 export function ProducaoProvider({ children }: { children: ReactNode }) {
+  const toast = useToast();
   const [data, setData] = useState<ProducaoDetalhada>(EMPTY);
 
   const [startDate, setStartDate] = useState(DEFAULT_INICIO);
@@ -93,7 +95,10 @@ export function ProducaoProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetchDashProducaoDetalhada(appliedStart, appliedEnd).then(setData).catch(() => {});
+    fetchDashProducaoDetalhada(appliedStart, appliedEnd).then(setData).catch(() => {
+      toast.error("Erro ao carregar dados de produção.");
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedStart, appliedEnd]);
 
   const leadTimeFiltered = useMemo(() =>
