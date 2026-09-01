@@ -1,12 +1,16 @@
 import type { TableValueType } from '../types/table';
+import { parseCurrencyToNumber } from './currencyUtils';
 
 export function detectValueType(value: unknown): TableValueType {
   if (typeof value === 'number') return 'number';
   if (typeof value === 'string') {
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return 'date-br';
     if (/^\d{4}-\d{2}-\d{2}/.test(value)) return 'date-iso';
-    const normalized = value.replace(/\./g, '').replace(',', '.');
-    if (/^-?[\d.]+$/.test(normalized) && !isNaN(parseFloat(normalized))) return 'number';
+    // Tira "R$ " antes de checar o formato — senão uma coluna de moeda
+    // (ex: "R$ 1.234,56") cai em 'text' e ordena por ordem alfabética.
+    const stripped = value.replace(/R\$\s?/g, '').trim();
+    const normalized = stripped.replace(/\./g, '').replace(',', '.');
+    if (stripped && /^-?[\d.]+$/.test(normalized) && !isNaN(parseFloat(normalized))) return 'number';
   }
   return 'text';
 }
@@ -14,10 +18,8 @@ export function detectValueType(value: unknown): TableValueType {
 function toSortKey(value: unknown, type: TableValueType): number | string {
   if (value == null || value === '') return '';
   switch (type) {
-    case 'number': {
-      const n = parseFloat(String(value).replace(/\./g, '').replace(',', '.'));
-      return isNaN(n) ? 0 : n;
-    }
+    case 'number':
+      return parseCurrencyToNumber(String(value));
     case 'date-br': {
       const parts = String(value).split('/');
       return parts.length === 3 ? `${parts[2]}${parts[1]}${parts[0]}` : String(value);

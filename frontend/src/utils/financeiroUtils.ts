@@ -1,4 +1,5 @@
 import type { MarginStatus, ProjectValue, FinancialSummary } from '../types/financeiro';
+import { formatCurrencyFromDB } from './currencyUtils';
 
 export function calcDescPct(bruto: number, negociado: number): number {
   if (!bruto) return 0;
@@ -21,8 +22,10 @@ export function getMarginStatus(margem: number): MarginStatus {
   return 'healthy';
 }
 
+// Reaproveita currencyUtils.formatCurrencyFromDB — eram duas implementações
+// independentes de "formatar número como BRL" que podiam divergir.
 export function formatBRL(value: number): string {
-  return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return formatCurrencyFromDB(value);
 }
 
 export function formatPct(value: number, decimals = 1): string {
