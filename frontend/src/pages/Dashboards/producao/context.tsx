@@ -95,9 +95,13 @@ export function ProducaoProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    fetchDashProducaoDetalhada(appliedStart, appliedEnd).then(setData).catch(() => {
-      toast.error("Erro ao carregar dados de produção.");
+    let alive = true;
+    fetchDashProducaoDetalhada(appliedStart, appliedEnd).then(d => {
+      if (alive) setData(d);
+    }).catch(() => {
+      if (alive) toast.error("Erro ao carregar dados de produção.");
     });
+    return () => { alive = false; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appliedStart, appliedEnd]);
 
