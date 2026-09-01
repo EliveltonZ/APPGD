@@ -20,6 +20,10 @@ async function inserirCliente(dados) {
   return repo.inserirCliente(dados);
 }
 
+async function buscarTipoProjeto(ordemdecompra) {
+  return repo.buscarTipoProjeto(ordemdecompra);
+}
+
 async function buscarParaEditar(ordemdecompra) {
   return repo.buscarParaEditar(ordemdecompra);
 }
@@ -46,6 +50,7 @@ module.exports = {
   listarTiposCliente,
   inserirProjeto,
   inserirCliente,
+  buscarTipoProjeto,
   buscarParaEditar,
   atualizarProjeto,
   buscarParaDeletar,

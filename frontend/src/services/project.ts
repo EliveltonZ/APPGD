@@ -6,6 +6,14 @@ import type { TeamMember, ServicePart } from '../types/assistencia'
 
 type RawRow = Record<string, unknown>
 
+// Aplicado tanto na criação quanto na edição, pra não deixar o casing do
+// dado divergir dependendo de qual fluxo salvou por último.
+function toUpperForm(form: ProjectFormData): ProjectFormData {
+  return Object.fromEntries(
+    Object.entries(form).map(([k, v]) => [k, typeof v === "string" ? v.toUpperCase() : v]),
+  ) as ProjectFormData
+}
+
 export async function fetchContratoInfo(
   contrato: string,
 ): Promise<{ clienteId: string; clienteNome: string; liberadorNome: string } | null> {
@@ -67,6 +75,7 @@ function assistenciaFields(form: ProjectFormData) {
 }
 
 function toInsertPayload(form: ProjectFormData) {
+  form = toUpperForm(form)
   const isAssistencia = form.tipoProjeto === 'ASSISTENCIA'
   return {
     tipo_projeto:    form.tipoProjeto || 'PROJETO',
@@ -184,6 +193,7 @@ export async function fetchEditProject(
 }
 
 function toUpdatePayload(form: ProjectFormData) {
+  form = toUpperForm(form)
   const isAssistencia = form.tipoProjeto === 'ASSISTENCIA'
   return {
     tipo_projeto:    form.tipoProjeto || 'PROJETO',

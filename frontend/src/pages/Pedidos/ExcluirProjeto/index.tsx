@@ -58,8 +58,8 @@ export function ExcluirProjetoPage() {
       }
       setForm((prev) => ({ ...prev, ...result }));
       setLoaded(true);
-    } catch {
-      toast.error("Erro ao buscar projeto.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao buscar projeto.");
     } finally {
       setLoadingProject(false);
     }

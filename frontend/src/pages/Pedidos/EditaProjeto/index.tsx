@@ -95,8 +95,8 @@ export function EditaProjetoPage() {
       }
       setForm((prev) => ({ ...prev, ...result }));
       setErrors({});
-    } catch {
-      toast.error('Erro ao buscar projeto.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erro ao buscar projeto.');
     } finally {
       setLoadingProject(false);
     }

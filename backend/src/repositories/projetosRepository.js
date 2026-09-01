@@ -200,6 +200,17 @@ async function inserirCliente(body) {
   return Clientes.create({ name: body.nome_cliente });
 }
 
+// Consulta leve (só o tipo) usada pra checar permissão contra o tipo real
+// do registro antes de editar/excluir — nunca confiar no tipo_projeto que
+// vem do body/query, que é controlado pelo cliente.
+async function buscarTipoProjeto(ordemdecompra) {
+  const p = await Projetos.findOne({
+    where: { ordemdecompra: Number(ordemdecompra) },
+    attributes: ['tipoProjeto'],
+  });
+  return p ? p.tipoProjeto : null;
+}
+
 async function buscarParaEditar(ordemdecompra) {
   const p = await Projetos.findOne({
     where: { ordemdecompra: Number(ordemdecompra) },
@@ -549,6 +560,7 @@ module.exports = {
   listarTiposCliente,
   inserirProjeto,
   inserirCliente,
+  buscarTipoProjeto,
   buscarParaEditar,
   atualizarProjeto,
   buscarParaDeletar,

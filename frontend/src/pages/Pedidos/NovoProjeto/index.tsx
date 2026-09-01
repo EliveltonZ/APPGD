@@ -169,11 +169,8 @@ export function NovoProjetoPage() {
   async function handleConfirm() {
     setConfirmOpen(false);
     setSaving(true);
-    const upperForm = Object.fromEntries(
-      Object.entries(form).map(([k, v]) => [k, typeof v === "string" ? v.toUpperCase() : v]),
-    ) as typeof form;
     try {
-      const { ordemdecompra } = await saveProject(upperForm);
+      const { ordemdecompra } = await saveProject(form);
       toast.success(
         tipoProjeto === 'ASSISTENCIA'
           ? `Assistência salva com sucesso. Nº OC: ${ordemdecompra}`
