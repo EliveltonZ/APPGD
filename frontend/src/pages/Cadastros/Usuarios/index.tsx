@@ -16,6 +16,7 @@ import {
   insertUser,
 } from '../../../services/usuarios'
 import type { UserRecord } from '../../../services/usuarios'
+import { validateCriarUsuario } from '../../../validation/usuario'
 import './index.css'
 
 // ── Tipos locais ─────────────────────────────────────────────────────────────
@@ -97,16 +98,10 @@ export function CadastrosUsuariosPage() {
     setCreateErrors((prev) => ({ ...prev, [field]: undefined }))
   }
 
+  // Reaproveita as mesmas regras de validation/usuario.ts (usadas também em
+  // Configurações) em vez de manter uma segunda cópia das regras aqui.
   function validateCreate(): CreateErrors {
-    const e: CreateErrors = {}
-    if (!createForm.login.trim())  e.login = 'Nome é obrigatório.'
-    if (!createForm.setor.trim())  e.setor = 'Setor é obrigatório.'
-    if (!createForm.local.trim())  e.local = 'Local é obrigatório.'
-    if (!createForm.senha)         e.senha = 'Senha é obrigatória.'
-    else if (createForm.senha.length < 6) e.senha = 'Mínimo 6 caracteres.'
-    if (!createForm.confirmSenha)  e.confirmSenha = 'Confirmação é obrigatória.'
-    else if (createForm.senha !== createForm.confirmSenha) e.confirmSenha = 'As senhas não coincidem.'
-    return e
+    return validateCriarUsuario(createForm).errors as CreateErrors
   }
 
   async function handleCreate() {
