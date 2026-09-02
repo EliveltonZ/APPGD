@@ -34,6 +34,7 @@ interface PartErrors {
   qtd?: string;
   peca?: string;
   falha?: string;
+  tipo?: string;
 }
 
 // ── Component ────────────────────────────────────────────
@@ -92,9 +93,13 @@ export function PartsModal({
 
   function validate(): boolean {
     const errs: PartErrors = {};
-    if (!form.qtd || Number(form.qtd) < 1) errs.qtd = "Informe a quantidade";
+    const qtdTrim = form.qtd.trim();
+    if (!qtdTrim) errs.qtd = "Informe a quantidade";
+    else if (!/^\d+$/.test(qtdTrim) || Number(qtdTrim) < 1)
+      errs.qtd = "Quantidade deve ser um número inteiro maior que zero";
     if (!form.peca.trim()) errs.peca = "Informe o nome da peça";
     if (!form.falha) errs.falha = "Selecione o tipo de falha";
+    if (!form.tipo) errs.tipo = "Selecione a ocorrência";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -201,10 +206,11 @@ export function PartsModal({
             placeholder="Selecionar tipo de falha..."
           />
           <Select
-            label="Ocorrência"
+            label="Ocorrência *"
             value={form.tipo}
             onChange={(e) => set("tipo", e.target.value)}
             options={ocorrenciaOptions}
+            error={errors.tipo}
             placeholder="Selecionar..."
           />
         </div>
