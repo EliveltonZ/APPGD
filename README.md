@@ -2,6 +2,8 @@
 
 Sistema interno de gestão da Geração Design. Cobre o ciclo completo de produção: pedidos, PCP, produção, expedição, compras, assistências técnicas, logística, qualidade e financeiro.
 
+<!-- teste de deploy: hotfix/urgente -->
+
 ---
 
 ## Sumário
