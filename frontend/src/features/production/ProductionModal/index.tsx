@@ -264,6 +264,7 @@ export function ProductionModal({
                     key={sectorConfig.id}
                     config={sectorConfig}
                     data={form.setores[sectorConfig.id]}
+                    employees={employees}
                     onChange={(field, value) =>
                       updateSector(sectorConfig.id, field, value)
                     }

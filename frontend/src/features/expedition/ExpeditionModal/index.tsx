@@ -151,6 +151,7 @@ export function ExpeditionModal({
             <FormSection step={3} title="Status Operacional">
               <OperationalStatusSection
                 data={form}
+                users={users}
                 onChange={updateForm}
                 onPickUser={handlePickUser}
               />

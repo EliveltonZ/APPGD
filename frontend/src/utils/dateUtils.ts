@@ -35,6 +35,13 @@ export function localDateStr(date: Date = new Date()): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+/** Retorna "yyyy-MM-ddTHH:mm" no fuso local, para <input type="datetime-local">. */
+export function nowDatetimeLocal(date: Date = new Date()): string {
+  const hh  = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  return `${localDateStr(date)}T${hh}:${min}`;
+}
+
 /** Converte ISO UTC → "yyyy-MM-ddTHH:mm" em horário local para <input type="datetime-local">. */
 export function toDatetimeLocal(val: unknown): string {
   if (!val) return "";

@@ -1,30 +1,36 @@
 import { useState } from 'react'
 import { Users } from 'lucide-react'
 import { ConfirmModal } from '../../../components/ConfirmModal'
-import type { SectorConfig, SectorData } from '../../../types/production'
+import { findPersonById } from '../../../utils/people'
+import { nowDatetimeLocal } from '../../../utils/dateUtils'
+import { validateOperadorId } from '../../../validation'
+import type { SectorConfig, SectorData, Employee } from '../../../types/production'
 import './index.css'
 
 interface ProductionSectorProps {
   config: SectorConfig
   data: SectorData
+  employees: Employee[]
   onChange: (field: keyof SectorData, value: string | boolean) => void
   onPickEmployee: () => void
-}
-
-function nowDatetimeLocal(): string {
-  const d = new Date()
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 export function ProductionSector({
   config,
   data,
+  employees,
   onChange,
   onPickEmployee,
 }: ProductionSectorProps) {
   const [pendingField, setPendingField] = useState<'inicio' | 'fim' | null>(null)
   const [warningMsg, setWarningMsg] = useState<string | null>(null)
+  const [responsavelErro, setResponsavelErro] = useState<string | null>(null)
+
+  function resolveResponsavel(value: string) {
+    setResponsavelErro(validateOperadorId(value, employees))
+    const match = findPersonById(employees, value)
+    onChange('responsavelNome', match ? match.nome : '')
+  }
 
   function handleConfirm() {
     if (pendingField) onChange(pendingField, nowDatetimeLocal())
@@ -129,8 +135,15 @@ export function ProductionSector({
               type="text"
               className="sector-card__input"
               value={data.responsavelId}
-              onChange={(e) => onChange('responsavelId', e.target.value)}
+              onChange={(e) => { onChange('responsavelId', e.target.value); setResponsavelErro(null) }}
+              onBlur={(e) => resolveResponsavel(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') resolveResponsavel((e.target as HTMLInputElement).value)
+              }}
             />
+            {responsavelErro && (
+              <span className="sector-card__field-error">{responsavelErro}</span>
+            )}
           </div>
           <div className="sector-card__field">
             <label className="sector-card__label">Responsável</label>
