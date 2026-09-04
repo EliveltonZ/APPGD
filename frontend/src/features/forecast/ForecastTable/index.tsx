@@ -8,6 +8,7 @@ import type {
   ForecastStageStatus,
 } from "../../../types/forecast";
 import { FORECAST_PROJECT_STATUS_LABELS } from "../../../data/forecastConfig";
+import { fmtDate as fmtDateUtil } from "../../../utils/dateUtils";
 import { StatusBadge } from "../StatusBadge";
 import "./index.css";
 
@@ -48,9 +49,7 @@ function fmtPrazo(days: number): string {
 }
 
 function fmtDate(iso: string): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+  return fmtDateUtil(iso) || "—";
 }
 
 type ForecastRow = {

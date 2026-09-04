@@ -1,9 +1,8 @@
+import { fmtDate as fmtDateUtil } from '../../../../utils/dateUtils'
 import type { StatusProject } from '../../../../types/status'
 
 function fmtDate(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  const [y, m, d] = iso.split('-')
-  return `${d}/${m}/${y}`
+  return fmtDateUtil(iso) || '—'
 }
 
 function fmtPrazo(p: StatusProject): string {
