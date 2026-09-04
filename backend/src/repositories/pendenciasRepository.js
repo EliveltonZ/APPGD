@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const { Acessorios, Projetos, Clientes, Categorias } = require('../client/db');
+const { todayBR } = require('../utils/dateBR');
 
 async function buscarContratoPendencia(p_contrato) {
   const rows = await Projetos.findAll({
@@ -15,8 +16,7 @@ async function buscarContratoPendencia(p_contrato) {
     attributes: ['ordemdecompra', 'previsao', 'recebido'],
   });
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = todayBR();
 
   const acessMap = {};
   for (const a of allAcessorios) {

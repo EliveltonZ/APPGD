@@ -8,6 +8,7 @@ const {
   Pecas,
 } = require("../client/db");
 const { assistenciaStatus, diasRestantes } = require("../utils/calcStatus");
+const { fmtDate } = require("../utils/dateBR");
 
 async function listarAssistencias(p_data) {
   const rows = await Assistencias.findAll({
@@ -159,7 +160,7 @@ async function buscarCapaAssistencia(p_solicitacao) {
 }
 
 async function _gerarSolicitacaoId() {
-  const year = new Date().getFullYear();
+  const year = Number(fmtDate().slice(0, 4));
   const count = await Assistencias.count({
     where: { solicitacao: { [Op.like]: `AS-${year}-%` } },
   });
@@ -174,7 +175,7 @@ async function inserirSolicitacao(body) {
     contrato:        body.contrato ? Number(body.contrato) : null,
     cliente:         body.cliente ?? "",
     ambiente:        body.ambiente ?? null,
-    datasolicitacao: body.datasolicitacao ? new Date(body.datasolicitacao) : new Date(),
+    datasolicitacao: body.datasolicitacao ? fmtDate(body.datasolicitacao) : fmtDate(),
     solicitante:     body.solicitante ?? null,
     urgente:         body.urgente ?? null,
     observacoes2:    body.observacoes ?? null,
@@ -202,7 +203,7 @@ async function inserirSolicitacaoCompleta(body) {
       contrato:        body.contrato ? Number(body.contrato) : null,
       cliente:         body.cliente ?? "",
       ambiente:        body.ambiente ?? null,
-      datasolicitacao: body.datasolicitacao ? new Date(body.datasolicitacao) : new Date(),
+      datasolicitacao: body.datasolicitacao ? fmtDate(body.datasolicitacao) : fmtDate(),
       solicitante:     body.solicitante ?? null,
       urgente:         body.urgente ?? null,
       observacoes2:    body.observacoes ?? null,

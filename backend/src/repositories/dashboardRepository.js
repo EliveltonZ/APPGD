@@ -1,6 +1,7 @@
 const { sequelize } = require('../client/db');
 const { QueryTypes } = require('sequelize');
 const { producaoStatus } = require('../utils/calcStatus');
+const { fmtDate } = require('../utils/dateBR');
 
 async function getProjetosDash() {
   const rows = await sequelize.query(
@@ -193,7 +194,7 @@ async function getProducaoDashDetalhada(start, end) {
 
 async function getParadasDash(start, end) {
   const s = start || '2020-01-01';
-  const e = end   || new Date().toISOString().slice(0, 10);
+  const e = end   || fmtDate().slice(0, 10);
   const rep = { start: s, end: e };
 
   const [porTipo, porMaquina, porMes, porMaquinaMes, [abertas]] = await Promise.all([

@@ -7,12 +7,7 @@ const {
   Montador, EquipSat, Acessorios,
   Falhas, Ocorrencia, Producao,
 } = require('../client/db');
-
-function fmtDate(d = new Date()) {
-  return new Date(d)
-    .toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' })
-    .replace(',', '');
-}
+const { fmtDate } = require('../utils/dateBR');
 
 // ─── Lookups já convertidos (inalterados) ────────────────────────────────────
 

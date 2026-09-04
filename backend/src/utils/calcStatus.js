@@ -1,10 +1,9 @@
+const { todayBR } = require("./dateBR");
+
 const BULLET = "●"; // chr(9679)
 
 function today() {
-  const now = new Date();
-  return new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  return todayBR();
 }
 
 function toDate(v) {
