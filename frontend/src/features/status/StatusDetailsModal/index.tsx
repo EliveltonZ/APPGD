@@ -6,6 +6,7 @@ import { AcessoriosTable } from "../../../components/AcessoriosTable";
 import type { AcessorioRow } from "../../../components/AcessoriosTable";
 import { fetchStatusDetail } from "../../../services/status";
 import { fetchPendingItems } from "../../../services/pending";
+import { fmtDate as fmtDateUtil } from "../../../utils/dateUtils";
 import type { PendingItem } from "../../../types/pending";
 import type {
   StatusProject,
@@ -15,9 +16,7 @@ import type {
 import "./sections/ProductionStagesSection.css";
 
 function fmtDate(iso: string | null | undefined): string {
-  if (!iso) return "—";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+  return fmtDateUtil(iso) || "—";
 }
 
 const STAGE_DEFS: {
