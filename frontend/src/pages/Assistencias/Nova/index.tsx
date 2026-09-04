@@ -137,7 +137,7 @@ export function AssistenciasNovaPage() {
       return;
     }
     setSending(true);
-    const dataHoraEnvio = new Date().toISOString().slice(0, 19);
+    const dataHoraEnvio = new Date().toISOString();
     try {
       const solicitacaoId = await submitSolicitacaoCompleta(
         req.numSolicitacao,
