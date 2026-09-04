@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import { waitForImages } from "../shared/waitForImages";
 import { apiGet } from "../../../services/api";
+import { fmtDateTime } from "../../../utils/dateUtils";
 import "./CapaAssistencia.css";
 import { B } from "./constants";
 import type { AssistData, Peca } from "./types";
@@ -24,10 +25,6 @@ async function fetchAssistData(id: string): Promise<AssistData> {
   });
   if (!rows.length) throw new Error("Assistência não encontrada");
   const r = rows[0];
-  const dtStr = String(r.datasolicitacao ?? "");
-  const [datePart = "", timePart = ""] = dtStr.split("T");
-  const [y = "", m = "", d = ""] = datePart.split("-");
-  const time = timePart.split(".")[0] ?? "";
   return {
     numSolicitacao: String(r.solicitacao ?? ""),
     numContrato: String(r.contrato ?? ""),
@@ -39,7 +36,7 @@ async function fetchAssistData(id: string): Promise<AssistData> {
     solicitante: String(r.solicitante ?? ""),
     supervisor: String(r.supervisor ?? ""),
     responsavel: String(r.responsavel ?? ""),
-    dataHora: datePart ? `${d}/${m}/${y}${time ? " " + time : ""}` : "",
+    dataHora: fmtDateTime(r.datasolicitacao as string | null),
     urgente: String(r.urgente ?? "nao").toUpperCase(),
   };
 }

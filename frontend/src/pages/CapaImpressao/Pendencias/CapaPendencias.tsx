@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "../Producao/CapaImpressao.css";
 import { waitForImages } from "../shared/waitForImages";
-import { fmtDate } from "../../../utils/dateUtils";
+import { fmtDate, localDateStr } from "../../../utils/dateUtils";
 import { useAuth } from "../../../context/AuthContext";
 import { fetchCapaData } from "../capaData";
 import type { CapaData } from "../capaData";
@@ -50,7 +50,7 @@ export function CapaPendenciasPage() {
     const nome = user?.nome
       ? user.nome.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())
       : "";
-    const hoje = fmtDate(new Date().toISOString().split("T")[0]);
+    const hoje = fmtDate(localDateStr());
     return { ...d, responsavel: nome, data: hoje };
   }
 
