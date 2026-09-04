@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Pause, Play, CheckCircle2, User, Clock } from "lucide-react";
 import { fmtDateTime } from "../../../utils/dateUtils";
 import { calcWorkMinutes, fmtWorkDuration } from "../../../utils/workTime";
+import { findPersonByIdOrName } from "../../../utils/people";
+import { validateOperadorIdOuNome } from "../../../validation";
 import type { Stage, StageStatus, StageAction, Operator } from "../types";
 import "./index.css";
 
@@ -33,22 +35,13 @@ function OperatorInput({
   onOperatorChange: (id: string, nome: string) => void;
 }) {
   const [opInput, setOpInput] = useState(initialId);
+  const [erro, setErro] = useState<string | null>(null);
 
   function resolveOperator(value: string) {
-    const v = value.trim();
-    if (!v) { onOperatorChange("", ""); return; }
-
-    if (/^\d+$/.test(v)) {
-      const op = operators.find(o => Number(o.id) === Number(v));
-      if (op) { onOperatorChange(op.id, op.nome); return; }
-    }
-
-    const byName = operators.find(
-      o => o.nome.toLowerCase() === v.toLowerCase(),
-    );
-    if (byName) { onOperatorChange(byName.id, byName.nome); return; }
-
-    onOperatorChange("", "");
+    if (!value.trim()) { setErro(null); onOperatorChange("", ""); return; }
+    setErro(validateOperadorIdOuNome(value, operators));
+    const match = findPersonByIdOrName(operators, value);
+    onOperatorChange(match?.id ?? "", match?.nome ?? "");
   }
 
   return (
@@ -59,7 +52,7 @@ function OperatorInput({
         className="apt-stage__operator-id"
         placeholder="ID"
         value={opInput}
-        onChange={(e) => setOpInput(e.target.value)}
+        onChange={(e) => { setOpInput(e.target.value); setErro(null); }}
         onBlur={(e) => resolveOperator(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -69,7 +62,7 @@ function OperatorInput({
         }}
       />
       <span className={`apt-stage__operator-name${!responsavelNome ? " apt-stage__operator-name--empty" : ""}`}>
-        {responsavelNome ?? "—"}
+        {erro ?? responsavelNome ?? "—"}
       </span>
     </div>
   );

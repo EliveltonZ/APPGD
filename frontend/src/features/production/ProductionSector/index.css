@@ -89,6 +89,18 @@
 .sector-card__field--id {
   flex: none;
   width: 40px;
+  position: relative;
+}
+
+.sector-card__field-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 2px;
+  font-size: 10px;
+  color: var(--atrasado, #dc2626);
+  white-space: nowrap;
+  z-index: 1;
 }
 
 .sector-card__label {

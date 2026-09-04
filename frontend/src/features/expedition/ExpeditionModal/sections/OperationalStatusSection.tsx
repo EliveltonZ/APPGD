@@ -1,11 +1,21 @@
+import { useState } from 'react';
 import { User } from 'lucide-react';
-import type { ExpeditionDetail } from '../../../../types/expedition';
+import { findPersonById } from '../../../../utils/people';
+import { validateOperadorId } from '../../../../validation';
+import type { ExpeditionDetail, ExpeditionUser } from '../../../../types/expedition';
 import './OperationalStatusSection.css';
 
 export type PickRole = 'embalagem' | 'conferido' | 'motorista';
 
+const NAME_FIELD: Record<PickRole, 'embalagemname' | 'conferidoname' | 'motoristaname'> = {
+  embalagem: 'embalagemname',
+  conferido: 'conferidoname',
+  motorista: 'motoristaname',
+};
+
 interface OperationalStatusSectionProps {
   data: ExpeditionDetail;
+  users: ExpeditionUser[];
   onChange: (updates: Partial<ExpeditionDetail>) => void;
   onPickUser: (role: PickRole) => void;
 }
@@ -16,7 +26,19 @@ const EMB_BADGE: Record<string, string> = {
   done:   'CONCLUÍDO',
 };
 
-export function OperationalStatusSection({ data, onChange, onPickUser }: OperationalStatusSectionProps) {
+export function OperationalStatusSection({ data, users, onChange, onPickUser }: OperationalStatusSectionProps) {
+  const [errors, setErrors] = useState<Partial<Record<PickRole, string | null>>>({});
+
+  function resolveUser(role: PickRole, rawId: string) {
+    setErrors((prev) => ({ ...prev, [role]: validateOperadorId(rawId, users) }));
+    const match = findPersonById(users, rawId);
+    onChange({ [NAME_FIELD[role]]: match ? match.nome : '' });
+  }
+
+  function clearError(role: PickRole) {
+    setErrors((prev) => ({ ...prev, [role]: null }));
+  }
+
   const embState = data.embalagemfim
     ? 'done'
     : data.embalagempausa
@@ -93,9 +115,16 @@ export function OperationalStatusSection({ data, onChange, onPickUser }: Operati
                   type="number"
                   className="ops-status__input ops-status__input--id"
                   value={data.embalagemresp || ''}
-                  onChange={(e) => onChange({ embalagemresp: Number(e.target.value) })}
+                  onChange={(e) => { onChange({ embalagemresp: Number(e.target.value) }); clearError('embalagem'); }}
+                  onBlur={(e) => resolveUser('embalagem', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') resolveUser('embalagem', (e.target as HTMLInputElement).value);
+                  }}
                   placeholder="ID..."
                 />
+                {errors.embalagem && (
+                  <span className="ops-status__field-error">{errors.embalagem}</span>
+                )}
               </div>
               <div className="ops-status__field resp">
                 <label className="ops-status__label">Nome</label>
@@ -136,9 +165,16 @@ export function OperationalStatusSection({ data, onChange, onPickUser }: Operati
                   type="number"
                   className="ops-status__input ops-status__input--id"
                   value={data.conferido || ''}
-                  onChange={(e) => onChange({ conferido: Number(e.target.value) })}
+                  onChange={(e) => { onChange({ conferido: Number(e.target.value) }); clearError('conferido'); }}
+                  onBlur={(e) => resolveUser('conferido', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') resolveUser('conferido', (e.target as HTMLInputElement).value);
+                  }}
                   placeholder="ID..."
                 />
+                {errors.conferido && (
+                  <span className="ops-status__field-error">{errors.conferido}</span>
+                )}
               </div>
               <div className="ops-status__field resp">
                 <label className="ops-status__label">Conferido por</label>
@@ -179,9 +215,16 @@ onChange={(e) => onChange({ entrega: e.target.value })}
                   type="number"
                   className="ops-status__input ops-status__input--id"
                   value={data.motorista || ''}
-                  onChange={(e) => onChange({ motorista: Number(e.target.value) })}
+                  onChange={(e) => { onChange({ motorista: Number(e.target.value) }); clearError('motorista'); }}
+                  onBlur={(e) => resolveUser('motorista', e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') resolveUser('motorista', (e.target as HTMLInputElement).value);
+                  }}
                   placeholder="ID..."
                 />
+                {errors.motorista && (
+                  <span className="ops-status__field-error">{errors.motorista}</span>
+                )}
               </div>
               <div className="ops-status__field resp">
                 <label className="ops-status__label">Motorista</label>
