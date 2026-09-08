@@ -23,12 +23,14 @@ interface EntityConfig {
   label: string
   labelPlaceholder: string
   hasPassword?: boolean
+  hasRegime?: boolean
+  hasAtivo?: boolean
 }
 
 const ENTITIES: EntityConfig[] = [
-  { key: 'vendedores',    label: 'Vendedores',       labelPlaceholder: 'Nome do vendedor'    },
-  { key: 'liberadores',   label: 'Liberadores',      labelPlaceholder: 'Nome do liberador'   },
-  { key: 'montadores',    label: 'Montadores',       labelPlaceholder: 'Nome do montador', hasPassword: true },
+  { key: 'vendedores',    label: 'Vendedores',       labelPlaceholder: 'Nome do vendedor', hasRegime: true, hasAtivo: true },
+  { key: 'liberadores',   label: 'Liberadores',      labelPlaceholder: 'Nome do liberador', hasRegime: true, hasAtivo: true },
+  { key: 'montadores',    label: 'Montadores',       labelPlaceholder: 'Nome do montador', hasPassword: true, hasRegime: true, hasAtivo: true },
   { key: 'causas',        label: 'Causas',           labelPlaceholder: 'Descrição da causa'  },
   { key: 'falhas',        label: 'Falhas',           labelPlaceholder: 'Descrição da falha'  },
   { key: 'etapas',        label: 'Etapas',           labelPlaceholder: 'Nome da etapa'       },
@@ -81,6 +83,8 @@ export function CadastrosPage() {
   const [selected, setSelected]           = useState<CadastroRow | null>(null)
   const [labelValue, setLabelValue]       = useState('')
   const [passwordValue, setPasswordValue] = useState('')
+  const [regimeValue, setRegimeValue]     = useState('')
+  const [ativoValue, setAtivoValue]       = useState(true)
   const [saving, setSaving]               = useState(false)
   const [deleting, setDeleting]           = useState(false)
 
@@ -88,6 +92,8 @@ export function CadastrosPage() {
     setSelected(null)
     setLabelValue('')
     setPasswordValue('')
+    setRegimeValue('')
+    setAtivoValue(true)
     setModalOpen(true)
   }
 
@@ -95,6 +101,8 @@ export function CadastrosPage() {
     setSelected(row)
     setLabelValue(row.label)
     setPasswordValue(row.password ?? '')
+    setRegimeValue(row.regime ?? '')
+    setAtivoValue(row.ativo ?? true)
     setModalOpen(true)
   }
 
@@ -110,6 +118,8 @@ export function CadastrosPage() {
     try {
       const payload: Omit<CadastroRow, 'id'> = { label: trimmed }
       if (activeConfig.hasPassword) payload.password = passwordValue || null
+      if (activeConfig.hasRegime) payload.regime = regimeValue.trim() || null
+      if (activeConfig.hasAtivo) payload.ativo = ativoValue
       if (selected) {
         await updateCadastro(activeKey, selected.id, payload)
         toast.success('Registro atualizado.')
@@ -269,6 +279,31 @@ export function CadastrosPage() {
                 value={passwordValue}
                 onChange={(e) => setPasswordValue(e.target.value)}
               />
+            </label>
+          )}
+
+          {activeConfig.hasRegime && (
+            <label className="cad-field">
+              <span className="cad-field__label">Regime</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: CLT, Diarista..."
+                value={regimeValue}
+                onChange={(e) => setRegimeValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          )}
+
+          {activeConfig.hasAtivo && (
+            <label className="cad-field cad-field--checkbox">
+              <input
+                type="checkbox"
+                checked={ativoValue}
+                onChange={(e) => setAtivoValue(e.target.checked)}
+              />
+              <span className="cad-field__label">Ativo</span>
             </label>
           )}
         </div>

@@ -4,6 +4,8 @@ export interface CadastroRow {
   id: number
   label: string
   password?: string | null
+  regime?: string | null
+  ativo?: boolean | null
 }
 
 export async function listCadastro(entity: string): Promise<CadastroRow[]> {

@@ -11,6 +11,14 @@ module.exports = function(sequelize, DataTypes) {
     name: {
       type: DataTypes.TEXT,
       allowNull: false
+    },
+    regime: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    ativo: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
     }
   }, {
     sequelize,

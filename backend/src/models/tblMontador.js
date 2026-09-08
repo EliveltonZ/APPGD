@@ -15,6 +15,14 @@ module.exports = function(sequelize, DataTypes) {
     password: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    regime: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    ativo: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true
     }
   }, {
     sequelize,
