@@ -20,7 +20,7 @@ import "./index.css";
 // ── Helpers ──────────────────────────────────────────────
 
 const EMPTY_FORM: PartFormData = {
-  qtd: "1",
+  qtd: "",
   peca: "",
   dimensoes: "",
   cor: "",
@@ -68,7 +68,7 @@ export function PartsModal({
     fetchFalhasConfig()
       .then((items) =>
         setFalhaOptions(
-          items.map((f) => ({ value: String(f.id), label: f.label })),
+          items.map((f) => ({ value: String(f.id), label: `${f.id} - ${f.label}` })),
         ),
       )
       .catch(() => {
