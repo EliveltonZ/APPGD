@@ -3,17 +3,17 @@ import type { ServicePart } from '../types/assistencia';
 
 type RawRow = Record<string, unknown>;
 
-export async function fetchContratoAssist(
-  contrato: number,
-): Promise<{ cliente: string; liberador: string } | null> {
-  try {
-    const rows = await apiGet<RawRow[]>('/solicitacao/contrato', { contrato });
-    const r    = Array.isArray(rows) ? rows[0] : null;
-    if (!r) return null;
-    return { cliente: String(r.cliente ?? ''), liberador: String(r.liberador ?? '') };
-  } catch {
-    return null;
-  }
+export interface SolicitacaoTipo {
+  cod:   number;
+  label: string;
+}
+
+export async function fetchSolicitacaoConfig(): Promise<SolicitacaoTipo[]> {
+  const rows = await apiGet<RawRow[]>('/solicitacao/config');
+  return rows.map(r => ({
+    cod:   Number(r.cod),
+    label: String(r.descricao ?? ''),
+  }));
 }
 
 interface SolicitacaoBody {

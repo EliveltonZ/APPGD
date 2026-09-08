@@ -10,7 +10,7 @@ import { SelectedPartsTable } from "../../../features/assistencias/nova/Selected
 import { TeamModal } from "../../../features/assistencias/nova/TeamModal";
 import { PartsModal } from "../../../features/assistencias/nova/PartsModal";
 import { buildInitialRequest } from "../../../data/assistenciaMocks";
-import { submitSolicitacaoCompleta, fetchContratoAssist } from "../../../services/assistencia";
+import { submitSolicitacaoCompleta } from "../../../services/assistencia";
 import { useToast } from "../../../context/ToastContext";
 import { useAuth } from "../../../context/AuthContext";
 import {
@@ -49,7 +49,6 @@ function validate(req: ServiceRequest): FormErrors {
     e.tipoSolicitacao = "Selecione o tipo de solicitação";
   if (!req.destino) e.destino = "Selecione o destino";
   if (!req.supervisor.trim()) e.supervisor = "Informe o supervisor";
-  if (!req.liberador.trim()) e.liberador = "Informe o liberador";
   return e;
 }
 
@@ -93,18 +92,6 @@ export function AssistenciasNovaPage() {
       const el = document.querySelector<HTMLElement>('.input-has-error, .select-has-error');
       el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
-  }
-
-  async function handleContratoBlur() {
-    const num = Number(req.numContrato.trim());
-    if (!num) return;
-    const data = await fetchContratoAssist(num);
-    if (!data) return;
-    setReq((prev) => ({
-      ...prev,
-      cliente:   data.cliente   || prev.cliente,
-      liberador: data.liberador || prev.liberador,
-    }));
   }
 
   function addMember(member: TeamMember) {
@@ -246,7 +233,6 @@ export function AssistenciasNovaPage() {
                 patch("numContrato", e.target.value);
                 clearError("numContrato");
               }}
-              onBlur={handleContratoBlur}
               error={errors.numContrato}
               placeholder="Ex: 1901"
             />
@@ -347,20 +333,11 @@ export function AssistenciasNovaPage() {
           </div>
           <div className="frow--2 ap-dates-row">
             <Input
-              label="Liberador *"
-              value={req.liberador}
-              onChange={(e) => {
-                patch("liberador", e.target.value);
-                clearError("liberador");
-              }}
-              error={errors.liberador}
-              placeholder="Nome do liberador"
-            />
-            <Input
               label="Tempo Estimado"
               value={req.tempo}
               onChange={(e) => patch("tempo", e.target.value)}
               placeholder="Ex: 2 horas"
+              className="fcol--span2"
             />
           </div>
         </FormSection>
