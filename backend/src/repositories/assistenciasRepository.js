@@ -16,6 +16,7 @@ async function listarAssistencias(data) {
     attributes: [
       "solicitacao",
       "corte",
+      "pedido",
       "contrato",
       "cliente",
       "ambiente",
@@ -40,6 +41,7 @@ async function listarAssistencias(data) {
   return rows.map((a) => ({
     solicitacao:     a.solicitacao,
     corte:           a.corte,
+    pedido:          a.pedido,
     contrato:        a.contrato,
     cliente:         a.cliente,
     ambiente:        a.ambiente,
