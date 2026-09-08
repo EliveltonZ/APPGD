@@ -55,7 +55,7 @@ async function listarOcorrencias() {
 }
 
 async function listarMontadores() {
-  const rows = await Montador.findAll({ order: [['id', 'ASC']] });
+  const rows = await Montador.findAll({ where: { ativo: true }, order: [['name', 'ASC']] });
   return rows.map(r => ({ codigo: r.id, nome: r.name }));
 }
 
