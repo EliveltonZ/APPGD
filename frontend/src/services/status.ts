@@ -1,5 +1,10 @@
 import { apiGet } from './api'
-import type { StatusProject, StatusProjectDetail, StageStatus } from '../types/status'
+import type {
+  StatusProject,
+  StatusProjectDetail,
+  StatusProjectDetailStages,
+  StatusStageDetail,
+} from '../types/status'
 
 type RawRow = Record<string, unknown>
 
@@ -8,10 +13,14 @@ function toDateStr(val: unknown): string {
   return String(val).split('T')[0]
 }
 
-function toStage(val: unknown): StageStatus {
-  const s = String(val ?? 'AGUARDE')
-  if (s === 'FINALIZADO' || s === 'INICIADO' || s === 'PAUSADO') return s
-  return 'AGUARDE'
+function toDetailStage(r: RawRow, inicioKey: string, fimKey: string): StatusStageDetail {
+  const inicio = r[inicioKey] ? String(r[inicioKey]) : ''
+  const fim    = r[fimKey]    ? String(r[fimKey])    : ''
+  return {
+    inicio,
+    fim,
+    status: fim ? 'concluido' : inicio ? 'em_andamento' : 'nao_iniciado',
+  }
 }
 
 function toStatusProject(r: RawRow): StatusProject {
@@ -40,6 +49,16 @@ function toStatusProject(r: RawRow): StatusProject {
 }
 
 function toStatusProjectDetail(r: RawRow): StatusProjectDetail {
+  const stages: StatusProjectDetailStages = {
+    corte:        toDetailStage(r, 'corteinicio',        'cortefim'),
+    customizacao: toDetailStage(r, 'customizacaoinicio', 'customizacaofim'),
+    coladeira:    toDetailStage(r, 'coladeirainicio',    'coladeirafim'),
+    usinagem:     toDetailStage(r, 'usinageminicio',     'usinagemfim'),
+    montagem:     toDetailStage(r, 'montageminicio',     'montagemfim'),
+    paineis:      toDetailStage(r, 'paineisinicio',      'paineisfim'),
+    acabamento:   toDetailStage(r, 'acabamentoinicio',   'acabamentofim'),
+    embalagem:    toDetailStage(r, 'embalageminicio',    'embalagemfim'),
+  }
   return {
     numOC:        String(r.ordemdecompra ?? ''),
     cliente:      String(r.cliente ?? ''),
@@ -50,16 +69,7 @@ function toStatusProjectDetail(r: RawRow): StatusProjectDetail {
     lote:         String(r.lote ?? ''),
     fabrica:      toDateStr(r.chegoufabrica),
     entrega:      toDateStr(r.dataentrega),
-    stages: {
-      corte:       toStage(r.scorte),
-      customizacao:toStage(r.scustom),
-      coladeira:   toStage(r.scoladeira),
-      usinagem:    toStage(r.susinagem),
-      montagem:    toStage(r.smontagem),
-      paineis:     toStage(r.spaineis),
-      acabamento:  toStage(r.sacabamento),
-      embalagem:   toStage(r.sembalagem),
-    },
+    stages,
     previsao:     toDateStr(r.previsao) || null,
     pronto:       toDateStr(r.pronto) || null,
     entregue:     toDateStr(r.entrega) || null,

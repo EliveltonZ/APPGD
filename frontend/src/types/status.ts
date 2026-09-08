@@ -22,6 +22,29 @@ export interface StatusProjectStages {
   embalagem: StageStatus;
 }
 
+export type StatusDetailStageStatus =
+  | "nao_iniciado"
+  | "em_andamento"
+  | "pausado"
+  | "concluido";
+
+export interface StatusStageDetail {
+  inicio: string;
+  fim: string;
+  status: StatusDetailStageStatus;
+}
+
+export interface StatusProjectDetailStages {
+  corte: StatusStageDetail;
+  customizacao: StatusStageDetail;
+  coladeira: StatusStageDetail;
+  usinagem: StatusStageDetail;
+  montagem: StatusStageDetail;
+  paineis: StatusStageDetail;
+  acabamento: StatusStageDetail;
+  embalagem: StatusStageDetail;
+}
+
 export interface StatusProjectDetail {
   numOC: string;
   cliente: string;
@@ -32,7 +55,7 @@ export interface StatusProjectDetail {
   lote: string;
   fabrica: string;
   entrega: string;
-  stages: StatusProjectStages;
+  stages: StatusProjectDetailStages;
   previsao: string | null;
   pronto: string | null;
   entregue: string | null;

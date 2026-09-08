@@ -12,7 +12,7 @@ export interface ProductionStageCardProps {
   status: StageStatus;
   inicio: string;
   fim: string;
-  responsavel: string;
+  responsavel?: string;
   pausa?: string;
 }
 
@@ -76,10 +76,12 @@ export function ProductionStageCard({
             <DateValue iso={pausa} />
           </div>
         )}
-        <div className="psc-field psc-field--full">
-          <span>Responsável</span>
-          <strong>{responsavel || "—"}</strong>
-        </div>
+        {responsavel !== undefined && (
+          <div className="psc-field psc-field--full">
+            <span>Responsável</span>
+            <strong>{responsavel || "—"}</strong>
+          </div>
+        )}
       </div>
     </div>
   );

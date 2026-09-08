@@ -4,16 +4,12 @@ import { StatusBadge } from "../StatusBadge";
 import { ProjectInfoSection } from "./sections/ProjectInfoSection";
 import { AcessoriosTable } from "../../../components/AcessoriosTable";
 import type { AcessorioRow } from "../../../components/AcessoriosTable";
+import { ProductionStageCard } from "../../../components/ProductionStageCard";
 import { fetchStatusDetail } from "../../../services/status";
 import { fetchPendingItems } from "../../../services/pending";
 import { fmtDate as fmtDateUtil } from "../../../utils/dateUtils";
 import type { PendingItem } from "../../../types/pending";
-import type {
-  StatusProject,
-  StatusProjectDetail,
-  StageStatus,
-} from "../../../types/status";
-import "./sections/ProductionStagesSection.css";
+import type { StatusProject, StatusProjectDetail } from "../../../types/status";
 
 function fmtDate(iso: string | null | undefined): string {
   return fmtDateUtil(iso) || "—";
@@ -32,45 +28,6 @@ const STAGE_DEFS: {
   { key: "acabamento", label: "Acabamento" },
   { key: "embalagem", label: "Embalagem" },
 ];
-
-const STAGE_LABEL: Record<StageStatus, string> = {
-  FINALIZADO: "Finalizado",
-  INICIADO: "Em andamento",
-  AGUARDE: "Aguardando",
-  PAUSADO: "Pausado",
-};
-
-const STAGE_CLS: Record<StageStatus, string> = {
-  FINALIZADO: "st-stage-card--concluido",
-  INICIADO: "st-stage-card--em_andamento",
-  PAUSADO: "st-stage-card--pausado",
-  AGUARDE: "",
-};
-
-function StageCard({
-  index,
-  label,
-  status,
-}: {
-  index: number;
-  label: string;
-  status: StageStatus;
-}) {
-  return (
-    <div className={`st-stage-card ${STAGE_CLS[status]}`}>
-      <div className="st-stage-card__header">
-        <span className="st-stage-card__index">{index}</span>
-        <span className="st-stage-card__label">{label}</span>
-      </div>
-      <div className="st-stage-card__body">
-        <div className="st-stage-card__field">
-          <span>Status</span>
-          <strong>{STAGE_LABEL[status]}</strong>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 interface StatusDetailsModalProps {
   isOpen: boolean;
@@ -147,15 +104,20 @@ export function StatusDetailsModal({
             {loadingDetail ? (
               <p className="plan-modal__empty">Carregando...</p>
             ) : detail ? (
-              <div className="st-stages-grid">
-                {STAGE_DEFS.map((s, i) => (
-                  <StageCard
-                    key={s.key}
-                    index={i + 1}
-                    label={s.label}
-                    status={detail.stages[s.key]}
-                  />
-                ))}
+              <div className="plan-modal__stages-grid">
+                {STAGE_DEFS.map((s, i) => {
+                  const stage = detail.stages[s.key];
+                  return (
+                    <ProductionStageCard
+                      key={s.key}
+                      index={i + 1}
+                      label={s.label}
+                      status={stage.status}
+                      inicio={stage.inicio}
+                      fim={stage.fim}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <p className="plan-modal__empty">Dados não disponíveis.</p>
