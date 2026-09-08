@@ -19,7 +19,7 @@ import "./index.css";
 // ── Helpers ──────────────────────────────────────────────
 
 const EMPTY_FORM: PartFormData = {
-  qtd: "1",
+  qtd: "",
   peca: "",
   dimensoes: "",
   cor: "",
@@ -33,6 +33,7 @@ interface PartErrors {
   qtd?: string;
   peca?: string;
   falha?: string;
+  tipo?: string;
 }
 
 // ── Component ────────────────────────────────────────────
@@ -65,7 +66,7 @@ export function PartsModal({
     fetchFalhasConfig()
       .then((items) =>
         setFalhaOptions(
-          items.map((f) => ({ value: String(f.id), label: f.label })),
+          items.map((f) => ({ value: String(f.id), label: `${f.id} - ${f.label}` })),
         ),
       )
       .catch(() => {});
@@ -88,6 +89,7 @@ export function PartsModal({
     if (!form.qtd || Number(form.qtd) < 1) errs.qtd = "Informe a quantidade";
     if (!form.peca.trim()) errs.peca = "Informe o nome da peça";
     if (!form.falha) errs.falha = "Selecione o tipo de falha";
+    if (!form.tipo) errs.tipo = "Selecione a ocorrência";
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -194,10 +196,11 @@ export function PartsModal({
             placeholder="Selecionar tipo de falha..."
           />
           <Select
-            label="Ocorrência"
+            label="Ocorrência *"
             value={form.tipo}
             onChange={(e) => set("tipo", e.target.value)}
             options={ocorrenciaOptions}
+            error={errors.tipo}
             placeholder="Selecionar..."
           />
         </div>

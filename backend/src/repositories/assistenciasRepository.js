@@ -229,16 +229,20 @@ async function inserirSolicitacaoCompleta(body) {
     }
 
     for (const r of (body.pecas ?? [])) {
+      if (!r.qtd || Number(r.qtd) < 1)
+        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui quantidade informada.`);
       if (!r.id_falha || Number(r.id_falha) === 0)
         throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui tipo de falha informado.`);
+      if (!r.id_ocorrencia || Number(r.id_ocorrencia) === 0)
+        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui ocorrência informada.`);
       await Pecas.create({
         idAssistencia: solicitacao,
-        qtd:          Number(r.qtd) || 0,
+        qtd:          Number(r.qtd),
         peca:         r.peca ?? null,
         dimensoes:    r.dimensoes ?? null,
         cor:          r.cor ?? null,
         lado:         r.lado ?? null,
-        idOcorrencia: r.id_ocorrencia ? Number(r.id_ocorrencia) : null,
+        idOcorrencia: Number(r.id_ocorrencia),
         idFalha:      Number(r.id_falha),
         observacoes:  r.observacoes ?? null,
       }, { transaction: t });
