@@ -64,6 +64,14 @@ const COLUMNS: TableColumn<AssistanceProduction>[] = [
     sortable: true,
   },
   {
+    key: "pedido",
+    label: "Pedido",
+    type: "text",
+    filterable: true,
+    sortable: true,
+    render: (v) => <span>{(v as string) || "—"}</span>,
+  },
+  {
     key: "cliente",
     label: "Cliente",
     type: "text",

@@ -30,7 +30,7 @@ function toAssistencia(r: RawRow, index: number): AssistanceProduction {
     numSolicitacao: String(r.solicitacao ?? ''),
     numContrato:    String(r.contrato    ?? ''),
     corte:          String(r.corte       ?? ''),
-    pedido:         '',
+    pedido:         String(r.pedido      ?? ''),
     cliente:        String(r.cliente     ?? ''),
     ambiente:       String(r.ambiente    ?? ''),
     solicitante:    '',
