@@ -6,9 +6,23 @@
 //   - Lançar Error com a mensagem do servidor em caso de falha
 
 import { STORAGE_KEYS } from '../utils/storageKeys'
+import type { ValidationErrors } from '../validation/types'
 
 // Em produção, VITE_API_URL é vazio e o frontend usa o mesmo host (Express serve os dois)
 const BASE = import.meta.env.VITE_API_URL ?? ''
+
+// Lançado quando o backend responde com erros por campo (ex.: ValidationError
+// de backend/src/validation) — mesmo shape do ValidationResult do frontend,
+// pra dar pra jogar `errors` direto em setErrors() sem tradução.
+export class ApiError extends Error {
+  errors?: ValidationErrors
+
+  constructor(message: string, errors?: ValidationErrors) {
+    super(message)
+    this.name = 'ApiError'
+    this.errors = errors
+  }
+}
 
 function getToken(): string | null {
   return localStorage.getItem(STORAGE_KEYS.authToken)
@@ -37,7 +51,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({})) as Record<string, unknown>
-    throw new Error((body.message as string) ?? (body.error as string) ?? `HTTP ${res.status}`)
+    const message = (body.message as string) ?? (body.error as string) ?? `HTTP ${res.status}`
+    const errors = body.errors as ValidationErrors | undefined
+    throw new ApiError(message, errors && Object.keys(errors).length ? errors : undefined)
   }
 
   return res.json() as Promise<T>
