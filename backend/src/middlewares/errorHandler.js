@@ -6,7 +6,11 @@ function errorHandler(err, _req, res, _next) {
   const message = (status < 500 || process.env.NODE_ENV === 'development')
     ? (err.message || 'Internal Server Error')
     : 'Erro interno no servidor'
-  res.status(status).json({ error: message })
+  const body = { error: message }
+  // ValidationError (backend/src/validation) anexa erros por campo, no mesmo
+  // formato do ValidationResult do frontend — dá pra jogar direto em setErrors().
+  if (err.errors) body.errors = err.errors
+  res.status(status).json(body)
 }
 
 module.exports = errorHandler

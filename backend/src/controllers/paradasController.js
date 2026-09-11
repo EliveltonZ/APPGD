@@ -10,7 +10,9 @@ function fail(res, e) {
     return res.status(409).json({ error: e.message });
   }
   if (e.code === 'VALIDACAO') {
-    return res.status(400).json({ error: e.message });
+    const body = { error: e.message };
+    if (e.errors) body.errors = e.errors;
+    return res.status(400).json(body);
   }
   console.error('[paradas]', e);
   res.status(500).json({ error: e.message });
