@@ -38,7 +38,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({})) as Record<string, unknown>
-    throw new Error((body.message as string) ?? (body.error as string) ?? `HTTP ${res.status}`)
+    // `error` carrega o motivo específico (e.message do backend); `message` é um
+    // rótulo genérico por endpoint (ex.: "Erro ao inserir solicitação completa").
+    // Prioriza o motivo real — sem isso, todo erro de um endpoint mostra sempre
+    // o mesmo texto genérico, não importa a causa.
+    throw new Error((body.error as string) ?? (body.message as string) ?? `HTTP ${res.status}`)
   }
 
   return res.json() as Promise<T>
