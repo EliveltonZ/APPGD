@@ -7,6 +7,7 @@ import { Button } from "../../../components/Button";
 import { useAuth } from "../../../context/AuthContext";
 import { checkPassword, updateSenha } from "../../../services/usuarios";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage, getFieldErrors } from "../../../utils/errorMessage";
 import "./index.css";
 
 interface SenhaForm {
@@ -71,7 +72,9 @@ export function ConfigSenhaPage() {
       setSuccess(true);
       toast.success("Senha alterada com sucesso!");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao alterar senha.");
+      const fieldErrors = getFieldErrors(err);
+      if (fieldErrors) setErrors(fieldErrors as FormErrors);
+      else toast.error(getErrorMessage(err, "Erro ao alterar senha."));
     } finally {
       setSaving(false);
     }

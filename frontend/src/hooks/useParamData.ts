@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export interface ParamDataResult<T> {
   data:    T | undefined;
@@ -35,7 +36,7 @@ export function useParamData<T>(
     setError(null);
     ref.current(param)
       .then(d => { if (alive) { setData(d); setError(null); } })
-      .catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Erro ao carregar'); })
+      .catch(e => { if (alive) setError(getErrorMessage(e, 'Erro ao carregar')); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [param, tick]);

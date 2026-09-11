@@ -17,6 +17,7 @@ import {
 } from "../../../services/pending";
 import type { PendingItem, PendingProject } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
 interface PendingControlModalProps {
@@ -136,7 +137,7 @@ export function PendingControlModal({
       handleClearForm();
       toast.success("Item inserido com sucesso.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao inserir item.");
+      toast.error(getErrorMessage(err, "Erro ao inserir item."));
     } finally {
       setInserting(false);
     }

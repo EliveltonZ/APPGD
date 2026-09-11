@@ -25,6 +25,7 @@ import {
   type Client,
 } from "../../../types/project";
 import { fetchEditProject, saveEditProject } from "../../../services/project";
+import { getErrorMessage, getFieldErrors } from "../../../utils/errorMessage";
 import {
   fetchLiberadores,
   fetchVendedores,
@@ -96,7 +97,7 @@ export function EditaProjetoPage() {
       setForm((prev) => ({ ...prev, ...result }));
       setErrors({});
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao buscar projeto.');
+      toast.error(getErrorMessage(err, 'Erro ao buscar projeto.'));
     } finally {
       setLoadingProject(false);
     }
@@ -119,7 +120,13 @@ export function EditaProjetoPage() {
       await saveEditProject(form);
       toast.success("Projeto atualizado com sucesso.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar projeto.");
+      const fieldErrors = getFieldErrors(err);
+      if (fieldErrors) {
+        setErrors(fieldErrors as ProjectFormErrors);
+        toast.error("Verifique os campos destacados.");
+      } else {
+        toast.error(getErrorMessage(err, "Erro ao salvar projeto."));
+      }
     } finally {
       setSaving(false);
     }

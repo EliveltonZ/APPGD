@@ -15,6 +15,7 @@ import type {
   QualitySummary,
 } from "../../../types/qualityControl";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
 function calcSummary(data: QualityItem[]): QualitySummary {
@@ -146,7 +147,7 @@ export function AssistenciasQualidadePage() {
 
       toast.success("Análise concluída com sucesso!");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar análise. Tente novamente.");
+      toast.error(getErrorMessage(err, "Erro ao salvar análise. Tente novamente."));
     }
   }
 

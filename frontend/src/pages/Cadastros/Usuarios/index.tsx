@@ -17,6 +17,7 @@ import {
 } from '../../../services/usuarios'
 import type { UserRecord } from '../../../services/usuarios'
 import { validateCriarUsuario } from '../../../validation/usuario'
+import { getErrorMessage, getFieldErrors } from '../../../utils/errorMessage'
 import './index.css'
 
 // ── Tipos locais ─────────────────────────────────────────────────────────────
@@ -123,7 +124,9 @@ export function CadastrosUsuariosPage() {
       setCreateOpen(false)
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao cadastrar usuário.')
+      const fieldErrors = getFieldErrors(err)
+      if (fieldErrors) setCreateErrors(fieldErrors as CreateErrors)
+      else toast.error(getErrorMessage(err, 'Erro ao cadastrar usuário.'))
     } finally {
       setCreating(false)
     }
@@ -166,7 +169,7 @@ export function CadastrosUsuariosPage() {
       setEditOpen(false)
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+      toast.error(getErrorMessage(err, 'Erro ao salvar.'))
     } finally {
       setSaving(false)
     }

@@ -15,6 +15,7 @@ import {
   deleteMaterial,
 } from '../../../services/materiais'
 import type { Material, MaterialPayload } from '../../../services/materiais'
+import { getErrorMessage } from '../../../utils/errorMessage'
 import '../index.css'
 
 const UNIDADE_LABEL: Record<string, string> = { M2: 'M²', UN: 'UN' }
@@ -176,7 +177,7 @@ export function CadastrosMateriaisPage() {
       closeModal()
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+      toast.error(getErrorMessage(err, 'Erro ao salvar.'))
     } finally {
       setSaving(false)
     }
@@ -192,7 +193,7 @@ export function CadastrosMateriaisPage() {
       closeModal()
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao excluir.')
+      toast.error(getErrorMessage(err, 'Erro ao excluir.'))
       setConfirmOpen(false)
     } finally {
       setDeleting(false)

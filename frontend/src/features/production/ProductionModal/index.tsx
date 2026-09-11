@@ -17,6 +17,7 @@ import {
   saveProductionData,
 } from "../../../services/production";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import type {
   ProductionOrder,
   ProductionDetail,
@@ -146,7 +147,7 @@ export function ProductionModal({
       onSave?.();
       onClose();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar. Tente novamente.");
+      toast.error(getErrorMessage(err, "Erro ao salvar. Tente novamente."));
     } finally {
       setSaving(false);
     }

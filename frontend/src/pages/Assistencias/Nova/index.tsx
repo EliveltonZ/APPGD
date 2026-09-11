@@ -18,6 +18,7 @@ import {
   DESTINATION_OPTIONS,
   URGENTE_OPTIONS,
 } from "../../../data/assistenciaConfig";
+import { getErrorMessage, getFieldErrors } from "../../../utils/errorMessage";
 import type {
   ServiceRequest,
   TeamMember,
@@ -160,12 +161,16 @@ export function AssistenciasNovaPage() {
       setGeneratedId(solicitacaoId);
       setSubmitted(true);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : null;
-      if (msg?.toLowerCase().includes('já cadastrado')) {
+      const fieldErrors = getFieldErrors(e);
+      const msg = getErrorMessage(e, "Erro ao enviar solicitação. Tente novamente.");
+      if (fieldErrors) {
+        setErrors((prev) => ({ ...prev, ...fieldErrors }));
+        scrollToFirstError();
+      } else if (msg.toLowerCase().includes('já cadastrado')) {
         setErrors((prev) => ({ ...prev, numSolicitacao: msg }));
         scrollToFirstError();
       } else {
-        toast.error(msg ?? "Erro ao enviar solicitação. Tente novamente.");
+        toast.error(msg);
       }
     } finally {
       setSending(false);

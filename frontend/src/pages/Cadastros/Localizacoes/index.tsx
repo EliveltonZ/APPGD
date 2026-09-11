@@ -15,6 +15,7 @@ import {
   deleteLocalizacao,
 } from '../../../services/localizacoes'
 import type { Localizacao, LocalizacaoPayload } from '../../../services/localizacoes'
+import { getErrorMessage } from '../../../utils/errorMessage'
 import '../index.css'
 
 const COLUMNS: TableColumn<Localizacao>[] = [
@@ -119,7 +120,7 @@ export function CadastrosLocalizacoesPage() {
       closeModal()
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar.')
+      toast.error(getErrorMessage(err, 'Erro ao salvar.'))
     } finally {
       setSaving(false)
     }
@@ -135,7 +136,7 @@ export function CadastrosLocalizacoesPage() {
       closeModal()
       reload()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao excluir.')
+      toast.error(getErrorMessage(err, 'Erro ao excluir.'))
       setConfirmOpen(false)
     } finally {
       setDeleting(false)

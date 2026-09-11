@@ -16,6 +16,7 @@ import {
   saveExpeditionData,
 } from "../../../services/expedition";
 import { fetchConfigDate, saveConfigDate } from "../../../services/utils";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import { emptyExpeditionDetail } from "../../../data/expeditionConfig";
 import type {
   ExpeditionOrder,
@@ -84,7 +85,7 @@ export function ExpedicaoPage() {
       toast.success("Expedição salva com sucesso!");
       reloadOrders();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar expedição.");
+      toast.error(getErrorMessage(err, "Erro ao salvar expedição."));
     } finally {
       setSaving(false);
     }

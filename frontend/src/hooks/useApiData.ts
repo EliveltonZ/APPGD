@@ -11,6 +11,7 @@
 // - A `ref` interna garante que trocar a referência de `fetchFn` não cause re-execução
 
 import { useState, useEffect, useRef } from 'react';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export interface ApiDataResult<T> {
   data: T | undefined;
@@ -33,7 +34,7 @@ export function useApiData<T>(fetchFn: () => Promise<T>): ApiDataResult<T> {
     setError(null);
     ref.current()
       .then(d  => { if (id === callId.current) { setData(d); setError(null); } })
-      .catch(e => { if (id === callId.current) setError(e instanceof Error ? e.message : 'Erro ao carregar dados'); })
+      .catch(e => { if (id === callId.current) setError(getErrorMessage(e, 'Erro ao carregar dados')); })
       .finally(() => { if (id === callId.current) setLoading(false); });
   }
 

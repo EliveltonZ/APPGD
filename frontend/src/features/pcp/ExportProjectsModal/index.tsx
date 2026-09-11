@@ -5,6 +5,7 @@ import { Button } from '../../../components/Button';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { exportarProjetos, type ExportedProject } from '../../../services/pcp';
 import { useToast } from '../../../context/ToastContext';
+import { getErrorMessage } from '../../../utils/errorMessage';
 import type { ExportProjectsFormData } from '../../../types/pcp';
 import './index.css';
 
@@ -69,7 +70,7 @@ export function ExportProjectsModal({ isOpen, onClose }: Props) {
       downloadXlsx(rows, form.dataInicial, form.dataFinal);
       onClose();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao exportar. Tente novamente.');
+      toast.error(getErrorMessage(err, 'Erro ao exportar. Tente novamente.'));
     } finally {
       setExporting(false);
     }

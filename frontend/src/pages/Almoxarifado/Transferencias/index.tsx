@@ -9,6 +9,7 @@ import { Input } from '../../../components/Input';
 import { useApiData } from '../../../hooks/useApiData';
 import { useToast } from '../../../context/ToastContext';
 import { localDateStr } from '../../../utils/dateUtils';
+import { getErrorMessage } from '../../../utils/errorMessage';
 import { fetchMateriais } from '../../../services/materiais';
 import { fetchLocalizacoes } from '../../../services/localizacoes';
 import {
@@ -173,7 +174,7 @@ export function AlmoxarifadoTransferenciasPage() {
       fetchSaldo(mat);
       recarregarHist();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao registrar transferência.');
+      toast.error(getErrorMessage(err, 'Erro ao registrar transferência.'));
     } finally {
       setSaving(false);
     }

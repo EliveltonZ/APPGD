@@ -20,6 +20,7 @@ import {
   type ProjectFormData,
 } from "../../../types/project";
 import { fetchDeleteProject, deleteProject } from "../../../services/project";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import "../../../features/pedidos/common/projeto-page.css";
 
 export function ExcluirProjetoPage() {
@@ -59,7 +60,7 @@ export function ExcluirProjetoPage() {
       setForm((prev) => ({ ...prev, ...result }));
       setLoaded(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao buscar projeto.");
+      toast.error(getErrorMessage(err, "Erro ao buscar projeto."));
     } finally {
       setLoadingProject(false);
     }
@@ -75,7 +76,7 @@ export function ExcluirProjetoPage() {
       setForm(emptyProjectForm());
       setLoaded(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao excluir.");
+      toast.error(getErrorMessage(err, "Erro ao excluir."));
     } finally {
       setDeleting(false);
     }

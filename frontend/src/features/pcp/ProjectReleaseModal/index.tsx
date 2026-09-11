@@ -13,6 +13,7 @@ import {
   updateProjectPcp,
 } from "../../../services/pcp";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import type {
   ProductionProject,
   ProjectReleaseFormData,
@@ -96,9 +97,7 @@ export function ProjectReleaseModal({ isOpen, onClose, onSave }: Props) {
       setSearchMsg("");
       setSearchOk(false);
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Erro ao liberar projeto.";
-      toast.error(msg);
+      toast.error(getErrorMessage(err, "Erro ao liberar projeto."));
     } finally {
       setSaving(false);
     }

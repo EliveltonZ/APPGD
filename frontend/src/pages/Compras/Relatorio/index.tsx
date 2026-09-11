@@ -16,6 +16,7 @@ import {
 } from "../../../services/utils";
 import type { Purchase } from "../../../types/purchases";
 import { useToast } from "../../../context/ToastContext";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
 export function RelatorioComprasPage() {
@@ -90,7 +91,7 @@ export function RelatorioComprasPage() {
       toast.success("Compra atualizada com sucesso.");
       loadPurchases(filterDate);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar compra.");
+      toast.error(getErrorMessage(err, "Erro ao salvar compra."));
     }
   }
 

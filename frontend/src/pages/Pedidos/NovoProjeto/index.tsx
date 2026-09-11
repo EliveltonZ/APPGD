@@ -28,6 +28,7 @@ import {
   type Client,
 } from "../../../types/project";
 import { fetchContractOptions, saveProject, type ContractOption } from "../../../services/project";
+import { getErrorMessage, getFieldErrors } from "../../../utils/errorMessage";
 import { fetchMaxOrder } from "../../../services/pcp";
 import {
   fetchLiberadores,
@@ -179,8 +180,13 @@ export function NovoProjetoPage() {
       setForm({ ...emptyProjectForm(), tipoProjeto: tipoProjeto! });
       setErrors({});
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Erro ao salvar.";
-      toast.error(msg);
+      const fieldErrors = getFieldErrors(err);
+      if (fieldErrors) {
+        setErrors(fieldErrors as ProjectFormErrors);
+        toast.error("Verifique os campos destacados.");
+      } else {
+        toast.error(getErrorMessage(err, "Erro ao salvar."));
+      }
     } finally {
       setSaving(false);
     }

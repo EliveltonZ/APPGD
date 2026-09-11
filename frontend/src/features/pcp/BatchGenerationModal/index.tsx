@@ -6,6 +6,7 @@ import { fetchLoteAvailable, atualizarLote, fetchLastLote } from "../../../servi
 import { useToast } from "../../../context/ToastContext";
 import { exportLoteExcel, fmtEntrega, type LoteExportRow } from "../../../utils/exportExcel";
 import { localDateStr } from "../../../utils/dateUtils";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import type { LoteAvailableProject } from "../../../types/pcp";
 import "./index.css";
 
@@ -112,7 +113,7 @@ export function BatchGenerationModal({ isOpen, onClose, onGenerate }: Props) {
       onGenerate(lote.trim(), Array.from(selectedIds));
       dispatch({ type: "set_confirm", value: false });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao gerar lote. Tente novamente.");
+      toast.error(getErrorMessage(err, "Erro ao gerar lote. Tente novamente."));
       dispatch({ type: "set_confirm", value: false });
     } finally {
       setSaving(false);

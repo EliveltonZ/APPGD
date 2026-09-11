@@ -6,6 +6,7 @@ import type { PermissionKey } from '../../../config/appRoutes'
 import type { AuthUser, UserPermissions } from '../../../types/auth'
 import { fetchAcessos, saveAcessos } from '../../../services/usuarios'
 import { useToast } from '../../../context/ToastContext'
+import { getErrorMessage } from '../../../utils/errorMessage'
 import './index.css'
 
 function GroupCheckbox({
@@ -96,7 +97,7 @@ export function ConfigAcessosPage() {
       toast.success('Acessos atualizados com sucesso!')
       closeEditor()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Erro ao salvar acessos.')
+      toast.error(getErrorMessage(err, 'Erro ao salvar acessos.'))
     }
   }
 

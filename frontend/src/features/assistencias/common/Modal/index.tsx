@@ -7,6 +7,7 @@ import { OperationalStatusSection } from "./sections/OperationalStatusSection";
 import { LogisticsSection } from "./sections/LogisticsSection";
 import { NotesSection } from "./sections/NotesSection";
 import { useToast } from "../../../../context/ToastContext";
+import { getErrorMessage } from "../../../../utils/errorMessage";
 import { TeamTable } from "./sections/TeamTable";
 import { ConfirmModal } from "../../../../components/ConfirmModal";
 import type { AssistanceProduction } from "../../../../types/assistenciaProducao";
@@ -142,7 +143,7 @@ export function Modal({
               onSaved?.(data);
               toast.success("Projeto salvo com sucesso!");
             } catch (err) {
-              toast.error(err instanceof Error ? err.message : "Erro ao salvar assistência.");
+              toast.error(getErrorMessage(err, "Erro ao salvar assistência."));
             }
           }}
           onCancel={() => setSaveConfirmOpen(false)}
