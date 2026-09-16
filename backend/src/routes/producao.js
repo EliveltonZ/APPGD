@@ -8,7 +8,7 @@ router.get('/',          prod, c.fillTable)
 router.get('/projeto',   prod, c.getProducao)
 router.get('/barcode',   prod, c.getProducaoBarcode)
 router.post('/dados',    prod, c.setDataProducao)
-router.get('/materiais', prod, c.getMateriais)
-router.get('/capa',      prod, c.getCapaProducao)
+router.get('/materiais', rp('relatorios'), c.getMateriais)
+router.get('/capa',      rp('relatorios'), c.getCapaProducao)
 
 module.exports = router

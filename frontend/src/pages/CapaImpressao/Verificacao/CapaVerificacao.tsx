@@ -27,7 +27,7 @@ export function CapaVerificacaoPage() {
     if (!urlOc) return;
     fetchCapaData(urlOc)
       .then((d) => setData(d))
-      .catch(() => setError("O.C. não encontrada."))
+      .catch((e) => setError(e instanceof Error ? e.message : "O.C. não encontrada."))
       .finally(() => setLoading(false));
   }, [urlOc]);
 

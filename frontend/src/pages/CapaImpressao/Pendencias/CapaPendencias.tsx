@@ -58,7 +58,7 @@ export function CapaPendenciasPage() {
     if (!urlId) return;
     fetchCapaData(Number(urlId))
       .then((d) => setData(withUserInfo(d)))
-      .catch(() => setError("Projeto não encontrado."))
+      .catch((e) => setError(e instanceof Error ? e.message : "Projeto não encontrado."))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlId]);

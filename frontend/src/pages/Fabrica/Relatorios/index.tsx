@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FileText, Search } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
+import { useToast } from "../../../context/ToastContext";
 import {
   fetchCapaRelatorio,
   saveTipoUrgente,
@@ -41,6 +42,7 @@ const REPORTS: ReportCard[] = [
 ];
 
 export function RelatoriosPcpPage() {
+  const toast = useToast();
   const [oc, setOc] = useState("");
   const [tipo, setTipo] = useState("");
   const [urgente, setUrgente] = useState(false);
@@ -81,8 +83,10 @@ export function RelatoriosPcpPage() {
         setTipo(result.tipo);
         setUrgente(result.urgente);
       }
-    } catch {
-      setFound(false);
+    } catch (e) {
+      // Erro de verdade (ex.: permissão negada) — diferente de "não encontrada",
+      // que já vem como found:false sem lançar exceção.
+      toast.error(e instanceof Error ? e.message : "Erro ao buscar a O.C.");
     } finally {
       setSearching(false);
     }
