@@ -84,7 +84,7 @@ export async function fetchCapaData(oc: number): Promise<CapaData> {
 
   const [resCapa, resMateriais] = await Promise.allSettled([
     apiGet<R[]>("/producao/capa", { id: oc }),
-    apiGet<R[]>("/producao/materiais", { id: oc }),
+    apiGet<R[]>("/producao/materiais-capa", { id: oc }),
   ]);
 
   const d = resCapa.status === "fulfilled" ? (resCapa.value[0] ?? {}) : {};
