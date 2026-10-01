@@ -120,8 +120,33 @@ export function AssistenciasQualidadePage() {
     }
   }
 
+  function handleRequestSave() {
+    if (!editing) return;
+
+    if (
+      editing.idErp === null ||
+      editing.idErp === undefined ||
+      editing.idErp === ""
+    ) {
+      toast.error("Preencha o ID ERP antes de concluir a análise.");
+      return;
+    }
+
+    setIsOpen(true);
+  }
+
   async function handleSave() {
     if (!editing) return;
+
+    if (
+      editing.idErp === null ||
+      editing.idErp === undefined ||
+      editing.idErp === ""
+    ) {
+      setIsOpen(false);
+      toast.error("Preencha o ID ERP antes de concluir a análise.");
+      return;
+    }
 
     setIsOpen(false);
 
@@ -146,7 +171,11 @@ export function AssistenciasQualidadePage() {
 
       toast.success("Análise concluída com sucesso!");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao salvar análise. Tente novamente.");
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Erro ao salvar análise. Tente novamente.",
+      );
     }
   }
 
@@ -185,7 +214,7 @@ export function AssistenciasQualidadePage() {
           onClose={handleClose}
           data={editing}
           onChange={handleChange}
-          onSave={() => setIsOpen(true)}
+          onSave={handleRequestSave}
           falhaOptions={falhaOptions}
           causaOptions={causaOptions}
         />
