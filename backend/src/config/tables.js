@@ -88,6 +88,7 @@ const T = {
   localizacoes:            { name: 'tblLocalizacoes',            pk: 'id' },
   materiais:               { name: 'tblMateriais',               pk: 'id' },
   materiaisCodigoNF:       { name: 'tblMateriaisCodigoNF',       pk: 'id' },
+  materiaisReferenciaPromob: { name: 'tblMateriaisReferenciaPromob', pk: 'id' },
   notasFiscais:            { name: 'tblNotasFiscais',            pk: 'id' },
   notasFiscaisItens:       { name: 'tblNotasFiscaisItens',       pk: 'id' },
   xmlImportacoes:          { name: 'tblXmlImportacoes',          pk: 'id' },

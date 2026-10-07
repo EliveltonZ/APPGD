@@ -2,6 +2,7 @@ var DataTypes = require("sequelize").DataTypes;
 var _Localizacoes            = require("./tblLocalizacoes");
 var _Materiais               = require("./tblMateriais");
 var _MateriaisCodigoNF       = require("./tblMateriaisCodigoNF");
+var _MateriaisReferenciaPromob = require("./tblMateriaisReferenciaPromob");
 var _NotasFiscais            = require("./tblNotasFiscais");
 var _NotasFiscaisItens       = require("./tblNotasFiscaisItens");
 var _XmlImportacoes          = require("./tblXmlImportacoes");
@@ -47,6 +48,7 @@ function initModels(sequelize) {
   var Localizacoes            = _Localizacoes(sequelize, DataTypes);
   var Materiais               = _Materiais(sequelize, DataTypes);
   var MateriaisCodigoNF       = _MateriaisCodigoNF(sequelize, DataTypes);
+  var MateriaisReferenciaPromob = _MateriaisReferenciaPromob(sequelize, DataTypes);
   var NotasFiscais            = _NotasFiscais(sequelize, DataTypes);
   var NotasFiscaisItens       = _NotasFiscaisItens(sequelize, DataTypes);
   var XmlImportacoes          = _XmlImportacoes(sequelize, DataTypes);
@@ -117,6 +119,8 @@ function initModels(sequelize) {
   MateriaisCodigoNF.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });
   MateriaisCodigoNF.belongsTo(Fornecedores, { as: "fornecedor", foreignKey: "fornecedorId" });
 
+  MateriaisReferenciaPromob.belongsTo(Materiais, { as: "material", foreignKey: "materialId" });
+
   NotasFiscaisItens.belongsTo(NotasFiscais, { as: "notaFiscal", foreignKey: "notaFiscalId" });
   NotasFiscaisItens.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });
   NotasFiscais.hasMany(NotasFiscaisItens,   { as: "itens",      foreignKey: "notaFiscalId" });
@@ -178,6 +182,7 @@ function initModels(sequelize) {
     Localizacoes,
     Materiais,
     MateriaisCodigoNF,
+    MateriaisReferenciaPromob,
     NotasFiscais,
     NotasFiscaisItens,
     XmlImportacoes,
