@@ -94,6 +94,18 @@ async function criarMovimento(dados, options) {
   return EstoqueMovimentos.create(dados, options);
 }
 
+async function buscarMateriaisPorId(ids) {
+  return Materiais.findAll({ where: { id: { [Op.in]: ids } }, raw: true });
+}
+
+async function criarImportacao(dados) {
+  return XmlImportacoes.create(dados);
+}
+
+async function criarConsumos(rows) {
+  return XmlConsumo.bulkCreate(rows);
+}
+
 async function listarAbaixoDoMinimo() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
@@ -130,5 +142,8 @@ module.exports = {
   listarPendentesOuReservados,
   criarMovimento,
   listarAbaixoDoMinimo,
+  buscarMateriaisPorId,
+  criarImportacao,
+  criarConsumos,
   sequelize,
 };
