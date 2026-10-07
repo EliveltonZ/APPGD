@@ -18,15 +18,28 @@ async function calcularSaldo(materialId) {
   return { fisico, reservado, comprado, solicitado, disponivel, saldoBloqueio, saldoVisibilidade };
 }
 
-// Custo = quantidade do XML (m² ou unidade) × preço por m²/unidade vigente na
-// data do chegoufabrica do pedido (fallback: último preço conhecido do material).
+// Custo = quantidade do XML (m², metro ou unidade) × preço por m²/metro/unidade
+// vigente na data do chegoufabrica do pedido (fallback: último preço conhecido
+// do material). O fator de conversão depende do tipo:
+//   M2 (chapa) -> m² por chapa inteira, fixo no cadastro do material.
+//   M  (fita)  -> metros por rolo, varia por FORNECEDOR (de-para em
+//                 tblMateriaisCodigoNF) — usa o fornecedor da própria compra
+//                 encontrada na data do chegoufabrica.
+//   UN (ferragem) -> 1 (sem conversão, já vem pronto).
 async function calcularCusto(xmlConsumo, material) {
   const chegoufabrica = await repo.buscarChegouFabrica(xmlConsumo.ordemdecompra);
-  const precoHistorico = await repo.buscarPrecoNaData(material.id, chegoufabrica);
-  const preco = precoHistorico ?? material.ultimoPrecoUn ?? null;
+  const historico = await repo.buscarPrecoNaData(material.id, chegoufabrica);
+  const preco = historico?.preco ?? material.ultimoPrecoUn ?? null;
   if (preco == null) return { preco: null, custo: null };
 
-  const fatorConversao = xmlConsumo.unidadeXml === 'M2' ? (material.m2PorUnidade || 1) : 1;
+  let fatorConversao = 1;
+  if (xmlConsumo.unidadeXml === 'M2') {
+    fatorConversao = material.m2PorUnidade || 1;
+  } else if (xmlConsumo.unidadeXml === 'M') {
+    fatorConversao = await repo.buscarFatorConversaoFornecedor(material.id, historico?.fornecedorId);
+    if (!fatorConversao) return { preco: Number(preco), custo: null }; // sem de-para do fornecedor, não dá pra converter com segurança
+  }
+
   const custo = Number(xmlConsumo.qtdXml) * (Number(preco) / Number(fatorConversao));
   return { preco: Number(preco), custo };
 }

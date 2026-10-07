@@ -2,7 +2,7 @@
 const { Op, QueryTypes } = require('sequelize');
 const {
   sequelize, Materiais, XmlConsumo, XmlImportacoes,
-  EstoqueMovimentos, SolicitacaoComprasItens, Projetos,
+  EstoqueMovimentos, SolicitacaoComprasItens, Projetos, MateriaisCodigoNF,
 } = require('../client/db');
 
 async function buscarMaterial(id) {
@@ -39,11 +39,13 @@ async function saldoSolicitado(materialId) {
   return Number(total) || 0;
 }
 
-// Preço vigente na data informada — última nota fiscal com data_entrada <= data.
+// Preço (e fornecedor da compra) vigente na data informada — última nota
+// fiscal com data_entrada <= data. O fornecedor importa pra materiais tipo M
+// (fita): o comprimento do rolo varia por fornecedor.
 async function buscarPrecoNaData(materialId, data) {
   if (!data) return null;
   const rows = await sequelize.query(
-    `SELECT nfi.preco_un
+    `SELECT nfi.preco_un, nf.fornecedor_id
      FROM "tblNotasFiscaisItens" nfi
      JOIN "tblNotasFiscais" nf ON nf.id = nfi.nota_fiscal_id
      WHERE nfi.material_id = :materialId AND nf.data_entrada <= :data
@@ -51,7 +53,19 @@ async function buscarPrecoNaData(materialId, data) {
      LIMIT 1`,
     { replacements: { materialId, data }, type: QueryTypes.SELECT },
   );
-  return rows[0]?.preco_un ?? null;
+  if (!rows[0]) return null;
+  return { preco: rows[0].preco_un, fornecedorId: rows[0].fornecedor_id };
+}
+
+// Fator de conversão (quantidade física por UN de compra) específico do
+// fornecedor — ex.: um rolo de fita pode ter 20m com um fornecedor e 300m
+// com outro. Sem isso cadastrado, não há como converter com segurança.
+async function buscarFatorConversaoFornecedor(materialId, fornecedorId) {
+  if (!fornecedorId) return null;
+  const row = await MateriaisCodigoNF.findOne({
+    where: { materialId, fornecedorId }, raw: true,
+  });
+  return row?.m2PorUnidade ?? null;
 }
 
 async function buscarChegouFabrica(ordemdecompra) {
@@ -109,6 +123,7 @@ module.exports = {
   saldoComprado,
   saldoSolicitado,
   buscarPrecoNaData,
+  buscarFatorConversaoFornecedor,
   buscarChegouFabrica,
   buscarXmlConsumo,
   listarXmlConsumoPorPedido,
