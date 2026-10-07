@@ -10,6 +10,7 @@ const corpoXml = express.text({ type: '*/*', limit: '20mb' });
 
 router.get('/alerta-minimo',        rp('estoque_reservar'), c.getAlertaMinimo);
 router.get('/saldo/:materialId',    rp('estoque_reservar'), c.getSaldo);
+router.put('/:id/quantidade',       rp('estoque_reservar'), c.putQuantidade);
 router.post('/:id/reservar',        rp('estoque_reservar'), c.postReservar);
 router.post('/:id/liberar-reserva', rp('estoque_reservar'), c.postLiberarReserva);
 router.post('/:id/baixa',           rp('estoque_reservar'), c.postBaixa);

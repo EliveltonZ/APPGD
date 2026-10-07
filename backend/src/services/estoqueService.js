@@ -44,6 +44,24 @@ async function calcularCusto(xmlConsumo, material) {
   return { preco: Number(preco), custo };
 }
 
+// Define/edita a quantidade em unidade (chapas inteiras ou rolos de fita)
+// que o pedido vai usar — só antes de reservar. Ferragem não precisa disso
+// (já vem pronta do XML em unidade).
+async function definirQuantidade(xmlConsumoId, qtdUnConfirmada) {
+  const linha = await repo.buscarXmlConsumo(xmlConsumoId);
+  if (!linha) return null;
+  if (linha.status !== 'PENDENTE') {
+    throw erro('Só é possível alterar a quantidade de um item PENDENTE.', 409, 'STATUS_INVALIDO');
+  }
+  const qtd = Number(qtdUnConfirmada);
+  if (!qtd || qtd <= 0) {
+    throw erro('Informe uma quantidade maior que zero.', 400, 'VALIDACAO');
+  }
+  linha.qtdUnConfirmada = qtd;
+  await linha.save();
+  return linha;
+}
+
 async function reservar(xmlConsumoId, usuarioId) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
@@ -149,6 +167,7 @@ async function listarAlertaMinimo() {
 
 module.exports = {
   calcularSaldo,
+  definirQuantidade,
   reservar,
   liberarReserva,
   darBaixa,

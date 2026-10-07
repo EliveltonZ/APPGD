@@ -18,6 +18,14 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async putQuantidade(req, res, next) {
+    try {
+      const linha = await service.definirQuantidade(Number(req.params.id), req.body.qtd_un_confirmada);
+      if (!linha) return notFound(res);
+      res.json(linha);
+    } catch (err) { next(err); }
+  },
+
   async postReservar(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
