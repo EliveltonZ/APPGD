@@ -21,10 +21,16 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       field:     'material_id',
     },
-    qtdM2: {
+    qtdXml: {
       type:      DataTypes.DECIMAL(10, 4),
       allowNull: true,
-      field:     'qtd_m2',
+      field:     'qtd_xml',
+    },
+    unidadeXml: {
+      type:         DataTypes.STRING(2),
+      allowNull:    false,
+      defaultValue: 'M2',
+      field:        'unidade_xml',
     },
     qtdUnSugerida: {
       type:      DataTypes.DECIMAL(10, 3),
@@ -50,12 +56,28 @@ module.exports = function(sequelize, DataTypes) {
       type:         DataTypes.STRING(10),
       allowNull:    false,
       defaultValue: 'PENDENTE',
+      // PENDENTE | RESERVADO | EXECUTADO | CANCELADO
+    },
+    qtdUnBaixada: {
+      type:      DataTypes.DECIMAL(10, 3),
+      allowNull: true,
+      field:     'qtd_un_baixada',
     },
     dataImportacao: {
       type:         DataTypes.DATE,
       allowNull:    false,
       defaultValue: DataTypes.NOW,
       field:        'data_importacao',
+    },
+    dataReserva: {
+      type:      DataTypes.DATE,
+      allowNull: true,
+      field:     'data_reserva',
+    },
+    usuarioReservaId: {
+      type:      DataTypes.INTEGER,
+      allowNull: true,
+      field:     'usuario_reserva_id',
     },
     dataBaixa: {
       type:      DataTypes.DATE,

@@ -55,6 +55,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       field:     'usuario_id',
     },
+    cancelado: {
+      type:         DataTypes.BOOLEAN,
+      allowNull:    false,
+      defaultValue: false,
+    },
   }, {
     sequelize,
     tableName:  T.solicitacaoComprasItens.name,

@@ -36,5 +36,6 @@ router.use('/localizacoes', require('./localizacoes'))
 router.use('/dashboard',      require('./dashboard'))
 router.use('/preferencias',   require('./preferencias'))
 router.use('/transferencias', require('./transferencias'))
+router.use('/estoque',        require('./estoque'))
 
 module.exports = router
