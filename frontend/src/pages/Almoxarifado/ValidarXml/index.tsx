@@ -21,13 +21,9 @@ interface Row extends ItemXml {
   id: string;
   // Material já casado quando a linha chegou (vínculo salvo, código interno
   // batendo, ou item adicionado manualmente escolhendo o material direto).
-  // Serve só pra decidir se mostra o botão de vincular — refaz o casamento
-  // nunca é necessário pra quem já chegou casado.
+  // Linha que já chega casada não precisa reexibir o seletor — é o mesmo
+  // item; só quem chega sem nada (materialIdOriginal null) pede vínculo.
   materialIdOriginal: number | null;
-  // Item adicionado na mão já nasce escolhendo o material direto — a coluna
-  // "Material do cadastro" não tem o que mostrar de novo, é o mesmo material
-  // que já aparece em Descrição.
-  origem: "xml" | "manual";
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -83,7 +79,6 @@ export function AlmoxarifadoValidarXmlPage() {
           ...item,
           id: `${item.tipo}-${item.referencia}-${i}`,
           materialIdOriginal: item.materialId,
-          origem: "xml",
         })),
       );
     } catch (err) {
@@ -152,7 +147,6 @@ export function AlmoxarifadoValidarXmlPage() {
       espessura: null,
       materialId: material.id,
       materialIdOriginal: material.id,
-      origem: "manual",
     };
     setRows((prev) =>
       [...prev, novaLinha].sort((a, b) =>
@@ -211,9 +205,10 @@ export function AlmoxarifadoValidarXmlPage() {
       label: "Material do cadastro",
       minWidth: 280,
       render: (_v, row) => {
-        if (row.origem === "manual") {
-          // Item adicionado na mão já É o material — repetir a escolha aqui
-          // seria mostrar a mesma coisa duas vezes.
+        if (row.materialIdOriginal != null) {
+          // Já chegou casada (XML casado automaticamente ou item adicionado
+          // na mão escolhendo o material direto) — é o mesmo item, reexibir
+          // o seletor aqui não acrescenta nada.
           return <span style={{ color: "var(--text)" }}>—</span>;
         }
         return (
@@ -224,12 +219,11 @@ export function AlmoxarifadoValidarXmlPage() {
               onChange={(materialId) => trocarMaterial(row.id, materialId)}
               placeholder="Buscar material (nome ou código)..."
             />
-            {row.materialId !== row.materialIdOriginal && (
+            {row.materialId != null && (
               <button
                 type="button"
                 title="Vincular permanentemente essa referência a este material"
                 className="btn-icon"
-                disabled={!row.materialId}
                 onClick={() => vincularMaterial(row)}
               >
                 <Link2 size={14} />
