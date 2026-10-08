@@ -59,9 +59,10 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     paradas_maquina:           Boolean(r.paradas_maquina),
     paradas_admin:             Boolean(r.paradas_admin),
     almoxarifado_transferencias: Boolean(r.almoxarifado_transferencias),
-    // Placeholder — mesma chave usada nas rotas novas de estoque no backend;
-    // ainda não existe coluna real em tblUsuario (permissões reais ficaram pra depois).
-    estoque_reservar:          Boolean(r.estoque_reservar),
+    // Placeholder — mesma chave usada nas rotas novas de estoque no backend.
+    // Liberado pra qualquer usuário logado por enquanto (sem coluna real em
+    // tblUsuario ainda) — permissões reais ficaram combinadas pra depois.
+    estoque_reservar: true,
   };
   return {
     id:          String(r.id    ?? ''),
