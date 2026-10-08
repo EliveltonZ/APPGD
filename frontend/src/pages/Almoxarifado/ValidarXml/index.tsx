@@ -6,6 +6,7 @@ import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
 import { Button } from "../../../components/Button";
 import { Select } from "../../../components/Select";
+import { SummaryCard } from "../../../components/SummaryCard";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchMateriais } from "../../../services/materiais";
@@ -133,7 +134,7 @@ export function AlmoxarifadoValidarXmlPage() {
         <div className="validar-xml__header">
           <div>
             <h2 style={{ margin: 0 }}>Validar XML do Promob</h2>
-            <p style={{ margin: "4px 0 0", color: "var(--text-muted)", fontSize: 13 }}>
+            <p style={{ margin: "4px 0 0", color: "var(--text)", fontSize: 13 }}>
               Leitura isolada, pra conferir se as quantidades batem com o Promob — ainda não associa a
               nenhum pedido.
             </p>
@@ -167,10 +168,14 @@ export function AlmoxarifadoValidarXmlPage() {
 
         {rows.length > 0 && (
           <div className="validar-xml__tiles">
-            <SummaryTile label="Chapa (m²)" value={totalChapa.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
-            <SummaryTile label="Fita (m)" value={totalFita.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} />
-            <SummaryTile label="Ferragem (referências)" value={String(totalFerragem)} />
-            <SummaryTile label="Sem material casado" value={String(semMaterial)} highlight={semMaterial > 0} />
+            <SummaryCard label="Chapa (m²)" value={totalChapa.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
+            <SummaryCard label="Fita (m)" value={totalFita.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} />
+            <SummaryCard label="Ferragem (referências)" value={String(totalFerragem)} />
+            <SummaryCard
+              label="Sem material casado"
+              value={String(semMaterial)}
+              accent={semMaterial > 0 ? "#f97316" : undefined}
+            />
           </div>
         )}
 
@@ -186,14 +191,5 @@ export function AlmoxarifadoValidarXmlPage() {
         />
       </div>
     </AppLayout>
-  );
-}
-
-function SummaryTile({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className={`validar-xml__tile${highlight ? " validar-xml__tile--alerta" : ""}`}>
-      <div className="validar-xml__tile-label">{label}</div>
-      <div className="validar-xml__tile-value">{value}</div>
-    </div>
   );
 }
