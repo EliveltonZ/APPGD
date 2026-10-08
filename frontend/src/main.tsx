@@ -43,6 +43,7 @@ import { ApontamentoPage } from "./pages/Fabrica/Apontamento";
 import { ExpedicaoPage } from "./pages/Fabrica/Expedicao";
 import { RelatoriosPcpPage } from "./pages/Fabrica/Relatorios";
 import { ParadasPage } from "./pages/Fabrica/Paradas";
+import { FabricaValidarXmlPage } from "./pages/Fabrica/ValidarXml";
 
 // ── Logística ─────────────────────────────────────────────────────────────────
 import { LogisticaStatusPage } from "./pages/Logistica/Status";
@@ -66,7 +67,6 @@ import { ConfigAcessosPage } from "./pages/Configuracoes/Acessos";
 
 // ── Almoxarifado ──────────────────────────────────────────────────────────────
 import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
-import { AlmoxarifadoValidarXmlPage } from "./pages/Almoxarifado/ValidarXml";
 
 // ── Cadastros ─────────────────────────────────────────────────────────────────
 import { CadastrosPage } from "./pages/Cadastros";
@@ -107,6 +107,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   pcp_expedicao: ExpedicaoPage,
   logistica_planejamento: PlanejamentoPage,
   pcp_relatorios: RelatoriosPcpPage,
+  estoque_reservar: FabricaValidarXmlPage,
   logistica_status: LogisticaStatusPage,
   assistencias_nova: AssistenciasNovaPage,
   assistencias_producao: AssistenciasProducaoPage,
@@ -126,7 +127,6 @@ const PAGE_MAP: Record<string, ComponentType> = {
   paradas_maquina:     ParadasPage,
   paradas_admin:       ParadasPage,
   almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
-  estoque_reservar: AlmoxarifadoValidarXmlPage,
 };
 
 createRoot(document.getElementById("root")!).render(

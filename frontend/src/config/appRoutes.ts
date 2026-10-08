@@ -109,6 +109,7 @@ export const ROUTE_ITEMS = [
   buildSidebarList('pcp_relatorios', '/fabrica/relatorios', 'fabrica', 'Relatórios'),
   buildSidebarList('paradas_maquina', '/fabrica/paradas', 'fabrica', 'Paradas'),
   buildSidebarList('paradas_admin', '/fabrica/paradas', 'fabrica', 'Paradas Admin', false, true),
+  buildSidebarList('estoque_reservar', '/fabrica/validar-xml', 'fabrica', 'Validar XML'),
 
   // ── Logística ──────────────────────────────────────────────────────────────
   buildSidebarList('logistica_status', '/logistica/status', 'logistica', 'Status'),
@@ -148,12 +149,6 @@ export const ROUTE_ITEMS = [
     '/almoxarifado/transferencias',
     'almoxarifado',
     'Transferências'
-  ),
-  buildSidebarList(
-    'estoque_reservar',
-    '/almoxarifado/validar-xml',
-    'almoxarifado',
-    'Validar XML'
   ),
 
 ] as const satisfies ReadonlyArray<RouteItem>;

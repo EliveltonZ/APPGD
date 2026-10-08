@@ -57,7 +57,7 @@ const TIPO_POR_UNIDADE: Record<string, ItemXmlTipo> = {
   UN: "FERRAGEM",
 };
 
-export function AlmoxarifadoValidarXmlPage() {
+export function FabricaValidarXmlPage() {
   const toast = useToast();
   const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
   const materiaisOptions = materiais.map((m) => ({
@@ -365,7 +365,7 @@ export function AlmoxarifadoValidarXmlPage() {
           data={rows}
           rowKey="id"
           loading={loading}
-          storageKey="dt:almox:validar-xml"
+          storageKey="dt:fabrica:validar-xml"
           showIndex
           emptyMessage="Escolha um arquivo XML do Promob para começar."
           rowClassName={(row) => {
