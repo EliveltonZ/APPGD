@@ -149,6 +149,12 @@ export const ROUTE_ITEMS = [
     'almoxarifado',
     'Transferências'
   ),
+  buildSidebarList(
+    'estoque_reservar',
+    '/almoxarifado/validar-xml',
+    'almoxarifado',
+    'Validar XML'
+  ),
 
 ] as const satisfies ReadonlyArray<RouteItem>;
 
