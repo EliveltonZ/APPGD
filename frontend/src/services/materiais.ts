@@ -10,6 +10,7 @@ export interface Material {
   dataUltimoPreco: string | null;
   estoqueMinimoUn: number | null;
   ativo: boolean;
+  cadastroRevisado: boolean;
 }
 
 export interface MaterialPayload {
@@ -19,6 +20,7 @@ export interface MaterialPayload {
   m2_por_unidade: number | null;
   estoque_minimo_un: number | null;
   ativo: boolean;
+  cadastro_revisado: boolean;
 }
 
 export interface MaterialOpcao {

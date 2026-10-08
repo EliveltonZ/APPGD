@@ -21,15 +21,32 @@ async function casarItens(itens) {
   if (semVinculo.length) {
     const materiais = await Materiais.findAll({
       where: { codigoInterno: { [Op.in]: semVinculo } },
+      attributes: ['id', 'codigoInterno'],
       raw: true,
     });
     for (const m of materiais) porCodigo.set(m.codigoInterno, m.id);
   }
 
-  return itens.map(item => ({
-    ...item,
-    materialId: porVinculo.get(item.referencia) ?? porCodigo.get(item.referencia) ?? null,
-  }));
+  // Um material com cadastro ainda não revisado não pode ser aceito
+  // silenciosamente num casamento automático — tratado como se a referência
+  // não tivesse casado com nada, forçando o operador a vincular na mão.
+  const candidatos = [...new Set([...porVinculo.values(), ...porCodigo.values()])].filter(Boolean);
+  const revisados = candidatos.length
+    ? await Materiais.findAll({
+        where: { id: { [Op.in]: candidatos }, cadastroRevisado: true },
+        attributes: ['id'],
+        raw: true,
+      })
+    : [];
+  const idsRevisados = new Set(revisados.map(m => m.id));
+
+  return itens.map(item => {
+    const materialId = porVinculo.get(item.referencia) ?? porCodigo.get(item.referencia) ?? null;
+    return {
+      ...item,
+      materialId: materialId && idsRevisados.has(materialId) ? materialId : null,
+    };
+  });
 }
 
 // Salva (ou atualiza) a associação permanente referência-Promob -> material.

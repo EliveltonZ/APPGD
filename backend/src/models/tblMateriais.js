@@ -46,6 +46,16 @@ module.exports = function(sequelize, DataTypes) {
       allowNull:    false,
       defaultValue: true,
     },
+    // Separado de `ativo` (que liga/desliga o material pra uso geral): marca
+    // se o cadastro é confiável pro casamento automático do XML do Promob.
+    // Material marcado como não revisado é tratado como se não tivesse
+    // cadastro nenhum na tela de validação — força vínculo manual.
+    cadastroRevisado: {
+      type:         DataTypes.BOOLEAN,
+      allowNull:    false,
+      defaultValue: true,
+      field:        'cadastro_revisado',
+    },
   }, {
     sequelize,
     tableName:  T.materiais.name,

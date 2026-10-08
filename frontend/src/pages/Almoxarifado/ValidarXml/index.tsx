@@ -19,6 +19,11 @@ import "./index.css";
 
 interface Row extends ItemXml {
   id: string;
+  // Material já casado quando a linha chegou (vínculo salvo, código interno
+  // batendo, ou item adicionado manualmente escolhendo o material direto).
+  // Serve só pra decidir se mostra o botão de vincular — refaz o casamento
+  // nunca é necessário pra quem já chegou casado.
+  materialIdOriginal: number | null;
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -73,6 +78,7 @@ export function AlmoxarifadoValidarXmlPage() {
         itensOrdenados.map((item, i) => ({
           ...item,
           id: `${item.tipo}-${item.referencia}-${i}`,
+          materialIdOriginal: item.materialId,
         })),
       );
     } catch (err) {
@@ -97,6 +103,11 @@ export function AlmoxarifadoValidarXmlPage() {
       await vincularReferencia(row.referencia, row.materialId);
       toast.success(
         `Referência "${row.referencia}" vinculada — próximas importações já virão casadas.`,
+      );
+      setRows((prev) =>
+        prev.map((r) =>
+          r.id === row.id ? { ...r, materialIdOriginal: r.materialId } : r,
+        ),
       );
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao vincular."));
@@ -135,6 +146,7 @@ export function AlmoxarifadoValidarXmlPage() {
       cor: null,
       espessura: null,
       materialId: material.id,
+      materialIdOriginal: material.id,
     };
     setRows((prev) =>
       [...prev, novaLinha].sort((a, b) =>
@@ -200,15 +212,17 @@ export function AlmoxarifadoValidarXmlPage() {
             onChange={(materialId) => trocarMaterial(row.id, materialId)}
             placeholder="Buscar material (nome ou código)..."
           />
-          <button
-            type="button"
-            title="Vincular permanentemente essa referência a este material"
-            className="btn-icon"
-            disabled={!row.materialId}
-            onClick={() => vincularMaterial(row)}
-          >
-            <Link2 size={14} />
-          </button>
+          {row.materialId !== row.materialIdOriginal && (
+            <button
+              type="button"
+              title="Vincular permanentemente essa referência a este material"
+              className="btn-icon"
+              disabled={!row.materialId}
+              onClick={() => vincularMaterial(row)}
+            >
+              <Link2 size={14} />
+            </button>
+          )}
         </div>
       ),
     },

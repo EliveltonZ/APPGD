@@ -31,26 +31,28 @@ async function listarOpcoes() {
 async function criar(body) {
   const isM2 = body.unidade_base === 'M2';
   return Materiais.create({
-    codigoInterno:   body.codigo_interno,
-    descricao:       body.descricao,
-    unidadeBase:     body.unidade_base,
-    m2PorUnidade:   isM2 ? (body.m2_por_unidade ?? 5.0416) : null,
+    codigoInterno:    body.codigo_interno,
+    descricao:        body.descricao,
+    unidadeBase:      body.unidade_base,
+    m2PorUnidade:    isM2 ? (body.m2_por_unidade ?? 5.0416) : null,
     // estoque_minimo_un vale pra qualquer unidade_base (chapa ou ferragem) —
     // é o que decide se o material participa do controle de reserva.
-    estoqueMinimoUn: body.estoque_minimo_un ?? null,
-    ativo:           body.ativo ?? true,
+    estoqueMinimoUn:  body.estoque_minimo_un ?? null,
+    ativo:            body.ativo ?? true,
+    cadastroRevisado: body.cadastro_revisado ?? true,
   });
 }
 
 async function atualizar(id, body) {
   const isM2 = body.unidade_base === 'M2';
   const [n] = await Materiais.update({
-    codigoInterno:   body.codigo_interno,
-    descricao:       body.descricao,
-    unidadeBase:     body.unidade_base,
-    m2PorUnidade:   isM2 ? (body.m2_por_unidade ?? null) : null,
-    estoqueMinimoUn: body.estoque_minimo_un ?? null,
-    ativo:           body.ativo ?? true,
+    codigoInterno:    body.codigo_interno,
+    descricao:        body.descricao,
+    unidadeBase:      body.unidade_base,
+    m2PorUnidade:    isM2 ? (body.m2_por_unidade ?? null) : null,
+    estoqueMinimoUn:  body.estoque_minimo_un ?? null,
+    ativo:            body.ativo ?? true,
+    cadastroRevisado: body.cadastro_revisado ?? true,
   }, { where: { id } });
   return n > 0;
 }

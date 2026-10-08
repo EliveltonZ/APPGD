@@ -65,6 +65,31 @@ const COLUMNS: TableColumn<Material>[] = [
       </span>
     ),
   },
+  {
+    key: 'cadastroRevisado',
+    label: 'Revisado',
+    type: 'text',
+    sortable: true,
+    filterable: false,
+    minWidth: 90,
+    align: 'center',
+    render: (v) => (
+      <span
+        title="Material não revisado é tratado como sem cadastro na validação do XML — força vínculo manual."
+        style={{
+          display: 'inline-block',
+          padding: '1px 8px',
+          borderRadius: 4,
+          fontSize: 11,
+          fontWeight: 600,
+          background: v ? 'var(--success-subtle, #dcfce7)' : 'var(--warning-subtle, #fef3c7)',
+          color: v ? 'var(--success, #16a34a)' : 'var(--warning, #b45309)',
+        }}
+      >
+        {v ? 'Sim' : 'Não'}
+      </span>
+    ),
+  },
 ]
 
 interface FormState {
@@ -74,16 +99,18 @@ interface FormState {
   m2PorUnidade: string
   estoqueMinimoUn: string
   ativo: boolean
+  cadastroRevisado: boolean
 }
 
 function emptyForm(): FormState {
   return {
-    codigoInterno:   '',
-    descricao:       '',
-    unidadeBase:     'M2',
-    m2PorUnidade:    '5.0416',
-    estoqueMinimoUn: '',
-    ativo:           true,
+    codigoInterno:    '',
+    descricao:        '',
+    unidadeBase:      'M2',
+    m2PorUnidade:     '5.0416',
+    estoqueMinimoUn:  '',
+    ativo:            true,
+    cadastroRevisado: true,
   }
 }
 
@@ -96,17 +123,19 @@ function toPayload(f: FormState): MaterialPayload {
     m2_por_unidade:    isM2 && f.m2PorUnidade  ? Number(f.m2PorUnidade)  : null,
     estoque_minimo_un: isM2 && f.estoqueMinimoUn ? Number(f.estoqueMinimoUn) : null,
     ativo:             f.ativo,
+    cadastro_revisado: f.cadastroRevisado,
   }
 }
 
 function fromMaterial(m: Material): FormState {
   return {
-    codigoInterno:   m.codigoInterno,
-    descricao:       m.descricao,
-    unidadeBase:     m.unidadeBase,
-    m2PorUnidade:    m.m2PorUnidade     != null ? String(m.m2PorUnidade)     : '5.0416',
-    estoqueMinimoUn: m.estoqueMinimoUn  != null ? String(m.estoqueMinimoUn)  : '',
-    ativo:           m.ativo,
+    codigoInterno:    m.codigoInterno,
+    descricao:        m.descricao,
+    unidadeBase:      m.unidadeBase,
+    m2PorUnidade:     m.m2PorUnidade     != null ? String(m.m2PorUnidade)     : '5.0416',
+    estoqueMinimoUn:  m.estoqueMinimoUn  != null ? String(m.estoqueMinimoUn)  : '',
+    ativo:            m.ativo,
+    cadastroRevisado: m.cadastroRevisado,
   }
 }
 
@@ -316,6 +345,20 @@ export function CadastrosMateriaisPage() {
                 style={{ width: 15, height: 15, cursor: 'pointer' }}
               />
               <span className="cad-field__label" style={{ margin: 0 }}>Ativo</span>
+            </label>
+
+            <label
+              className="cad-field"
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+              title="Desmarque se o cadastro ainda precisa de revisão (ex.: importado em massa) — enquanto isso, a validação do XML trata como se não tivesse cadastro e pede vínculo manual."
+            >
+              <input
+                type="checkbox"
+                checked={form.cadastroRevisado}
+                onChange={(e) => field('cadastroRevisado', e.target.checked)}
+                style={{ width: 15, height: 15, cursor: 'pointer' }}
+              />
+              <span className="cad-field__label" style={{ margin: 0 }}>Cadastro revisado</span>
             </label>
           </div>
         </div>
