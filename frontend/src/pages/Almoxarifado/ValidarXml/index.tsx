@@ -1,17 +1,19 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Upload, Link2, Trash2 } from "lucide-react";
+import { Upload, Link2, Trash2, Plus } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
 import { Button } from "../../../components/Button";
 import { SearchSelect } from "../../../components/SearchSelect";
 import { SummaryCard } from "../../../components/SummaryCard";
+import { Modal } from "../../../components/Modal";
+import { Input } from "../../../components/Input";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import { previewXml, vincularReferencia } from "../../../services/estoqueXml";
-import type { ItemXml } from "../../../services/estoqueXml";
+import type { ItemXml, ItemXmlTipo } from "../../../services/estoqueXml";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
@@ -25,6 +27,11 @@ const TIPO_LABEL: Record<string, string> = {
   FERRAGEM: "Ferragem",
 };
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
+const TIPO_POR_UNIDADE: Record<string, ItemXmlTipo> = {
+  M2: "CHAPA",
+  M: "FITA",
+  UN: "FERRAGEM",
+};
 
 export function AlmoxarifadoValidarXmlPage() {
   const toast = useToast();
@@ -43,6 +50,11 @@ export function AlmoxarifadoValidarXmlPage() {
   const [loading, setLoading] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [addOpen, setAddOpen] = useState(false);
+  const [addMaterialId, setAddMaterialId] = useState<number | null>(null);
+  const [addQuantidade, setAddQuantidade] = useState("");
+  const [addAmbiente, setAddAmbiente] = useState("");
 
   const semMaterial = rows.filter((r) => r.materialId == null).length;
 
@@ -94,6 +106,45 @@ export function AlmoxarifadoValidarXmlPage() {
 
   function excluirLinha(id: string) {
     setRows((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  function abrirAdicionar() {
+    setAddMaterialId(null);
+    setAddQuantidade("");
+    setAddAmbiente("");
+    setAddOpen(true);
+  }
+
+  function confirmarAdicionar() {
+    const material = materiais.find((m) => m.id === addMaterialId);
+    if (!material) {
+      toast.error("Escolha um material.");
+      return;
+    }
+    const quantidade = Number(addQuantidade.replace(",", "."));
+    if (!quantidade || quantidade <= 0) {
+      toast.error("Informe uma quantidade válida.");
+      return;
+    }
+    const novaLinha: Row = {
+      id: `manual-${material.id}-${Date.now()}`,
+      tipo: TIPO_POR_UNIDADE[material.unidadeBase] ?? "FERRAGEM",
+      descricao: material.descricao,
+      referencia: material.codigoInterno,
+      unidade: material.unidadeBase,
+      quantidade,
+      ambiente: addAmbiente.trim() || null,
+      material: null,
+      cor: null,
+      espessura: null,
+      materialId: material.id,
+    };
+    setRows((prev) =>
+      [...prev, novaLinha].sort((a, b) =>
+        a.descricao.localeCompare(b.descricao, "pt-BR"),
+      ),
+    );
+    setAddOpen(false);
   }
 
   const totalChapa = rows
@@ -204,7 +255,11 @@ export function AlmoxarifadoValidarXmlPage() {
               — ainda não associa a nenhum pedido.
             </p>
           </div>
-          <div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button variant="secondary" size="sm" onClick={abrirAdicionar}>
+              <Plus size={14} />
+              Adicionar item
+            </Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -275,6 +330,56 @@ export function AlmoxarifadoValidarXmlPage() {
             row.materialId == null ? "row-em-evidencia" : ""
           }
         />
+
+        <Modal
+          title="Adicionar item à lista"
+          isOpen={addOpen}
+          onClose={() => setAddOpen(false)}
+          footer={
+            <div className="cad-modal-footer__right">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setAddOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={confirmarAdicionar}
+              >
+                Adicionar
+              </Button>
+            </div>
+          }
+        >
+          <div className="cad-modal-body">
+            <div className="cad-field">
+              <label className="cad-field__label">Material</label>
+              <SearchSelect
+                options={materiaisOptions}
+                value={addMaterialId}
+                onChange={setAddMaterialId}
+                placeholder="Buscar material (nome ou código)..."
+              />
+            </div>
+            <Input
+              label="Quantidade"
+              type="text"
+              inputMode="decimal"
+              value={addQuantidade}
+              onChange={(e) => setAddQuantidade(e.target.value)}
+              placeholder="0"
+            />
+            <Input
+              label="Ambiente (opcional)"
+              type="text"
+              value={addAmbiente}
+              onChange={(e) => setAddAmbiente(e.target.value)}
+            />
+          </div>
+        </Modal>
       </div>
     </AppLayout>
   );

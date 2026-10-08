@@ -25,7 +25,7 @@ export interface MaterialOpcao {
   id: number;
   codigoInterno: string;
   descricao: string;
-  unidadeBase: 'M2' | 'UN';
+  unidadeBase: 'M2' | 'M' | 'UN';
 }
 
 export const fetchMateriais        = (): Promise<Material[]>       => apiGet('/materiais');
