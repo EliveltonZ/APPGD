@@ -106,13 +106,12 @@ export function AlmoxarifadoValidarXmlPage() {
 
   const columns: TableColumn<Row>[] = [
     {
-      key: "tipo",
-      label: "Tipo",
+      key: "referencia",
+      label: "Referência Promob",
       type: "text",
       sortable: true,
       filterable: true,
-      minWidth: 90,
-      render: (v) => TIPO_LABEL[v as string] ?? String(v),
+      minWidth: 160,
     },
     {
       key: "descricao",
@@ -121,14 +120,6 @@ export function AlmoxarifadoValidarXmlPage() {
       sortable: true,
       filterable: true,
       minWidth: 220,
-    },
-    {
-      key: "referencia",
-      label: "Referência Promob",
-      type: "text",
-      sortable: true,
-      filterable: true,
-      minWidth: 160,
     },
     {
       key: "quantidade",
@@ -148,6 +139,15 @@ export function AlmoxarifadoValidarXmlPage() {
       filterable: true,
       minWidth: 140,
       render: (v) => (v as string) ?? "—",
+    },
+    {
+      key: "tipo",
+      label: "Tipo",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 90,
+      render: (v) => TIPO_LABEL[v as string] ?? String(v),
     },
     {
       key: "materialId",
@@ -192,14 +192,8 @@ export function AlmoxarifadoValidarXmlPage() {
 
   return (
     <AppLayout pageTitle="Validar XML do Promob">
-      <div
-        style={{
-          padding: "20px 24px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 16,
-        }}
-      >
+      <div className="validar-xml__page">
+
         <div className="validar-xml__header">
           <div>
             <h2 style={{ margin: 0 }}>Validar XML do Promob</h2>
