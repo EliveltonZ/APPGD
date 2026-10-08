@@ -126,7 +126,7 @@ function fromMaterial(m: Material): FormState {
 
 export function CadastrosMateriaisPage() {
   const toast = useToast()
-  const { data: rows = [], loading, reload } = useApiData(fetchMateriais)
+  const { data: rows = [], loading, refetch: reload } = useApiData(fetchMateriais)
 
   const [modalOpen, setModalOpen]     = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)

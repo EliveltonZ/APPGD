@@ -21,7 +21,7 @@ import '../index.css'
 const COLUMNS: TableColumn<Localizacao>[] = [
   { key: 'codigo',    label: 'Código',    type: 'text', sortable: true, filterable: true,  minWidth: 130 },
   { key: 'descricao', label: 'Descrição', type: 'text', sortable: true, filterable: true,  minWidth: 260,
-    render: (v) => <span>{v ?? '—'}</span> },
+    render: (v) => <span>{(v as string | null) ?? '—'}</span> },
   {
     key: 'ativo',
     label: 'Ativo',
@@ -70,7 +70,7 @@ function toPayload(f: FormState): LocalizacaoPayload {
 
 export function CadastrosLocalizacoesPage() {
   const toast = useToast()
-  const { data: rows = [], loading, reload } = useApiData(fetchLocalizacoes)
+  const { data: rows = [], loading, refetch: reload } = useApiData(fetchLocalizacoes)
 
   const [modalOpen, setModalOpen]     = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
