@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, X } from "lucide-react";
 import "./index.css";
 
@@ -32,8 +33,10 @@ export function SearchSelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [highlight, setHighlight] = useState(0);
+  const [coords, setCoords] = useState<{ top: number; left: number; width: number } | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const selected = useMemo(() => options.find((o) => o.value === value) ?? null, [options, value]);
 
@@ -56,7 +59,14 @@ export function SearchSelect({
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      // A lista é renderizada via portal (fora da árvore de .ssel), pra não
+      // ficar presa no scroll/clip de um ancestral (ex.: o corpo de um
+      // modal) — por isso precisa checar os dois containers separadamente.
+      if (
+        wrapperRef.current && !wrapperRef.current.contains(target) &&
+        listRef.current && !listRef.current.contains(target)
+      ) {
         setOpen(false);
         setQuery("");
       }
@@ -64,6 +74,24 @@ export function SearchSelect({
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
+
+  // Reposiciona a lista (portal) pra acompanhar o campo quando a página
+  // rola ou a janela muda de tamanho, já que position:fixed não segue o
+  // elemento sozinho.
+  useLayoutEffect(() => {
+    if (!open) return;
+    function updateCoords() {
+      const rect = wrapperRef.current?.getBoundingClientRect();
+      if (rect) setCoords({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+    updateCoords();
+    window.addEventListener("scroll", updateCoords, true);
+    window.addEventListener("resize", updateCoords);
+    return () => {
+      window.removeEventListener("scroll", updateCoords, true);
+      window.removeEventListener("resize", updateCoords);
+    };
+  }, [open]);
 
   function openList() {
     setOpen(true);
@@ -129,29 +157,36 @@ export function SearchSelect({
         <ChevronDown size={14} className="ssel__chevron" />
       </div>
 
-      {open && (
-        <ul className="ssel__list" role="listbox">
-          {filtered.length === 0 && <li className="ssel__empty">Nenhum material encontrado.</li>}
-          {filtered.map((opt, i) => (
-            <li
-              key={opt.value}
-              role="option"
-              aria-selected={opt.value === value}
-              className={`ssel__option${i === highlight ? " ssel__option--active" : ""}${opt.value === value ? " ssel__option--selected" : ""}`}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                pick(opt);
-              }}
-              onMouseEnter={() => setHighlight(i)}
-            >
-              {opt.label}
-            </li>
-          ))}
-          {filtered.length === maxResults && (
-            <li className="ssel__hint">Mostrando os {maxResults} primeiros — digite para refinar.</li>
-          )}
-        </ul>
-      )}
+      {open && coords &&
+        createPortal(
+          <ul
+            ref={listRef}
+            className="ssel__list"
+            role="listbox"
+            style={{ position: "fixed", top: coords.top, left: coords.left, width: coords.width }}
+          >
+            {filtered.length === 0 && <li className="ssel__empty">Nenhum material encontrado.</li>}
+            {filtered.map((opt, i) => (
+              <li
+                key={opt.value}
+                role="option"
+                aria-selected={opt.value === value}
+                className={`ssel__option${i === highlight ? " ssel__option--active" : ""}${opt.value === value ? " ssel__option--selected" : ""}`}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  pick(opt);
+                }}
+                onMouseEnter={() => setHighlight(i)}
+              >
+                {opt.label}
+              </li>
+            ))}
+            {filtered.length === maxResults && (
+              <li className="ssel__hint">Mostrando os {maxResults} primeiros — digite para refinar.</li>
+            )}
+          </ul>,
+          document.body,
+        )}
     </div>
   );
 }

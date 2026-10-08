@@ -64,12 +64,11 @@
   background: var(--border);
 }
 
+/* position/top/left/width vêm inline via JS (coords calculados a partir do
+   campo) — a lista é renderizada em portal direto no <body>, pra não ficar
+   presa no scroll/clip de um ancestral (ex.: o corpo de um modal). */
 .ssel__list {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
+  z-index: 500;
   max-height: 260px;
   overflow-y: auto;
   margin: 0;

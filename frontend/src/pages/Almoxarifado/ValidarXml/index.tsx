@@ -351,21 +351,23 @@ export function AlmoxarifadoValidarXmlPage() {
           isOpen={addOpen}
           onClose={() => setAddOpen(false)}
           footer={
-            <div className="cad-modal-footer__right">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setAddOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={confirmarAdicionar}
-              >
-                Adicionar
-              </Button>
+            <div className="cad-modal-footer">
+              <div className="cad-modal-footer__right">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setAddOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={confirmarAdicionar}
+                >
+                  Adicionar
+                </Button>
+              </div>
             </div>
           }
         >
