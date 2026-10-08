@@ -26,6 +26,23 @@ interface Row extends ItemXml {
   materialIdOriginal: number | null;
   // Pra destacar visualmente o que foi incluído na mão (não veio do XML).
   origem: "xml" | "manual";
+  // Detalhe livre (cor, dimensão, espessura...) pra item manual de material
+  // genérico — ex. "porta de alumínio" cadastrada uma vez só, mas cada
+  // pedido tem uma medida/cor diferente. Item do XML já tem isso nos campos
+  // material/cor/espessura (ver detalhesDe()).
+  detalhesManual: string | null;
+}
+
+function detalhesDe(row: Row): string {
+  if (row.origem === "manual") return row.detalhesManual ?? "—";
+  // material/cor/espessura do XML são herdados do nó pai na árvore do
+  // Promob (pensado pra descrever a chapa configurada do móvel) — faz
+  // sentido só pra CHAPA. Pra ferragem/fita, o pai costuma ser o mesmo
+  // móvel/chapa, então os valores vazam sem descrever a peça em si
+  // (ex.: uma bucha "herdando" material/cor da chapa do armário ao lado).
+  if (row.tipo !== "CHAPA") return "—";
+  const partes = [row.material, row.cor, row.espessura].filter(Boolean);
+  return partes.length ? partes.join(" · ") : "—";
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -61,6 +78,7 @@ export function AlmoxarifadoValidarXmlPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [addMaterialId, setAddMaterialId] = useState<number | null>(null);
   const [addQuantidade, setAddQuantidade] = useState("");
+  const [addDetalhes, setAddDetalhes] = useState("");
 
   const semMaterial = rows.filter((r) => r.materialId == null).length;
 
@@ -82,6 +100,7 @@ export function AlmoxarifadoValidarXmlPage() {
           id: `${item.tipo}-${item.referencia}-${i}`,
           materialIdOriginal: item.materialId,
           origem: "xml",
+          detalhesManual: null,
         })),
       );
     } catch (err) {
@@ -124,6 +143,7 @@ export function AlmoxarifadoValidarXmlPage() {
   function abrirAdicionar() {
     setAddMaterialId(null);
     setAddQuantidade("");
+    setAddDetalhes("");
     setAddOpen(true);
   }
 
@@ -151,6 +171,7 @@ export function AlmoxarifadoValidarXmlPage() {
       materialId: material.id,
       materialIdOriginal: material.id,
       origem: "manual",
+      detalhesManual: addDetalhes.trim() || null,
     };
     setRows((prev) =>
       [...prev, novaLinha].sort((a, b) =>
@@ -184,6 +205,14 @@ export function AlmoxarifadoValidarXmlPage() {
       sortable: true,
       filterable: true,
       minWidth: 220,
+    },
+    {
+      key: "detalhesManual",
+      label: "Detalhes",
+      type: "text",
+      filterable: true,
+      minWidth: 180,
+      render: (_v, row) => detalhesDe(row),
     },
     {
       key: "quantidade",
@@ -388,6 +417,13 @@ export function AlmoxarifadoValidarXmlPage() {
               value={addQuantidade}
               onChange={(e) => setAddQuantidade(e.target.value)}
               placeholder="0"
+            />
+            <Input
+              label="Detalhes (opcional)"
+              type="text"
+              value={addDetalhes}
+              onChange={(e) => setAddDetalhes(e.target.value)}
+              placeholder="Ex.: Branca, 60x210cm, 4mm"
             />
           </div>
         </Modal>
