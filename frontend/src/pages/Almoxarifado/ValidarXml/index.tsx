@@ -47,7 +47,10 @@ export function AlmoxarifadoValidarXmlPage() {
       const xml = await file.text();
       const result = await previewXml(xml);
       setCliente(result.cliente);
-      setRows(result.itens.map((item, i) => ({ ...item, id: `${item.tipo}-${item.referencia}-${i}` })));
+      const itensOrdenados = [...result.itens].sort((a, b) =>
+        a.descricao.localeCompare(b.descricao, "pt-BR"),
+      );
+      setRows(itensOrdenados.map((item, i) => ({ ...item, id: `${item.tipo}-${item.referencia}-${i}` })));
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao ler o XML."));
       setRows([]);
