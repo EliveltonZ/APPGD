@@ -24,6 +24,10 @@ interface Row extends ItemXml {
   // Serve só pra decidir se mostra o botão de vincular — refaz o casamento
   // nunca é necessário pra quem já chegou casado.
   materialIdOriginal: number | null;
+  // Item adicionado na mão já nasce escolhendo o material direto — a coluna
+  // "Material do cadastro" não tem o que mostrar de novo, é o mesmo material
+  // que já aparece em Descrição.
+  origem: "xml" | "manual";
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -79,6 +83,7 @@ export function AlmoxarifadoValidarXmlPage() {
           ...item,
           id: `${item.tipo}-${item.referencia}-${i}`,
           materialIdOriginal: item.materialId,
+          origem: "xml",
         })),
       );
     } catch (err) {
@@ -147,6 +152,7 @@ export function AlmoxarifadoValidarXmlPage() {
       espessura: null,
       materialId: material.id,
       materialIdOriginal: material.id,
+      origem: "manual",
     };
     setRows((prev) =>
       [...prev, novaLinha].sort((a, b) =>
@@ -204,27 +210,34 @@ export function AlmoxarifadoValidarXmlPage() {
       key: "materialId",
       label: "Material do cadastro",
       minWidth: 280,
-      render: (_v, row) => (
-        <div className="validar-xml__material-cell">
-          <SearchSelect
-            options={materiaisOptions}
-            value={row.materialId}
-            onChange={(materialId) => trocarMaterial(row.id, materialId)}
-            placeholder="Buscar material (nome ou código)..."
-          />
-          {row.materialId !== row.materialIdOriginal && (
-            <button
-              type="button"
-              title="Vincular permanentemente essa referência a este material"
-              className="btn-icon"
-              disabled={!row.materialId}
-              onClick={() => vincularMaterial(row)}
-            >
-              <Link2 size={14} />
-            </button>
-          )}
-        </div>
-      ),
+      render: (_v, row) => {
+        if (row.origem === "manual") {
+          // Item adicionado na mão já É o material — repetir a escolha aqui
+          // seria mostrar a mesma coisa duas vezes.
+          return <span style={{ color: "var(--text)" }}>—</span>;
+        }
+        return (
+          <div className="validar-xml__material-cell">
+            <SearchSelect
+              options={materiaisOptions}
+              value={row.materialId}
+              onChange={(materialId) => trocarMaterial(row.id, materialId)}
+              placeholder="Buscar material (nome ou código)..."
+            />
+            {row.materialId !== row.materialIdOriginal && (
+              <button
+                type="button"
+                title="Vincular permanentemente essa referência a este material"
+                className="btn-icon"
+                disabled={!row.materialId}
+                onClick={() => vincularMaterial(row)}
+              >
+                <Link2 size={14} />
+              </button>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: "id",
