@@ -32,6 +32,11 @@
   position: sticky;
   top: 0;
   left: -15px;
+  /* Precisa ficar acima de qualquer elemento posicionado dentro das linhas
+     (ex.: o combobox de busca, que usa position:relative pro dropdown) —
+     sem isso, empate de z-index:auto é resolvido pela ordem no DOM, e a
+     linha (que vem depois do cabeçalho) acaba pintando por cima. */
+  z-index: 2;
   background: var(--code-bg);
   border-bottom: 1px solid var(--border);
   padding: 0;
