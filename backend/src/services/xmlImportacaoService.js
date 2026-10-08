@@ -75,4 +75,11 @@ async function confirmar({ ordemdecompra, arquivoNome, usuarioId, itens }) {
   return importacao;
 }
 
-module.exports = { previsualizar, confirmar };
+async function vincularReferencia({ referenciaPromob, materialId, usuarioId }) {
+  if (!referenciaPromob || !materialId) {
+    throw erro('Informe a referência e o material.', 400, 'VALIDACAO');
+  }
+  return matchService.vincular(referenciaPromob, materialId, usuarioId);
+}
+
+module.exports = { previsualizar, confirmar, vincularReferencia };

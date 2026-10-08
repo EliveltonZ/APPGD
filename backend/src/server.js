@@ -39,7 +39,8 @@ app.use(cors({
   credentials: true,
 }))
 
-app.use(express.json())
+// Limite maior que o padrão (100kb) — XML de projetos complexos pode passar de 1MB
+app.use(express.json({ limit: '20mb' }))
 app.use(express.static(PUBLIC))
 
 // Rate limit no endpoint de login: máx. 20 tentativas por 15 min por IP
