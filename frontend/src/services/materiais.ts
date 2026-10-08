@@ -5,7 +5,6 @@ export interface Material {
   codigoInterno: string;
   descricao: string;
   unidadeBase: 'M2' | 'UN';
-  espessura: number | null;
   m2PorUnidade: number | null;
   ultimoPrecoUn: number | null;
   dataUltimoPreco: string | null;
@@ -17,7 +16,6 @@ export interface MaterialPayload {
   codigo_interno: string;
   descricao: string;
   unidade_base: 'M2' | 'UN';
-  espessura: number | null;
   m2_por_unidade: number | null;
   estoque_minimo_un: number | null;
   ativo: boolean;

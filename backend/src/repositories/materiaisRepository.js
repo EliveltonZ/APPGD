@@ -34,7 +34,6 @@ async function criar(body) {
     codigoInterno:   body.codigo_interno,
     descricao:       body.descricao,
     unidadeBase:     body.unidade_base,
-    espessura:       body.espessura       ?? null,
     m2PorUnidade:   isM2 ? (body.m2_por_unidade ?? 5.0416) : null,
     // estoque_minimo_un vale pra qualquer unidade_base (chapa ou ferragem) —
     // é o que decide se o material participa do controle de reserva.
@@ -49,7 +48,6 @@ async function atualizar(id, body) {
     codigoInterno:   body.codigo_interno,
     descricao:       body.descricao,
     unidadeBase:     body.unidade_base,
-    espessura:       body.espessura       ?? null,
     m2PorUnidade:   isM2 ? (body.m2_por_unidade ?? null) : null,
     estoqueMinimoUn: body.estoque_minimo_un ?? null,
     ativo:           body.ativo ?? true,

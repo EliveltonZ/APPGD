@@ -21,10 +21,6 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       field:     'unidade_base',
     },
-    espessura: {
-      type:      DataTypes.DECIMAL(6, 2),
-      allowNull: true,
-    },
     m2PorUnidade: {
       type:      DataTypes.DECIMAL(8, 4),
       allowNull: true,

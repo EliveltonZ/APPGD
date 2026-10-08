@@ -34,16 +34,6 @@ const COLUMNS: TableColumn<Material>[] = [
     render: (v) => <span style={{ fontWeight: 600 }}>{UNIDADE_LABEL[v as string] ?? v}</span>,
   },
   {
-    key: 'espessura',
-    label: 'Esp. (mm)',
-    type: 'number',
-    sortable: true,
-    filterable: false,
-    minWidth: 90,
-    align: 'right',
-    render: (v) => (v != null ? `${v} mm` : '—'),
-  },
-  {
     key: 'estoqueMinimoUn',
     label: 'Mín. Estoque',
     type: 'number',
@@ -81,7 +71,6 @@ interface FormState {
   codigoInterno: string
   descricao: string
   unidadeBase: 'M2' | 'UN'
-  espessura: string
   m2PorUnidade: string
   estoqueMinimoUn: string
   ativo: boolean
@@ -92,7 +81,6 @@ function emptyForm(): FormState {
     codigoInterno:   '',
     descricao:       '',
     unidadeBase:     'M2',
-    espessura:       '',
     m2PorUnidade:    '5.0416',
     estoqueMinimoUn: '',
     ativo:           true,
@@ -105,7 +93,6 @@ function toPayload(f: FormState): MaterialPayload {
     codigo_interno:    f.codigoInterno.trim().toUpperCase(),
     descricao:         f.descricao.trim().toUpperCase(),
     unidade_base:      f.unidadeBase,
-    espessura:         f.espessura      ? Number(f.espessura)      : null,
     m2_por_unidade:    isM2 && f.m2PorUnidade  ? Number(f.m2PorUnidade)  : null,
     estoque_minimo_un: isM2 && f.estoqueMinimoUn ? Number(f.estoqueMinimoUn) : null,
     ativo:             f.ativo,
@@ -117,7 +104,6 @@ function fromMaterial(m: Material): FormState {
     codigoInterno:   m.codigoInterno,
     descricao:       m.descricao,
     unidadeBase:     m.unidadeBase,
-    espessura:       m.espessura        != null ? String(m.espessura)        : '',
     m2PorUnidade:    m.m2PorUnidade     != null ? String(m.m2PorUnidade)     : '5.0416',
     estoqueMinimoUn: m.estoqueMinimoUn  != null ? String(m.estoqueMinimoUn)  : '',
     ativo:           m.ativo,
@@ -290,19 +276,6 @@ export function CadastrosMateriaisPage() {
                 <option value="M2">M² — chapa (conversão m²↔UN)</option>
                 <option value="UN">UN — baixa 1 a 1</option>
               </select>
-            </label>
-
-            <label className="cad-field">
-              <span className="cad-field__label">Espessura (mm)</span>
-              <input
-                className="cad-field__input"
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder="Ex: 15"
-                value={form.espessura}
-                onChange={(e) => field('espessura', e.target.value)}
-              />
             </label>
 
             {isM2 && (
