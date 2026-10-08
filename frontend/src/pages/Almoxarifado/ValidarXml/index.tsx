@@ -24,6 +24,8 @@ interface Row extends ItemXml {
   // Linha que já chega casada não precisa reexibir o seletor — é o mesmo
   // item; só quem chega sem nada (materialIdOriginal null) pede vínculo.
   materialIdOriginal: number | null;
+  // Pra destacar visualmente o que foi incluído na mão (não veio do XML).
+  origem: "xml" | "manual";
 }
 
 const TIPO_LABEL: Record<string, string> = {
@@ -79,6 +81,7 @@ export function AlmoxarifadoValidarXmlPage() {
           ...item,
           id: `${item.tipo}-${item.referencia}-${i}`,
           materialIdOriginal: item.materialId,
+          origem: "xml",
         })),
       );
     } catch (err) {
@@ -147,6 +150,7 @@ export function AlmoxarifadoValidarXmlPage() {
       espessura: null,
       materialId: material.id,
       materialIdOriginal: material.id,
+      origem: "manual",
     };
     setRows((prev) =>
       [...prev, novaLinha].sort((a, b) =>
@@ -335,9 +339,11 @@ export function AlmoxarifadoValidarXmlPage() {
           storageKey="dt:almox:validar-xml"
           showIndex
           emptyMessage="Escolha um arquivo XML do Promob para começar."
-          rowClassName={(row) =>
-            row.materialId == null ? "row-em-evidencia" : ""
-          }
+          rowClassName={(row) => {
+            if (row.materialId == null) return "row-em-evidencia";
+            if (row.origem === "manual") return "row-manual";
+            return "";
+          }}
         />
 
         <Modal

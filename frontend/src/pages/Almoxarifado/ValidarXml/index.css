@@ -69,6 +69,14 @@
   cursor: not-allowed;
 }
 
-tr.row-em-evidencia {
-  background: rgba(249, 115, 22, 0.12);
+/* .dt-row repetido pra ganhar de ".dt-row:nth-child(even)" (listra zebra) em
+   especificidade — senão a cor de destaque quase some nas linhas pares. */
+tr.dt-row.row-em-evidencia {
+  background: rgba(255, 0, 0, 0.286);
+}
+
+/* Item incluído na mão (não veio do XML) — cor diferente da de evidência,
+   que é reservada pra "precisa de atenção". */
+tr.dt-row.row-manual {
+  background: rgba(59, 130, 246, 0.1);
 }
