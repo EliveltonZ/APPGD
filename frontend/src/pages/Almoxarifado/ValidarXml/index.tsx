@@ -5,11 +5,11 @@ import { AppLayout } from "../../../components/Layout/AppLayout";
 import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
 import { Button } from "../../../components/Button";
-import { Select } from "../../../components/Select";
+import { SearchSelect } from "../../../components/SearchSelect";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
-import { fetchMateriais } from "../../../services/materiais";
+import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import { previewXml, vincularReferencia } from "../../../services/estoqueXml";
 import type { ItemXml } from "../../../services/estoqueXml";
 import { getErrorMessage } from "../../../utils/errorMessage";
@@ -19,18 +19,26 @@ interface Row extends ItemXml {
   id: string;
 }
 
-const TIPO_LABEL: Record<string, string> = { CHAPA: "Chapa", FITA: "Fita", FERRAGEM: "Ferragem" };
+const TIPO_LABEL: Record<string, string> = {
+  CHAPA: "Chapa",
+  FITA: "Fita",
+  FERRAGEM: "Ferragem",
+};
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 
 export function AlmoxarifadoValidarXmlPage() {
   const toast = useToast();
-  const { data: materiais = [] } = useApiData(fetchMateriais);
+  const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
   const materiaisOptions = materiais.map((m) => ({
     value: m.id,
     label: `${m.codigoInterno} — ${m.descricao}`,
+    searchHint: m.codigoInterno,
   }));
 
-  const [cliente, setCliente] = useState<{ codigo: string | null; nome: string | null } | null>(null);
+  const [cliente, setCliente] = useState<{
+    codigo: string | null;
+    nome: string | null;
+  } | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
@@ -50,7 +58,12 @@ export function AlmoxarifadoValidarXmlPage() {
       const itensOrdenados = [...result.itens].sort((a, b) =>
         a.descricao.localeCompare(b.descricao, "pt-BR"),
       );
-      setRows(itensOrdenados.map((item, i) => ({ ...item, id: `${item.tipo}-${item.referencia}-${i}` })));
+      setRows(
+        itensOrdenados.map((item, i) => ({
+          ...item,
+          id: `${item.tipo}-${item.referencia}-${i}`,
+        })),
+      );
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao ler o XML."));
       setRows([]);
@@ -61,15 +74,19 @@ export function AlmoxarifadoValidarXmlPage() {
     }
   }
 
-  function trocarMaterial(id: string, materialId: number) {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, materialId } : r)));
+  function trocarMaterial(id: string, materialId: number | null) {
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, materialId } : r)),
+    );
   }
 
   async function vincularMaterial(row: Row) {
     if (!row.materialId) return;
     try {
       await vincularReferencia(row.referencia, row.materialId);
-      toast.success(`Referência "${row.referencia}" vinculada — próximas importações já virão casadas.`);
+      toast.success(
+        `Referência "${row.referencia}" vinculada — próximas importações já virão casadas.`,
+      );
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao vincular."));
     }
@@ -79,35 +96,70 @@ export function AlmoxarifadoValidarXmlPage() {
     setRows((prev) => prev.filter((r) => r.id !== id));
   }
 
-  const totalChapa = rows.filter((r) => r.tipo === "CHAPA").reduce((s, r) => s + r.quantidade, 0);
-  const totalFita = rows.filter((r) => r.tipo === "FITA").reduce((s, r) => s + r.quantidade, 0);
+  const totalChapa = rows
+    .filter((r) => r.tipo === "CHAPA")
+    .reduce((s, r) => s + r.quantidade, 0);
+  const totalFita = rows
+    .filter((r) => r.tipo === "FITA")
+    .reduce((s, r) => s + r.quantidade, 0);
   const totalFerragem = rows.filter((r) => r.tipo === "FERRAGEM").length;
 
   const columns: TableColumn<Row>[] = [
     {
-      key: "tipo", label: "Tipo", type: "text", sortable: true, filterable: true, minWidth: 90,
+      key: "tipo",
+      label: "Tipo",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 90,
       render: (v) => TIPO_LABEL[v as string] ?? String(v),
     },
-    { key: "descricao", label: "Descrição", type: "text", sortable: true, filterable: true, minWidth: 220 },
-    { key: "referencia", label: "Referência Promob", type: "text", sortable: true, filterable: true, minWidth: 160 },
     {
-      key: "quantidade", label: "Quantidade", type: "number", sortable: true, minWidth: 120, align: "right",
+      key: "descricao",
+      label: "Descrição",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 220,
+    },
+    {
+      key: "referencia",
+      label: "Referência Promob",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 160,
+    },
+    {
+      key: "quantidade",
+      label: "Quantidade",
+      type: "number",
+      sortable: true,
+      minWidth: 120,
+      align: "right",
       render: (v, row) =>
         `${Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[row.unidade] ?? row.unidade}`,
     },
     {
-      key: "ambiente", label: "Ambiente", type: "text", sortable: true, filterable: true, minWidth: 140,
+      key: "ambiente",
+      label: "Ambiente",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 140,
       render: (v) => (v as string) ?? "—",
     },
     {
-      key: "materialId", label: "Material do cadastro", minWidth: 280,
+      key: "materialId",
+      label: "Material do cadastro",
+      minWidth: 280,
       render: (_v, row) => (
         <div className="validar-xml__material-cell">
-          <Select
+          <SearchSelect
             options={materiaisOptions}
-            value={row.materialId ?? ""}
-            onChange={(e) => e.target.value && trocarMaterial(row.id, Number(e.target.value))}
-            placeholder="Selecionar material..."
+            value={row.materialId}
+            onChange={(materialId) => trocarMaterial(row.id, materialId)}
+            placeholder="Buscar material (nome ou código)..."
           />
           <button
             type="button"
@@ -122,9 +174,16 @@ export function AlmoxarifadoValidarXmlPage() {
       ),
     },
     {
-      key: "id", label: "", minWidth: 50,
+      key: "id",
+      label: "",
+      minWidth: 50,
       render: (_v, row) => (
-        <button type="button" title="Excluir da leitura" className="btn-icon" onClick={() => excluirLinha(row.id)}>
+        <button
+          type="button"
+          title="Excluir da leitura"
+          className="btn-icon"
+          onClick={() => excluirLinha(row.id)}
+        >
           <Trash2 size={14} />
         </button>
       ),
@@ -133,13 +192,22 @@ export function AlmoxarifadoValidarXmlPage() {
 
   return (
     <AppLayout pageTitle="Validar XML do Promob">
-      <div style={{ padding: "20px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div
+        style={{
+          padding: "20px 24px",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
         <div className="validar-xml__header">
           <div>
             <h2 style={{ margin: 0 }}>Validar XML do Promob</h2>
-            <p style={{ margin: "4px 0 0", color: "var(--text)", fontSize: 13 }}>
-              Leitura isolada, pra conferir se as quantidades batem com o Promob — ainda não associa a
-              nenhum pedido.
+            <p
+              style={{ margin: "4px 0 0", color: "var(--text)", fontSize: 13 }}
+            >
+              Leitura isolada, pra conferir se as quantidades batem com o Promob
+              — ainda não associa a nenhum pedido.
             </p>
           </div>
           <div>
@@ -151,7 +219,12 @@ export function AlmoxarifadoValidarXmlPage() {
               style={{ display: "none" }}
               id="xml-file-input"
             />
-            <Button variant="primary" size="sm" onClick={() => fileInputRef.current?.click()} loading={loading}>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              loading={loading}
+            >
               <Upload size={14} />
               Escolher XML
             </Button>
@@ -161,7 +234,8 @@ export function AlmoxarifadoValidarXmlPage() {
         {cliente && (
           <div className="validar-xml__cliente">
             <div>
-              <strong>Cliente:</strong> {cliente.nome ?? "—"} {cliente.codigo ? `(cód. ${cliente.codigo})` : ""}
+              <strong>Cliente:</strong> {cliente.nome ?? "—"}{" "}
+              {cliente.codigo ? `(cód. ${cliente.codigo})` : ""}
             </div>
             <div>
               <strong>Arquivo:</strong> {nomeArquivo}
@@ -171,9 +245,22 @@ export function AlmoxarifadoValidarXmlPage() {
 
         {rows.length > 0 && (
           <div className="validar-xml__tiles">
-            <SummaryCard label="Chapa (m²)" value={totalChapa.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} />
-            <SummaryCard label="Fita (m)" value={totalFita.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} />
-            <SummaryCard label="Ferragem (referências)" value={String(totalFerragem)} />
+            <SummaryCard
+              label="Chapa (m²)"
+              value={totalChapa.toLocaleString("pt-BR", {
+                maximumFractionDigits: 4,
+              })}
+            />
+            <SummaryCard
+              label="Fita (m)"
+              value={totalFita.toLocaleString("pt-BR", {
+                maximumFractionDigits: 2,
+              })}
+            />
+            <SummaryCard
+              label="Ferragem (referências)"
+              value={String(totalFerragem)}
+            />
             <SummaryCard
               label="Sem material casado"
               value={String(semMaterial)}
@@ -190,7 +277,9 @@ export function AlmoxarifadoValidarXmlPage() {
           storageKey="dt:almox:validar-xml"
           showIndex
           emptyMessage="Escolha um arquivo XML do Promob para começar."
-          rowClassName={(row) => (row.materialId == null ? "row-em-evidencia" : "")}
+          rowClassName={(row) =>
+            row.materialId == null ? "row-em-evidencia" : ""
+          }
         />
       </div>
     </AppLayout>

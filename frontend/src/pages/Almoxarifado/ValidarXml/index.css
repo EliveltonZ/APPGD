@@ -30,7 +30,7 @@
   align-items: center;
 }
 
-.validar-xml__material-cell .select-group {
+.validar-xml__material-cell .ssel {
   flex: 1;
   min-width: 0;
 }

@@ -15,6 +15,19 @@ async function buscarPorId(id) {
   return Materiais.findByPk(id, { raw: true });
 }
 
+// Versão leve pra seletor/combobox — sem preço nem dados sensíveis, só o
+// necessário pra identificar o material. Não exige a permissão de cadastro,
+// já que escolher um material (ex.: casar referência do XML) é diferente de
+// administrar o catálogo.
+async function listarOpcoes() {
+  return Materiais.findAll({
+    where: { ativo: true },
+    attributes: ['id', 'codigoInterno', 'descricao', 'unidadeBase'],
+    order: [['descricao', 'ASC']],
+    raw: true,
+  });
+}
+
 async function criar(body) {
   const isM2 = body.unidade_base === 'M2';
   return Materiais.create({
@@ -49,4 +62,4 @@ async function excluir(id) {
   return n > 0;
 }
 
-module.exports = { listar, buscarPorId, criar, atualizar, excluir };
+module.exports = { listar, buscarPorId, listarOpcoes, criar, atualizar, excluir };

@@ -22,6 +22,10 @@ function handler(fn) {
   };
 }
 
+// Sem gate de permissão — lista enxuta (sem preço), usada por seletores em
+// outras telas (ex.: casar material na importação do XML).
+router.get('/opcoes', handler(() => repo.listarOpcoes()));
+
 router.get('/',     rp('cadastros_materiais'), handler(() => repo.listar()));
 router.get('/:id',  rp('cadastros_materiais'), handler((req) => repo.buscarPorId(req.params.id)));
 router.post('/',    rp('cadastros_materiais'), handler((req) => repo.criar(req.body)));
