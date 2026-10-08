@@ -131,7 +131,6 @@ export function AlmoxarifadoValidarXmlPage() {
       referencia: material.codigoInterno,
       unidade: material.unidadeBase,
       quantidade,
-      ambiente: null,
       material: null,
       cor: null,
       espessura: null,
@@ -179,15 +178,6 @@ export function AlmoxarifadoValidarXmlPage() {
       align: "right",
       render: (v, row) =>
         `${Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[row.unidade] ?? row.unidade}`,
-    },
-    {
-      key: "ambiente",
-      label: "Ambiente",
-      type: "text",
-      sortable: true,
-      filterable: true,
-      minWidth: 140,
-      render: (v) => (v as string) ?? "—",
     },
     {
       key: "tipo",

@@ -53,7 +53,6 @@ function percorrer(item, contexto, resultado) {
   // por isso herda do contexto, só sobrescrevendo quando o nó atual define algo.
   const caractAqui = extrairCaracteristicas(item);
   const novoContexto = {
-    ambiente: uniqueId?.AMBIENTNAME ?? contexto.ambiente,
     projeto: uniqueId?.PROJECTNAME ?? contexto.projeto,
     material: caractAqui.MATERIAL ?? contexto.material,
     cor: caractAqui.COR ?? contexto.cor,
@@ -71,7 +70,6 @@ function percorrer(item, contexto, resultado) {
         referencia: item.REFERENCIA ?? '',
         unidade: item.UNIDADE ?? '',
         quantidade: numero(item.QUANTIDADE),
-        ambiente: novoContexto.ambiente ?? null,
         material: novoContexto.material ?? null,
         cor: novoContexto.cor ?? null,
         espessura: novoContexto.espessura ?? null,

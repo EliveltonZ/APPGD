@@ -8,7 +8,6 @@ export interface ItemXml {
   referencia: string
   unidade: string
   quantidade: number
-  ambiente: string | null
   material: string | null
   cor: string | null
   espessura: string | null
