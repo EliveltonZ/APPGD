@@ -54,7 +54,6 @@ export function AlmoxarifadoValidarXmlPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [addMaterialId, setAddMaterialId] = useState<number | null>(null);
   const [addQuantidade, setAddQuantidade] = useState("");
-  const [addAmbiente, setAddAmbiente] = useState("");
 
   const semMaterial = rows.filter((r) => r.materialId == null).length;
 
@@ -111,7 +110,6 @@ export function AlmoxarifadoValidarXmlPage() {
   function abrirAdicionar() {
     setAddMaterialId(null);
     setAddQuantidade("");
-    setAddAmbiente("");
     setAddOpen(true);
   }
 
@@ -133,7 +131,7 @@ export function AlmoxarifadoValidarXmlPage() {
       referencia: material.codigoInterno,
       unidade: material.unidadeBase,
       quantidade,
-      ambiente: addAmbiente.trim() || null,
+      ambiente: null,
       material: null,
       cor: null,
       espessura: null,
@@ -371,12 +369,6 @@ export function AlmoxarifadoValidarXmlPage() {
               value={addQuantidade}
               onChange={(e) => setAddQuantidade(e.target.value)}
               placeholder="0"
-            />
-            <Input
-              label="Ambiente (opcional)"
-              type="text"
-              value={addAmbiente}
-              onChange={(e) => setAddAmbiente(e.target.value)}
             />
           </div>
         </Modal>
