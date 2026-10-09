@@ -6,6 +6,7 @@ import { FormSection } from "../../../components/FormSection";
 import { ProjectSummarySection } from "./sections/ProjectSummarySection";
 import { PendingItemsTable } from "./sections/PendingItemsTable";
 import { PendingItemForm } from "./sections/PendingItemForm";
+import { ImportarXmlSection } from "./sections/ImportarXmlSection";
 import {
   fetchPendingItems,
   insertPendingItem,
@@ -89,6 +90,14 @@ export function PendingControlModal({
     }
   }, [isOpen, project]);
 
+  async function refetchItens() {
+    if (!localProject) return;
+    const itens = await fetchPendingItems(localProject.id);
+    const delta = itens.length - localProject.itens.length;
+    setLocalProject((prev) => (prev ? { ...prev, itens } : prev));
+    if (delta !== 0) onItemsChanged?.(localProject.id, delta);
+  }
+
   async function handleFormSubmit(data: {
     materialId: number;
     quantidade: number;
@@ -98,9 +107,7 @@ export function PendingControlModal({
     setInserting(true);
     try {
       await insertPendingItem(localProject.id, data);
-      const itens = await fetchPendingItems(localProject.id);
-      setLocalProject((prev) => (prev ? { ...prev, itens } : prev));
-      onItemsChanged?.(localProject.id, 1);
+      await refetchItens();
       toast.success("Item inserido com sucesso.");
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao inserir item."));
@@ -140,7 +147,7 @@ export function PendingControlModal({
         title={`${project.numOC} — ${project.cliente} / ${project.ambiente}`}
         isOpen={isOpen}
         onClose={onClose}
-        maxWidth={960}
+        maxWidth={1100}
         footer={footer(onClose, setConfirmSave)}
       >
         {localProject && (
@@ -162,7 +169,15 @@ export function PendingControlModal({
               )}
             </FormSection>
 
-            <FormSection step={3} title="Inserir Novo Item">
+            <FormSection step={3} title="Importar XML do Promob">
+              <ImportarXmlSection
+                ordemdecompra={localProject.id}
+                materiaisOptions={materiaisOptions}
+                onImported={refetchItens}
+              />
+            </FormSection>
+
+            <FormSection step={4} title="Inserir Item Avulso">
               <PendingItemForm
                 materiaisOptions={materiaisOptions}
                 inserting={inserting}

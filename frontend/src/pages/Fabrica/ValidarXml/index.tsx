@@ -1,45 +1,17 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Upload, Link2, Trash2 } from "lucide-react";
+import { Upload } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
-import { DataTable } from "../../../components/DataTable";
-import type { TableColumn } from "../../../components/DataTable";
 import { Button } from "../../../components/Button";
-import { SearchSelect } from "../../../components/SearchSelect";
 import { SummaryCard } from "../../../components/SummaryCard";
+import { XmlItensTable } from "../../../features/estoqueXml/XmlItensTable";
+import type { XmlRow } from "../../../features/estoqueXml/XmlItensTable";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import { previewXml, vincularReferencia } from "../../../services/estoqueXml";
-import type { ItemXml } from "../../../services/estoqueXml";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
-
-interface Row extends ItemXml {
-  id: string;
-  // Material já casado quando a linha chegou (vínculo salvo, ou código
-  // interno batendo). Linha que já chega casada não precisa reexibir o
-  // seletor — é o mesmo item; só quem chega sem nada pede vínculo.
-  materialIdOriginal: number | null;
-}
-
-// material/cor/espessura do XML são herdados do nó pai na árvore do Promob
-// (pensado pra descrever a chapa configurada do móvel) — faz sentido só pra
-// CHAPA. Pra ferragem/fita o pai costuma ser o mesmo móvel, então os valores
-// vazam sem descrever a peça em si (ex.: uma bucha "herdando" material/cor
-// da chapa do armário ao lado).
-function detalhesDe(row: Row): string {
-  if (row.tipo !== "CHAPA") return "—";
-  const partes = [row.material, row.cor, row.espessura].filter(Boolean);
-  return partes.length ? partes.join(" · ") : "—";
-}
-
-const TIPO_LABEL: Record<string, string> = {
-  CHAPA: "Chapa",
-  FITA: "Fita",
-  FERRAGEM: "Ferragem",
-};
-const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 
 export function FabricaValidarXmlPage() {
   const toast = useToast();
@@ -54,7 +26,7 @@ export function FabricaValidarXmlPage() {
     codigo: string | null;
     nome: string | null;
   } | null>(null);
-  const [rows, setRows] = useState<Row[]>([]);
+  const [rows, setRows] = useState<XmlRow[]>([]);
   const [loading, setLoading] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,7 +68,7 @@ export function FabricaValidarXmlPage() {
     );
   }
 
-  async function vincularMaterial(row: Row) {
+  async function vincularMaterial(row: XmlRow) {
     if (!row.materialId) return;
     try {
       await vincularReferencia(row.referencia, row.materialId);
@@ -124,99 +96,6 @@ export function FabricaValidarXmlPage() {
     .filter((r) => r.tipo === "FITA")
     .reduce((s, r) => s + r.quantidade, 0);
   const totalFerragem = rows.filter((r) => r.tipo === "FERRAGEM").length;
-
-  const columns: TableColumn<Row>[] = [
-    {
-      key: "referencia",
-      label: "Referência Promob",
-      type: "text",
-      sortable: true,
-      filterable: true,
-      minWidth: 160,
-    },
-    {
-      key: "descricao",
-      label: "Descrição",
-      type: "text",
-      sortable: true,
-      filterable: true,
-      minWidth: 220,
-    },
-    {
-      key: "material",
-      label: "Detalhes",
-      type: "text",
-      filterable: true,
-      minWidth: 180,
-      render: (_v, row) => detalhesDe(row),
-    },
-    {
-      key: "quantidade",
-      label: "Quantidade",
-      type: "number",
-      sortable: true,
-      minWidth: 120,
-      align: "right",
-      render: (v, row) =>
-        `${Number(v).toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[row.unidade] ?? row.unidade}`,
-    },
-    {
-      key: "tipo",
-      label: "Tipo",
-      type: "text",
-      sortable: true,
-      filterable: true,
-      minWidth: 90,
-      render: (v) => TIPO_LABEL[v as string] ?? String(v),
-    },
-    {
-      key: "materialId",
-      label: "Material do cadastro",
-      minWidth: 280,
-      render: (_v, row) => {
-        if (row.materialIdOriginal != null) {
-          // Já chegou casada (vínculo salvo ou código interno batendo) — é
-          // o mesmo item, reexibir o seletor aqui não acrescenta nada.
-          return <span style={{ color: "var(--text)" }}>—</span>;
-        }
-        return (
-          <div className="validar-xml__material-cell">
-            <SearchSelect
-              options={materiaisOptions}
-              value={row.materialId}
-              onChange={(materialId) => trocarMaterial(row.id, materialId)}
-              placeholder="Buscar material (nome ou código)..."
-            />
-            {row.materialId != null && (
-              <button
-                type="button"
-                title="Vincular permanentemente essa referência a este material"
-                className="btn-icon"
-                onClick={() => vincularMaterial(row)}
-              >
-                <Link2 size={14} />
-              </button>
-            )}
-          </div>
-        );
-      },
-    },
-    {
-      key: "id",
-      label: "",
-      minWidth: 50,
-      render: (_v, row) => (
-        <button
-          type="button"
-          title="Excluir da leitura"
-          className="btn-icon"
-          onClick={() => excluirLinha(row.id)}
-        >
-          <Trash2 size={14} />
-        </button>
-      ),
-    },
-  ];
 
   return (
     <AppLayout pageTitle="Validar XML do Promob">
@@ -292,17 +171,14 @@ export function FabricaValidarXmlPage() {
           </div>
         )}
 
-        <DataTable<Row>
-          columns={columns}
-          data={rows}
-          rowKey="id"
+        <XmlItensTable
+          rows={rows}
+          materiaisOptions={materiaisOptions}
           loading={loading}
           storageKey="dt:fabrica:validar-xml"
-          showIndex
-          emptyMessage="Escolha um arquivo XML do Promob para começar."
-          rowClassName={(row) =>
-            row.materialId == null ? "row-em-evidencia" : ""
-          }
+          onTrocarMaterial={trocarMaterial}
+          onVincular={vincularMaterial}
+          onExcluir={excluirLinha}
         />
       </div>
     </AppLayout>
