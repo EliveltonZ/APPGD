@@ -193,6 +193,24 @@ async function listarAbaixoDoMinimo() {
     .filter(r => r.saldoBloqueio <= r.estoqueMinimoUn);
 }
 
+// Saldo real por material — "o que eu realmente tenho em estoque", não fila
+// de ação. Mesma fórmula de calcularSaldo() (estoqueService.js), mas numa
+// query só pra todo material ativo de uma vez, em vez de N chamadas.
+async function listarSaldoPorMaterial() {
+  const rows = await sequelize.query(
+    `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
+            COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
+            COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'RESERVADO'), 0) AS reservado,
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND data_comprado IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND data_comprado IS NULL), 0) AS solicitado
+     FROM "tblMateriais" m
+     WHERE m.ativo = true
+     ORDER BY m.codigo_interno ASC`,
+    { type: QueryTypes.SELECT },
+  );
+  return rows;
+}
+
 // Fila de baixa do almoxarifado: todo item já RESERVADO (qualquer material)
 // + todo item PENDENTE de material sem estoque mínimo controlado (pula a
 // reserva por regra — ver estoqueService.darBaixa). Cruza pedido/cliente
@@ -231,6 +249,7 @@ module.exports = {
   listarPendentesOuReservados,
   criarMovimento,
   listarAbaixoDoMinimo,
+  listarSaldoPorMaterial,
   listarProntosParaBaixa,
   buscarMateriaisPorId,
   criarImportacao,

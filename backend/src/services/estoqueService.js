@@ -233,6 +233,33 @@ async function listarAlertaMinimo() {
   return repo.listarAbaixoDoMinimo();
 }
 
+// Saldo real por material — "o que eu tenho", não fila de ação.
+async function listarSaldoPorMaterial() {
+  const rows = await repo.listarSaldoPorMaterial();
+  return rows.map(r => {
+    const fisico = Number(r.fisico);
+    const reservado = Number(r.reservado);
+    const comprado = Number(r.comprado);
+    const solicitado = Number(r.solicitado);
+    const disponivel = fisico - reservado;
+    const saldoBloqueio = disponivel + comprado;
+    return {
+      id: r.id,
+      codigoInterno: r.codigo_interno,
+      descricao: r.descricao,
+      unidadeBase: r.unidade_base,
+      estoqueMinimoUn: r.estoque_minimo_un != null ? Number(r.estoque_minimo_un) : null,
+      fisico,
+      reservado,
+      disponivel,
+      comprado,
+      solicitado,
+      saldoBloqueio,
+      saldoVisibilidade: saldoBloqueio + solicitado,
+    };
+  });
+}
+
 // Fila do almoxarifado: tudo que já pode ser baixado agora, cruzando pedidos
 // diferentes (ao contrário de "Itens Pedido", que é por um pedido só).
 const TIPO_POR_UNIDADE = { M2: 'CHAPA', M: 'FITA', UN: 'FERRAGEM' };
@@ -267,5 +294,6 @@ module.exports = {
   liberarReserva,
   darBaixa,
   listarAlertaMinimo,
+  listarSaldoPorMaterial,
   listarProntoParaBaixa,
 };

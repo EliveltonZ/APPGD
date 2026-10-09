@@ -151,6 +151,12 @@ export const ROUTE_ITEMS = [
     'Estoque'
   ),
   buildSidebarList(
+    'almoxarifado_baixas',
+    '/almoxarifado/baixas',
+    'almoxarifado',
+    'Baixas'
+  ),
+  buildSidebarList(
     'almoxarifado_transferencias',
     '/almoxarifado/transferencias',
     'almoxarifado',

@@ -11,6 +11,7 @@ const pedidoC = require('../controllers/pedidoItensController');
 
 router.get('/alerta-minimo',        c.getAlertaMinimo);
 router.get('/pronto-para-baixa',    c.getProntoParaBaixa);
+router.get('/saldo-materiais',      c.getSaldoPorMaterial);
 router.get('/saldo/:materialId',    c.getSaldo);
 router.put('/:id/quantidade',       c.putQuantidade);
 router.post('/:id/reservar',        c.postReservar);

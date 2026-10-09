@@ -1,147 +1,97 @@
-import { useState } from "react";
-import { PackageCheck, Undo2, Boxes } from "lucide-react";
+import { Boxes } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
-import { BaixaModal } from "../../../features/pending/PendingControlModal/sections/BaixaModal";
 import { useApiData } from "../../../hooks/useApiData";
-import { useToast } from "../../../context/ToastContext";
-import { getErrorMessage } from "../../../utils/errorMessage";
-import {
-  fetchProntoParaBaixa,
-  liberarReserva as apiLiberarReserva,
-  darBaixa as apiDarBaixa,
-} from "../../../services/estoque";
-import type { EstoquePendenteItem } from "../../../services/estoque";
-import { PEND_STATUS_LABELS } from "../../../data/pendingConfig";
+import { fetchSaldoPorMaterial } from "../../../services/estoque";
+import type { SaldoMaterial } from "../../../services/estoque";
 import "./index.css";
 
-const TIPO_LABEL: Record<string, string> = { CHAPA: "Chapa", FITA: "Fita", FERRAGEM: "Ferragem" };
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 
-function fmtQtd(item: EstoquePendenteItem): string {
-  const base = `${item.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[item.unidade] ?? item.unidade}`;
-  if (item.unidade === "UN") return base;
-  const un = item.qtdUnConfirmada != null ? `${item.qtdUnConfirmada} un` : "— un";
-  return `${base} · ${un}`;
+function fmtQtd(v: number): string {
+  return v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+}
+
+function abaixoDoMinimo(row: SaldoMaterial): boolean {
+  return row.estoqueMinimoUn != null && row.estoqueMinimoUn > 0 && row.saldoBloqueio <= row.estoqueMinimoUn;
 }
 
 export function AlmoxarifadoEstoquePage() {
-  const toast = useToast();
-  const { data: itens = [], loading, refetch } = useApiData(fetchProntoParaBaixa);
+  const { data: materiais = [], loading } = useApiData(fetchSaldoPorMaterial);
 
-  const [baixaItem, setBaixaItem] = useState<EstoquePendenteItem | null>(null);
-  const [acting, setActing] = useState(false);
+  const comEstoque = materiais.filter((m) => m.fisico > 0).length;
+  const abaixoMinimo = materiais.filter(abaixoDoMinimo).length;
 
-  async function handleLiberar(item: EstoquePendenteItem) {
-    try {
-      await apiLiberarReserva(item.id);
-      await refetch();
-      toast.success("Reserva liberada.");
-    } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao liberar reserva."));
-    }
-  }
-
-  async function handleBaixaConfirm(data: { qtdUnBaixada: number; localizacaoId: number }) {
-    if (!baixaItem) return;
-    setActing(true);
-    try {
-      await apiDarBaixa(baixaItem.id, data);
-      await refetch();
-      toast.success("Baixa registrada.");
-      setBaixaItem(null);
-    } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao dar baixa."));
-    } finally {
-      setActing(false);
-    }
-  }
-
-  const columns: TableColumn<EstoquePendenteItem>[] = [
+  const columns: TableColumn<SaldoMaterial>[] = [
     { key: "codigoInterno", label: "Código", type: "text", sortable: true, filterable: true, minWidth: 90 },
-    { key: "descricao", label: "Descrição", type: "text", sortable: true, filterable: true, minWidth: 220 },
-    { key: "detalhes", label: "Detalhes", type: "text", minWidth: 120, render: (v) => (v ? String(v) : "—") },
+    { key: "descricao", label: "Descrição", type: "text", sortable: true, filterable: true, minWidth: 240 },
     {
-      key: "tipo",
-      label: "Tipo",
+      key: "unidadeBase",
+      label: "Un.",
       type: "text",
-      sortable: true,
       align: "center",
-      minWidth: 90,
-      render: (v) => TIPO_LABEL[String(v)] ?? String(v),
+      minWidth: 60,
+      render: (v) => UNIDADE_LABEL[String(v)] ?? String(v),
     },
     {
-      key: "quantidade",
-      label: "Qtd",
+      key: "fisico",
+      label: "Físico",
       type: "number",
-      align: "center",
-      minWidth: 110,
-      render: (_v, row) => fmtQtd(row),
-    },
-    {
-      key: "contrato",
-      label: "Contrato",
-      type: "text",
       sortable: true,
-      filterable: true,
+      align: "right",
       minWidth: 100,
+      render: (v) => fmtQtd(Number(v)),
     },
     {
-      key: "ambiente",
-      label: "Pedido / Ambiente",
-      type: "text",
+      key: "reservado",
+      label: "Reservado",
+      type: "number",
       sortable: true,
-      filterable: true,
-      minWidth: 220,
+      align: "right",
+      minWidth: 100,
+      render: (v) => fmtQtd(Number(v)),
+    },
+    {
+      key: "disponivel",
+      label: "Disponível",
+      type: "number",
+      sortable: true,
+      align: "right",
+      minWidth: 100,
+      render: (v) => fmtQtd(Number(v)),
+    },
+    {
+      key: "comprado",
+      label: "Comprado",
+      type: "number",
+      sortable: true,
+      align: "right",
+      minWidth: 100,
+      render: (v) => fmtQtd(Number(v)),
+    },
+    {
+      key: "saldoBloqueio",
+      label: "Saldo",
+      type: "number",
+      sortable: true,
+      align: "right",
+      minWidth: 100,
       render: (v, row) => (
-        <span>
-          {row.ordemdecompra} — {String(v)}
-          {row.cliente ? ` (${row.cliente})` : ""}
+        <span className={abaixoDoMinimo(row) ? "estq-saldo--baixo" : undefined}>
+          {fmtQtd(Number(v))}
         </span>
       ),
     },
     {
-      key: "status",
-      label: "Status",
-      type: "text",
+      key: "estoqueMinimoUn",
+      label: "Mínimo",
+      type: "number",
       sortable: true,
-      minWidth: 100,
-      render: (v) => (
-        <span className={`estq-badge estq-badge--${String(v).toLowerCase()}`}>
-          {PEND_STATUS_LABELS[v as keyof typeof PEND_STATUS_LABELS] ?? String(v)}
-        </span>
-      ),
-    },
-    {
-      key: "id",
-      label: "Ações",
-      type: "text",
-      align: "center",
+      align: "right",
       minWidth: 90,
-      render: (_v, row) => (
-        <div className="estq-actions">
-          <button
-            type="button"
-            className="estq-action-btn"
-            title="Dar baixa"
-            onClick={() => setBaixaItem(row)}
-          >
-            <PackageCheck size={13} />
-          </button>
-          {row.status === "RESERVADO" && (
-            <button
-              type="button"
-              className="estq-action-btn"
-              title="Liberar reserva"
-              onClick={() => handleLiberar(row)}
-            >
-              <Undo2 size={13} />
-            </button>
-          )}
-        </div>
-      ),
+      render: (v) => (v != null ? fmtQtd(Number(v)) : "—"),
     },
   ];
 
@@ -152,18 +102,31 @@ export function AlmoxarifadoEstoquePage() {
           <div>
             <h1 className="estq-page__title">Estoque</h1>
             <p className="estq-page__subtitle">
-              Fila de baixa do almoxarifado — tudo que já está reservado, ou
-              pendente de material sem controle de estoque mínimo (que não
-              precisa de reserva prévia).
+              Saldo real por material — o que você efetivamente tem, não o
+              que falta dar baixa.
             </p>
           </div>
         </div>
 
         <div className="estq-summary">
           <SummaryCard
-            label="Itens prontos para baixa"
-            value={itens.length}
+            label="Materiais cadastrados"
+            value={materiais.length}
             accent="var(--text-h)"
+            icon={<Boxes size={13} />}
+            loading={loading}
+          />
+          <SummaryCard
+            label="Com saldo físico"
+            value={comEstoque}
+            accent="var(--iniciado)"
+            icon={<Boxes size={13} />}
+            loading={loading}
+          />
+          <SummaryCard
+            label="Abaixo do mínimo"
+            value={abaixoMinimo}
+            accent="var(--accent2, #be1e1e)"
             icon={<Boxes size={13} />}
             loading={loading}
           />
@@ -171,20 +134,13 @@ export function AlmoxarifadoEstoquePage() {
 
         <DataTable
           columns={columns}
-          data={itens}
+          data={materiais}
           rowKey="id"
           loading={loading}
-          storageKey="almoxarifado-estoque"
-          emptyMessage="Nenhum item pronto para baixa no momento."
+          storageKey="almoxarifado-estoque-saldo"
+          emptyMessage="Nenhum material ativo cadastrado."
         />
       </div>
-
-      <BaixaModal
-        item={baixaItem}
-        saving={acting}
-        onClose={() => setBaixaItem(null)}
-        onConfirm={handleBaixaConfirm}
-      />
     </AppLayout>
   );
 }

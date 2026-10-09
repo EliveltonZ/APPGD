@@ -69,3 +69,22 @@ export interface EstoquePendenteItem extends PendingItem {
 
 export const fetchProntoParaBaixa = (): Promise<EstoquePendenteItem[]> =>
   apiGet('/estoque/pronto-para-baixa')
+
+// Saldo real por material — "o que eu tenho em estoque", não fila de ação.
+export interface SaldoMaterial {
+  id: number
+  codigoInterno: string
+  descricao: string
+  unidadeBase: string
+  estoqueMinimoUn: number | null
+  fisico: number
+  reservado: number
+  disponivel: number
+  comprado: number
+  solicitado: number
+  saldoBloqueio: number
+  saldoVisibilidade: number
+}
+
+export const fetchSaldoPorMaterial = (): Promise<SaldoMaterial[]> =>
+  apiGet('/estoque/saldo-materiais')

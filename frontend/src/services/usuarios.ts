@@ -64,6 +64,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     // tblUsuario ainda) — permissões reais ficaram combinadas pra depois.
     estoque_reservar: true,
     almoxarifado_estoque: true,
+    almoxarifado_baixas: true,
   };
   return {
     id:          String(r.id    ?? ''),

@@ -67,6 +67,7 @@ import { ConfigAcessosPage } from "./pages/Configuracoes/Acessos";
 
 // ── Almoxarifado ──────────────────────────────────────────────────────────────
 import { AlmoxarifadoEstoquePage } from "./pages/Almoxarifado/Estoque";
+import { AlmoxarifadoBaixasPage } from "./pages/Almoxarifado/Baixas";
 import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
 
 // ── Cadastros ─────────────────────────────────────────────────────────────────
@@ -128,6 +129,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   paradas_maquina:     ParadasPage,
   paradas_admin:       ParadasPage,
   almoxarifado_estoque: AlmoxarifadoEstoquePage,
+  almoxarifado_baixas: AlmoxarifadoBaixasPage,
   almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
 };
 
