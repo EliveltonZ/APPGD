@@ -141,10 +141,11 @@ async function criarConsumoManual(dados) {
   return XmlConsumo.create(dados);
 }
 
-// Só remove item que nunca passou por importação real (importacaoId null) —
-// um item que veio do XML não é excluído por aqui.
+// Só remove item que nunca passou por importação real (importacaoId null) E
+// ainda está PENDENTE — depois de reservado/baixado, excluir por aqui
+// apagaria o rastro sem desfazer reserva/movimento.
 async function removerConsumoManual(id) {
-  const n = await XmlConsumo.destroy({ where: { id: Number(id), importacaoId: null } });
+  const n = await XmlConsumo.destroy({ where: { id: Number(id), importacaoId: null, status: 'PENDENTE' } });
   return n > 0;
 }
 

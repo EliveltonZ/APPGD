@@ -16,6 +16,7 @@ export async function fetchPendingItems(
     unidade:       String(r.unidade ?? ''),
     tipo:          (r.tipo as PendingItem['tipo']) ?? 'FERRAGEM',
     quantidade:    Number(r.quantidade ?? 0),
+    qtdUnConfirmada: r.qtdUnConfirmada != null ? Number(r.qtdUnConfirmada) : null,
     detalhes:      r.detalhes != null ? String(r.detalhes) : null,
     origem:        (r.origem as PendingItem['origem']) ?? 'MANUAL',
     status:        (r.status as PendingItem['status']) ?? 'PENDENTE',

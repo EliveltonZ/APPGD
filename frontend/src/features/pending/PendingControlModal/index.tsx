@@ -7,13 +7,21 @@ import { ProjectSummarySection } from "./sections/ProjectSummarySection";
 import { PendingItemsTable } from "./sections/PendingItemsTable";
 import { PendingItemForm } from "./sections/PendingItemForm";
 import { ImportarXmlSection } from "./sections/ImportarXmlSection";
+import { DefinirQuantidadeModal } from "./sections/DefinirQuantidadeModal";
+import { BaixaModal } from "./sections/BaixaModal";
 import {
   fetchPendingItems,
   insertPendingItem,
   deletePendingItem,
 } from "../../../services/pending";
+import {
+  definirQuantidade as apiDefinirQuantidade,
+  reservar as apiReservar,
+  liberarReserva as apiLiberarReserva,
+  darBaixa as apiDarBaixa,
+} from "../../../services/estoque";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
-import type { PendingProject } from "../../../types/pending";
+import type { PendingProject, PendingItem } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
@@ -51,6 +59,9 @@ export function PendingControlModal({
   const [loadingItems, setLoadingItems] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [confirmSave, setConfirmSave] = useState(false);
+  const [qtdModalItem, setQtdModalItem] = useState<PendingItem | null>(null);
+  const [baixaModalItem, setBaixaModalItem] = useState<PendingItem | null>(null);
+  const [acting, setActing] = useState(false);
   const [materiaisOptions, setMateriaisOptions] = useState<
     { value: number; label: string; searchHint?: string }[]
   >([]);
@@ -133,6 +144,56 @@ export function PendingControlModal({
     }
   }
 
+  async function handleDefinirQuantidadeConfirm(qtdUnConfirmada: number) {
+    if (!qtdModalItem) return;
+    setActing(true);
+    try {
+      await apiDefinirQuantidade(qtdModalItem.id, qtdUnConfirmada);
+      await refetchItens();
+      toast.success("Quantidade definida.");
+      setQtdModalItem(null);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao definir quantidade."));
+    } finally {
+      setActing(false);
+    }
+  }
+
+  async function handleReservar(item: PendingItem) {
+    try {
+      await apiReservar(item.id);
+      await refetchItens();
+      toast.success("Item reservado.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao reservar."));
+    }
+  }
+
+  async function handleLiberar(item: PendingItem) {
+    try {
+      await apiLiberarReserva(item.id);
+      await refetchItens();
+      toast.success("Reserva liberada.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao liberar reserva."));
+    }
+  }
+
+  async function handleBaixaConfirm(data: { qtdUnBaixada: number; localizacaoId: number }) {
+    if (!baixaModalItem) return;
+    setActing(true);
+    try {
+      await apiDarBaixa(baixaModalItem.id, data);
+      await refetchItens();
+      toast.success("Baixa registrada.");
+      setBaixaModalItem(null);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao dar baixa."));
+    } finally {
+      setActing(false);
+    }
+  }
+
   function handleSaveConfirm() {
     if (!localProject) return;
     onSave(localProject);
@@ -164,6 +225,10 @@ export function PendingControlModal({
               ) : (
                 <PendingItemsTable
                   items={localProject.itens}
+                  onDefinirQuantidade={setQtdModalItem}
+                  onReservar={handleReservar}
+                  onLiberar={handleLiberar}
+                  onBaixa={setBaixaModalItem}
                   onDelete={setDeleteId}
                 />
               )}
@@ -204,6 +269,20 @@ export function PendingControlModal({
         cancelLabel="Cancelar"
         onConfirm={handleSaveConfirm}
         onCancel={() => setConfirmSave(false)}
+      />
+
+      <DefinirQuantidadeModal
+        item={qtdModalItem}
+        saving={acting}
+        onClose={() => setQtdModalItem(null)}
+        onConfirm={handleDefinirQuantidadeConfirm}
+      />
+
+      <BaixaModal
+        item={baixaModalItem}
+        saving={acting}
+        onClose={() => setBaixaModalItem(null)}
+        onConfirm={handleBaixaConfirm}
       />
     </>
   );

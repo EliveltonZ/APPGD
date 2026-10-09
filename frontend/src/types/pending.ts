@@ -10,6 +10,10 @@ export interface PendingItem {
   unidade: string;
   tipo: PendingItemTipo;
   quantidade: number;
+  // Quantidade em UN (chapas inteiras / rolos de fita) a reservar — só
+  // ferragem já nasce com isso preenchido; chapa/fita precisa ser definida
+  // antes de reservar.
+  qtdUnConfirmada: number | null;
   detalhes: string | null;
   origem: PendingItemOrigem;
   status: PendingStatus;

@@ -30,6 +30,7 @@ async function listarItens(ordemdecompra) {
       unidade:       r.unidadeXml,
       tipo:          TIPO_POR_UNIDADE[r.unidadeXml] ?? 'FERRAGEM',
       quantidade:    r.qtdXml != null ? Number(r.qtdXml) : null,
+      qtdUnConfirmada: r.qtdUnConfirmada != null ? Number(r.qtdUnConfirmada) : null,
       detalhes:      r.detalhes,
       origem:        r.importacaoId == null ? 'MANUAL' : 'XML',
       status:        r.status,

@@ -28,7 +28,7 @@ module.exports = {
   async deleteItem(req, res, next) {
     try {
       const ok = await service.remover(Number(req.params.id));
-      if (!ok) return res.status(404).json({ error: 'Item não encontrado ou não pode ser removido (veio de uma importação de XML).' });
+      if (!ok) return res.status(404).json({ error: 'Item não encontrado ou não pode ser removido (veio de uma importação de XML, ou já foi reservado/baixado).' });
       // Corpo sempre em JSON, mesmo em sucesso — o `request()` genérico do
       // frontend (services/api.ts) chama res.json() sem checar status, e
       // quebra ("Unexpected end of JSON input") num 204 sem corpo.
