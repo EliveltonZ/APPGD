@@ -121,7 +121,7 @@ function toPayload(f: FormState): MaterialPayload {
     descricao:         f.descricao.trim().toUpperCase(),
     unidade_base:      f.unidadeBase,
     m2_por_unidade:    isM2 && f.m2PorUnidade  ? Number(f.m2PorUnidade)  : null,
-    estoque_minimo_un: isM2 && f.estoqueMinimoUn ? Number(f.estoqueMinimoUn) : null,
+    estoque_minimo_un: f.estoqueMinimoUn ? Number(f.estoqueMinimoUn) : null,
     ativo:             f.ativo,
     cadastro_revisado: f.cadastroRevisado,
   }
@@ -298,7 +298,9 @@ export function CadastrosMateriaisPage() {
                 onChange={(e) => {
                   field('unidadeBase', e.target.value as 'M2' | 'UN')
                   if (e.target.value === 'UN') {
-                    setForm((p) => ({ ...p, unidadeBase: 'UN', m2PorUnidade: '', estoqueMinimoUn: '' }))
+                    // m2PorUnidade só faz sentido pra chapa — estoque mínimo
+                    // vale pra qualquer unidade, não precisa limpar.
+                    setForm((p) => ({ ...p, unidadeBase: 'UN', m2PorUnidade: '' }))
                   }
                 }}
               >
@@ -308,34 +310,32 @@ export function CadastrosMateriaisPage() {
             </label>
 
             {isM2 && (
-              <>
-                <label className="cad-field">
-                  <span className="cad-field__label">m² por unidade</span>
-                  <input
-                    className="cad-field__input"
-                    type="number"
-                    min="0"
-                    step="0.0001"
-                    placeholder="5.0416 (2740×1840)"
-                    value={form.m2PorUnidade}
-                    onChange={(e) => field('m2PorUnidade', e.target.value)}
-                  />
-                </label>
-
-                <label className="cad-field">
-                  <span className="cad-field__label">Estoque mínimo (UN)</span>
-                  <input
-                    className="cad-field__input"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Deixe em branco para sem controle"
-                    value={form.estoqueMinimoUn}
-                    onChange={(e) => field('estoqueMinimoUn', e.target.value)}
-                  />
-                </label>
-              </>
+              <label className="cad-field">
+                <span className="cad-field__label">m² por unidade</span>
+                <input
+                  className="cad-field__input"
+                  type="number"
+                  min="0"
+                  step="0.0001"
+                  placeholder="5.0416 (2740×1840)"
+                  value={form.m2PorUnidade}
+                  onChange={(e) => field('m2PorUnidade', e.target.value)}
+                />
+              </label>
             )}
+
+            <label className="cad-field">
+              <span className="cad-field__label">Estoque mínimo (UN)</span>
+              <input
+                className="cad-field__input"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="Deixe em branco para sem controle"
+                value={form.estoqueMinimoUn}
+                onChange={(e) => field('estoqueMinimoUn', e.target.value)}
+              />
+            </label>
 
             <label className="cad-field" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <input
