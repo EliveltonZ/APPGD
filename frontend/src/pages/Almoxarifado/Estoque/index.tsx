@@ -8,7 +8,12 @@ import { fetchSaldoPorMaterial } from "../../../services/estoque";
 import type { SaldoMaterial } from "../../../services/estoque";
 import "./index.css";
 
-const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
+// `unidadeBase` é a unidade de CÁLCULO DO PROJETO (m²/m/un no XML) — não a
+// unidade de controle de estoque. Chapa e fita são controladas em UN
+// (chapa inteira, rolo inteiro) igual a ferragem; só o consumo do projeto é
+// calculado em m²/m. Por isso os saldos abaixo são sempre "un", e esta
+// coluna serve só pra identificar o tipo do material.
+const TIPO_LABEL: Record<string, string> = { M2: "Chapa", M: "Fita", UN: "Ferragem" };
 
 function fmtQtd(v: number): string {
   return v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
@@ -29,55 +34,55 @@ export function AlmoxarifadoEstoquePage() {
     { key: "descricao", label: "Descrição", type: "text", sortable: true, filterable: true, minWidth: 240 },
     {
       key: "unidadeBase",
-      label: "Un.",
+      label: "Tipo",
       type: "text",
       align: "center",
-      minWidth: 60,
-      render: (v) => UNIDADE_LABEL[String(v)] ?? String(v),
+      minWidth: 80,
+      render: (v) => TIPO_LABEL[String(v)] ?? String(v),
     },
     {
       key: "fisico",
-      label: "Físico",
+      label: "Físico (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 100,
+      minWidth: 110,
       render: (v) => fmtQtd(Number(v)),
     },
     {
       key: "reservado",
-      label: "Reservado",
+      label: "Reservado (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 100,
+      minWidth: 120,
       render: (v) => fmtQtd(Number(v)),
     },
     {
       key: "disponivel",
-      label: "Disponível",
+      label: "Disponível (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 100,
+      minWidth: 120,
       render: (v) => fmtQtd(Number(v)),
     },
     {
       key: "comprado",
-      label: "Comprado",
+      label: "Comprado (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 100,
+      minWidth: 120,
       render: (v) => fmtQtd(Number(v)),
     },
     {
       key: "saldoBloqueio",
-      label: "Saldo",
+      label: "Saldo (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 100,
+      minWidth: 110,
       render: (v, row) => (
         <span className={abaixoDoMinimo(row) ? "estq-saldo--baixo" : undefined}>
           {fmtQtd(Number(v))}
@@ -86,11 +91,11 @@ export function AlmoxarifadoEstoquePage() {
     },
     {
       key: "estoqueMinimoUn",
-      label: "Mínimo",
+      label: "Mínimo (un)",
       type: "number",
       sortable: true,
       align: "right",
-      minWidth: 90,
+      minWidth: 100,
       render: (v) => (v != null ? fmtQtd(Number(v)) : "—"),
     },
   ];
@@ -103,7 +108,8 @@ export function AlmoxarifadoEstoquePage() {
             <h1 className="estq-page__title">Estoque</h1>
             <p className="estq-page__subtitle">
               Saldo real por material — o que você efetivamente tem, não o
-              que falta dar baixa.
+              que falta dar baixa. Controle sempre em unidade inteira (chapa
+              e fita incluídas) — m²/m é só o cálculo de consumo do projeto.
             </p>
           </div>
         </div>
