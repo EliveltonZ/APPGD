@@ -47,6 +47,11 @@ async function calcularCusto(xmlConsumo, material) {
 // Define/edita a quantidade em unidade (chapas inteiras ou rolos de fita)
 // que o pedido vai usar — só antes de reservar. Ferragem não precisa disso
 // (já vem pronta do XML em unidade).
+//
+// Zero é um valor válido — ex.: um pedaço pequeno de chapa que já sobrou de
+// outro corte, sem precisar reservar nenhuma chapa inteira pra esse item.
+// Por isso o cheque é `== null`/NaN, não falsy — `!0` seria true e barraria
+// exatamente o caso que precisa passar.
 async function definirQuantidade(xmlConsumoId, qtdUnConfirmada) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
@@ -54,8 +59,8 @@ async function definirQuantidade(xmlConsumoId, qtdUnConfirmada) {
     throw erro('Só é possível alterar a quantidade de um item PENDENTE.', 409, 'STATUS_INVALIDO');
   }
   const qtd = Number(qtdUnConfirmada);
-  if (!qtd || qtd <= 0) {
-    throw erro('Informe uma quantidade maior que zero.', 400, 'VALIDACAO');
+  if (qtdUnConfirmada == null || Number.isNaN(qtd) || qtd < 0) {
+    throw erro('Informe uma quantidade válida (zero ou mais).', 400, 'VALIDACAO');
   }
   linha.qtdUnConfirmada = qtd;
   await linha.save();
@@ -68,17 +73,22 @@ async function reservar(xmlConsumoId, usuarioId) {
   if (linha.status !== 'PENDENTE') {
     throw erro('Só é possível reservar um item PENDENTE.', 409, 'STATUS_INVALIDO');
   }
-  const qtd = Number(linha.qtdUnConfirmada);
-  if (!qtd || qtd <= 0) {
-    throw erro('Informe a quantidade em unidade antes de reservar.', 400, 'VALIDACAO');
+  if (linha.qtdUnConfirmada == null) {
+    throw erro('Defina a quantidade em unidade antes de reservar (pode ser zero).', 400, 'VALIDACAO');
   }
+  const qtd = Number(linha.qtdUnConfirmada);
 
-  const saldo = await calcularSaldo(linha.materialId);
-  if (saldo.saldoBloqueio < qtd) {
-    throw erro(
-      `Saldo insuficiente para reservar (disponível com compras: ${saldo.saldoBloqueio}, necessário: ${qtd}).`,
-      409, 'SALDO_INSUFICIENTE',
-    );
+  // Reservar zero não mexe em saldo nenhum — não faz sentido gastar a
+  // consulta nem arriscar barrar por "saldo insuficiente" num caso que
+  // nunca precisou de saldo.
+  if (qtd > 0) {
+    const saldo = await calcularSaldo(linha.materialId);
+    if (saldo.saldoBloqueio < qtd) {
+      throw erro(
+        `Saldo insuficiente para reservar (disponível com compras: ${saldo.saldoBloqueio}, necessário: ${qtd}).`,
+        409, 'SALDO_INSUFICIENTE',
+      );
+    }
   }
 
   linha.status = 'RESERVADO';
@@ -104,17 +114,32 @@ async function reservarVarios(linhas, usuarioId) {
   return resultados;
 }
 
-// Reserva tudo que já está pronto pra reservar (PENDENTE + quantidade em UN
-// definida) num pedido só.
+// Trava da reserva em massa: só prossegue se TODO item PENDENTE do escopo já
+// tem quantidade definida (zero conta como definida — só null bloqueia).
+// Reservar em massa ignorando quem ainda falta passava despercebido; agora
+// nem começa, e avisa exatamente quantos itens faltam resolver antes.
+function garantirTodosComQuantidade(linhas, ondeMsg) {
+  const semQtd = linhas.filter(l => l.qtdUnConfirmada == null);
+  if (semQtd.length) {
+    throw erro(
+      `${semQtd.length} item(ns) ${ondeMsg} ainda sem quantidade definida — defina antes de reservar tudo.`,
+      409, 'QUANTIDADE_PENDENTE',
+    );
+  }
+}
+
+// Reserva tudo que está PENDENTE num pedido só — todos precisam já ter
+// quantidade em UN definida (zero vale), senão nada é reservado.
 async function reservarPedido(ordemdecompra, usuarioId) {
-  const linhas = await repo.listarElegiveisParaReserva(ordemdecompra);
+  const linhas = await repo.listarPendentesDoPedido(ordemdecompra);
+  garantirTodosComQuantidade(linhas, 'nesse pedido');
   const resultados = await reservarVarios(linhas, usuarioId);
   return { totalItens: linhas.length, resultados };
 }
 
-// Reserva tudo que está pronto em TODOS os pedidos que compartilham o mesmo
-// lote do pedido informado — lote é o agrupamento do Corte Certo, então um
-// lote normalmente cobre vários pedidos cortados juntos.
+// Reserva tudo que está PENDENTE em TODOS os pedidos que compartilham o
+// mesmo lote do pedido informado — lote é o agrupamento do Corte Certo,
+// então um lote normalmente cobre vários pedidos cortados juntos.
 async function reservarLote(ordemdecompraReferencia, usuarioId) {
   const lote = await repo.buscarLote(ordemdecompraReferencia);
   if (!lote) {
@@ -123,9 +148,10 @@ async function reservarLote(ordemdecompraReferencia, usuarioId) {
   const ordens = await repo.listarOrdensDoLote(lote);
   let linhas = [];
   for (const ordemdecompra of ordens) {
-    const doPedido = await repo.listarElegiveisParaReserva(ordemdecompra);
-    linhas = linhas.concat(doPedido.map(l => ({ id: l.id, ordemdecompra })));
+    const doPedido = await repo.listarPendentesDoPedido(ordemdecompra);
+    linhas = linhas.concat(doPedido.map(l => ({ id: l.id, ordemdecompra, qtdUnConfirmada: l.qtdUnConfirmada })));
   }
+  garantirTodosComQuantidade(linhas, `no lote ${lote}`);
   const resultados = await reservarVarios(linhas, usuarioId);
   return { lote, totalPedidos: ordens.length, totalItens: linhas.length, resultados };
 }

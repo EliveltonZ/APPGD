@@ -84,12 +84,13 @@ async function listarXmlConsumoPorPedido(ordemdecompra) {
   return XmlConsumo.findAll({ where: { ordemdecompra }, order: [['id', 'ASC']] });
 }
 
-// Itens prontos pra reservar — PENDENTE e já com a quantidade em UN
-// definida (ferragem já nasce assim; chapa/fita precisa do passo de
-// "definir quantidade" primeiro, então fica de fora até lá).
-async function listarElegiveisParaReserva(ordemdecompra) {
+// Todo item PENDENTE de um pedido — inclui quem ainda não tem a quantidade
+// em UN definida, de propósito: a reserva em massa precisa enxergar quem
+// falta resolver pra travar o lote inteiro, não só pular quem não está
+// pronto.
+async function listarPendentesDoPedido(ordemdecompra) {
   return XmlConsumo.findAll({
-    where: { ordemdecompra, status: 'PENDENTE', qtdUnConfirmada: { [Op.ne]: null } },
+    where: { ordemdecompra, status: 'PENDENTE' },
     order: [['id', 'ASC']],
   });
 }
@@ -203,7 +204,7 @@ module.exports = {
   buscarChegouFabrica,
   buscarXmlConsumo,
   listarXmlConsumoPorPedido,
-  listarElegiveisParaReserva,
+  listarPendentesDoPedido,
   buscarLote,
   listarOrdensDoLote,
   listarPendentesOuReservados,
