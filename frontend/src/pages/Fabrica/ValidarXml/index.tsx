@@ -1,45 +1,34 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
-import { Upload, Link2, Trash2, Plus } from "lucide-react";
+import { Upload, Link2, Trash2 } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
 import { Button } from "../../../components/Button";
 import { SearchSelect } from "../../../components/SearchSelect";
 import { SummaryCard } from "../../../components/SummaryCard";
-import { Modal } from "../../../components/Modal";
-import { Input } from "../../../components/Input";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import { previewXml, vincularReferencia } from "../../../services/estoqueXml";
-import type { ItemXml, ItemXmlTipo } from "../../../services/estoqueXml";
+import type { ItemXml } from "../../../services/estoqueXml";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
 interface Row extends ItemXml {
   id: string;
-  // Material já casado quando a linha chegou (vínculo salvo, código interno
-  // batendo, ou item adicionado manualmente escolhendo o material direto).
-  // Linha que já chega casada não precisa reexibir o seletor — é o mesmo
-  // item; só quem chega sem nada (materialIdOriginal null) pede vínculo.
+  // Material já casado quando a linha chegou (vínculo salvo, ou código
+  // interno batendo). Linha que já chega casada não precisa reexibir o
+  // seletor — é o mesmo item; só quem chega sem nada pede vínculo.
   materialIdOriginal: number | null;
-  // Pra destacar visualmente o que foi incluído na mão (não veio do XML).
-  origem: "xml" | "manual";
-  // Detalhe livre (cor, dimensão, espessura...) pra item manual de material
-  // genérico — ex. "porta de alumínio" cadastrada uma vez só, mas cada
-  // pedido tem uma medida/cor diferente. Item do XML já tem isso nos campos
-  // material/cor/espessura (ver detalhesDe()).
-  detalhesManual: string | null;
 }
 
+// material/cor/espessura do XML são herdados do nó pai na árvore do Promob
+// (pensado pra descrever a chapa configurada do móvel) — faz sentido só pra
+// CHAPA. Pra ferragem/fita o pai costuma ser o mesmo móvel, então os valores
+// vazam sem descrever a peça em si (ex.: uma bucha "herdando" material/cor
+// da chapa do armário ao lado).
 function detalhesDe(row: Row): string {
-  if (row.origem === "manual") return row.detalhesManual ?? "—";
-  // material/cor/espessura do XML são herdados do nó pai na árvore do
-  // Promob (pensado pra descrever a chapa configurada do móvel) — faz
-  // sentido só pra CHAPA. Pra ferragem/fita, o pai costuma ser o mesmo
-  // móvel/chapa, então os valores vazam sem descrever a peça em si
-  // (ex.: uma bucha "herdando" material/cor da chapa do armário ao lado).
   if (row.tipo !== "CHAPA") return "—";
   const partes = [row.material, row.cor, row.espessura].filter(Boolean);
   return partes.length ? partes.join(" · ") : "—";
@@ -51,11 +40,6 @@ const TIPO_LABEL: Record<string, string> = {
   FERRAGEM: "Ferragem",
 };
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
-const TIPO_POR_UNIDADE: Record<string, ItemXmlTipo> = {
-  M2: "CHAPA",
-  M: "FITA",
-  UN: "FERRAGEM",
-};
 
 export function FabricaValidarXmlPage() {
   const toast = useToast();
@@ -74,11 +58,6 @@ export function FabricaValidarXmlPage() {
   const [loading, setLoading] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [addOpen, setAddOpen] = useState(false);
-  const [addMaterialId, setAddMaterialId] = useState<number | null>(null);
-  const [addQuantidade, setAddQuantidade] = useState("");
-  const [addDetalhes, setAddDetalhes] = useState("");
 
   const semMaterial = rows.filter((r) => r.materialId == null).length;
 
@@ -99,8 +78,6 @@ export function FabricaValidarXmlPage() {
           ...item,
           id: `${item.tipo}-${item.referencia}-${i}`,
           materialIdOriginal: item.materialId,
-          origem: "xml",
-          detalhesManual: null,
         })),
       );
     } catch (err) {
@@ -140,47 +117,6 @@ export function FabricaValidarXmlPage() {
     setRows((prev) => prev.filter((r) => r.id !== id));
   }
 
-  function abrirAdicionar() {
-    setAddMaterialId(null);
-    setAddQuantidade("");
-    setAddDetalhes("");
-    setAddOpen(true);
-  }
-
-  function confirmarAdicionar() {
-    const material = materiais.find((m) => m.id === addMaterialId);
-    if (!material) {
-      toast.error("Escolha um material.");
-      return;
-    }
-    const quantidade = Number(addQuantidade.replace(",", "."));
-    if (!quantidade || quantidade <= 0) {
-      toast.error("Informe uma quantidade válida.");
-      return;
-    }
-    const novaLinha: Row = {
-      id: `manual-${material.id}-${Date.now()}`,
-      tipo: TIPO_POR_UNIDADE[material.unidadeBase] ?? "FERRAGEM",
-      descricao: material.descricao,
-      referencia: material.codigoInterno,
-      unidade: material.unidadeBase,
-      quantidade,
-      material: null,
-      cor: null,
-      espessura: null,
-      materialId: material.id,
-      materialIdOriginal: material.id,
-      origem: "manual",
-      detalhesManual: addDetalhes.trim() || null,
-    };
-    setRows((prev) =>
-      [...prev, novaLinha].sort((a, b) =>
-        a.descricao.localeCompare(b.descricao, "pt-BR"),
-      ),
-    );
-    setAddOpen(false);
-  }
-
   const totalChapa = rows
     .filter((r) => r.tipo === "CHAPA")
     .reduce((s, r) => s + r.quantidade, 0);
@@ -207,7 +143,7 @@ export function FabricaValidarXmlPage() {
       minWidth: 220,
     },
     {
-      key: "detalhesManual",
+      key: "material",
       label: "Detalhes",
       type: "text",
       filterable: true,
@@ -239,9 +175,8 @@ export function FabricaValidarXmlPage() {
       minWidth: 280,
       render: (_v, row) => {
         if (row.materialIdOriginal != null) {
-          // Já chegou casada (XML casado automaticamente ou item adicionado
-          // na mão escolhendo o material direto) — é o mesmo item, reexibir
-          // o seletor aqui não acrescenta nada.
+          // Já chegou casada (vínculo salvo ou código interno batendo) — é
+          // o mesmo item, reexibir o seletor aqui não acrescenta nada.
           return <span style={{ color: "var(--text)" }}>—</span>;
         }
         return (
@@ -294,14 +229,11 @@ export function FabricaValidarXmlPage() {
               style={{ margin: "4px 0 0", color: "var(--text)", fontSize: 13 }}
             >
               Leitura isolada, pra conferir se as quantidades batem com o Promob
-              — ainda não associa a nenhum pedido.
+              — não lança nada em nenhum pedido. Pra lançar itens de verdade,
+              use a tela Itens Pedido.
             </p>
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Button variant="secondary" size="sm" onClick={abrirAdicionar}>
-              <Plus size={14} />
-              Adicionar item
-            </Button>
+          <div>
             <input
               ref={fileInputRef}
               type="file"
@@ -368,65 +300,10 @@ export function FabricaValidarXmlPage() {
           storageKey="dt:fabrica:validar-xml"
           showIndex
           emptyMessage="Escolha um arquivo XML do Promob para começar."
-          rowClassName={(row) => {
-            if (row.materialId == null) return "row-em-evidencia";
-            if (row.origem === "manual") return "row-manual";
-            return "";
-          }}
-        />
-
-        <Modal
-          title="Adicionar item à lista"
-          isOpen={addOpen}
-          onClose={() => setAddOpen(false)}
-          footer={
-            <div className="cad-modal-footer">
-              <div className="cad-modal-footer__right">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setAddOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={confirmarAdicionar}
-                >
-                  Adicionar
-                </Button>
-              </div>
-            </div>
+          rowClassName={(row) =>
+            row.materialId == null ? "row-em-evidencia" : ""
           }
-        >
-          <div className="cad-modal-body">
-            <div className="cad-field">
-              <label className="cad-field__label">Material</label>
-              <SearchSelect
-                options={materiaisOptions}
-                value={addMaterialId}
-                onChange={setAddMaterialId}
-                placeholder="Buscar material (nome ou código)..."
-              />
-            </div>
-            <Input
-              label="Quantidade"
-              type="text"
-              inputMode="decimal"
-              value={addQuantidade}
-              onChange={(e) => setAddQuantidade(e.target.value)}
-              placeholder="0"
-            />
-            <Input
-              label="Detalhes (opcional)"
-              type="text"
-              value={addDetalhes}
-              onChange={(e) => setAddDetalhes(e.target.value)}
-              placeholder="Ex.: Branca, 60x210cm, 4mm"
-            />
-          </div>
-        </Modal>
+        />
       </div>
     </AppLayout>
   );

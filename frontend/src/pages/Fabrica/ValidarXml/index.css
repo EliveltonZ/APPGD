@@ -74,9 +74,3 @@
 tr.dt-row.row-em-evidencia {
   background: rgba(255, 0, 0, 0.286);
 }
-
-/* Item incluído na mão (não veio do XML) — cor diferente da de evidência,
-   que é reservada pra "precisa de atenção". */
-tr.dt-row.row-manual {
-  background: rgba(59, 131, 246, 0.431);
-}

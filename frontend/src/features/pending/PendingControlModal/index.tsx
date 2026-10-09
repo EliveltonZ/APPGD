@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../../../components/Modal";
 import { Button } from "../../../components/Button";
 import { ConfirmModal } from "../../../components/ConfirmModal";
@@ -6,16 +6,13 @@ import { FormSection } from "../../../components/FormSection";
 import { ProjectSummarySection } from "./sections/ProjectSummarySection";
 import { PendingItemsTable } from "./sections/PendingItemsTable";
 import { PendingItemForm } from "./sections/PendingItemForm";
-import { emptyPendingItem } from "../../../data/pendingConfig";
 import {
-  fetchPendingCategories,
   fetchPendingItems,
   insertPendingItem,
-  updatePendingItem,
   deletePendingItem,
-  type PendingCategory,
 } from "../../../services/pending";
-import type { PendingItem, PendingProject } from "../../../types/pending";
+import { fetchMateriaisOpcoes } from "../../../services/materiais";
+import type { PendingProject } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
@@ -49,29 +46,33 @@ export function PendingControlModal({
   onItemsChanged,
 }: PendingControlModalProps) {
   const [localProject, setLocalProject] = useState<PendingProject | null>(null);
-  const [formItem, setFormItem] = useState<PendingItem>(emptyPendingItem());
-  const [isEditMode, setIsEditMode] = useState(false);
   const [inserting, setInserting] = useState(false);
   const [loadingItems, setLoadingItems] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [confirmSave, setConfirmSave] = useState(false);
-  const [categories, setCategories] = useState<PendingCategory[]>([]);
-  const nextId = useRef(10000);
+  const [materiaisOptions, setMateriaisOptions] = useState<
+    { value: number; label: string; searchHint?: string }[]
+  >([]);
   const toast = useToast();
 
   useEffect(() => {
     if (isOpen && project) {
       setLocalProject({ ...project, itens: [] });
-      setFormItem(emptyPendingItem());
-      setIsEditMode(false);
       setDeleteId(null);
-      nextId.current = 1;
 
-      if (categories.length === 0) {
-        fetchPendingCategories()
-          .then(setCategories)
+      if (materiaisOptions.length === 0) {
+        fetchMateriaisOpcoes()
+          .then((materiais) =>
+            setMateriaisOptions(
+              materiais.map((m) => ({
+                value: m.id,
+                label: `${m.codigoInterno} — ${m.descricao}`,
+                searchHint: m.codigoInterno,
+              })),
+            ),
+          )
           .catch(() => {
-            toast.error("Erro ao carregar categorias de pendência.");
+            toast.error("Erro ao carregar materiais.");
           });
       }
 
@@ -79,62 +80,27 @@ export function PendingControlModal({
       fetchPendingItems(project.id)
         .then((itens) => {
           setLocalProject((prev) => (prev ? { ...prev, itens } : prev));
-          nextId.current = Math.max(0, ...itens.map((i) => i.id)) + 1;
         })
         .finally(() => setLoadingItems(false));
     } else if (!isOpen) {
       setLocalProject(null);
-      setFormItem(emptyPendingItem());
-      setIsEditMode(false);
       setDeleteId(null);
       setConfirmSave(false);
     }
   }, [isOpen, project]);
 
-  function handleEditRow(item: PendingItem) {
-    setFormItem({ ...item });
-    setIsEditMode(true);
-  }
-
-  function handleClearForm() {
-    setFormItem(emptyPendingItem());
-    setIsEditMode(false);
-  }
-
-  async function handleFormSubmit() {
+  async function handleFormSubmit(data: {
+    materialId: number;
+    quantidade: number;
+    detalhes: string | null;
+  }) {
     if (!localProject) return;
-
-    if (isEditMode) {
-      setInserting(true);
-      try {
-        await updatePendingItem(formItem);
-        setLocalProject({
-          ...localProject,
-          itens: localProject.itens.map((i) =>
-            i.id === formItem.id ? formItem : i,
-          ),
-        });
-        handleClearForm();
-        toast.success("Item atualizado com sucesso.");
-      } catch {
-        toast.error("Erro ao atualizar item.");
-      } finally {
-        setInserting(false);
-      }
-      return;
-    }
-
-    // New item → insert directly in DB
     setInserting(true);
     try {
-      await insertPendingItem(localProject.id, formItem);
-      const newItem = { ...formItem, id: nextId.current++ };
-      setLocalProject({
-        ...localProject,
-        itens: [...localProject.itens, newItem],
-      });
+      await insertPendingItem(localProject.id, data);
+      const itens = await fetchPendingItems(localProject.id);
+      setLocalProject((prev) => (prev ? { ...prev, itens } : prev));
       onItemsChanged?.(localProject.id, 1);
-      handleClearForm();
       toast.success("Item inserido com sucesso.");
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao inserir item."));
@@ -153,8 +119,8 @@ export function PendingControlModal({
       });
       onItemsChanged?.(localProject.id, -1);
       toast.success("Item excluído com sucesso.");
-    } catch {
-      toast.error("Erro ao excluir item.");
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao excluir item."));
     } finally {
       setDeleteId(null);
     }
@@ -183,7 +149,7 @@ export function PendingControlModal({
               <ProjectSummarySection data={localProject} />
             </FormSection>
 
-            <FormSection step={2} title="Itens Pendentes">
+            <FormSection step={2} title="Itens do Pedido">
               {loadingItems ? (
                 <p style={{ padding: "12px 0", opacity: 0.5, fontSize: 13 }}>
                   Carregando itens...
@@ -191,24 +157,16 @@ export function PendingControlModal({
               ) : (
                 <PendingItemsTable
                   items={localProject.itens}
-                  onEdit={handleEditRow}
                   onDelete={setDeleteId}
                 />
               )}
             </FormSection>
 
-            <FormSection
-              step={3}
-              title={isEditMode ? "Editar Item" : "Inserir Novo Item"}
-            >
+            <FormSection step={3} title="Inserir Novo Item">
               <PendingItemForm
-                item={formItem}
-                categories={categories}
-                isEditing={isEditMode}
+                materiaisOptions={materiaisOptions}
                 inserting={inserting}
-                onChange={setFormItem}
                 onSubmit={handleFormSubmit}
-                onClear={handleClearForm}
               />
             </FormSection>
           </div>

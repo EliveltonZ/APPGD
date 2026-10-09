@@ -1,101 +1,71 @@
+import { useState } from 'react';
 import { Button } from '../../../../components/Button';
-import type { PendingItem } from '../../../../types/pending';
-import type { PendingCategory } from '../../../../services/pending';
+import { SearchSelect } from '../../../../components/SearchSelect';
+import type { SearchSelectOption } from '../../../../components/SearchSelect';
 
 interface Props {
-  item: PendingItem;
-  categories: PendingCategory[];
-  isEditing: boolean;
+  materiaisOptions: SearchSelectOption[];
   inserting?: boolean;
-  onChange: (item: PendingItem) => void;
-  onSubmit: () => void;
-  onClear: () => void;
+  onSubmit: (data: { materialId: number; quantidade: number; detalhes: string | null }) => void;
 }
 
-export function PendingItemForm({
-  item, categories, isEditing, inserting, onChange, onSubmit, onClear,
-}: Props) {
-  function set<K extends keyof PendingItem>(field: K, value: PendingItem[K]) {
-    onChange({ ...item, [field]: value });
+export function PendingItemForm({ materiaisOptions, inserting, onSubmit }: Props) {
+  const [materialId, setMaterialId] = useState<number | null>(null);
+  const [quantidade, setQuantidade] = useState('');
+  const [detalhes, setDetalhes] = useState('');
+
+  function handleClear() {
+    setMaterialId(null);
+    setQuantidade('');
+    setDetalhes('');
+  }
+
+  function handleSubmit() {
+    if (!materialId) return;
+    const qtd = Number(quantidade.replace(',', '.'));
+    if (!qtd || qtd <= 0) return;
+    onSubmit({ materialId, quantidade: qtd, detalhes: detalhes.trim() || null });
+    handleClear();
   }
 
   return (
     <div className="pinfo-section">
-      <div className="frow frow--4">
-        <div className="pfield pfield--span3">
-          <label>Descrição</label>
-          <input
-            type="text"
-            value={item.descricao}
-            onChange={(e) => set('descricao', e.target.value)}
-            placeholder="Descrição do item..."
-          />
-        </div>
-        <div className="pfield">
-          <label>Categoria</label>
-          <select
-            className="pfield__select"
-            value={item.categoriaId}
-            onChange={(e) => {
-              const id = Number(e.target.value);
-              const nome = categories.find((c) => c.id === id)?.nome ?? '';
-              onChange({ ...item, categoriaId: id, categoria: nome });
-            }}
-          >
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.nome}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="frow frow--4">
+      <div className="frow frow--3">
         <div className="pfield pfield--span2">
-          <label>Medida</label>
-          <input
-            type="text"
-            value={item.medida}
-            onChange={(e) => set('medida', e.target.value)}
-            placeholder="Ex: 35mm, 2750x1830mm..."
+          <label>Material</label>
+          <SearchSelect
+            options={materiaisOptions}
+            value={materialId}
+            onChange={setMaterialId}
+            placeholder="Buscar material (nome ou código)..."
           />
         </div>
         <div className="pfield">
           <label>Quantidade</label>
           <input
-            type="number"
-            min={1}
-            value={item.qtd}
-            onChange={(e) => set('qtd', Number(e.target.value))}
-          />
-        </div>
-        <div className="pfield">
-          <label>Fornecedor</label>
-          <input
             type="text"
-            value={item.fornecedor}
-            onChange={(e) => set('fornecedor', e.target.value)}
-            placeholder="Nome do fornecedor..."
+            inputMode="decimal"
+            value={quantidade}
+            onChange={(e) => setQuantidade(e.target.value)}
+            placeholder="0"
           />
         </div>
       </div>
 
-      <div className="frow frow--3">
+      <div className="frow frow--1">
         <div className="pfield">
-          <label>Data da Compra</label>
-          <input type="date" value={item.compra}   onChange={(e) => set('compra',   e.target.value)} />
-        </div>
-        <div className="pfield">
-          <label>Previsão de Entrega</label>
-          <input type="date" value={item.previsao} onChange={(e) => set('previsao', e.target.value)} />
-        </div>
-        <div className="pfield">
-          <label>Recebido em</label>
-          <input type="date" value={item.recebido} onChange={(e) => set('recebido', e.target.value)} />
+          <label>Detalhes (opcional)</label>
+          <input
+            type="text"
+            value={detalhes}
+            onChange={(e) => setDetalhes(e.target.value)}
+            placeholder="Ex.: Branca, 60x210cm, 4mm"
+          />
         </div>
       </div>
 
       <div className="pend-form-actions">
-        <Button variant="ghost" size="sm" type="button" onClick={onClear}>
+        <Button variant="ghost" size="sm" type="button" onClick={handleClear}>
           Limpar
         </Button>
         <Button
@@ -103,10 +73,10 @@ export function PendingItemForm({
           size="sm"
           type="button"
           loading={inserting}
-          disabled={!item.descricao.trim()}
-          onClick={onSubmit}
+          disabled={!materialId || !quantidade.trim()}
+          onClick={handleSubmit}
         >
-          {isEditing ? 'Salvar Alteração' : 'Inserir Item'}
+          Inserir Item
         </Button>
       </div>
     </div>

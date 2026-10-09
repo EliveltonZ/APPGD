@@ -34,7 +34,7 @@ import { ExcluirProjetoPage } from "./pages/Pedidos/ExcluirProjeto";
 
 // ── Compras ───────────────────────────────────────────────────────────────────
 import { RelatorioComprasPage } from "./pages/Compras/Relatorio";
-import { PendenciasPage } from "./pages/Compras/Pendencias";
+import { ItensPedidoPage } from "./pages/Compras/ItensPedido";
 
 // ── Fábrica ───────────────────────────────────────────────────────────────────
 import { PcpPage } from "./pages/Fabrica/Painel";
@@ -100,7 +100,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   pedidos_editar: EditaProjetoPage,
   pedidos_excluir: ExcluirProjetoPage,
   compras_lista: RelatorioComprasPage,
-  compras_pendencias: PendenciasPage,
+  compras_pendencias: ItensPedidoPage,
   pcp_painel: PcpPage,
   pcp_producao: ProducaoPage,
   pcp_apontamento: ApontamentoPage,

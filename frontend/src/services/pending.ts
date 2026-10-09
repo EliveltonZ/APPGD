@@ -1,40 +1,31 @@
-import { apiGet, apiPost, apiPut } from './api'
+import { apiGet, apiPost, apiDelete } from './api'
 import { toDateInput } from '../utils/dateUtils'
-import { fetchCategories, type Category } from './utils'
 import type { PendingItem, PendingProject } from '../types/pending'
 
 type RawRow = Record<string, unknown>
 
-export type PendingCategory = Category
-
-export function fetchPendingCategories() {
-  return fetchCategories()
-}
-
 export async function fetchPendingItems(
   ordemdecompra: number,
 ): Promise<PendingItem[]> {
-  const rows = await apiGet<RawRow[]>('/pendencias/acessorios', {
-    ordemdecompra,
-  })
+  const rows = await apiGet<RawRow[]>(`/estoque/pedido/${ordemdecompra}/itens`)
   return rows.map((r) => ({
-    id:          Number(r.id),
-    categoriaId: Number(r.id_categoria ?? 0),
-    categoria:   String(r.categoria ?? ''),
-    descricao:   String(r.descricao  ?? ''),
-    medida:      String(r.medida     ?? ''),
-    qtd:         Number(r.qtd),
-    fornecedor:  String(r.fornecedor ?? ''),
-    compra:      toDateInput(r.datacompra),
-    previsao:    toDateInput(r.previsao),
-    recebido:    toDateInput(r.recebido),
+    id:            Number(r.id),
+    materialId:    Number(r.materialId),
+    codigoInterno: r.codigoInterno != null ? String(r.codigoInterno) : null,
+    descricao:     r.descricao     != null ? String(r.descricao)     : null,
+    unidade:       String(r.unidade ?? ''),
+    tipo:          (r.tipo as PendingItem['tipo']) ?? 'FERRAGEM',
+    quantidade:    Number(r.quantidade ?? 0),
+    detalhes:      r.detalhes != null ? String(r.detalhes) : null,
+    origem:        (r.origem as PendingItem['origem']) ?? 'MANUAL',
+    status:        (r.status as PendingItem['status']) ?? 'PENDENTE',
   }))
 }
 
 export async function fetchPendingByContract(
   contrato: string,
 ): Promise<PendingProject[]> {
-  const rows = await apiGet<RawRow[]>('/pendencias/contrato', { contrato })
+  const rows = await apiGet<RawRow[]>('/estoque/pedido/buscar-contrato', { contrato })
   return rows.map((r) => ({
     id:        Number(r.ordemdecompra),
     numOC:     String(r.ordemdecompra ?? ''),
@@ -42,46 +33,22 @@ export async function fetchPendingByContract(
     cliente:   String(r.cliente  ?? ''),
     ambiente:  String(r.ambiente ?? ''),
     entrega:   toDateInput(r.dataentrega),
-    total:     Number(r.total     ?? 0),
-    atrasados: Number(r.atrasados ?? 0),
-    recebidos: Number(r.recebidos ?? 0),
+    total:     Number(r.total ?? 0),
     itens:     [],
   }))
 }
 
-export async function updatePendingItem(item: PendingItem): Promise<void> {
-  await apiPut('/pendencias/acessorios', {
-    id:           item.id,
-    id_categoria: item.categoriaId || null,
-    descricao:    item.descricao,
-    medida:       item.medida      || null,
-    parcelamento: null,
-    numcard:      null,
-    qtd:          item.qtd,
-    fornecedor:   item.fornecedor  || null,
-    datacompra:   item.compra      || null,
-    previsao:     item.previsao    || null,
-    recebido:     item.recebido    || null,
+export async function insertPendingItem(
+  ordemdecompra: number,
+  item: { materialId: number; quantidade: number; detalhes: string | null },
+): Promise<void> {
+  await apiPost(`/estoque/pedido/${ordemdecompra}/itens`, {
+    material_id: item.materialId,
+    quantidade:  item.quantidade,
+    detalhes:    item.detalhes,
   })
 }
 
 export async function deletePendingItem(id: number): Promise<void> {
-  await apiPost('/pendencias/del-acessorio', { id })
-}
-
-export async function insertPendingItem(
-  ordemdecompra: number,
-  item: PendingItem,
-): Promise<void> {
-  await apiPost('/pendencias/acessorios', {
-    ordemdecompra,
-    id_categoria:  item.categoriaId,
-    descricao:     item.descricao,
-    medida:        item.medida   || null,
-    quantidade:    item.qtd,
-    fornecedor:    item.fornecedor || null,
-    compra:        item.compra   || null,
-    previsao:      item.previsao || null,
-    recebido:      item.recebido || null,
-  })
+  await apiDelete(`/estoque/pedido/itens/${id}`)
 }

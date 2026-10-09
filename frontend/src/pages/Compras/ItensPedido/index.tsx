@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FolderOpen, Layers, AlertTriangle, PackageCheck } from "lucide-react";
+import { FolderOpen, Layers } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { ProjectEnvironmentTable } from "../../../features/pending/ProjectEnvironmentTable";
@@ -9,7 +9,7 @@ import type { PendingProject } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
 import "./index.css";
 
-export function PendenciasPage() {
+export function ItensPedidoPage() {
   const toast = useToast();
   const [projects, setProjects] = useState<PendingProject[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export function PendenciasPage() {
   function handleSave(updated: PendingProject) {
     setProjects((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
     setModalOpen(false);
-    toast.success("Pendência atualizada com sucesso.");
+    toast.success("Pedido atualizado com sucesso.");
   }
 
   function handleItemsChanged(projectId: number, delta: number) {
@@ -54,16 +54,14 @@ export function PendenciasPage() {
   }
 
   const summaryProjetos   = projects.length;
-  const summaryTotalItens = projects.reduce((acc, p) => acc + p.total,     0);
-  const summaryAtrasados  = projects.reduce((acc, p) => acc + p.atrasados, 0);
-  const summaryRecebidos  = projects.reduce((acc, p) => acc + p.recebidos, 0);
+  const summaryTotalItens = projects.reduce((acc, p) => acc + p.total, 0);
 
   return (
-    <AppLayout pageTitle="Pendências">
+    <AppLayout pageTitle="Itens Pedido">
       <div className="pend-page">
         <div className="pend-page__top">
           <div>
-            <h1 className="pend-page__title">Controle de Pendências</h1>
+            <h1 className="pend-page__title">Itens Pedido</h1>
             <p className="pend-page__subtitle">
               {!searched
                 ? "Busque um contrato para exibir os resultados"
@@ -100,20 +98,6 @@ export function PendenciasPage() {
             value={summaryTotalItens}
             accent="var(--iniciado)"
             icon={<Layers size={13} />}
-            loading={loading}
-          />
-          <SummaryCard
-            label="Atrasados"
-            value={summaryAtrasados}
-            accent="var(--atrasado)"
-            icon={<AlertTriangle size={13} />}
-            loading={loading}
-          />
-          <SummaryCard
-            label="Recebidos"
-            value={summaryRecebidos}
-            accent="var(--entregue)"
-            icon={<PackageCheck size={13} />}
             loading={loading}
           />
         </div>

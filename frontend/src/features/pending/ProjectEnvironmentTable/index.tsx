@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { DataTable } from '../../../components/DataTable';
 import type { TableColumn } from '../../../components/DataTable';
-import { computeItemStatus } from '../../../data/pendingConfig';
 import type { PendingProject } from '../../../types/pending';
 import './index.css';
 
@@ -25,7 +24,6 @@ type ProjectRow = {
   ambiente: string;
   entrega: string;
   _itens: number;
-  _atrasados: number;
 };
 
 const COLUMNS: TableColumn<ProjectRow>[] = [
@@ -38,34 +36,20 @@ const COLUMNS: TableColumn<ProjectRow>[] = [
     key: '_itens', label: 'Itens', type: 'number',
     render: (v) => <span className="penv-count">{v as number}</span>,
   },
-  {
-    key: '_atrasados', label: 'Atrasados', type: 'number',
-    render: (v) =>
-      (v as number) > 0 ? (
-        <span className="penv-count penv-count--atrasado">{v as number}</span>
-      ) : (
-        <span className="penv-count penv-count--ok">—</span>
-      ),
-  },
 ];
 
 export function ProjectEnvironmentTable({ projects, onSelect, loading }: ProjectEnvironmentTableProps) {
   const rows = useMemo<ProjectRow[]>(
     () =>
-      projects.map((p) => {
-        const statuses = p.itens.map(computeItemStatus);
-        const atrasados = statuses.filter((s) => s === 'atrasado').length;
-        return {
-          id:          p.id,
-          numOC:       p.numOC,
-          contrato:    p.contrato,
-          cliente:     p.cliente,
-          ambiente:    p.ambiente,
-          entrega:     fmt(p.entrega),
-          _itens:      p.total,
-          _atrasados:  atrasados,
-        };
-      }),
+      projects.map((p) => ({
+        id:          p.id,
+        numOC:       p.numOC,
+        contrato:    p.contrato,
+        cliente:     p.cliente,
+        ambiente:    p.ambiente,
+        entrega:     fmt(p.entrega),
+        _itens:      p.total,
+      })),
     [projects]
   );
 
@@ -80,7 +64,6 @@ export function ProjectEnvironmentTable({ projects, onSelect, loading }: Project
         const original = projects.find((p) => p.id === row.id);
         if (original) onSelect(original);
       }}
-      rowClassName={(row) => (row._atrasados > 0 ? 'penv-table__row--alert' : '')}
     />
   );
 }

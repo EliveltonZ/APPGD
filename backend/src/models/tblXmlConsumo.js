@@ -9,7 +9,9 @@ module.exports = function(sequelize, DataTypes) {
     },
     importacaoId: {
       type:      DataTypes.INTEGER,
-      allowNull: false,
+      // Item lançado na mão (fora de uma importação de XML) não tem isso —
+      // ver campo `origem` derivado (null = MANUAL, preenchido = XML).
+      allowNull: true,
       field:     'importacao_id',
     },
     ordemdecompra: {
@@ -62,6 +64,10 @@ module.exports = function(sequelize, DataTypes) {
       type:      DataTypes.DECIMAL(10, 3),
       allowNull: true,
       field:     'qtd_un_baixada',
+    },
+    detalhes: {
+      type:      DataTypes.TEXT,
+      allowNull: true,
     },
     dataImportacao: {
       type:         DataTypes.DATE,

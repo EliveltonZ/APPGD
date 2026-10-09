@@ -3,6 +3,7 @@ const { Op, QueryTypes } = require('sequelize');
 const {
   sequelize, Materiais, XmlConsumo, XmlImportacoes,
   EstoqueMovimentos, SolicitacaoComprasItens, Projetos, MateriaisCodigoNF,
+  Clientes,
 } = require('../client/db');
 
 async function buscarMaterial(id) {
@@ -106,6 +107,47 @@ async function criarConsumos(rows) {
   return XmlConsumo.bulkCreate(rows);
 }
 
+// Busca pedidos por contrato com a contagem de itens já lançados em
+// tblXmlConsumo (XML ou manual) — usado pela tela "Itens Pedido".
+async function buscarContratoPedido(contrato) {
+  const rows = await Projetos.findAll({
+    where: { contrato: Number(contrato) },
+    attributes: ['ordemdecompra', 'ambiente', 'dataentrega'],
+    include: [{ model: Clientes, as: 'tblCliente', attributes: ['name'], required: true }],
+  });
+  if (!rows.length) return [];
+
+  const ordemIds = rows.map(p => p.ordemdecompra);
+  const counts = await XmlConsumo.findAll({
+    where: { ordemdecompra: { [Op.in]: ordemIds } },
+    attributes: ['ordemdecompra', [sequelize.fn('COUNT', sequelize.col('id')), 'total']],
+    group: ['ordemdecompra'],
+    raw: true,
+  });
+  const totalMap = new Map(counts.map(c => [String(c.ordemdecompra), Number(c.total)]));
+
+  return rows.map(p => ({
+    ordemdecompra: p.ordemdecompra,
+    cliente:       p.tblCliente?.name ?? null,
+    ambiente:      p.ambiente,
+    dataentrega:   p.dataentrega,
+    total:         totalMap.get(String(p.ordemdecompra)) ?? 0,
+  }));
+}
+
+// Item lançado direto no pedido (sem passar por importação de XML) — o
+// liberador registrando um acessório de terceiro, por exemplo.
+async function criarConsumoManual(dados) {
+  return XmlConsumo.create(dados);
+}
+
+// Só remove item que nunca passou por importação real (importacaoId null) —
+// um item que veio do XML não é excluído por aqui.
+async function removerConsumoManual(id) {
+  const n = await XmlConsumo.destroy({ where: { id: Number(id), importacaoId: null } });
+  return n > 0;
+}
+
 async function listarAbaixoDoMinimo() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
@@ -145,5 +187,8 @@ module.exports = {
   buscarMateriaisPorId,
   criarImportacao,
   criarConsumos,
+  buscarContratoPedido,
+  criarConsumoManual,
+  removerConsumoManual,
   sequelize,
 };

@@ -18,12 +18,6 @@ interface ForecastDetailsModalProps {
   onClose: () => void;
 }
 
-function dateBr(value: string): string {
-  if (!value) return "";
-  const [y, m, d] = value.split("-");
-  return `${d}/${m}/${y}`;
-}
-
 export function ForecastDetailsModal({ isOpen, project, onClose }: ForecastDetailsModalProps) {
   const [detail, setDetail]           = useState<ForecastProjectDetail | null>(null);
   const [accessories, setAccessories] = useState<PendingItem[]>([]);
@@ -45,14 +39,17 @@ export function ForecastDetailsModal({ isOpen, project, onClose }: ForecastDetai
   }, [isOpen, project?.id]);
 
   const accessoryRows = useMemo<AcessorioRow[]>(
+    // Rastreamento de compra/previsão/recebimento ainda não existe nessa
+    // versão da fonte de dados (tblXmlConsumo) — fica em branco até essa
+    // etapa ser migrada também.
     () => accessories.map((a) => ({
-      id:       String(a.id),
-      descricao: a.descricao,
-      medida:    a.medida,
-      qtd:       a.qtd,
-      compra:    dateBr(a.compra),
-      previsao:  dateBr(a.previsao),
-      recebido:  dateBr(a.recebido),
+      id:        String(a.id),
+      descricao: a.descricao ?? "",
+      medida:    a.detalhes ?? "",
+      qtd:       a.quantidade,
+      compra:    "",
+      previsao:  "",
+      recebido:  "",
     })),
     [accessories],
   );

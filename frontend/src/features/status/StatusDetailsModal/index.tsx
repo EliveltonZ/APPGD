@@ -67,14 +67,17 @@ export function StatusDetailsModal({
 
   const accessoryRows = useMemo<AcessorioRow[]>(
     () =>
+      // Rastreamento de compra/previsão/recebimento ainda não existe nessa
+      // versão da fonte de dados (tblXmlConsumo) — fica em branco até essa
+      // etapa ser migrada também.
       accessories.map((a) => ({
         id: String(a.id),
-        descricao: a.descricao,
-        medida: a.medida,
-        qtd: a.qtd,
-        compra: a.compra ? a.compra.split("-").reverse().join("/") : "—",
-        previsao: a.previsao ? a.previsao.split("-").reverse().join("/") : "—",
-        recebido: a.recebido ? a.recebido.split("-").reverse().join("/") : "",
+        descricao: a.descricao ?? "",
+        medida: a.detalhes ?? "",
+        qtd: a.quantidade,
+        compra: "—",
+        previsao: "—",
+        recebido: "",
       })),
     [accessories],
   );

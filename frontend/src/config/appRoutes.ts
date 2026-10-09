@@ -99,7 +99,7 @@ export const ROUTE_ITEMS = [
   // ── Compras ────────────────────────────────────────────────────────────────
 
   buildSidebarList('compras_lista', '/compras/lista', 'compras', 'Compras', true),
-  buildSidebarList('compras_pendencias', '/compras/pendencias', 'compras', 'Pendências'),
+  buildSidebarList('compras_pendencias', '/compras/itens-pedido', 'compras', 'Itens Pedido'),
   
   // ── PCP ────────────────────────────────────────────────────────────────────
   buildSidebarList('pcp_painel', '/fabrica/pcp', 'fabrica', 'Painel PCP'),
