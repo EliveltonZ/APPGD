@@ -34,6 +34,7 @@ export async function fetchPendingByContract(
     cliente:   String(r.cliente  ?? ''),
     ambiente:  String(r.ambiente ?? ''),
     entrega:   toDateInput(r.dataentrega),
+    lote:      r.lote != null ? Number(r.lote) : null,
     total:     Number(r.total ?? 0),
     itens:     [],
   }))

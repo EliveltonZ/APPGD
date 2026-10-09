@@ -27,4 +27,10 @@ router.get('/pedido/:ordemdecompra/itens', pedidoC.getItens);
 router.post('/pedido/:ordemdecompra/itens', pedidoC.postItem);
 router.delete('/pedido/itens/:id',          pedidoC.deleteItem);
 
+// Reserva em lote — por pedido inteiro ou por todos os pedidos do mesmo
+// lote de corte. Reaproveita a mesma validação de saldo do reservar
+// individual, item por item (não trava tudo se um material faltar saldo).
+router.post('/pedido/:ordemdecompra/reservar-tudo', c.postReservarPedido);
+router.post('/pedido/:ordemdecompra/reservar-lote', c.postReservarLote);
+
 module.exports = router;

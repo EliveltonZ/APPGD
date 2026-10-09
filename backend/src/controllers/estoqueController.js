@@ -35,6 +35,20 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async postReservarPedido(req, res, next) {
+    try {
+      const usuarioId = Number(req.user.sub);
+      res.json(await service.reservarPedido(Number(req.params.ordemdecompra), usuarioId));
+    } catch (err) { next(err); }
+  },
+
+  async postReservarLote(req, res, next) {
+    try {
+      const usuarioId = Number(req.user.sub);
+      res.json(await service.reservarLote(Number(req.params.ordemdecompra), usuarioId));
+    } catch (err) { next(err); }
+  },
+
   async postLiberarReserva(req, res, next) {
     try {
       const linha = await service.liberarReserva(Number(req.params.id));

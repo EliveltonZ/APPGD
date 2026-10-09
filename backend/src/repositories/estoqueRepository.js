@@ -84,6 +84,26 @@ async function listarXmlConsumoPorPedido(ordemdecompra) {
   return XmlConsumo.findAll({ where: { ordemdecompra }, order: [['id', 'ASC']] });
 }
 
+// Itens prontos pra reservar — PENDENTE e já com a quantidade em UN
+// definida (ferragem já nasce assim; chapa/fita precisa do passo de
+// "definir quantidade" primeiro, então fica de fora até lá).
+async function listarElegiveisParaReserva(ordemdecompra) {
+  return XmlConsumo.findAll({
+    where: { ordemdecompra, status: 'PENDENTE', qtdUnConfirmada: { [Op.ne]: null } },
+    order: [['id', 'ASC']],
+  });
+}
+
+async function buscarLote(ordemdecompra) {
+  const p = await Projetos.findOne({ where: { ordemdecompra }, attributes: ['lote'], raw: true });
+  return p?.lote ?? null;
+}
+
+async function listarOrdensDoLote(lote) {
+  const rows = await Projetos.findAll({ where: { lote }, attributes: ['ordemdecompra'], raw: true });
+  return rows.map(r => r.ordemdecompra);
+}
+
 async function listarPendentesOuReservados(materialId) {
   return XmlConsumo.findAll({
     where: { materialId, status: { [Op.in]: ['PENDENTE', 'RESERVADO'] } },
@@ -112,7 +132,7 @@ async function criarConsumos(rows) {
 async function buscarContratoPedido(contrato) {
   const rows = await Projetos.findAll({
     where: { contrato: Number(contrato) },
-    attributes: ['ordemdecompra', 'ambiente', 'dataentrega'],
+    attributes: ['ordemdecompra', 'ambiente', 'dataentrega', 'lote'],
     include: [{ model: Clientes, as: 'tblCliente', attributes: ['name'], required: true }],
   });
   if (!rows.length) return [];
@@ -131,6 +151,7 @@ async function buscarContratoPedido(contrato) {
     cliente:       p.tblCliente?.name ?? null,
     ambiente:      p.ambiente,
     dataentrega:   p.dataentrega,
+    lote:          p.lote || null, // 0/null = sem lote de verdade definido
     total:         totalMap.get(String(p.ordemdecompra)) ?? 0,
   }));
 }
@@ -182,6 +203,9 @@ module.exports = {
   buscarChegouFabrica,
   buscarXmlConsumo,
   listarXmlConsumoPorPedido,
+  listarElegiveisParaReserva,
+  buscarLote,
+  listarOrdensDoLote,
   listarPendentesOuReservados,
   criarMovimento,
   listarAbaixoDoMinimo,

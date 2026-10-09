@@ -26,6 +26,7 @@ export interface PendingProject {
   cliente: string;
   ambiente: string;
   entrega: string;    // yyyy-mm-dd
+  lote: number | null; // agrupamento do Corte Certo — null/0 = sem lote de verdade
   total: number;
   itens: PendingItem[];
 }

@@ -30,3 +30,28 @@ export const darBaixa = (
     qtd_un_baixada: payload.qtdUnBaixada,
     localizacao_id: payload.localizacaoId,
   })
+
+export interface ReservaResultado {
+  id: number
+  ordemdecompra: number
+  ok: boolean
+  erro?: string
+}
+
+export interface ReservaLoteResumo {
+  lote: number
+  totalPedidos: number
+  totalItens: number
+  resultados: ReservaResultado[]
+}
+
+export interface ReservaPedidoResumo {
+  totalItens: number
+  resultados: ReservaResultado[]
+}
+
+export const reservarPedido = (ordemdecompra: number): Promise<ReservaPedidoResumo> =>
+  apiPost(`/estoque/pedido/${ordemdecompra}/reservar-tudo`, {})
+
+export const reservarLote = (ordemdecompra: number): Promise<ReservaLoteResumo> =>
+  apiPost(`/estoque/pedido/${ordemdecompra}/reservar-lote`, {})

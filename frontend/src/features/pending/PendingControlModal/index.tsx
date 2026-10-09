@@ -17,9 +17,12 @@ import {
 import {
   definirQuantidade as apiDefinirQuantidade,
   reservar as apiReservar,
+  reservarPedido as apiReservarPedido,
+  reservarLote as apiReservarLote,
   liberarReserva as apiLiberarReserva,
   darBaixa as apiDarBaixa,
 } from "../../../services/estoque";
+import type { ReservaResultado } from "../../../services/estoque";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import type { PendingProject, PendingItem } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
@@ -169,6 +172,58 @@ export function PendingControlModal({
     }
   }
 
+  function resumoReserva(resultados: ReservaResultado[]): { ok: number; falhas: number } {
+    const falhas = resultados.filter((r) => !r.ok).length;
+    return { ok: resultados.length - falhas, falhas };
+  }
+
+  async function handleReservarPedido() {
+    if (!localProject) return;
+    setActing(true);
+    try {
+      const resumo = await apiReservarPedido(localProject.id);
+      await refetchItens();
+      if (resumo.totalItens === 0) {
+        toast.error("Nenhum item pronto pra reservar nesse pedido (sem itens, ou chapa/fita ainda sem quantidade definida).");
+        return;
+      }
+      const { ok, falhas } = resumoReserva(resumo.resultados);
+      if (falhas === 0) {
+        toast.success(`${ok} ite${ok === 1 ? "m" : "ns"} reservado${ok === 1 ? "" : "s"}.`);
+      } else {
+        toast.error(`${ok} reservado(s), ${falhas} sem saldo suficiente.`);
+      }
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao reservar o pedido."));
+    } finally {
+      setActing(false);
+    }
+  }
+
+  async function handleReservarLote() {
+    if (!localProject) return;
+    setActing(true);
+    try {
+      const resumo = await apiReservarLote(localProject.id);
+      await refetchItens();
+      if (resumo.totalItens === 0) {
+        toast.error(`Nenhum item pronto pra reservar no lote ${resumo.lote}.`);
+        return;
+      }
+      const { ok, falhas } = resumoReserva(resumo.resultados);
+      const pedidos = `${resumo.totalPedidos} pedido${resumo.totalPedidos === 1 ? "" : "s"}`;
+      if (falhas === 0) {
+        toast.success(`Lote ${resumo.lote}: ${ok} ite${ok === 1 ? "m" : "ns"} reservado${ok === 1 ? "" : "s"} em ${pedidos}.`);
+      } else {
+        toast.error(`Lote ${resumo.lote}: ${ok} reservado(s), ${falhas} sem saldo suficiente (${pedidos}).`);
+      }
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao reservar o lote."));
+    } finally {
+      setActing(false);
+    }
+  }
+
   async function handleLiberar(item: PendingItem) {
     try {
       await apiLiberarReserva(item.id);
@@ -218,6 +273,26 @@ export function PendingControlModal({
             </FormSection>
 
             <FormSection step={2} title="Itens do Pedido">
+              <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  loading={acting}
+                  onClick={handleReservarPedido}
+                >
+                  Reservar tudo do pedido
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  loading={acting}
+                  disabled={!localProject.lote}
+                  title={!localProject.lote ? "Este pedido não tem lote definido" : undefined}
+                  onClick={handleReservarLote}
+                >
+                  Reservar tudo do lote{localProject.lote ? ` (${localProject.lote})` : ""}
+                </Button>
+              </div>
               {loadingItems ? (
                 <p style={{ padding: "12px 0", opacity: 0.5, fontSize: 13 }}>
                   Carregando itens...

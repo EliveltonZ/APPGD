@@ -88,6 +88,48 @@ async function reservar(xmlConsumoId, usuarioId) {
   return linha;
 }
 
+// Reserva uma lista de itens um por um — continua mesmo se algum falhar
+// (saldo insuficiente de um material não deve travar os outros), e devolve
+// o resultado de cada um pra tela mostrar o que deu certo e o que não deu.
+async function reservarVarios(linhas, usuarioId) {
+  const resultados = [];
+  for (const linha of linhas) {
+    try {
+      await reservar(linha.id, usuarioId);
+      resultados.push({ id: linha.id, ordemdecompra: linha.ordemdecompra, ok: true });
+    } catch (err) {
+      resultados.push({ id: linha.id, ordemdecompra: linha.ordemdecompra, ok: false, erro: err.message });
+    }
+  }
+  return resultados;
+}
+
+// Reserva tudo que já está pronto pra reservar (PENDENTE + quantidade em UN
+// definida) num pedido só.
+async function reservarPedido(ordemdecompra, usuarioId) {
+  const linhas = await repo.listarElegiveisParaReserva(ordemdecompra);
+  const resultados = await reservarVarios(linhas, usuarioId);
+  return { totalItens: linhas.length, resultados };
+}
+
+// Reserva tudo que está pronto em TODOS os pedidos que compartilham o mesmo
+// lote do pedido informado — lote é o agrupamento do Corte Certo, então um
+// lote normalmente cobre vários pedidos cortados juntos.
+async function reservarLote(ordemdecompraReferencia, usuarioId) {
+  const lote = await repo.buscarLote(ordemdecompraReferencia);
+  if (!lote) {
+    throw erro('Este pedido não tem lote definido — não dá pra reservar por lote.', 400, 'VALIDACAO');
+  }
+  const ordens = await repo.listarOrdensDoLote(lote);
+  let linhas = [];
+  for (const ordemdecompra of ordens) {
+    const doPedido = await repo.listarElegiveisParaReserva(ordemdecompra);
+    linhas = linhas.concat(doPedido.map(l => ({ id: l.id, ordemdecompra })));
+  }
+  const resultados = await reservarVarios(linhas, usuarioId);
+  return { lote, totalPedidos: ordens.length, totalItens: linhas.length, resultados };
+}
+
 async function liberarReserva(xmlConsumoId) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
@@ -169,6 +211,8 @@ module.exports = {
   calcularSaldo,
   definirQuantidade,
   reservar,
+  reservarPedido,
+  reservarLote,
   liberarReserva,
   darBaixa,
   listarAlertaMinimo,

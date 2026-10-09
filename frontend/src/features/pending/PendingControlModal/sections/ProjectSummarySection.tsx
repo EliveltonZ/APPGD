@@ -26,13 +26,17 @@ export function ProjectSummarySection({ data }: Props) {
         </div>
       </div>
       <div className="frow frow--4">
-        <div className="pfield pfield--span3">
+        <div className="pfield pfield--span2">
           <label>Ambiente</label>
           <input type="text" value={data.ambiente} disabled readOnly />
         </div>
         <div className="pfield">
           <label>Entrega</label>
           <input type="text" value={fmt(data.entrega)} disabled readOnly />
+        </div>
+        <div className="pfield">
+          <label>Lote</label>
+          <input type="text" value={data.lote ?? "— sem lote"} disabled readOnly />
         </div>
       </div>
     </div>
