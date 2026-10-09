@@ -1,4 +1,5 @@
 import { apiGet, apiPost, apiPut } from './api'
+import type { PendingItem } from '../types/pending'
 
 export interface Saldo {
   fisico: number
@@ -55,3 +56,16 @@ export const reservarPedido = (ordemdecompra: number): Promise<ReservaPedidoResu
 
 export const reservarLote = (ordemdecompra: number): Promise<ReservaLoteResumo> =>
   apiPost(`/estoque/pedido/${ordemdecompra}/reservar-lote`, {})
+
+// Fila do almoxarifado — tudo que já pode ser baixado agora, cruzando
+// pedidos diferentes (RESERVADO de qualquer material, ou PENDENTE de
+// material sem controle de estoque mínimo, que pula a reserva).
+export interface EstoquePendenteItem extends PendingItem {
+  ordemdecompra: number
+  contrato: string
+  ambiente: string
+  cliente: string | null
+}
+
+export const fetchProntoParaBaixa = (): Promise<EstoquePendenteItem[]> =>
+  apiGet('/estoque/pronto-para-baixa')

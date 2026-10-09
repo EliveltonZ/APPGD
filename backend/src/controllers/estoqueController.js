@@ -18,6 +18,12 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async getProntoParaBaixa(req, res, next) {
+    try {
+      res.json(await service.listarProntoParaBaixa());
+    } catch (err) { next(err); }
+  },
+
   async putQuantidade(req, res, next) {
     try {
       const linha = await service.definirQuantidade(Number(req.params.id), req.body.qtd_un_confirmada);

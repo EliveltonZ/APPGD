@@ -233,6 +233,31 @@ async function listarAlertaMinimo() {
   return repo.listarAbaixoDoMinimo();
 }
 
+// Fila do almoxarifado: tudo que já pode ser baixado agora, cruzando pedidos
+// diferentes (ao contrário de "Itens Pedido", que é por um pedido só).
+const TIPO_POR_UNIDADE = { M2: 'CHAPA', M: 'FITA', UN: 'FERRAGEM' };
+
+async function listarProntoParaBaixa() {
+  const rows = await repo.listarProntosParaBaixa();
+  return rows.map(r => ({
+    id: r.id,
+    ordemdecompra: r.ordemdecompra,
+    materialId: r.material_id,
+    codigoInterno: r.codigo_interno,
+    descricao: r.descricao,
+    unidade: r.unidade_xml,
+    tipo: TIPO_POR_UNIDADE[r.unidade_xml] ?? 'FERRAGEM',
+    quantidade: r.qtd_xml != null ? Number(r.qtd_xml) : null,
+    qtdUnConfirmada: r.qtd_un_confirmada != null ? Number(r.qtd_un_confirmada) : null,
+    detalhes: r.detalhes,
+    status: r.status,
+    origem: r.importacao_id != null ? 'XML' : 'MANUAL',
+    contrato: r.contrato,
+    ambiente: r.ambiente,
+    cliente: r.cliente,
+  }));
+}
+
 module.exports = {
   calcularSaldo,
   definirQuantidade,
@@ -242,4 +267,5 @@ module.exports = {
   liberarReserva,
   darBaixa,
   listarAlertaMinimo,
+  listarProntoParaBaixa,
 };

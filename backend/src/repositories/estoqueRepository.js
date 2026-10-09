@@ -193,6 +193,27 @@ async function listarAbaixoDoMinimo() {
     .filter(r => r.saldoBloqueio <= r.estoqueMinimoUn);
 }
 
+// Fila de baixa do almoxarifado: todo item já RESERVADO (qualquer material)
+// + todo item PENDENTE de material sem estoque mínimo controlado (pula a
+// reserva por regra — ver estoqueService.darBaixa). Cruza pedido/cliente
+// pra dar contexto de qual OC/ambiente cada linha pertence.
+async function listarProntosParaBaixa() {
+  return sequelize.query(
+    `SELECT xc.id, xc.ordemdecompra, xc.material_id, xc.qtd_xml, xc.unidade_xml,
+            xc.qtd_un_confirmada, xc.detalhes, xc.status, xc.importacao_id,
+            m.codigo_interno, m.descricao, m.unidade_base,
+            p.contrato, p.ambiente, c.name AS cliente
+     FROM "tblXmlConsumo" xc
+     JOIN "tblMateriais" m ON m.id = xc.material_id
+     JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
+     LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
+     WHERE xc.status = 'RESERVADO'
+        OR (xc.status = 'PENDENTE' AND COALESCE(m.estoque_minimo_un, 0) <= 0)
+     ORDER BY xc.id ASC`,
+    { type: QueryTypes.SELECT },
+  );
+}
+
 module.exports = {
   buscarMaterial,
   saldoFisico,
@@ -210,6 +231,7 @@ module.exports = {
   listarPendentesOuReservados,
   criarMovimento,
   listarAbaixoDoMinimo,
+  listarProntosParaBaixa,
   buscarMateriaisPorId,
   criarImportacao,
   criarConsumos,

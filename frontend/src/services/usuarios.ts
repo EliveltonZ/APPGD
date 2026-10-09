@@ -63,6 +63,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     // Liberado pra qualquer usuário logado por enquanto (sem coluna real em
     // tblUsuario ainda) — permissões reais ficaram combinadas pra depois.
     estoque_reservar: true,
+    almoxarifado_estoque: true,
   };
   return {
     id:          String(r.id    ?? ''),

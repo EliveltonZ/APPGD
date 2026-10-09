@@ -10,6 +10,7 @@ const pedidoC = require('../controllers/pedidoItensController');
 // coluna real em tblUsuario, reintroduzir `rp('estoque_reservar')` em cada rota.
 
 router.get('/alerta-minimo',        c.getAlertaMinimo);
+router.get('/pronto-para-baixa',    c.getProntoParaBaixa);
 router.get('/saldo/:materialId',    c.getSaldo);
 router.put('/:id/quantidade',       c.putQuantidade);
 router.post('/:id/reservar',        c.postReservar);
