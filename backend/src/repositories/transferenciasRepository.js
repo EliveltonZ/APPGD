@@ -2,19 +2,23 @@
 
 const { sequelize, Transferencias, EstoqueMovimentos } = require('../client/db');
 
+// "codigo" da localização (ex.: 01-01-03-D) não existe como coluna — é
+// sempre montado em SQL a partir de rua/prateleira/nível/divisão.
+const CODIGO_LOCALIZACAO = `(l.rua || '-' || l.prateleira || '-' || l.nivel || '-' || l.divisao)`;
+
 async function listarSaldo(materialId) {
   const [rows] = await sequelize.query(
     `SELECT
        em.localizacao_id,
-       l.codigo,
+       ${CODIGO_LOCALIZACAO} AS codigo,
        l.descricao,
        CAST(SUM(em.qtd_un) AS FLOAT) AS saldo
      FROM "tblEstoqueMovimentos" em
      JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
      WHERE em.material_id = :materialId
-     GROUP BY em.localizacao_id, l.id, l.codigo, l.descricao
+     GROUP BY em.localizacao_id, l.id, l.rua, l.prateleira, l.nivel, l.divisao, l.descricao
      HAVING SUM(em.qtd_un) > 0
-     ORDER BY l.codigo`,
+     ORDER BY l.rua, l.prateleira, l.nivel, l.divisao`,
     { replacements: { materialId: Number(materialId) } },
   );
   return rows;
@@ -29,9 +33,9 @@ async function listar() {
        t.observacoes,
        m.codigo_interno,
        m.descricao AS material_descricao,
-       lo.codigo   AS origem_codigo,
+       (lo.rua || '-' || lo.prateleira || '-' || lo.nivel || '-' || lo.divisao) AS origem_codigo,
        lo.descricao AS origem_descricao,
-       ld.codigo   AS destino_codigo,
+       (ld.rua || '-' || ld.prateleira || '-' || ld.nivel || '-' || ld.divisao) AS destino_codigo,
        ld.descricao AS destino_descricao,
        u.login     AS usuario_login
      FROM "tblTransferencias" t
