@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { FileText, Plus, Trash2, Upload } from "lucide-react";
+import { FileText, Lock, Plus, Trash2, Upload } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
@@ -34,6 +34,11 @@ interface ItemRascunho {
   precoUn: number | null;
   salvarVinculo: boolean;
   fator: number | null;
+  // Item que veio de um XML de NF-e importado não pode ser removido do
+  // rascunho — só reassociado a outro material. Garante que a nota lançada
+  // sempre tem exatamente os itens da nota real, nunca menos (ver
+  // handleRemoveItem).
+  origemXml: boolean;
 }
 
 function fmtQtd(v: number): string {
@@ -194,13 +199,21 @@ export function AlmoxarifadoNotaFiscalPage() {
         fator: toNumber(fator),
         codigoInterno: material?.codigoInterno ?? "",
         descricao: material?.descricao ?? "",
+        origemXml: false,
       },
     ]);
     resetItemForm();
   }
 
   function handleRemoveItem(key: number) {
-    setItens((prev) => prev.filter((i) => i._key !== key));
+    setItens((prev) => {
+      const item = prev.find((i) => i._key === key);
+      if (item?.origemXml) {
+        toast.error("Item veio da nota fiscal importada — não pode ser removido, só trocar o material associado.");
+        return prev;
+      }
+      return prev.filter((i) => i._key !== key);
+    });
   }
 
   function handleAssignMaterial(key: number, newMaterialId: number | null) {
@@ -279,6 +292,7 @@ export function AlmoxarifadoNotaFiscalPage() {
         precoUn: item.precoNf,
         salvarVinculo: false,
         fator: null,
+        origemXml: true,
       }));
       setItens((prev) => [...prev, ...novosItens]);
 
@@ -582,9 +596,15 @@ export function AlmoxarifadoNotaFiscalPage() {
                         placeholder="Escolher material do cadastro..."
                       />
                     </div>
-                    <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
-                      <Trash2 size={13} />
-                    </button>
+                    {i.origemXml ? (
+                      <span className="nf-item-row__remove" title="Veio da nota fiscal — não pode ser removido, só trocar o material.">
+                        <Lock size={13} />
+                      </span>
+                    ) : (
+                      <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <div key={i._key} className="nf-item-row">
@@ -595,9 +615,15 @@ export function AlmoxarifadoNotaFiscalPage() {
                         {i.precoUn != null ? ` · ${fmtMoeda(i.precoUn)}/un` : ""}
                       </span>
                     </div>
-                    <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
-                      <Trash2 size={13} />
-                    </button>
+                    {i.origemXml ? (
+                      <span className="nf-item-row__remove" title="Veio da nota fiscal — não pode ser removido, só trocar o material.">
+                        <Lock size={13} />
+                      </span>
+                    ) : (
+                      <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
+                        <Trash2 size={13} />
+                      </button>
+                    )}
                   </div>
                 ),
               )}

@@ -138,6 +138,11 @@
   color: var(--accent2);
 }
 
+.nf-item-row__remove[title] {
+  cursor: default;
+  color: var(--text-muted);
+}
+
 .nf-item-row--evidencia {
   background: rgba(255, 0, 0, 0.1);
   border-radius: 6px;
