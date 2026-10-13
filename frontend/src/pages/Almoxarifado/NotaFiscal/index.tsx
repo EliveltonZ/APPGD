@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { FileText, Plus, Trash2, Upload } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
@@ -12,7 +12,7 @@ import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import { localDateStr } from "../../../utils/dateUtils";
-import { fetchFornecedores } from "../../../services/fornecedores";
+import { fetchFornecedores, createFornecedor } from "../../../services/fornecedores";
 import { fetchLocalizacoes } from "../../../services/localizacoes";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import {
@@ -20,18 +20,28 @@ import {
   fetchItensNota,
   criarNotaFiscal,
   fetchVinculo,
+  previewNotaFiscalXml,
 } from "../../../services/notaFiscal";
 import type {
   NotaFiscalResumo,
   NotaFiscalItem,
-  NotaFiscalItemPayload,
 } from "../../../services/notaFiscal";
 import "./index.css";
 
-interface ItemRascunho extends NotaFiscalItemPayload {
+interface ItemRascunho {
   _key: number;
+  materialId: number | null;
   codigoInterno: string;
   descricao: string;
+  codigoNf: string | null;
+  descricaoNf: string | null;
+  unidadeCompra: string;
+  qtdNf: number;
+  qtdUn: number;
+  precoNf: number | null;
+  precoUn: number | null;
+  salvarVinculo: boolean;
+  fator: number | null;
 }
 
 function fmtQtd(v: number): string {
@@ -68,10 +78,13 @@ let nextKey = 1;
 
 export function AlmoxarifadoNotaFiscalPage() {
   const toast = useToast();
-  const { data: fornecedores = [] } = useApiData(fetchFornecedores);
+  const { data: fornecedores = [], refetch: recarregarFornecedores } = useApiData(fetchFornecedores);
   const { data: localizacoes = [] } = useApiData(fetchLocalizacoes);
   const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
   const { data: historico = [], loading: loadingHist, refetch: recarregarHist } = useApiData(fetchNotasFiscais);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importandoXml, setImportandoXml] = useState(false);
 
   const [fornecedorId, setFornecedorId] = useState("");
   const [numeroNota, setNumeroNota] = useState("");
@@ -221,6 +234,93 @@ export function AlmoxarifadoNotaFiscalPage() {
     setItens((prev) => prev.filter((i) => i._key !== key));
   }
 
+  function handleAssignMaterial(key: number, newMaterialId: number | null) {
+    const material = materiais.find((m) => m.id === newMaterialId);
+    setItens((prev) =>
+      prev.map((i) =>
+        i._key === key
+          ? {
+              ...i,
+              materialId: newMaterialId,
+              codigoInterno: material?.codigoInterno ?? "",
+              descricao: material?.descricao ?? "",
+              // material escolhido na mão pra um item que veio do XML sem
+              // vínculo — próxima nota do mesmo fornecedor já vem casada.
+              salvarVinculo: newMaterialId != null,
+            }
+          : i,
+      ),
+    );
+  }
+
+  function handlePickXmlFile() {
+    fileInputRef.current?.click();
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    setImportandoXml(true);
+    try {
+      const xmlText = await file.text();
+      const preview = await previewNotaFiscalXml(xmlText);
+
+      if (preview.numeroNota) setNumeroNota(preview.numeroNota);
+      if (preview.dataEmissao) setDataEmissao(preview.dataEmissao);
+      if (preview.dataEntrada) setDataEntrada(preview.dataEntrada);
+
+      let fornecedorIdResolvido = preview.fornecedor.id;
+      if (!fornecedorIdResolvido && preview.fornecedor.nome) {
+        const novo = await createFornecedor({
+          nome: preview.fornecedor.nome,
+          cnpj: preview.fornecedor.cnpj,
+          contato: null,
+          ativo: true,
+          inscricao_estadual: preview.fornecedor.inscricaoEstadual,
+          endereco: preview.fornecedor.endereco,
+          numero: preview.fornecedor.numero,
+          bairro: preview.fornecedor.bairro,
+          cidade: preview.fornecedor.cidade,
+          cep: preview.fornecedor.cep,
+          estado: preview.fornecedor.estado,
+        });
+        fornecedorIdResolvido = novo.id;
+        recarregarFornecedores();
+      }
+      if (fornecedorIdResolvido) setFornecedorId(String(fornecedorIdResolvido));
+
+      const novosItens: ItemRascunho[] = preview.itens.map((item) => ({
+        _key: nextKey++,
+        materialId: item.materialId,
+        codigoInterno: item.codigoInterno ?? "",
+        descricao: item.materialDescricao ?? item.descricao ?? "",
+        codigoNf: item.codigoNf,
+        descricaoNf: item.descricao,
+        unidadeCompra: (item.unidadeCompra ?? "UN").toUpperCase(),
+        qtdNf: item.qtdNf ?? 0,
+        qtdUn: item.qtdNf ?? 0,
+        precoNf: item.precoNf,
+        precoUn: item.precoNf,
+        salvarVinculo: false,
+        fator: null,
+      }));
+      setItens((prev) => [...prev, ...novosItens]);
+
+      const semMaterial = novosItens.filter((i) => i.materialId == null).length;
+      if (semMaterial > 0) {
+        toast.error(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, ${semMaterial} sem material associado — escolha abaixo antes de lançar.`);
+      } else {
+        toast.success(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, todos já casados com o cadastro.`);
+      }
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao importar XML."));
+    } finally {
+      setImportandoXml(false);
+    }
+  }
+
   const valorTotalRascunho = itens.reduce((acc, i) => acc + (i.precoNf != null ? i.precoNf * i.qtdNf : 0), 0);
 
   async function handleSubmit() {
@@ -244,6 +344,11 @@ export function AlmoxarifadoNotaFiscalPage() {
       toast.error("Adicione ao menos um item.");
       return;
     }
+    const semMaterial = itens.filter((i) => i.materialId == null).length;
+    if (semMaterial > 0) {
+      toast.error(`${semMaterial} ite${semMaterial === 1 ? "m" : "ns"} ainda sem material associado — resolva antes de lançar.`);
+      return;
+    }
 
     setSaving(true);
     try {
@@ -254,10 +359,18 @@ export function AlmoxarifadoNotaFiscalPage() {
         dataEntrada,
         localizacaoId: Number(localizacaoId),
         observacoes: observacoes.trim() || null,
-        itens: itens.map(({ _key, codigoInterno, descricao, ...rest }) => {
-          void _key; void codigoInterno; void descricao;
-          return rest;
-        }),
+        itens: itens.map((i) => ({
+          materialId: i.materialId as number,
+          codigoNf: i.codigoNf,
+          descricaoNf: i.descricaoNf,
+          unidadeCompra: i.unidadeCompra,
+          qtdNf: i.qtdNf,
+          qtdUn: i.qtdUn,
+          precoNf: i.precoNf,
+          precoUn: i.precoUn,
+          salvarVinculo: i.salvarVinculo,
+          fator: i.fator,
+        })),
       });
       toast.success("Nota fiscal lançada com sucesso.");
       setNumeroNota("");
@@ -290,6 +403,29 @@ export function AlmoxarifadoNotaFiscalPage() {
       <div className="nf-page">
         <aside className="nf-form-panel">
           <h2 className="nf-panel-title">Nova Nota Fiscal</h2>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xml,text/xml"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={importandoXml}
+            onClick={handlePickXmlFile}
+            style={{ width: "100%" }}
+          >
+            <Upload size={14} />
+            Importar XML da NF-e
+          </Button>
+          <p className="nf-hint" style={{ margin: 0 }}>
+            Lê fornecedor e itens do XML — tenta casar cada item com o cadastro automaticamente.
+          </p>
+
+          <div className="nf-divider" />
 
           <div className="frow frow--2">
             <Select
@@ -349,7 +485,7 @@ export function AlmoxarifadoNotaFiscalPage() {
             <Input
               label="Unidade de compra"
               uppercase
-              maxLength={2}
+              maxLength={10}
               value={unidadeCompra}
               onChange={(e) => setUnidadeCompra(e.target.value)}
               placeholder="UN"
@@ -419,20 +555,42 @@ export function AlmoxarifadoNotaFiscalPage() {
 
           {itens.length > 0 && (
             <div className="nf-itens-rascunho">
-              {itens.map((i) => (
-                <div key={i._key} className="nf-item-row">
-                  <div className="nf-item-row__info">
-                    <strong>{i.codigoInterno}</strong> — {i.descricao}
-                    <span className="nf-item-row__qtd">
-                      {fmtQtd(i.qtdNf)} {i.unidadeCompra} → {fmtQtd(i.qtdUn)} un
-                      {i.precoUn != null ? ` · ${fmtMoeda(i.precoUn)}/un` : ""}
-                    </span>
+              {itens.map((i) =>
+                i.materialId == null ? (
+                  <div key={i._key} className="nf-item-row nf-item-row--evidencia">
+                    <div className="nf-item-row__info" style={{ flex: 1 }}>
+                      <strong>Sem material — {i.descricaoNf ?? i.codigoNf}</strong>
+                      <span className="nf-item-row__qtd">
+                        {fmtQtd(i.qtdNf)} {i.unidadeCompra}
+                        {i.precoNf != null ? ` · ${fmtMoeda(i.precoNf)}/${i.unidadeCompra}` : ""}
+                        {i.codigoNf ? ` · código NF ${i.codigoNf}` : ""}
+                      </span>
+                      <SearchSelect
+                        options={materiaisOptions}
+                        value={null}
+                        onChange={(id) => handleAssignMaterial(i._key, id)}
+                        placeholder="Escolher material do cadastro..."
+                      />
+                    </div>
+                    <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
+                      <Trash2 size={13} />
+                    </button>
                   </div>
-                  <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
+                ) : (
+                  <div key={i._key} className="nf-item-row">
+                    <div className="nf-item-row__info">
+                      <strong>{i.codigoInterno}</strong> — {i.descricao}
+                      <span className="nf-item-row__qtd">
+                        {fmtQtd(i.qtdNf)} {i.unidadeCompra} → {fmtQtd(i.qtdUn)} un
+                        {i.precoUn != null ? ` · ${fmtMoeda(i.precoUn)}/un` : ""}
+                      </span>
+                    </div>
+                    <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ),
+              )}
               <div className="nf-total-rascunho">Total: {fmtMoeda(valorTotalRascunho || null)}</div>
             </div>
           )}

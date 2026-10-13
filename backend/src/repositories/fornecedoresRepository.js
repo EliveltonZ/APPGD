@@ -1,8 +1,21 @@
 'use strict';
-const { Fornecedores } = require('../client/db');
+const { Fornecedores, sequelize } = require('../client/db');
 
 async function listar() {
   return Fornecedores.findAll({ order: [['nome', 'ASC']], raw: true });
+}
+
+// Busca por CNPJ ignorando pontuação — o cadastro guarda formatado
+// ("61.069.373/0061-44") mas a leitura de XML de NF-e só tem dígitos.
+async function buscarPorCnpj(cnpjDigitos) {
+  if (!cnpjDigitos) return null;
+  const rows = await sequelize.query(
+    `SELECT * FROM "tblFornecedores"
+     WHERE regexp_replace(cnpj, '\\D', '', 'g') = :cnpj
+     LIMIT 1`,
+    { replacements: { cnpj: cnpjDigitos }, type: sequelize.QueryTypes.SELECT },
+  );
+  return rows[0] ?? null;
 }
 
 function camposEndereco(body) {
@@ -35,4 +48,4 @@ async function excluir(id) {
   return n > 0;
 }
 
-module.exports = { listar, criar, atualizar, excluir };
+module.exports = { listar, criar, atualizar, excluir, buscarPorCnpj };

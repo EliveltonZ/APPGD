@@ -30,6 +30,6 @@ export interface FornecedorPayload {
 }
 
 export const fetchFornecedores = (): Promise<Fornecedor[]>               => apiGet('/fornecedores');
-export const createFornecedor   = (p: FornecedorPayload)                 => apiPost('/fornecedores', p);
+export const createFornecedor   = (p: FornecedorPayload): Promise<Fornecedor> => apiPost('/fornecedores', p);
 export const updateFornecedor   = (id: number, p: FornecedorPayload)     => apiPut(`/fornecedores/${id}`, p);
 export const deleteFornecedor   = (id: number)                           => apiDelete(`/fornecedores/${id}`);

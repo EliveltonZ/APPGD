@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const repo   = require('../repositories/notaFiscalRepository');
 const codigoNFRepo = require('../repositories/materiaisCodigoNFRepository');
+const nfeMatchService = require('../services/nfeMatchService');
 
 // Permissões reais da feature de estoque ainda não foram desenhadas (mesma
 // decisão já tomada pra /estoque — ver comentário lá). Por enquanto, liberado
@@ -24,6 +25,11 @@ function handler(fn) {
 router.get('/',          handler(() => repo.listar()));
 router.get('/:id/itens', handler((req) => repo.buscarItens(req.params.id)));
 router.post('/',         handler((req) => repo.criar(req.body, req.user?.sub)));
+
+// Lê um XML de NF-e (chave, fornecedor, itens) e tenta casar fornecedor
+// (por CNPJ) e cada item (por vínculo já salvo) — nada é gravado aqui, só
+// prévia pra tela montar o rascunho.
+router.post('/xml/preview', handler((req) => nfeMatchService.preview(req.body.xml)));
 
 // Vínculo código interno ↔ fornecedor — usado pra auto-preencher o item ao
 // escolher material+fornecedor no lançamento da nota.

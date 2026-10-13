@@ -71,3 +71,44 @@ export const criarNotaFiscal = (payload: NotaFiscalPayload): Promise<{ id: numbe
 
 export const fetchVinculo = (materialId: number, fornecedorId: number): Promise<VinculoCodigoNF | null> =>
   apiGet(`/nota-fiscal/vinculo/${materialId}/${fornecedorId}`);
+
+// Prévia da leitura de um XML de NF-e — nada é gravado, só o parse + o
+// casamento de fornecedor (por CNPJ) e itens (por vínculo já salvo).
+export interface NFePreviewFornecedor {
+  id: number | null;
+  cnpj: string | null;
+  nome: string | null;
+  inscricaoEstadual: string | null;
+  endereco: string | null;
+  numero: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  cep: string | null;
+  estado: string | null;
+}
+
+export interface NFePreviewItem {
+  codigoNf: string | null;
+  descricao: string | null;
+  unidadeCompra: string | null;
+  qtdNf: number | null;
+  precoNf: number | null;
+  total: number | null;
+  materialId: number | null;
+  codigoInterno: string | null;
+  materialDescricao: string | null;
+  fator: number | null;
+}
+
+export interface NFePreview {
+  chave: string | null;
+  numeroNota: string | null;
+  dataEmissao: string | null;
+  dataEntrada: string | null;
+  valorTotal: number | null;
+  fornecedor: NFePreviewFornecedor;
+  itens: NFePreviewItem[];
+}
+
+export const previewNotaFiscalXml = (xml: string): Promise<NFePreview> =>
+  apiPost('/nota-fiscal/xml/preview', { xml });

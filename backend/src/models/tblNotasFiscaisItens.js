@@ -28,7 +28,7 @@ module.exports = function(sequelize, DataTypes) {
       field:     'descricao_nf',
     },
     unidadeCompra: {
-      type:      DataTypes.STRING(2),
+      type:      DataTypes.STRING(10),
       allowNull: false,
       field:     'unidade_compra',
     },

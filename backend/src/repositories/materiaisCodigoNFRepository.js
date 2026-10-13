@@ -17,6 +17,17 @@ async function listarPorMaterial(materialId) {
   return MateriaisCodigoNF.findAll({ where: { materialId }, raw: true });
 }
 
+// Direção inversa de buscarVinculo — usada na leitura de XML de NF-e, onde
+// se conhece o fornecedor e o código dele (cProd), e se quer descobrir qual
+// material do cadastro corresponde.
+async function buscarPorCodigoFornecedor(fornecedorId, codigoNf) {
+  return MateriaisCodigoNF.findOne({
+    where: { fornecedorId, codigoNf },
+    order: [['id', 'DESC']],
+    raw: true,
+  });
+}
+
 // Cria ou atualiza o vínculo (material, fornecedor, código NF) — mesma
 // chave única do banco. Chamado ao lançar NF quando o usuário marca
 // "salvar vínculo pra próxima vez".
@@ -37,4 +48,4 @@ async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra
   }, { transaction: options.transaction });
 }
 
-module.exports = { buscarVinculo, listarPorMaterial, upsertVinculo };
+module.exports = { buscarVinculo, listarPorMaterial, upsertVinculo, buscarPorCodigoFornecedor };
