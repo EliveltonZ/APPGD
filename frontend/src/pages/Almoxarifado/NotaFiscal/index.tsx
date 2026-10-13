@@ -5,9 +5,6 @@ import { Button } from "../../../components/Button";
 import { Input } from "../../../components/Input";
 import { Select } from "../../../components/Select";
 import { SearchSelect } from "../../../components/SearchSelect";
-import { Modal } from "../../../components/Modal";
-import { DataTable } from "../../../components/DataTable";
-import type { TableColumn } from "../../../components/DataTable";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
@@ -16,15 +13,9 @@ import { fetchFornecedores, createFornecedor } from "../../../services/fornecedo
 import { fetchLocalizacoes } from "../../../services/localizacoes";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import {
-  fetchNotasFiscais,
-  fetchItensNota,
   criarNotaFiscal,
   fetchVinculo,
   previewNotaFiscalXml,
-} from "../../../services/notaFiscal";
-import type {
-  NotaFiscalResumo,
-  NotaFiscalItem,
 } from "../../../services/notaFiscal";
 import "./index.css";
 
@@ -58,22 +49,6 @@ function toNumber(s: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function fmtDate(iso: string | null): string {
-  if (!iso) return "—";
-  const d = new Date(`${iso}T00:00:00`);
-  if (isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString("pt-BR");
-}
-
-const HIST_COLUMNS: TableColumn<NotaFiscalResumo>[] = [
-  { key: "numero_nota", label: "Número", type: "text", sortable: true, filterable: true, minWidth: 100 },
-  { key: "fornecedor_nome", label: "Fornecedor", type: "text", sortable: true, filterable: true, minWidth: 200 },
-  { key: "data_entrada", label: "Entrada", type: "text", sortable: true, minWidth: 100, render: (v) => fmtDate(v as string) },
-  { key: "total_itens", label: "Itens", type: "number", align: "center", minWidth: 70 },
-  { key: "valor_total", label: "Valor", type: "number", align: "right", sortable: true, minWidth: 110, render: (v) => fmtMoeda(v != null ? Number(v) : null) },
-  { key: "usuario_login", label: "Lançado por", type: "text", sortable: true, filterable: true, minWidth: 110 },
-];
-
 let nextKey = 1;
 
 export function AlmoxarifadoNotaFiscalPage() {
@@ -81,7 +56,6 @@ export function AlmoxarifadoNotaFiscalPage() {
   const { data: fornecedores = [], refetch: recarregarFornecedores } = useApiData(fetchFornecedores);
   const { data: localizacoes = [] } = useApiData(fetchLocalizacoes);
   const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
-  const { data: historico = [], loading: loadingHist, refetch: recarregarHist } = useApiData(fetchNotasFiscais);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importandoXml, setImportandoXml] = useState(false);
@@ -106,10 +80,6 @@ export function AlmoxarifadoNotaFiscalPage() {
   const [precoUn, setPrecoUn] = useState("");
   const [salvarVinculo, setSalvarVinculo] = useState(true);
   const [vinculoCarregado, setVinculoCarregado] = useState(false);
-
-  const [viewNota, setViewNota] = useState<NotaFiscalResumo | null>(null);
-  const [viewItens, setViewItens] = useState<NotaFiscalItem[] | null>(null);
-  const [loadingViewItens, setLoadingViewItens] = useState(false);
 
   const materiaisOptions = materiais.map((m) => ({
     value: m.id,
@@ -377,24 +347,10 @@ export function AlmoxarifadoNotaFiscalPage() {
       setDataEmissao("");
       setObservacoes("");
       setItens([]);
-      recarregarHist();
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao lançar nota fiscal."));
     } finally {
       setSaving(false);
-    }
-  }
-
-  async function handleViewItens(nota: NotaFiscalResumo) {
-    setViewNota(nota);
-    setLoadingViewItens(true);
-    try {
-      const rows = await fetchItensNota(nota.id);
-      setViewItens(rows);
-    } catch {
-      setViewItens([]);
-    } finally {
-      setLoadingViewItens(false);
     }
   }
 
@@ -553,7 +509,19 @@ export function AlmoxarifadoNotaFiscalPage() {
             Adicionar item
           </Button>
 
-          {itens.length > 0 && (
+          <Button variant="primary" loading={saving} onClick={handleSubmit} style={{ width: "100%", marginTop: 8 }}>
+            <FileText size={14} />
+            Lançar Nota Fiscal
+          </Button>
+        </aside>
+
+        <section className="nf-hist-panel">
+          <h2 className="nf-panel-title">Itens da Nota</h2>
+          {itens.length === 0 ? (
+            <p style={{ padding: "12px 0", opacity: 0.5, fontSize: 13 }}>
+              Nenhum item adicionado ainda — importe um XML ou use "Adicionar item".
+            </p>
+          ) : (
             <div className="nf-itens-rascunho">
               {itens.map((i) =>
                 i.materialId == null ? (
@@ -594,67 +562,8 @@ export function AlmoxarifadoNotaFiscalPage() {
               <div className="nf-total-rascunho">Total: {fmtMoeda(valorTotalRascunho || null)}</div>
             </div>
           )}
-
-          <Button variant="primary" loading={saving} onClick={handleSubmit} style={{ width: "100%", marginTop: 8 }}>
-            <FileText size={14} />
-            Lançar Nota Fiscal
-          </Button>
-        </aside>
-
-        <section className="nf-hist-panel">
-          <h2 className="nf-panel-title">Histórico</h2>
-          <DataTable
-            columns={HIST_COLUMNS}
-            data={historico}
-            rowKey="id"
-            loading={loadingHist}
-            storageKey="nota-fiscal-hist"
-            onRowClick={handleViewItens}
-            emptyMessage="Nenhuma nota fiscal lançada."
-          />
         </section>
       </div>
-
-      <Modal
-        title={viewNota ? `NF ${viewNota.numero_nota} — ${viewNota.fornecedor_nome}` : ""}
-        isOpen={!!viewNota}
-        onClose={() => {
-          setViewNota(null);
-          setViewItens(null);
-        }}
-        maxWidth={760}
-      >
-        {loadingViewItens ? (
-          <p style={{ padding: "12px 0", opacity: 0.5, fontSize: 13 }}>Carregando...</p>
-        ) : (
-          <table className="nf-view-table">
-            <thead>
-              <tr>
-                <th>Código</th>
-                <th>Material</th>
-                <th>Qtd NF</th>
-                <th>Qtd UN</th>
-                <th>Preço UN</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(viewItens ?? []).map((i) => (
-                <tr key={i.id}>
-                  <td>{i.codigo_interno}</td>
-                  <td>{i.material_descricao}</td>
-                  <td>
-                    {fmtQtd(Number(i.qtd_nf))} {i.unidade_compra}
-                  </td>
-                  <td>{fmtQtd(Number(i.qtd_un))}</td>
-                  <td>{i.preco_un != null ? fmtMoeda(Number(i.preco_un)) : "—"}</td>
-                  <td>{i.total != null ? fmtMoeda(Number(i.total)) : "—"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Modal>
     </AppLayout>
   );
 }
