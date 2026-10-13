@@ -15,7 +15,13 @@ function handler(fn) {
     try {
       res.json(await fn(req));
     } catch (err) {
+      if (err.name === 'SequelizeUniqueConstraintError') {
+        return res.status(409).json({ error: 'Esta nota já foi lançada.' });
+      }
       const msg = err.message || '';
+      if (err.status) {
+        return res.status(err.status).json({ error: msg || 'Erro.' });
+      }
       const validacao = /selecione|informe|adicione|inválid|configurad/i.test(msg);
       res.status(validacao ? 422 : 500).json({ error: msg || 'Erro interno.' });
     }

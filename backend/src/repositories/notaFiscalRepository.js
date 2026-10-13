@@ -21,6 +21,23 @@ async function listar() {
   return rows;
 }
 
+// Usado tanto pra bloquear o lançamento duplicado quanto pra avisar já na
+// prévia do XML (antes do usuário preencher tudo de novo à toa).
+async function buscarDuplicata({ chave, fornecedorId, numeroNota }) {
+  if (chave) {
+    const porChave = await NotasFiscais.findOne({ where: { chave }, raw: true });
+    if (porChave) return porChave;
+  }
+  if (fornecedorId && numeroNota) {
+    const porNumero = await NotasFiscais.findOne({
+      where: { fornecedorId: Number(fornecedorId), numeroNota: String(numeroNota).trim() },
+      raw: true,
+    });
+    if (porNumero) return porNumero;
+  }
+  return null;
+}
+
 async function buscarItens(notaFiscalId) {
   const [rows] = await sequelize.query(
     `SELECT nfi.*, m.codigo_interno, m.descricao AS material_descricao
@@ -70,6 +87,17 @@ async function criar(body, usuarioId) {
   }
 
   const fornecedorId = Number(body.fornecedorId);
+  const numeroNota = body.numeroNota.trim();
+  const chave = body.chave?.trim() || null;
+
+  const duplicata = await buscarDuplicata({ chave, fornecedorId, numeroNota });
+  if (duplicata) {
+    throw Object.assign(
+      new Error(`Esta nota já foi lançada (NF ${duplicata.numeroNota}, em ${duplicata.dataEntrada}).`),
+      { status: 409 },
+    );
+  }
+
   const localizacaoId = recebimento.id;
   const dataEntrada = body.dataEntrada;
 
@@ -81,13 +109,14 @@ async function criar(body, usuarioId) {
     }
 
     const nf = await NotasFiscais.create({
-      numeroNota:   body.numeroNota.trim(),
+      numeroNota,
       fornecedorId,
       dataEmissao:  body.dataEmissao || null,
       dataEntrada,
       valorTotal:   valorTotal > 0 ? Math.round(valorTotal * 100) / 100 : null,
       usuarioId:    Number(usuarioId),
       observacoes:  body.observacoes || null,
+      chave,
     }, { transaction: t });
 
     for (const { item, qtdNf, qtdUn, precoNf, precoUn } of itensValidados) {
@@ -145,4 +174,4 @@ async function criar(body, usuarioId) {
   });
 }
 
-module.exports = { listar, buscarItens, criar };
+module.exports = { listar, buscarItens, criar, buscarDuplicata };

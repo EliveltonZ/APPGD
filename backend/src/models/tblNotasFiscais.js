@@ -41,6 +41,10 @@ module.exports = function(sequelize, DataTypes) {
       type:      DataTypes.TEXT,
       allowNull: true,
     },
+    chave: {
+      type:      DataTypes.STRING(44),
+      allowNull: true,
+    },
   }, {
     sequelize,
     tableName:  T.notasFiscais.name,

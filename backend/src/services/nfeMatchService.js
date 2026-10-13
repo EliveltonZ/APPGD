@@ -2,6 +2,7 @@
 const { parseNFeXml } = require('./nfeXmlParser');
 const fornecedoresRepo = require('../repositories/fornecedoresRepository');
 const codigoNFRepo = require('../repositories/materiaisCodigoNFRepository');
+const notaFiscalRepo = require('../repositories/notaFiscalRepository');
 const { Materiais } = require('../client/db');
 
 // Lê o XML + tenta casar fornecedor (por CNPJ) e cada item (por vínculo
@@ -12,6 +13,14 @@ async function preview(xmlText) {
   const parsed = parseNFeXml(xmlText);
 
   const fornecedor = await fornecedoresRepo.buscarPorCnpj(parsed.fornecedor.cnpj);
+
+  // Avisa já na prévia se essa nota já foi lançada — evita o usuário
+  // preencher/casar tudo de novo só pra descobrir isso na hora de salvar.
+  const duplicata = await notaFiscalRepo.buscarDuplicata({
+    chave: parsed.chave,
+    fornecedorId: fornecedor?.id ?? null,
+    numeroNota: parsed.numeroNota,
+  });
 
   const itens = await Promise.all(
     parsed.itens.map(async (item) => {
@@ -42,6 +51,7 @@ async function preview(xmlText) {
     dataEmissao: parsed.dataEmissao,
     dataEntrada: parsed.dataEntrada,
     valorTotal: parsed.valorTotal,
+    jaLancada: !!duplicata,
     fornecedor: {
       id: fornecedor?.id ?? null,
       cnpj: parsed.fornecedor.cnpj,

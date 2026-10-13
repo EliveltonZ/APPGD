@@ -48,6 +48,7 @@ export interface NotaFiscalPayload {
   dataEntrada: string;
   observacoes: string | null;
   itens: NotaFiscalItemPayload[];
+  chave?: string | null;
 }
 
 export interface VinculoCodigoNF {
@@ -105,6 +106,7 @@ export interface NFePreview {
   dataEmissao: string | null;
   dataEntrada: string | null;
   valorTotal: number | null;
+  jaLancada: boolean;
   fornecedor: NFePreviewFornecedor;
   itens: NFePreviewItem[];
 }

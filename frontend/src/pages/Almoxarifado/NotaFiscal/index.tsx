@@ -65,6 +65,7 @@ export function AlmoxarifadoNotaFiscalPage() {
   const [dataEmissao, setDataEmissao] = useState("");
   const [dataEntrada, setDataEntrada] = useState(localDateStr());
   const [observacoes, setObservacoes] = useState("");
+  const [chave, setChave] = useState<string | null>(null);
 
   const [itens, setItens] = useState<ItemRascunho[]>([]);
   const [saving, setSaving] = useState(false);
@@ -233,6 +234,12 @@ export function AlmoxarifadoNotaFiscalPage() {
       const xmlText = await file.text();
       const preview = await previewNotaFiscalXml(xmlText);
 
+      if (preview.jaLancada) {
+        toast.error(`Esta nota (${preview.numeroNota}) já foi lançada anteriormente — confira o histórico antes de importar de novo.`);
+        return;
+      }
+
+      setChave(preview.chave);
       if (preview.numeroNota) setNumeroNota(preview.numeroNota);
       if (preview.dataEmissao) setDataEmissao(preview.dataEmissao);
       if (preview.dataEntrada) setDataEntrada(preview.dataEntrada);
@@ -324,6 +331,7 @@ export function AlmoxarifadoNotaFiscalPage() {
         dataEmissao: dataEmissao || null,
         dataEntrada,
         observacoes: observacoes.trim() || null,
+        chave,
         itens: itens.map((i) => ({
           materialId: i.materialId as number,
           codigoNf: i.codigoNf,
@@ -341,6 +349,7 @@ export function AlmoxarifadoNotaFiscalPage() {
       setNumeroNota("");
       setDataEmissao("");
       setObservacoes("");
+      setChave(null);
       setItens([]);
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao lançar nota fiscal."));
