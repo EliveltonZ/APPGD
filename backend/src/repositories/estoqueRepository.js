@@ -232,6 +232,14 @@ async function listarProntosParaBaixa() {
   );
 }
 
+// Saldo físico de um material numa localização específica — base pro ajuste
+// por contagem (inventário): mostra o que o sistema acha que tem ali antes
+// do usuário informar o que contou de verdade.
+async function saldoPorLocalizacao(materialId, localizacaoId) {
+  const total = await EstoqueMovimentos.sum('qtdUn', { where: { materialId, localizacaoId } });
+  return Number(total) || 0;
+}
+
 module.exports = {
   buscarMaterial,
   saldoFisico,
@@ -251,6 +259,7 @@ module.exports = {
   listarAbaixoDoMinimo,
   listarSaldoPorMaterial,
   listarProntosParaBaixa,
+  saldoPorLocalizacao,
   buscarMateriaisPorId,
   criarImportacao,
   criarConsumos,

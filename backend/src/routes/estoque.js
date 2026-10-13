@@ -18,6 +18,12 @@ router.post('/:id/reservar',        c.postReservar);
 router.post('/:id/liberar-reserva', c.postLiberarReserva);
 router.post('/:id/baixa',           c.postBaixa);
 
+// Ajuste de estoque por contagem (inventário periódico) — informa o saldo
+// atual de um material numa localização, e lança a diferença contra o que
+// foi contado de verdade.
+router.get('/ajuste/saldo/:materialId/:localizacaoId', c.getSaldoLocalizacao);
+router.post('/ajuste',                                 c.postAjuste);
+
 router.post('/xml/preview',   xmlC.postPreview);
 router.post('/xml/vincular',  xmlC.postVincular);
 router.post('/xml/confirmar', xmlC.postConfirmar);

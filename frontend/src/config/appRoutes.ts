@@ -169,6 +169,12 @@ export const ROUTE_ITEMS = [
     'almoxarifado',
     'Transferências'
   ),
+  buildSidebarList(
+    'almoxarifado_ajuste',
+    '/almoxarifado/ajuste',
+    'almoxarifado',
+    'Ajuste de Estoque'
+  ),
 
 ] as const satisfies ReadonlyArray<RouteItem>;
 

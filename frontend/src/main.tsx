@@ -70,6 +70,7 @@ import { AlmoxarifadoEstoquePage } from "./pages/Almoxarifado/Estoque";
 import { AlmoxarifadoBaixasPage } from "./pages/Almoxarifado/Baixas";
 import { AlmoxarifadoNotaFiscalPage } from "./pages/Almoxarifado/NotaFiscal";
 import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
+import { AlmoxarifadoAjustePage } from "./pages/Almoxarifado/Ajuste";
 
 // ── Cadastros ─────────────────────────────────────────────────────────────────
 import { CadastrosPage } from "./pages/Cadastros";
@@ -135,6 +136,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   almoxarifado_baixas: AlmoxarifadoBaixasPage,
   almoxarifado_nota_fiscal: AlmoxarifadoNotaFiscalPage,
   almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
+  almoxarifado_ajuste: AlmoxarifadoAjustePage,
 };
 
 createRoot(document.getElementById("root")!).render(

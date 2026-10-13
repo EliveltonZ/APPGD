@@ -67,6 +67,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     almoxarifado_estoque: true,
     almoxarifado_baixas: true,
     almoxarifado_nota_fiscal: true,
+    almoxarifado_ajuste: true,
   };
   return {
     id:          String(r.id    ?? ''),

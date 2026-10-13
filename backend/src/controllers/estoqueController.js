@@ -82,4 +82,26 @@ module.exports = {
       res.json(linha);
     } catch (err) { next(err); }
   },
+
+  async getSaldoLocalizacao(req, res, next) {
+    try {
+      const materialId = Number(req.params.materialId);
+      const localizacaoId = Number(req.params.localizacaoId);
+      res.json({ saldo: await service.saldoPorLocalizacao(materialId, localizacaoId) });
+    } catch (err) { next(err); }
+  },
+
+  async postAjuste(req, res, next) {
+    try {
+      const usuarioId = Number(req.user.sub);
+      const { material_id, localizacao_id, contagem, observacoes } = req.body;
+      res.json(await service.ajustarEstoque({
+        materialId: material_id,
+        localizacaoId: localizacao_id,
+        contagem,
+        observacoes,
+        usuarioId,
+      }));
+    } catch (err) { next(err); }
+  },
 };

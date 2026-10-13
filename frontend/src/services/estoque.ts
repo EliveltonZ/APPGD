@@ -88,3 +88,26 @@ export interface SaldoMaterial {
 
 export const fetchSaldoPorMaterial = (): Promise<SaldoMaterial[]> =>
   apiGet('/estoque/saldo-materiais')
+
+// Ajuste de estoque por contagem (inventário periódico) — informa quanto
+// foi contado de verdade numa localização, o backend calcula e lança a
+// diferença contra o saldo atual (tipo AJUSTE em tblEstoqueMovimentos).
+export const fetchSaldoLocalizacao = (materialId: number, localizacaoId: number): Promise<{ saldo: number }> =>
+  apiGet(`/estoque/ajuste/saldo/${materialId}/${localizacaoId}`)
+
+export interface AjustePayload {
+  material_id: number
+  localizacao_id: number
+  contagem: number
+  observacoes: string | null
+}
+
+export interface AjusteResultado {
+  ajustado: boolean
+  diferenca: number
+  saldoAnterior: number
+  saldoNovo: number
+}
+
+export const criarAjusteEstoque = (payload: AjustePayload): Promise<AjusteResultado> =>
+  apiPost('/estoque/ajuste', payload)

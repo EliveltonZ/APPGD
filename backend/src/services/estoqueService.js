@@ -285,6 +285,46 @@ async function listarProntoParaBaixa() {
   }));
 }
 
+// Saldo físico de um material numa localização — base pro ajuste por
+// contagem mostrar "o sistema acha que tem X aqui" antes do usuário
+// informar o que contou de verdade.
+async function saldoPorLocalizacao(materialId, localizacaoId) {
+  return repo.saldoPorLocalizacao(materialId, localizacaoId);
+}
+
+// Ajuste de estoque por contagem (inventário periódico) — usuário informa
+// quanto contou de verdade numa localização, o sistema calcula a diferença
+// contra o saldo atual e lança um único movimento tipo AJUSTE com ela (nunca
+// grava a contagem em si, só a diferença, igual a qualquer outro movimento).
+// Contagem igual ao saldo atual não lança nada (nada mudou).
+async function ajustarEstoque({ materialId, localizacaoId, contagem, observacoes, usuarioId }) {
+  if (!materialId) throw erro('Selecione o material.', 400, 'VALIDACAO');
+  if (!localizacaoId) throw erro('Selecione a localização.', 400, 'VALIDACAO');
+  const contagemNum = Number(contagem);
+  if (!Number.isFinite(contagemNum) || contagemNum < 0) {
+    throw erro('Informe a quantidade contada (zero ou mais).', 400, 'VALIDACAO');
+  }
+
+  const saldoAtual = await repo.saldoPorLocalizacao(materialId, localizacaoId);
+  const diferenca = Math.round((contagemNum - saldoAtual) * 1000) / 1000;
+
+  if (diferenca === 0) {
+    return { ajustado: false, diferenca: 0, saldoAnterior: saldoAtual, saldoNovo: saldoAtual };
+  }
+
+  await repo.criarMovimento({
+    materialId,
+    localizacaoId,
+    tipo: 'AJUSTE',
+    qtdUn: diferenca,
+    data: new Date(),
+    usuarioId,
+    observacoes: observacoes || null,
+  });
+
+  return { ajustado: true, diferenca, saldoAnterior: saldoAtual, saldoNovo: contagemNum };
+}
+
 module.exports = {
   calcularSaldo,
   definirQuantidade,
@@ -296,4 +336,6 @@ module.exports = {
   listarAlertaMinimo,
   listarSaldoPorMaterial,
   listarProntoParaBaixa,
+  saldoPorLocalizacao,
+  ajustarEstoque,
 };
