@@ -10,7 +10,7 @@ import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import { localDateStr } from "../../../utils/dateUtils";
 import { fetchFornecedores, createFornecedor } from "../../../services/fornecedores";
-import { fetchLocalizacoes } from "../../../services/localizacoes";
+import { fetchRecebimento } from "../../../services/localizacoes";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import {
   criarNotaFiscal,
@@ -54,7 +54,7 @@ let nextKey = 1;
 export function AlmoxarifadoNotaFiscalPage() {
   const toast = useToast();
   const { data: fornecedores = [], refetch: recarregarFornecedores } = useApiData(fetchFornecedores);
-  const { data: localizacoes = [] } = useApiData(fetchLocalizacoes);
+  const { data: recebimento } = useApiData(fetchRecebimento);
   const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +64,6 @@ export function AlmoxarifadoNotaFiscalPage() {
   const [numeroNota, setNumeroNota] = useState("");
   const [dataEmissao, setDataEmissao] = useState("");
   const [dataEntrada, setDataEntrada] = useState(localDateStr());
-  const [localizacaoId, setLocalizacaoId] = useState("");
   const [observacoes, setObservacoes] = useState("");
 
   const [itens, setItens] = useState<ItemRascunho[]>([]);
@@ -87,9 +86,6 @@ export function AlmoxarifadoNotaFiscalPage() {
     searchHint: m.codigoInterno,
   }));
   const fornecedoresOptions = fornecedores.filter((f) => f.ativo).map((f) => ({ value: f.id, label: f.nome }));
-  const localizacoesOptions = localizacoes
-    .filter((l) => l.ativo)
-    .map((l) => ({ value: l.id, label: `${l.codigo}${l.descricao ? ` — ${l.descricao}` : ""}` }));
 
   function recomputeQtdUn(qtdNfStr: string, fatorStr: string): string {
     const qn = toNumber(qtdNfStr);
@@ -306,8 +302,8 @@ export function AlmoxarifadoNotaFiscalPage() {
       toast.error("Informe a data de entrada.");
       return;
     }
-    if (!localizacaoId) {
-      toast.error("Selecione a localização de entrada.");
+    if (!recebimento) {
+      toast.error("Nenhuma localização de recebimento configurada — marque uma em Cadastros > Localizações.");
       return;
     }
     if (itens.length === 0) {
@@ -327,7 +323,6 @@ export function AlmoxarifadoNotaFiscalPage() {
         numeroNota: numeroNota.trim(),
         dataEmissao: dataEmissao || null,
         dataEntrada,
-        localizacaoId: Number(localizacaoId),
         observacoes: observacoes.trim() || null,
         itens: itens.map((i) => ({
           materialId: i.materialId as number,
@@ -399,16 +394,9 @@ export function AlmoxarifadoNotaFiscalPage() {
             />
           </div>
 
-          <div className="frow frow--3">
+          <div className="frow frow--2">
             <Input label="Emissão" type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} />
             <Input label="Entrada *" type="date" value={dataEntrada} onChange={(e) => setDataEntrada(e.target.value)} />
-            <Select
-              label="Localização *"
-              options={localizacoesOptions}
-              value={localizacaoId}
-              onChange={(e) => setLocalizacaoId(e.target.value)}
-              placeholder="Selecione..."
-            />
           </div>
 
           <Input
@@ -417,6 +405,21 @@ export function AlmoxarifadoNotaFiscalPage() {
             onChange={(e) => setObservacoes(e.target.value)}
             placeholder="Opcional..."
           />
+
+          <p style={{ margin: 0, fontSize: 12.5 }}>
+            {recebimento ? (
+              <span style={{ color: "var(--text-muted)" }}>
+                Entrada em: <strong style={{ color: "var(--text-h)" }}>{recebimento.codigo}</strong>
+                {recebimento.descricao ? ` — ${recebimento.descricao}` : ""} — depois é só transferir pra
+                localização definitiva.
+              </span>
+            ) : (
+              <span style={{ color: "var(--accent2, #be1e1e)" }}>
+                Nenhuma localização de recebimento configurada — marque uma em Cadastros &gt; Localizações antes de
+                lançar.
+              </span>
+            )}
+          </p>
 
           <div className="nf-divider" />
 

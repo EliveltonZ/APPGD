@@ -9,6 +9,7 @@ export interface Localizacao {
   prateleira: string;
   nivel: string;
   divisao: string;
+  padraoRecebimento: boolean;
 }
 
 export interface LocalizacaoPayload {
@@ -18,9 +19,11 @@ export interface LocalizacaoPayload {
   prateleira: string;
   nivel: string;
   divisao: string;
+  padrao_recebimento: boolean;
 }
 
 export const fetchLocalizacoes   = (): Promise<Localizacao[]>              => apiGet('/localizacoes');
+export const fetchRecebimento    = (): Promise<Localizacao | null>         => apiGet('/localizacoes/recebimento');
 export const createLocalizacao   = (p: LocalizacaoPayload)                 => apiPost('/localizacoes', p);
 export const updateLocalizacao   = (id: number, p: LocalizacaoPayload)     => apiPut(`/localizacoes/${id}`, p);
 export const deleteLocalizacao   = (id: number)                            => apiDelete(`/localizacoes/${id}`);

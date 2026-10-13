@@ -25,7 +25,16 @@ function handler(fn) {
 // Leitura liberada pra qualquer usuário autenticado — escolher uma
 // localização (ex.: dar baixa de estoque) é diferente de administrar o
 // cadastro, mesmo padrão já usado em /materiais/opcoes.
-router.get('/',      handler(() => repo.listar()));
+router.get('/',             handler(() => repo.listar()));
+// `null` é uma resposta válida aqui (nenhuma localização marcada como
+// padrão ainda) — não é 404, por isso não usa o `handler()` genérico.
+router.get('/recebimento',  async (_req, res) => {
+  try {
+    res.json(await repo.buscarRecebimento());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 router.post('/',     rp('cadastros_localizacoes'), handler((req) => repo.criar(req.body)));
 router.put('/:id',   rp('cadastros_localizacoes'), handler((req) => repo.atualizar(req.params.id, req.body)));
 router.delete('/:id',rp('cadastros_localizacoes'), handler((req) => repo.excluir(req.params.id)));

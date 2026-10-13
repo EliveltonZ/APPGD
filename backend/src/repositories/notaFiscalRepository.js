@@ -1,6 +1,7 @@
 'use strict';
 const { sequelize, NotasFiscais, NotasFiscaisItens, EstoqueMovimentos, Materiais } = require('../client/db');
 const codigoNFRepo = require('./materiaisCodigoNFRepository');
+const localizacoesRepo = require('./localizacoesRepository');
 
 async function listar() {
   const [rows] = await sequelize.query(
@@ -50,17 +51,26 @@ function validarItem(item) {
 // item (tblEstoqueMovimentos, tipo ENTRADA) + atualização do último preço do
 // material + vínculo código-interno↔fornecedor (quando marcado). Tudo numa
 // transação só — ou lança tudo, ou nada.
+//
+// A localização de entrada nunca é escolhida na hora de lançar a nota — toda
+// NF entra direto na localização marcada como "padrão de recebimento"
+// (Cadastros > Localizações). Os responsáveis transferem pra localização
+// definitiva depois, via Transferências.
 async function criar(body, usuarioId) {
   if (!body.fornecedorId) throw new Error('Selecione o fornecedor.');
   if (!body.numeroNota?.trim()) throw new Error('Informe o número da nota.');
   if (!body.dataEntrada) throw new Error('Informe a data de entrada.');
-  if (!body.localizacaoId) throw new Error('Selecione a localização de entrada.');
   if (!Array.isArray(body.itens) || body.itens.length === 0) {
     throw new Error('Adicione ao menos um item.');
   }
 
+  const recebimento = await localizacoesRepo.buscarRecebimento();
+  if (!recebimento) {
+    throw new Error('Nenhuma localização de recebimento configurada — marque uma em Cadastros > Localizações.');
+  }
+
   const fornecedorId = Number(body.fornecedorId);
-  const localizacaoId = Number(body.localizacaoId);
+  const localizacaoId = recebimento.id;
   const dataEntrada = body.dataEntrada;
 
   return sequelize.transaction(async (t) => {

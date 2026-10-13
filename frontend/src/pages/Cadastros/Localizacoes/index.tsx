@@ -27,6 +27,28 @@ const COLUMNS: TableColumn<Localizacao>[] = [
   { key: 'descricao', label: 'Descrição', type: 'text', sortable: true, filterable: true,  minWidth: 220,
     render: (v) => <span>{(v as string | null) ?? '—'}</span> },
   {
+    key: 'padraoRecebimento',
+    label: 'Recebimento',
+    type: 'text',
+    sortable: true,
+    filterable: false,
+    minWidth: 100,
+    align: 'center',
+    render: (v) => v ? (
+      <span style={{
+        display: 'inline-block',
+        padding: '1px 8px',
+        borderRadius: 4,
+        fontSize: 11,
+        fontWeight: 600,
+        background: 'var(--accent-bg)',
+        color: 'var(--accent)',
+      }}>
+        Padrão
+      </span>
+    ) : null,
+  },
+  {
     key: 'ativo',
     label: 'Ativo',
     type: 'text',
@@ -57,10 +79,11 @@ interface FormState {
   divisao:    string
   descricao:  string
   ativo:      boolean
+  padraoRecebimento: boolean
 }
 
 function emptyForm(): FormState {
-  return { rua: '', prateleira: '', nivel: '', divisao: '', descricao: '', ativo: true }
+  return { rua: '', prateleira: '', nivel: '', divisao: '', descricao: '', ativo: true, padraoRecebimento: false }
 }
 
 function fromLocalizacao(l: Localizacao): FormState {
@@ -71,6 +94,7 @@ function fromLocalizacao(l: Localizacao): FormState {
     divisao: l.divisao,
     descricao: l.descricao ?? '',
     ativo: l.ativo,
+    padraoRecebimento: l.padraoRecebimento,
   }
 }
 
@@ -82,6 +106,7 @@ function toPayload(f: FormState): LocalizacaoPayload {
     divisao:    f.divisao.trim().toUpperCase(),
     descricao:  f.descricao.trim() || null,
     ativo:      f.ativo,
+    padrao_recebimento: f.padraoRecebimento,
   }
 }
 
@@ -292,6 +317,23 @@ export function CadastrosLocalizacoesPage() {
             />
             <span className="cad-field__label" style={{ margin: 0 }}>Ativo</span>
           </label>
+
+          <label className="cad-field" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={form.padraoRecebimento}
+              onChange={(e) => field('padraoRecebimento', e.target.checked)}
+              style={{ width: 15, height: 15, cursor: 'pointer' }}
+            />
+            <span className="cad-field__label" style={{ margin: 0 }}>
+              Localização padrão de recebimento
+            </span>
+          </label>
+          {form.padraoRecebimento && (
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--iniciado, #2080c5)' }}>
+              Toda nota fiscal lançada vai entrar aqui automaticamente — marcar esta desmarca a anterior.
+            </p>
+          )}
         </div>
       </Modal>
 

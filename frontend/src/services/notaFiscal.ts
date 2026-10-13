@@ -46,7 +46,6 @@ export interface NotaFiscalPayload {
   numeroNota: string;
   dataEmissao: string | null;
   dataEntrada: string;
-  localizacaoId: number;
   observacoes: string | null;
   itens: NotaFiscalItemPayload[];
 }

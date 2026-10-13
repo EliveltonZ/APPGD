@@ -32,6 +32,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull:    false,
       defaultValue: true,
     },
+    padraoRecebimento: {
+      type:         DataTypes.BOOLEAN,
+      allowNull:    false,
+      defaultValue: false,
+      field:        'padrao_recebimento',
+    },
   }, {
     sequelize,
     tableName:  T.localizacoes.name,

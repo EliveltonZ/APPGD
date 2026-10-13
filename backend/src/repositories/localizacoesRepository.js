@@ -1,5 +1,6 @@
 'use strict';
-const { Localizacoes } = require('../client/db');
+const { Op } = require('sequelize');
+const { Localizacoes, sequelize } = require('../client/db');
 
 // "codigo" (ex.: 01-01-03-D) não é uma coluna — é só a junção de
 // rua/prateleira/nivel/divisao, calculada aqui pra todo consumidor que só
@@ -17,6 +18,14 @@ async function listar() {
   return rows.map(comCodigo);
 }
 
+// Localização padrão de recebimento — toda nota fiscal lançada entra aqui
+// automaticamente (ver notaFiscalRepository.criar), e os responsáveis
+// transferem pra localização definitiva depois via Transferências.
+async function buscarRecebimento() {
+  const row = await Localizacoes.findOne({ where: { padraoRecebimento: true }, raw: true });
+  return row ? comCodigo(row) : null;
+}
+
 function camposEndereco(body) {
   const rua        = String(body.rua ?? '').trim().toUpperCase();
   const prateleira = String(body.prateleira ?? '').trim().toUpperCase();
@@ -27,19 +36,43 @@ function camposEndereco(body) {
   }
   return {
     rua, prateleira, nivel, divisao,
-    descricao: body.descricao?.trim() || null,
-    ativo:     body.ativo ?? true,
+    descricao:         body.descricao?.trim() || null,
+    ativo:             body.ativo ?? true,
+    padraoRecebimento: body.padrao_recebimento ?? false,
   };
 }
 
+// Só uma localização pode ser a padrão de recebimento por vez — marcar uma
+// nova desmarca automaticamente a anterior (índice único parcial no banco
+// garante isso de qualquer forma, mas aqui evita o usuário esbarrar num
+// erro de constraint só pra trocar qual é a padrão).
+async function desmarcarOutrasRecebimento(idAtual, transaction) {
+  await Localizacoes.update(
+    { padraoRecebimento: false },
+    { where: idAtual ? { padraoRecebimento: true, id: { [Op.ne]: idAtual } } : { padraoRecebimento: true }, transaction },
+  );
+}
+
 async function criar(body) {
-  const row = await Localizacoes.create(camposEndereco(body));
-  return comCodigo(row.toJSON());
+  const campos = camposEndereco(body);
+  return sequelize.transaction(async (t) => {
+    if (campos.padraoRecebimento) {
+      await desmarcarOutrasRecebimento(null, t);
+    }
+    const row = await Localizacoes.create(campos, { transaction: t });
+    return comCodigo(row.toJSON());
+  });
 }
 
 async function atualizar(id, body) {
-  const [n] = await Localizacoes.update(camposEndereco(body), { where: { id } });
-  return n > 0;
+  const campos = camposEndereco(body);
+  return sequelize.transaction(async (t) => {
+    if (campos.padraoRecebimento) {
+      await desmarcarOutrasRecebimento(Number(id), t);
+    }
+    const [n] = await Localizacoes.update(campos, { where: { id }, transaction: t });
+    return n > 0;
+  });
 }
 
 async function excluir(id) {
@@ -47,4 +80,4 @@ async function excluir(id) {
   return n > 0;
 }
 
-module.exports = { listar, criar, atualizar, excluir };
+module.exports = { listar, criar, atualizar, excluir, buscarRecebimento };

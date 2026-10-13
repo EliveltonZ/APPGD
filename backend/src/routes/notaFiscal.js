@@ -16,7 +16,7 @@ function handler(fn) {
       res.json(await fn(req));
     } catch (err) {
       const msg = err.message || '';
-      const validacao = /selecione|informe|adicione|inválid/i.test(msg);
+      const validacao = /selecione|informe|adicione|inválid|configurad/i.test(msg);
       res.status(validacao ? 422 : 500).json({ error: msg || 'Erro interno.' });
     }
   };
