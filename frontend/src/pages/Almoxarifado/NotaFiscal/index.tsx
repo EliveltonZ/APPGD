@@ -39,6 +39,11 @@ interface ItemRascunho {
   // sempre tem exatamente os itens da nota real, nunca menos (ver
   // handleRemoveItem).
   origemXml: boolean;
+  // Fita é comprada em rolo (metros variam por produto/fornecedor — 20m,
+  // 300m etc.) mas o estoque dela é controlado em METROS, não em rolos —
+  // sem saber quantos metros tem o rolo (fator), não dá pra lançar o item
+  // sem arriscar salvar "5" no estoque quando era "5 rolos de 20m = 100m".
+  needsFator: boolean;
 }
 
 function fmtQtd(v: number): string {
@@ -95,12 +100,46 @@ export function AlmoxarifadoNotaFiscalPage() {
   }));
   const fornecedoresOptions = fornecedores.filter((f) => f.ativo).map((f) => ({ value: f.id, label: f.nome }));
 
+  // fator = quantidade física (em metros, pra fita) que cabe em 1 unidade de
+  // compra (1 rolo). Rolo de 20m comprando 5 rolos → 5 × 20 = 100m de
+  // estoque, não 5 — era isso que estava invertido (dividia em vez de
+  // multiplicar).
   function recomputeQtdUn(qtdNfStr: string, fatorStr: string): string {
     const qn = toNumber(qtdNfStr);
     const f = toNumber(fatorStr);
     if (!qn) return "";
     if (!f || f === 1) return String(qn);
-    return String(Math.round((qn / f) * 1000) / 1000);
+    return String(Math.round(qn * f * 1000) / 1000);
+  }
+
+  // Material cuja unidade de estoque (metros, só fita hoje) é diferente da
+  // unidade que ele é comprado (ex: rolo) — precisa de um fator de conversão
+  // informado, nunca pode assumir 1:1 silenciosamente.
+  function precisaFator(matId: number | null, unCompra: string): boolean {
+    const material = materiais.find((m) => m.id === matId);
+    return material?.unidadeBase === "M" && unCompra.trim().toUpperCase() !== "M";
+  }
+
+  // Dado material + unidade de compra + quantidades, resolve qtdUn/precoUn
+  // de estoque — ou sinaliza que falta o fator (metros por rolo) pra fazer
+  // essa conta com segurança, em vez de arriscar salvar rolo como se fosse
+  // metro.
+  function resolverConversao(
+    matId: number | null,
+    unCompra: string,
+    qtdNfVal: number,
+    precoNfVal: number | null,
+    fatorConhecido: number | null,
+  ): { qtdUn: number; precoUn: number | null; needsFator: boolean; fator: number | null } {
+    if (!precisaFator(matId, unCompra)) {
+      return { qtdUn: qtdNfVal, precoUn: precoNfVal, needsFator: false, fator: null };
+    }
+    if (fatorConhecido != null && fatorConhecido > 0) {
+      const qtdUn = Math.round(qtdNfVal * fatorConhecido * 1000) / 1000;
+      const precoUn = precoNfVal != null ? Math.round((precoNfVal / fatorConhecido) * 10000) / 10000 : null;
+      return { qtdUn, precoUn, needsFator: false, fator: fatorConhecido };
+    }
+    return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
   }
 
   function recomputePrecoUn(qtdNfStr: string, precoNfStr: string, qtdUnStr: string): string {
@@ -182,6 +221,10 @@ export function AlmoxarifadoNotaFiscalPage() {
       toast.error("Informe a unidade de compra.");
       return;
     }
+    if (precisaFator(materialId, unidadeCompra) && !toNumber(fator)) {
+      toast.error("Este material é controlado em metros — informe o fator de conversão (metros por rolo) antes de adicionar.");
+      return;
+    }
 
     setItens((prev) => [
       ...prev,
@@ -200,6 +243,7 @@ export function AlmoxarifadoNotaFiscalPage() {
         codigoInterno: material?.codigoInterno ?? "",
         descricao: material?.descricao ?? "",
         origemXml: false,
+        needsFator: false,
       },
     ]);
     resetItemForm();
@@ -216,22 +260,60 @@ export function AlmoxarifadoNotaFiscalPage() {
     });
   }
 
-  function handleAssignMaterial(key: number, newMaterialId: number | null) {
+  async function handleAssignMaterial(key: number, newMaterialId: number | null) {
     const material = materiais.find((m) => m.id === newMaterialId);
+
+    let fatorConhecido: number | null = null;
+    if (newMaterialId && fornecedorId) {
+      try {
+        const vinculo = await fetchVinculo(newMaterialId, Number(fornecedorId));
+        fatorConhecido = vinculo?.m2PorUnidade ?? null;
+      } catch {
+        // sem vínculo prévio — segue sem fator conhecido
+      }
+    }
+
     setItens((prev) =>
-      prev.map((i) =>
-        i._key === key
-          ? {
-              ...i,
-              materialId: newMaterialId,
-              codigoInterno: material?.codigoInterno ?? "",
-              descricao: material?.descricao ?? "",
-              // material escolhido na mão pra um item que veio do XML sem
-              // vínculo — próxima nota do mesmo fornecedor já vem casada.
-              salvarVinculo: newMaterialId != null,
-            }
-          : i,
-      ),
+      prev.map((i) => {
+        if (i._key !== key) return i;
+        const { qtdUn, precoUn, needsFator, fator: fatorResolvido } = resolverConversao(
+          newMaterialId,
+          i.unidadeCompra,
+          i.qtdNf,
+          i.precoNf,
+          fatorConhecido,
+        );
+        return {
+          ...i,
+          materialId: newMaterialId,
+          codigoInterno: material?.codigoInterno ?? "",
+          descricao: material?.descricao ?? "",
+          qtdUn,
+          precoUn,
+          needsFator,
+          fator: fatorResolvido,
+          // material escolhido na mão pra um item que veio do XML sem
+          // vínculo — próxima nota do mesmo fornecedor já vem casada
+          // (só quando já resolveu completamente, senão espera o fator).
+          salvarVinculo: newMaterialId != null && !needsFator,
+        };
+      }),
+    );
+  }
+
+  // Usuário informou o fator (metros por rolo) pra um item que precisava —
+  // recalcula qtdUn/precoUn de estoque e libera o item pra lançar.
+  function handleResolverFator(key: number, fatorStr: string) {
+    const fatorNum = toNumber(fatorStr);
+    setItens((prev) =>
+      prev.map((i) => {
+        if (i._key !== key) return i;
+        if (fatorNum == null || fatorNum <= 0) {
+          return { ...i, fator: null, needsFator: true, qtdUn: 0, precoUn: null };
+        }
+        const { qtdUn, precoUn } = resolverConversao(i.materialId, i.unidadeCompra, i.qtdNf, i.precoNf, fatorNum);
+        return { ...i, fator: fatorNum, needsFator: false, qtdUn, precoUn, salvarVinculo: true };
+      }),
     );
   }
 
@@ -278,30 +360,46 @@ export function AlmoxarifadoNotaFiscalPage() {
       }
       if (fornecedorIdResolvido) setFornecedorId(String(fornecedorIdResolvido));
 
-      const novosItens: ItemRascunho[] = preview.itens.map((item) => ({
-        _key: nextKey++,
-        materialId: item.materialId,
-        codigoInterno: item.codigoInterno ?? "",
-        descricao: item.materialDescricao ?? item.descricao ?? "",
-        codigoNf: item.codigoNf,
-        descricaoNf: item.descricao,
-        unidadeCompra: (item.unidadeCompra ?? "UN").toUpperCase(),
-        qtdNf: item.qtdNf ?? 0,
-        qtdUn: item.qtdNf ?? 0,
-        precoNf: item.precoNf,
-        precoUn: item.precoNf,
-        salvarVinculo: false,
-        fator: null,
-        origemXml: true,
-      }));
+      const novosItens: ItemRascunho[] = preview.itens.map((item) => {
+        const unidadeCompra = (item.unidadeCompra ?? "UN").toUpperCase();
+        const qtdNf = item.qtdNf ?? 0;
+        const { qtdUn, precoUn, needsFator, fator } = resolverConversao(
+          item.materialId,
+          unidadeCompra,
+          qtdNf,
+          item.precoNf,
+          item.fator,
+        );
+        return {
+          _key: nextKey++,
+          materialId: item.materialId,
+          codigoInterno: item.codigoInterno ?? "",
+          descricao: item.materialDescricao ?? item.descricao ?? "",
+          codigoNf: item.codigoNf,
+          descricaoNf: item.descricao,
+          unidadeCompra,
+          qtdNf,
+          qtdUn,
+          precoNf: item.precoNf,
+          precoUn,
+          salvarVinculo: false,
+          fator,
+          origemXml: true,
+          needsFator,
+        };
+      });
       setItens((prev) => [...prev, ...novosItens]);
 
       if (preview.duplicata) {
         toast.error(`Esta nota já foi lançada (NF ${preview.duplicata.numeroNota}, em ${preview.duplicata.dataEntrada}) — mostrando só pra consulta, o lançamento fica bloqueado.`);
       } else {
         const semMaterial = novosItens.filter((i) => i.materialId == null).length;
-        if (semMaterial > 0) {
-          toast.error(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, ${semMaterial} sem material associado — escolha abaixo antes de lançar.`);
+        const semFator = novosItens.filter((i) => i.materialId != null && i.needsFator).length;
+        if (semMaterial > 0 || semFator > 0) {
+          const partes = [];
+          if (semMaterial > 0) partes.push(`${semMaterial} sem material associado`);
+          if (semFator > 0) partes.push(`${semFator} sem fator de conversão (metros por rolo)`);
+          toast.error(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, ${partes.join(" e ")} — resolva abaixo antes de lançar.`);
         } else {
           toast.success(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, todos já casados com o cadastro.`);
         }
@@ -343,6 +441,11 @@ export function AlmoxarifadoNotaFiscalPage() {
     const semMaterial = itens.filter((i) => i.materialId == null).length;
     if (semMaterial > 0) {
       toast.error(`${semMaterial} ite${semMaterial === 1 ? "m" : "ns"} ainda sem material associado — resolva antes de lançar.`);
+      return;
+    }
+    const semFator = itens.filter((i) => i.needsFator).length;
+    if (semFator > 0) {
+      toast.error(`${semFator} ite${semFator === 1 ? "m" : "ns"} ainda sem fator de conversão (metros por rolo) — resolva antes de lançar.`);
       return;
     }
 
@@ -507,12 +610,13 @@ export function AlmoxarifadoNotaFiscalPage() {
               placeholder="0"
             />
             <Input
-              label="Fator conversão"
+              label="Fator (metros/rolo)"
               type="text"
               inputMode="decimal"
               value={fator}
               onChange={(e) => handleFatorChange(e.target.value)}
-              placeholder="1"
+              placeholder="Ex: 20"
+              title="Só pra fita — quantos metros tem em 1 rolo comprado."
             />
             <Input
               label="Qtd (UN) *"
@@ -594,6 +698,32 @@ export function AlmoxarifadoNotaFiscalPage() {
                         value={null}
                         onChange={(id) => handleAssignMaterial(i._key, id)}
                         placeholder="Escolher material do cadastro..."
+                      />
+                    </div>
+                    {i.origemXml ? (
+                      <span className="nf-item-row__remove" title="Veio da nota fiscal — não pode ser removido, só trocar o material.">
+                        <Lock size={13} />
+                      </span>
+                    ) : (
+                      <button type="button" className="nf-item-row__remove" onClick={() => handleRemoveItem(i._key)}>
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                ) : i.needsFator ? (
+                  <div key={i._key} className="nf-item-row nf-item-row--evidencia">
+                    <div className="nf-item-row__info" style={{ flex: 1 }}>
+                      <strong>{i.codigoInterno}</strong> — {i.descricao}
+                      <span className="nf-item-row__qtd">
+                        {fmtQtd(i.qtdNf)} {i.unidadeCompra}
+                        {i.precoNf != null ? ` · ${fmtMoeda(i.precoNf)}/${i.unidadeCompra}` : ""} — controlado em
+                        metros, falta o fator de conversão
+                      </span>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="Metros por rolo (ex: 20)"
+                        onChange={(e) => handleResolverFator(i._key, e.target.value)}
                       />
                     </div>
                     {i.origemXml ? (
