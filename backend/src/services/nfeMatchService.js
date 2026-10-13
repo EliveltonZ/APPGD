@@ -51,7 +51,15 @@ async function preview(xmlText) {
     dataEmissao: parsed.dataEmissao,
     dataEntrada: parsed.dataEntrada,
     valorTotal: parsed.valorTotal,
-    jaLancada: !!duplicata,
+    // A prévia sempre mostra os dados do XML, mesmo se a nota já tiver sido
+    // lançada antes — é a única forma de consultar uma nota já lançada,
+    // já que a tela não tem mais histórico. Só o lançamento em si (POST
+    // /nota-fiscal) é bloqueado de verdade quando é duplicata.
+    duplicata: duplicata && {
+      id: duplicata.id,
+      numeroNota: duplicata.numeroNota,
+      dataEntrada: duplicata.dataEntrada,
+    },
     fornecedor: {
       id: fornecedor?.id ?? null,
       cnpj: parsed.fornecedor.cnpj,

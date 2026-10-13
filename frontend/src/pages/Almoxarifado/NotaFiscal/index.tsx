@@ -17,6 +17,7 @@ import {
   fetchVinculo,
   previewNotaFiscalXml,
 } from "../../../services/notaFiscal";
+import type { NFePreviewDuplicata } from "../../../services/notaFiscal";
 import "./index.css";
 
 interface ItemRascunho {
@@ -66,6 +67,7 @@ export function AlmoxarifadoNotaFiscalPage() {
   const [dataEntrada, setDataEntrada] = useState(localDateStr());
   const [observacoes, setObservacoes] = useState("");
   const [chave, setChave] = useState<string | null>(null);
+  const [duplicata, setDuplicata] = useState<NFePreviewDuplicata | null>(null);
 
   const [itens, setItens] = useState<ItemRascunho[]>([]);
   const [saving, setSaving] = useState(false);
@@ -234,11 +236,10 @@ export function AlmoxarifadoNotaFiscalPage() {
       const xmlText = await file.text();
       const preview = await previewNotaFiscalXml(xmlText);
 
-      if (preview.jaLancada) {
-        toast.error(`Esta nota (${preview.numeroNota}) já foi lançada anteriormente — confira o histórico antes de importar de novo.`);
-        return;
-      }
-
+      // A prévia sempre mostra os dados, mesmo se a nota já tiver sido
+      // lançada — é a única forma de consultar uma nota já lançada. Só o
+      // botão de lançar fica bloqueado nesse caso (ver duplicata abaixo).
+      setDuplicata(preview.duplicata);
       setChave(preview.chave);
       if (preview.numeroNota) setNumeroNota(preview.numeroNota);
       if (preview.dataEmissao) setDataEmissao(preview.dataEmissao);
@@ -281,11 +282,15 @@ export function AlmoxarifadoNotaFiscalPage() {
       }));
       setItens((prev) => [...prev, ...novosItens]);
 
-      const semMaterial = novosItens.filter((i) => i.materialId == null).length;
-      if (semMaterial > 0) {
-        toast.error(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, ${semMaterial} sem material associado — escolha abaixo antes de lançar.`);
+      if (preview.duplicata) {
+        toast.error(`Esta nota já foi lançada (NF ${preview.duplicata.numeroNota}, em ${preview.duplicata.dataEntrada}) — mostrando só pra consulta, o lançamento fica bloqueado.`);
       } else {
-        toast.success(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, todos já casados com o cadastro.`);
+        const semMaterial = novosItens.filter((i) => i.materialId == null).length;
+        if (semMaterial > 0) {
+          toast.error(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, ${semMaterial} sem material associado — escolha abaixo antes de lançar.`);
+        } else {
+          toast.success(`XML importado: ${novosItens.length} ite${novosItens.length === 1 ? "m" : "ns"}, todos já casados com o cadastro.`);
+        }
       }
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao importar XML."));
@@ -297,6 +302,10 @@ export function AlmoxarifadoNotaFiscalPage() {
   const valorTotalRascunho = itens.reduce((acc, i) => acc + (i.precoNf != null ? i.precoNf * i.qtdNf : 0), 0);
 
   async function handleSubmit() {
+    if (duplicata) {
+      toast.error(`Esta nota já foi lançada (NF ${duplicata.numeroNota}, em ${duplicata.dataEntrada}).`);
+      return;
+    }
     if (!fornecedorId) {
       toast.error("Selecione o fornecedor.");
       return;
@@ -350,6 +359,7 @@ export function AlmoxarifadoNotaFiscalPage() {
       setDataEmissao("");
       setObservacoes("");
       setChave(null);
+      setDuplicata(null);
       setItens([]);
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao lançar nota fiscal."));
@@ -385,6 +395,13 @@ export function AlmoxarifadoNotaFiscalPage() {
             Lê fornecedor e itens do XML — tenta casar cada item com o cadastro automaticamente.
           </p>
 
+          {duplicata && (
+            <p style={{ margin: 0, fontSize: 12.5, color: "var(--accent2, #be1e1e)" }}>
+              Esta nota já foi lançada (NF {duplicata.numeroNota}, em {duplicata.dataEntrada}) — os dados abaixo são
+              só pra consulta, lançar de novo fica bloqueado.
+            </p>
+          )}
+
           <div className="nf-divider" />
 
           <div className="frow frow--2">
@@ -392,13 +409,19 @@ export function AlmoxarifadoNotaFiscalPage() {
               label="Fornecedor *"
               options={fornecedoresOptions}
               value={fornecedorId}
-              onChange={(e) => setFornecedorId(e.target.value)}
+              onChange={(e) => {
+                setFornecedorId(e.target.value);
+                setDuplicata(null);
+              }}
               placeholder="Selecione..."
             />
             <Input
               label="Número da nota *"
               value={numeroNota}
-              onChange={(e) => setNumeroNota(e.target.value)}
+              onChange={(e) => {
+                setNumeroNota(e.target.value);
+                setDuplicata(null);
+              }}
               placeholder="Ex: 12345"
             />
           </div>
@@ -521,7 +544,14 @@ export function AlmoxarifadoNotaFiscalPage() {
             Adicionar item
           </Button>
 
-          <Button variant="primary" loading={saving} onClick={handleSubmit} style={{ width: "100%", marginTop: 8 }}>
+          <Button
+            variant="primary"
+            loading={saving}
+            disabled={!!duplicata}
+            onClick={handleSubmit}
+            style={{ width: "100%", marginTop: 8 }}
+            title={duplicata ? "Esta nota já foi lançada — não pode ser lançada de novo." : undefined}
+          >
             <FileText size={14} />
             Lançar Nota Fiscal
           </Button>

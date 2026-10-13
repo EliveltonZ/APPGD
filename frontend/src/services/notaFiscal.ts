@@ -100,13 +100,19 @@ export interface NFePreviewItem {
   fator: number | null;
 }
 
+export interface NFePreviewDuplicata {
+  id: number;
+  numeroNota: string;
+  dataEntrada: string;
+}
+
 export interface NFePreview {
   chave: string | null;
   numeroNota: string | null;
   dataEmissao: string | null;
   dataEntrada: string | null;
   valorTotal: number | null;
-  jaLancada: boolean;
+  duplicata: NFePreviewDuplicata | null;
   fornecedor: NFePreviewFornecedor;
   itens: NFePreviewItem[];
 }
