@@ -25,6 +25,35 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true
+    },
+    inscricaoEstadual: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'inscricao_estadual'
+    },
+    endereco: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    numero: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    bairro: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    cidade: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    cep: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+    estado: {
+      type: DataTypes.STRING(2),
+      allowNull: true
     }
   }, {
     sequelize,

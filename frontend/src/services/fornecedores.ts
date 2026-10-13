@@ -6,6 +6,13 @@ export interface Fornecedor {
   cnpj: string | null;
   contato: string | null;
   ativo: boolean;
+  inscricaoEstadual: string | null;
+  endereco: string | null;
+  numero: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  cep: string | null;
+  estado: string | null;
 }
 
 export interface FornecedorPayload {
@@ -13,6 +20,13 @@ export interface FornecedorPayload {
   cnpj: string | null;
   contato: string | null;
   ativo: boolean;
+  inscricao_estadual: string | null;
+  endereco: string | null;
+  numero: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  cep: string | null;
+  estado: string | null;
 }
 
 export const fetchFornecedores = (): Promise<Fornecedor[]>               => apiGet('/fornecedores');

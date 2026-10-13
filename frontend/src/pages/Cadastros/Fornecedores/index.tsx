@@ -24,6 +24,8 @@ const COLUMNS: TableColumn<Fornecedor>[] = [
     render: (v) => <span>{(v as string | null) ?? '—'}</span> },
   { key: 'contato', label: 'Contato', type: 'text', sortable: true, filterable: true, minWidth: 180,
     render: (v) => <span>{(v as string | null) ?? '—'}</span> },
+  { key: 'cidade', label: 'Cidade', type: 'text', sortable: true, filterable: true, minWidth: 140,
+    render: (v, row) => <span>{v ? `${v}${row.estado ? `/${row.estado}` : ''}` : '—'}</span> },
   {
     key: 'ativo',
     label: 'Ativo',
@@ -49,18 +51,40 @@ const COLUMNS: TableColumn<Fornecedor>[] = [
 ]
 
 interface FormState {
-  nome:    string
-  cnpj:    string
-  contato: string
-  ativo:   boolean
+  nome:              string
+  cnpj:              string
+  contato:           string
+  ativo:             boolean
+  inscricaoEstadual: string
+  endereco:          string
+  numero:            string
+  bairro:            string
+  cidade:            string
+  cep:               string
+  estado:            string
 }
 
 function emptyForm(): FormState {
-  return { nome: '', cnpj: '', contato: '', ativo: true }
+  return {
+    nome: '', cnpj: '', contato: '', ativo: true,
+    inscricaoEstadual: '', endereco: '', numero: '', bairro: '', cidade: '', cep: '', estado: '',
+  }
 }
 
 function fromFornecedor(f: Fornecedor): FormState {
-  return { nome: f.nome, cnpj: f.cnpj ?? '', contato: f.contato ?? '', ativo: f.ativo }
+  return {
+    nome: f.nome,
+    cnpj: f.cnpj ?? '',
+    contato: f.contato ?? '',
+    ativo: f.ativo,
+    inscricaoEstadual: f.inscricaoEstadual ?? '',
+    endereco: f.endereco ?? '',
+    numero: f.numero ?? '',
+    bairro: f.bairro ?? '',
+    cidade: f.cidade ?? '',
+    cep: f.cep ?? '',
+    estado: f.estado ?? '',
+  }
 }
 
 function toPayload(f: FormState): FornecedorPayload {
@@ -69,6 +93,13 @@ function toPayload(f: FormState): FornecedorPayload {
     cnpj:    f.cnpj.trim() || null,
     contato: f.contato.trim() || null,
     ativo:   f.ativo,
+    inscricao_estadual: f.inscricaoEstadual.trim() || null,
+    endereco: f.endereco.trim() || null,
+    numero:   f.numero.trim() || null,
+    bairro:   f.bairro.trim() || null,
+    cidade:   f.cidade.trim() || null,
+    cep:      f.cep.trim() || null,
+    estado:   f.estado.trim().toUpperCase() || null,
   }
 }
 
@@ -181,7 +212,7 @@ export function CadastrosFornecedoresPage() {
         title={isEditing ? `Editar — ${selected?.nome}` : 'Novo Fornecedor'}
         isOpen={modalOpen}
         onClose={closeModal}
-        maxWidth={420}
+        maxWidth={560}
         footer={
           <div className="cad-modal-footer">
             {isEditing && (
@@ -210,17 +241,31 @@ export function CadastrosFornecedoresPage() {
             />
           </label>
 
-          <label className="cad-field">
-            <span className="cad-field__label">CNPJ</span>
-            <input
-              className="cad-field__input"
-              type="text"
-              placeholder="Ex: 00.000.000/0001-00"
-              value={form.cnpj}
-              onChange={(e) => field('cnpj', e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-            />
-          </label>
+          <div className="frow frow--2">
+            <label className="cad-field">
+              <span className="cad-field__label">CNPJ</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 00.000.000/0001-00"
+                value={form.cnpj}
+                onChange={(e) => field('cnpj', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+
+            <label className="cad-field">
+              <span className="cad-field__label">Inscrição Estadual</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Opcional"
+                value={form.inscricaoEstadual}
+                onChange={(e) => field('inscricaoEstadual', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
 
           <label className="cad-field">
             <span className="cad-field__label">Contato</span>
@@ -233,6 +278,82 @@ export function CadastrosFornecedoresPage() {
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
           </label>
+
+          <div className="frow frow--3">
+            <label className="cad-field" style={{ gridColumn: 'span 2' }}>
+              <span className="cad-field__label">Endereço</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: Rua Alvares Cabral"
+                value={form.endereco}
+                onChange={(e) => field('endereco', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+            <label className="cad-field">
+              <span className="cad-field__label">Número</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 1453"
+                value={form.numero}
+                onChange={(e) => field('numero', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
+
+          <div className="frow frow--2">
+            <label className="cad-field">
+              <span className="cad-field__label">Bairro</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Opcional"
+                value={form.bairro}
+                onChange={(e) => field('bairro', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+            <label className="cad-field">
+              <span className="cad-field__label">CEP</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 09980-160"
+                value={form.cep}
+                onChange={(e) => field('cep', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
+
+          <div className="frow frow--3">
+            <label className="cad-field" style={{ gridColumn: 'span 2' }}>
+              <span className="cad-field__label">Cidade</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Opcional"
+                value={form.cidade}
+                onChange={(e) => field('cidade', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+            <label className="cad-field">
+              <span className="cad-field__label">UF</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="SP"
+                maxLength={2}
+                value={form.estado}
+                onChange={(e) => field('estado', e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
 
           <label className="cad-field" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <input
