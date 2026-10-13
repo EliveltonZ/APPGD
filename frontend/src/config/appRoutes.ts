@@ -142,6 +142,7 @@ export const ROUTE_ITEMS = [
   buildSidebarList('cadastros_usuarios', '/cadastros/usuarios', 'cadastros', 'Usuários'),
   buildSidebarList('cadastros_materiais', '/cadastros/materiais', 'cadastros', 'Materiais'),
   buildSidebarList('cadastros_localizacoes', '/cadastros/localizacoes', 'cadastros', 'Localizações'),
+  buildSidebarList('cadastros_fornecedores', '/cadastros/fornecedores', 'cadastros', 'Fornecedores'),
 
   // ── Almoxarifado ───────────────────────────────────────────────────────────
   buildSidebarList(
@@ -155,6 +156,12 @@ export const ROUTE_ITEMS = [
     '/almoxarifado/baixas',
     'almoxarifado',
     'Baixas'
+  ),
+  buildSidebarList(
+    'almoxarifado_nota_fiscal',
+    '/almoxarifado/nota-fiscal',
+    'almoxarifado',
+    'Nota Fiscal'
   ),
   buildSidebarList(
     'almoxarifado_transferencias',

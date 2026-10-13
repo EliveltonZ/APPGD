@@ -37,5 +37,7 @@ router.use('/dashboard',      require('./dashboard'))
 router.use('/preferencias',   require('./preferencias'))
 router.use('/transferencias', require('./transferencias'))
 router.use('/estoque',        require('./estoque'))
+router.use('/fornecedores',   require('./fornecedores'))
+router.use('/nota-fiscal',    require('./notaFiscal'))
 
 module.exports = router

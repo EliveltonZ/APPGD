@@ -55,6 +55,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     cadastros_usuarios:        Boolean(r.cadastros_usuarios),
     cadastros_materiais:       Boolean(r.cadastros_materiais),
     cadastros_localizacoes:    Boolean(r.cadastros_localizacoes),
+    cadastros_fornecedores:    Boolean(r.cadastros_fornecedores),
     pcp_apontamento:           Boolean(r.apontamento),
     paradas_maquina:           Boolean(r.paradas_maquina),
     paradas_admin:             Boolean(r.paradas_admin),
@@ -65,6 +66,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     estoque_reservar: true,
     almoxarifado_estoque: true,
     almoxarifado_baixas: true,
+    almoxarifado_nota_fiscal: true,
   };
   return {
     id:          String(r.id    ?? ''),
@@ -162,6 +164,7 @@ export async function saveAcessos(id: number, permissions: UserPermissions): Pro
     cadastros_usuarios:    permissions.cadastros_usuarios,
     cadastros_materiais:    permissions.cadastros_materiais,
     cadastros_localizacoes: permissions.cadastros_localizacoes,
+    cadastros_fornecedores: permissions.cadastros_fornecedores,
     apontamento:            permissions.pcp_apontamento,
     paradas_maquina:       permissions.paradas_maquina,
     paradas_admin:         permissions.paradas_admin,

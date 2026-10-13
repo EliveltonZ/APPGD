@@ -1,0 +1,33 @@
+'use strict';
+
+const router = require('express').Router();
+const repo   = require('../repositories/notaFiscalRepository');
+const codigoNFRepo = require('../repositories/materiaisCodigoNFRepository');
+
+// Permissões reais da feature de estoque ainda não foram desenhadas (mesma
+// decisão já tomada pra /estoque — ver comentário lá). Por enquanto, liberado
+// pra qualquer usuário autenticado (o middleware `auth` global já exige
+// token válido antes de chegar aqui).
+
+function handler(fn) {
+  return async (req, res) => {
+    try {
+      res.json(await fn(req));
+    } catch (err) {
+      const msg = err.message || '';
+      const validacao = /selecione|informe|adicione|inválid/i.test(msg);
+      res.status(validacao ? 422 : 500).json({ error: msg || 'Erro interno.' });
+    }
+  };
+}
+
+router.get('/',          handler(() => repo.listar()));
+router.get('/:id/itens', handler((req) => repo.buscarItens(req.params.id)));
+router.post('/',         handler((req) => repo.criar(req.body, req.user?.sub)));
+
+// Vínculo código interno ↔ fornecedor — usado pra auto-preencher o item ao
+// escolher material+fornecedor no lançamento da nota.
+router.get('/vinculo/:materialId/:fornecedorId', handler((req) =>
+  codigoNFRepo.buscarVinculo(Number(req.params.materialId), Number(req.params.fornecedorId))));
+
+module.exports = router;

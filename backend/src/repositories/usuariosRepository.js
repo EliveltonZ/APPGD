@@ -13,7 +13,7 @@ const ACESSO_ATTRS = [
   'cadastrosEquipe', 'cadastrosQualidade', 'cadastrosComercial',
   'cadastrosClientes', 'cadastrosUsuarios', 'cadastrosMateriais', 'cadastrosLocalizacoes', 'apontamento',
   'paradasMaquina', 'paradasAdmin',
-  'almoxarifadoTransferencias',
+  'almoxarifadoTransferencias', 'cadastrosFornecedores',
 ];
 
 // Converte instância Sequelize (camelCase) para plain object com chaves snake_case
@@ -54,6 +54,7 @@ function rowToSnake(r) {
     paradas_maquina:       r.paradasMaquina       ?? false,
     paradas_admin:         r.paradasAdmin         ?? false,
     almoxarifado_transferencias: r.almoxarifadoTransferencias ?? false,
+    cadastros_fornecedores: r.cadastrosFornecedores ?? false,
   };
 }
 
@@ -136,6 +137,7 @@ async function atualizarAcessos(body) {
       paradasMaquina:       body.paradas_maquina       ?? false,
       paradasAdmin:         body.paradas_admin         ?? false,
       almoxarifadoTransferencias: body.almoxarifado_transferencias ?? false,
+      cadastrosFornecedores: body.cadastros_fornecedores ?? false,
     },
     { where: { id: body.id } }
   );

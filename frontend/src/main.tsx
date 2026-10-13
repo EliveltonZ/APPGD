@@ -68,6 +68,7 @@ import { ConfigAcessosPage } from "./pages/Configuracoes/Acessos";
 // ── Almoxarifado ──────────────────────────────────────────────────────────────
 import { AlmoxarifadoEstoquePage } from "./pages/Almoxarifado/Estoque";
 import { AlmoxarifadoBaixasPage } from "./pages/Almoxarifado/Baixas";
+import { AlmoxarifadoNotaFiscalPage } from "./pages/Almoxarifado/NotaFiscal";
 import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
 
 // ── Cadastros ─────────────────────────────────────────────────────────────────
@@ -75,6 +76,7 @@ import { CadastrosPage } from "./pages/Cadastros";
 import { CadastrosUsuariosPage } from "./pages/Cadastros/Usuarios";
 import { CadastrosMateriaisPage } from "./pages/Cadastros/Materiais";
 import { CadastrosLocalizacoesPage } from "./pages/Cadastros/Localizacoes";
+import { CadastrosFornecedoresPage } from "./pages/Cadastros/Fornecedores";
 
 // ── Impressão (iframe, sem layout) ────────────────────────────────────────────
 import {
@@ -126,10 +128,12 @@ const PAGE_MAP: Record<string, ComponentType> = {
   cadastros_usuarios:  CadastrosUsuariosPage,
   cadastros_materiais:    CadastrosMateriaisPage,
   cadastros_localizacoes: CadastrosLocalizacoesPage,
+  cadastros_fornecedores: CadastrosFornecedoresPage,
   paradas_maquina:     ParadasPage,
   paradas_admin:       ParadasPage,
   almoxarifado_estoque: AlmoxarifadoEstoquePage,
   almoxarifado_baixas: AlmoxarifadoBaixasPage,
+  almoxarifado_nota_fiscal: AlmoxarifadoNotaFiscalPage,
   almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
 };
 

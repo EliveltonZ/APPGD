@@ -235,6 +235,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: false,
       field: 'almoxarifado_transferencias'
+    },
+    cadastrosFornecedores: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'cadastros_fornecedores'
     }
   }, {
     sequelize,
