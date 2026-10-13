@@ -19,8 +19,12 @@ import { getErrorMessage } from '../../../utils/errorMessage'
 import '../index.css'
 
 const COLUMNS: TableColumn<Localizacao>[] = [
-  { key: 'codigo',    label: 'Código',    type: 'text', sortable: true, filterable: true,  minWidth: 130 },
-  { key: 'descricao', label: 'Descrição', type: 'text', sortable: true, filterable: true,  minWidth: 260,
+  { key: 'codigo',     label: 'Código',     type: 'text', sortable: true, filterable: true, minWidth: 130 },
+  { key: 'rua',        label: 'Rua',        type: 'text', sortable: true, filterable: true, minWidth: 70, align: 'center' },
+  { key: 'prateleira', label: 'Prateleira', type: 'text', sortable: true, filterable: true, minWidth: 90, align: 'center' },
+  { key: 'nivel',       label: 'Nível',      type: 'text', sortable: true, filterable: true, minWidth: 70, align: 'center' },
+  { key: 'divisao',    label: 'Divisão',    type: 'text', sortable: true, filterable: true, minWidth: 80, align: 'center' },
+  { key: 'descricao', label: 'Descrição', type: 'text', sortable: true, filterable: true,  minWidth: 220,
     render: (v) => <span>{(v as string | null) ?? '—'}</span> },
   {
     key: 'ativo',
@@ -47,25 +51,44 @@ const COLUMNS: TableColumn<Localizacao>[] = [
 ]
 
 interface FormState {
-  codigo:    string
-  descricao: string
-  ativo:     boolean
+  rua:        string
+  prateleira: string
+  nivel:      string
+  divisao:    string
+  descricao:  string
+  ativo:      boolean
 }
 
 function emptyForm(): FormState {
-  return { codigo: '', descricao: '', ativo: true }
+  return { rua: '', prateleira: '', nivel: '', divisao: '', descricao: '', ativo: true }
 }
 
 function fromLocalizacao(l: Localizacao): FormState {
-  return { codigo: l.codigo, descricao: l.descricao ?? '', ativo: l.ativo }
+  return {
+    rua: l.rua,
+    prateleira: l.prateleira,
+    nivel: l.nivel,
+    divisao: l.divisao,
+    descricao: l.descricao ?? '',
+    ativo: l.ativo,
+  }
 }
 
 function toPayload(f: FormState): LocalizacaoPayload {
   return {
-    codigo:    f.codigo.trim().toUpperCase(),
-    descricao: f.descricao.trim() || null,
-    ativo:     f.ativo,
+    rua:        f.rua.trim().toUpperCase(),
+    prateleira: f.prateleira.trim().toUpperCase(),
+    nivel:      f.nivel.trim().toUpperCase(),
+    divisao:    f.divisao.trim().toUpperCase(),
+    descricao:  f.descricao.trim() || null,
+    ativo:      f.ativo,
   }
+}
+
+function previewCodigo(f: FormState): string {
+  const partes = [f.rua, f.prateleira, f.nivel, f.divisao].map((p) => p.trim().toUpperCase())
+  if (partes.some((p) => !p)) return '—'
+  return partes.join('-')
 }
 
 export function CadastrosLocalizacoesPage() {
@@ -103,8 +126,8 @@ export function CadastrosLocalizacoesPage() {
   }
 
   async function handleSave() {
-    if (!form.codigo.trim()) {
-      toast.error('O código é obrigatório.')
+    if (!form.rua.trim() || !form.prateleira.trim() || !form.nivel.trim() || !form.divisao.trim()) {
+      toast.error('Informe rua, prateleira, nível e divisão.')
       return
     }
     setSaving(true)
@@ -177,7 +200,7 @@ export function CadastrosLocalizacoesPage() {
         title={isEditing ? `Editar — ${selected?.codigo}` : 'Nova Localização'}
         isOpen={modalOpen}
         onClose={closeModal}
-        maxWidth={420}
+        maxWidth={460}
         footer={
           <div className="cad-modal-footer">
             {isEditing && (
@@ -193,25 +216,67 @@ export function CadastrosLocalizacoesPage() {
         }
       >
         <div className="cad-modal-body">
-          <label className="cad-field">
-            <span className="cad-field__label">Código *</span>
-            <input
-              className="cad-field__input"
-              type="text"
-              placeholder="Ex: R1-01-01"
-              value={form.codigo}
-              onChange={(e) => field('codigo', e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-              autoFocus
-            />
-          </label>
+          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>
+            Endereço: <strong style={{ color: 'var(--text-h)' }}>{previewCodigo(form)}</strong>
+          </p>
+
+          <div className="frow frow--2">
+            <label className="cad-field">
+              <span className="cad-field__label">Rua *</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 01"
+                value={form.rua}
+                onChange={(e) => field('rua', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+                autoFocus
+              />
+            </label>
+            <label className="cad-field">
+              <span className="cad-field__label">Prateleira *</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 01"
+                value={form.prateleira}
+                onChange={(e) => field('prateleira', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
+
+          <div className="frow frow--2">
+            <label className="cad-field">
+              <span className="cad-field__label">Nível *</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: 03"
+                value={form.nivel}
+                onChange={(e) => field('nivel', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+            <label className="cad-field">
+              <span className="cad-field__label">Divisão *</span>
+              <input
+                className="cad-field__input"
+                type="text"
+                placeholder="Ex: D"
+                value={form.divisao}
+                onChange={(e) => field('divisao', e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              />
+            </label>
+          </div>
 
           <label className="cad-field">
             <span className="cad-field__label">Descrição</span>
             <input
               className="cad-field__input"
               type="text"
-              placeholder="Ex: Rua 1, Gondola 1, Prateleira 1"
+              placeholder="Opcional — ex: Galpão A"
               value={form.descricao}
               onChange={(e) => field('descricao', e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}

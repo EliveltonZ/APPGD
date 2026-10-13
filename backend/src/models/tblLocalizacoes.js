@@ -15,6 +15,22 @@ module.exports = function(sequelize, DataTypes) {
       type:      DataTypes.TEXT,
       allowNull: true,
     },
+    rua: {
+      type:      DataTypes.STRING(10),
+      allowNull: false,
+    },
+    prateleira: {
+      type:      DataTypes.STRING(10),
+      allowNull: false,
+    },
+    nivel: {
+      type:      DataTypes.STRING(10),
+      allowNull: false,
+    },
+    divisao: {
+      type:      DataTypes.STRING(10),
+      allowNull: false,
+    },
     ativo: {
       type:         DataTypes.BOOLEAN,
       allowNull:    false,

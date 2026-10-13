@@ -12,12 +12,12 @@ function handler(fn) {
       res.json(result);
     } catch (err) {
       if (err.name === 'SequelizeUniqueConstraintError') {
-        return res.status(409).json({ error: 'Código já cadastrado.' });
+        return res.status(409).json({ error: 'Já existe uma localização com esse endereço (rua/prateleira/nível/divisão).' });
       }
       if (err.name === 'SequelizeForeignKeyConstraintError') {
         return res.status(409).json({ error: 'Localização em uso e não pode ser excluída.' });
       }
-      res.status(500).json({ error: err.message });
+      res.status(err.status ?? 500).json({ error: err.message });
     }
   };
 }

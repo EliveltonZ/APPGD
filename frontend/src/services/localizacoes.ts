@@ -5,12 +5,19 @@ export interface Localizacao {
   codigo: string;
   descricao: string | null;
   ativo: boolean;
+  rua: string;
+  prateleira: string;
+  nivel: string;
+  divisao: string;
 }
 
 export interface LocalizacaoPayload {
-  codigo: string;
   descricao: string | null;
   ativo: boolean;
+  rua: string;
+  prateleira: string;
+  nivel: string;
+  divisao: string;
 }
 
 export const fetchLocalizacoes   = (): Promise<Localizacao[]>              => apiGet('/localizacoes');
