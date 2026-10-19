@@ -22,7 +22,7 @@ import {
   liberarReserva as apiLiberarReserva,
   darBaixa as apiDarBaixa,
 } from "../../../services/estoque";
-import type { ReservaResultado } from "../../../services/estoque";
+import type { ReservaResultado, BaixaSplit } from "../../../services/estoque";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import type { PendingProject, PendingItem } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
@@ -234,11 +234,11 @@ export function PendingControlModal({
     }
   }
 
-  async function handleBaixaConfirm(data: { qtdUnBaixada: number; localizacaoId: number }) {
+  async function handleBaixaConfirm(splits: BaixaSplit[]) {
     if (!baixaModalItem) return;
     setActing(true);
     try {
-      await apiDarBaixa(baixaModalItem.id, data);
+      await apiDarBaixa(baixaModalItem.id, splits);
       await refetchItens();
       toast.success("Baixa registrada.");
       setBaixaModalItem(null);
@@ -263,7 +263,7 @@ export function PendingControlModal({
         title={`${project.numOC} — ${project.cliente} / ${project.ambiente}`}
         isOpen={isOpen}
         onClose={onClose}
-        maxWidth={1100}
+        maxWidth={1500}
         footer={footer(onClose, setConfirmSave)}
       >
         {localProject && (

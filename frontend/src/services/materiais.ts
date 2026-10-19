@@ -28,6 +28,7 @@ export interface MaterialOpcao {
   codigoInterno: string;
   descricao: string;
   unidadeBase: 'M2' | 'M' | 'UN';
+  m2PorUnidade: number | null;
 }
 
 export const fetchMateriais        = (): Promise<Material[]>       => apiGet('/materiais');

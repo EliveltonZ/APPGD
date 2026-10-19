@@ -32,6 +32,15 @@ const TIPO_LABEL: Record<string, string> = {
 };
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 
+// Largura da coluna de material baseada na maior descrição possível entre
+// as opções — sem isso, descrição de material comprida (tem material com
+// mais de 80 caracteres no cadastro) fica cortada na caixa de busca.
+// ~7.2px por caractere (fonte do campo) + espaço do X de limpar/seta/padding.
+function larguraColunaMaterial(options: SearchSelectOption[]): number {
+  const maiorLabel = options.reduce((max, o) => Math.max(max, o.label.length), 0);
+  return Math.max(280, Math.round(maiorLabel * 7.2) + 70);
+}
+
 interface Props {
   rows: XmlRow[];
   materiaisOptions: SearchSelectOption[];
@@ -51,6 +60,7 @@ export function XmlItensTable({
   onVincular,
   onExcluir,
 }: Props) {
+  const larguraMaterial = larguraColunaMaterial(materiaisOptions);
   const columns: TableColumn<XmlRow>[] = [
     {
       key: "referencia",
@@ -98,7 +108,7 @@ export function XmlItensTable({
     {
       key: "materialId",
       label: "Material do cadastro",
-      minWidth: 280,
+      minWidth: larguraMaterial,
       render: (_v, row) => {
         if (row.materialIdOriginal != null) {
           // Já chegou casada (vínculo salvo ou código interno batendo) — é

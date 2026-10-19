@@ -10,9 +10,12 @@ const pedidoC = require('../controllers/pedidoItensController');
 // coluna real em tblUsuario, reintroduzir `rp('estoque_reservar')` em cada rota.
 
 router.get('/alerta-minimo',        c.getAlertaMinimo);
+router.get('/lista-compras',        c.getListaCompras);
 router.get('/pronto-para-baixa',    c.getProntoParaBaixa);
+router.get('/lista-separacao/:ordemdecompra', c.getListaSeparacao);
 router.get('/saldo-materiais',      c.getSaldoPorMaterial);
 router.get('/saldo/:materialId',    c.getSaldo);
+router.get('/saldo-localizacoes/:materialId', c.getSaldoLocalizacoes);
 router.put('/:id/quantidade',       c.putQuantidade);
 router.post('/:id/reservar',        c.postReservar);
 router.post('/:id/liberar-reserva', c.postLiberarReserva);
@@ -23,6 +26,7 @@ router.post('/:id/baixa',           c.postBaixa);
 // foi contado de verdade.
 router.get('/ajuste/saldo/:materialId/:localizacaoId', c.getSaldoLocalizacao);
 router.post('/ajuste',                                 c.postAjuste);
+router.get('/ajuste/historico',                        c.getHistoricoAjustes);
 
 router.post('/xml/preview',   xmlC.postPreview);
 router.post('/xml/vincular',  xmlC.postVincular);

@@ -1,0 +1,385 @@
+.conf-page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 4px;
+}
+
+.conf-page__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.conf-page__title {
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  margin: 0 0 2px !important;
+}
+
+.conf-page__subtitle {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+  max-width: 720px;
+}
+
+.conf-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .conf-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.conf-vazio {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+/* ── Pedido em confirmação (carrinho) ──────────────────────── */
+
+.conf-carrinho {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--accent-border, var(--border));
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.conf-section__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.conf-carrinho__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.conf-carrinho__count {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.conf-carrinho__form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 700px) {
+  .conf-carrinho__form {
+    grid-template-columns: 1fr;
+  }
+}
+
+.conf-carrinho__itens {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.conf-carrinho__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--content-bg);
+  font-size: 12.5px;
+}
+
+.conf-carrinho__item-label {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conf-carrinho__item-disponivel {
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+
+.conf-carrinho__item-qtd {
+  width: 90px;
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 12.5px;
+  outline: none;
+}
+
+.conf-carrinho__item-qtd:focus {
+  border-color: var(--accent);
+}
+
+.conf-carrinho__item-remove {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.conf-carrinho__item-remove:hover {
+  background: var(--accent2-bg);
+  color: var(--accent2);
+}
+
+/* ── Orçamentos em aberto (grupos) ─────────────────────────── */
+
+.conf-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conf-grupos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.conf-grupo {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.conf-grupo-header {
+  display: flex;
+  align-items: stretch;
+}
+
+.conf-grupo-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-h);
+  font-family: var(--sans);
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.conf-grupo-trigger:hover {
+  background: var(--hover);
+}
+
+.conf-grupo-print {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.conf-grupo-print:hover {
+  background: var(--hover);
+  color: var(--text-h);
+}
+
+.conf-grupo-add {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  border: none;
+  border-left: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.conf-grupo-add:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.conf-grupo-chevron {
+  flex-shrink: 0;
+  color: var(--text);
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.conf-grupo--aberto .conf-grupo-chevron {
+  transform: rotate(90deg);
+}
+
+.conf-grupo-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conf-grupo-obs {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.conf-grupo-count {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.conf-grupo-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+
+.conf-grupo--aberto .conf-grupo-wrap {
+  grid-template-rows: 1fr;
+}
+
+.conf-grupo-table {
+  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.conf-grupo-table thead th {
+  text-align: left;
+  padding: 8px 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--content-bg);
+}
+
+.conf-grupo-table tbody td {
+  padding: 8px 14px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+}
+
+.conf-grupo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Ações na tabela ────────────────────────────────────── */
+
+.conf-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.conf-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.conf-action-btn:hover:not(:disabled) {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+.conf-action-btn--ativo {
+  color: #16a34a;
+  border-color: #16a34a;
+}
+
+.conf-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Modal de edição ────────────────────────────────────── */
+
+.conf-modal__info {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.conf-modal__qtd-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 13px;
+  outline: none;
+}
+
+.conf-modal__qtd-input:focus {
+  border-color: var(--accent);
+}

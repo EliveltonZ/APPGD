@@ -40,13 +40,13 @@ function parseNFeXml(xmlText) {
   try {
     doc = parser.parse(xmlText);
   } catch {
-    throw new Error('Não foi possível ler o XML — arquivo inválido ou corrompido.');
+    throw Object.assign(new Error('Não foi possível ler o XML — arquivo inválido ou corrompido.'), { status: 400 });
   }
 
   const nfe = doc.nfeProc?.NFe ?? doc.NFe;
   const infNFe = nfe?.infNFe;
   if (!infNFe) {
-    throw new Error('XML inválido — tag infNFe (NF-e) não encontrada.');
+    throw Object.assign(new Error('XML inválido — tag infNFe (NF-e) não encontrada.'), { status: 400 });
   }
 
   const ide = infNFe.ide ?? {};

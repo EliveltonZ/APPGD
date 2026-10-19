@@ -5,12 +5,12 @@ import { DataTable } from '../../../components/DataTable';
 import type { TableColumn } from '../../../components/DataTable';
 import { Button } from '../../../components/Button';
 import { Select } from '../../../components/Select';
+import { SearchSelect } from '../../../components/SearchSelect';
 import { Input } from '../../../components/Input';
 import { useApiData } from '../../../hooks/useApiData';
 import { useToast } from '../../../context/ToastContext';
-import { localDateStr } from '../../../utils/dateUtils';
 import { getErrorMessage } from '../../../utils/errorMessage';
-import { fetchMateriais } from '../../../services/materiais';
+import { fetchMateriaisOpcoes } from '../../../services/materiais';
 import { fetchLocalizacoes } from '../../../services/localizacoes';
 import {
   fetchSaldoMaterial,
@@ -60,14 +60,11 @@ const HIST_COLUMNS: TableColumn<Transferencia>[] = [
   { key: 'usuario_login', label: 'Usuário', type: 'text', sortable: true, filterable: true, minWidth: 100 },
 ];
 
-const today = localDateStr();
-
 interface FormState {
   materialId:  string;
   origemId:    string;
   destinoId:   string;
   qtd:         string;
-  data:        string;
   observacoes: string;
 }
 
@@ -76,14 +73,13 @@ const emptyForm = (): FormState => ({
   origemId:    '',
   destinoId:   '',
   qtd:         '',
-  data:        today,
   observacoes: '',
 });
 
 export function AlmoxarifadoTransferenciasPage() {
   const toast = useToast();
 
-  const { data: materiais  = [] } = useApiData(fetchMateriais);
+  const { data: materiais  = [] } = useApiData(fetchMateriaisOpcoes);
   const { data: localizacoes = [] } = useApiData(fetchLocalizacoes);
   const { data: historico  = [], loading: loadingHist, refetch: recarregarHist } = useApiData(fetchTransferencias);
 
@@ -93,11 +89,10 @@ export function AlmoxarifadoTransferenciasPage() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
 
-  const materiaisAtivos = materiais.filter((m) => m.ativo);
-
-  const materialOptions = materiaisAtivos.map((m) => ({
+  const materialOptions = materiais.map((m) => ({
     value: m.id,
     label: `${m.codigoInterno} — ${m.descricao}`,
+    searchHint: m.codigoInterno,
   }));
 
   const origemOptions = saldo.map((s) => ({
@@ -127,10 +122,11 @@ export function AlmoxarifadoTransferenciasPage() {
     }
   }, []);
 
-  function handleMaterialChange(materialId: string) {
-    setForm((p) => ({ ...p, materialId, origemId: '', destinoId: '', qtd: '' }));
+  function handleMaterialChange(materialId: number | null) {
+    const idStr = materialId != null ? String(materialId) : '';
+    setForm((p) => ({ ...p, materialId: idStr, origemId: '', destinoId: '', qtd: '' }));
     setSaldo([]);
-    fetchSaldo(materialId);
+    fetchSaldo(idStr);
     setErrors({});
   }
 
@@ -149,7 +145,6 @@ export function AlmoxarifadoTransferenciasPage() {
     } else if (saldoOrigem !== null && Number(form.qtd) > saldoOrigem) {
       errs.qtd = `Máximo disponível: ${fmtQtd(saldoOrigem)} UN`;
     }
-    if (!form.data) errs.data = 'Obrigatório';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -164,7 +159,6 @@ export function AlmoxarifadoTransferenciasPage() {
         localizacao_origem_id:  Number(form.origemId),
         localizacao_destino_id: Number(form.destinoId),
         qtd_un:                 Number(form.qtd),
-        data:                   form.data,
         observacoes:            form.observacoes || null,
       });
       toast.success('Transferência registrada com sucesso.');
@@ -187,14 +181,16 @@ export function AlmoxarifadoTransferenciasPage() {
         <aside className="transf-form-panel">
           <h2 className="transf-panel-title">Nova Transferência</h2>
           <form className="transf-form" onSubmit={handleSubmit}>
-            <Select
-              label="Material *"
-              options={materialOptions}
-              value={form.materialId}
-              onChange={(e) => handleMaterialChange(e.target.value)}
-              error={errors.materialId}
-              placeholder="Selecione o material..."
-            />
+            <div className="pfield">
+              <label>Material *</label>
+              <SearchSelect
+                options={materialOptions}
+                value={form.materialId ? Number(form.materialId) : null}
+                onChange={handleMaterialChange}
+                placeholder="Buscar material (nome ou código)..."
+              />
+              {errors.materialId && <span className="input-error-msg">{errors.materialId}</span>}
+            </div>
 
             {/* Saldo por localização */}
             {form.materialId && (
@@ -235,25 +231,16 @@ export function AlmoxarifadoTransferenciasPage() {
               disabled={saldo.length === 0}
             />
 
-            <div className="frow frow--2">
-              <Input
-                label="Quantidade (UN) *"
-                type="number"
-                min="0.001"
-                step="0.001"
-                value={form.qtd}
-                onChange={(e) => handleChange('qtd', e.target.value)}
-                error={errors.qtd}
-                placeholder="0.000"
-              />
-              <Input
-                label="Data *"
-                type="date"
-                value={form.data}
-                onChange={(e) => handleChange('data', e.target.value)}
-                error={errors.data}
-              />
-            </div>
+            <Input
+              label="Quantidade (UN) *"
+              type="number"
+              min="0.001"
+              step="0.001"
+              value={form.qtd}
+              onChange={(e) => handleChange('qtd', e.target.value)}
+              error={errors.qtd}
+              placeholder="0.000"
+            />
 
             <Select
               label="Destino *"

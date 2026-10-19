@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Modal } from '../../../components/Modal';
 import { Button } from '../../../components/Button';
@@ -10,17 +10,27 @@ import { ProjectInfoSection } from './sections/ProjectInfoSection';
 import { AccessoriesChecklistSection } from './sections/AccessoriesChecklistSection';
 import { OperationalStatusSection } from './sections/OperationalStatusSection';
 import { NotesSection } from './sections/NotesSection';
-import { MaterialsTable } from '../../../components/MaterialsTable';
+import { ItensPedidoTable } from '../../../components/ItensPedidoTable';
+import { fetchPendingItems } from '../../../services/pending';
 import type { ExpeditionDetail, ExpeditionUser } from '../../../types/expedition';
+import type { PendingItem } from '../../../types/pending';
 import type { PickRole } from './sections/OperationalStatusSection';
 import './index.css';
 
-function validate(f: ExpeditionDetail): string | null {
+// Pedido só pode ser expedido depois que o almoxarifado separou tudo
+// (todo item em PENDENTE/RESERVADO bloqueia) — a não ser que seja expedido
+// com pendência marcada de propósito (mesma válvula de escape que já existe
+// pras outras validações abaixo).
+function temItemNaoSeparado(itens: PendingItem[]): boolean {
+  return itens.some((i) => i.status === 'PENDENTE' || i.status === 'RESERVADO');
+}
+
+function validate(f: ExpeditionDetail, pendingItems: PendingItem[]): string | null {
   if (f.pendencia) return null;
   if (!f.entrega && !f.pronto) return null;
   if (f.entrega && !f.pronto) return 'Projeto não finalizado';
   if (!f.etapa) return 'Etapas de produção em aberto';
-  if (f.acessoriosCompra.some((a) => !a.recebido)) return 'Acessórios pendentes';
+  if (temItemNaoSeparado(pendingItems)) return 'Separação do almoxarifado pendente';
   return null;
 }
 
@@ -48,10 +58,18 @@ export function ExpeditionModal({
   const [form, setForm] = useState<ExpeditionDetail | null>(() =>
     detail ? { ...detail } : null,
   );
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
   const [saveConfirmOpen, setSaveConfirmOpen] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [pickingFor, setPickingFor] = useState<PickRole | null>(null);
   const [validationWarning, setValidationWarning] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!detail) { setPendingItems([]); return; }
+    fetchPendingItems(detail.ordemdecompra)
+      .then(setPendingItems)
+      .catch(() => setPendingItems([]));
+  }, [detail?.ordemdecompra]);
 
   function updateForm(updates: Partial<ExpeditionDetail>) {
     setForm((prev) => (prev ? { ...prev, ...updates } : prev));
@@ -60,7 +78,7 @@ export function ExpeditionModal({
 
   function handleSaveClick() {
     if (!form) return;
-    const warning = validate(form);
+    const warning = validate(form, pendingItems);
     if (warning) { setValidationWarning(warning); return; }
     setValidationWarning(null);
     setSaveConfirmOpen(true);
@@ -161,8 +179,8 @@ export function ExpeditionModal({
               <NotesSection value={form.observacoes} onChange={(v) => updateForm({ observacoes: v })} />
             </FormSection>
 
-            <FormSection step={5} title="Compras Pendentes">
-              <MaterialsTable materials={form.acessoriosCompra} />
+            <FormSection step={5} title="Materiais — Separação do Almoxarifado">
+              <ItensPedidoTable items={pendingItems} />
             </FormSection>
           </div>
         )}

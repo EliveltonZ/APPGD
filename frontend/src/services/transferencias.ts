@@ -26,7 +26,6 @@ export interface NovaTransferenciaPayload {
   localizacao_origem_id:   number;
   localizacao_destino_id:  number;
   qtd_un:                  number;
-  data:                    string;
   observacoes:             string | null;
 }
 

@@ -69,7 +69,10 @@ async function criar(body, usuarioId) {
       throw new Error(`Saldo insuficiente. Disponível: ${saldoDisponivel.toFixed(3)} UN.`);
     }
 
-    const data = body.data ? new Date(body.data) : new Date();
+    // Timestamp é sempre o horário do servidor no momento do registro —
+    // nunca aceita data vinda do cliente, senão dá pra forjar quando a
+    // transferência "aconteceu" (burlável via front ou chamada direta à API).
+    const data = new Date();
 
     const transfer = await Transferencias.create({
       materialId:           Number(body.material_id),

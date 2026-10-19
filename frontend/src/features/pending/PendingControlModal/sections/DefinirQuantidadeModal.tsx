@@ -5,7 +5,9 @@ import { Input } from "../../../../components/Input";
 import type { PendingItem } from "../../../../types/pending";
 
 const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
-const UN_LABEL: Record<string, string> = { CHAPA: "chapas inteiras", FITA: "rolos" };
+// Só chapa (m²) passa por esse modal — fita é controlada em metro (não em
+// rolo inteiro), então nunca precisa dessa conversão manual.
+const UN_LABEL: Record<string, string> = { CHAPA: "chapas inteiras" };
 
 interface Props {
   item: PendingItem | null;

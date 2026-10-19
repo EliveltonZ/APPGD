@@ -97,6 +97,7 @@ const T = {
   estoqueMovimentos:       { name: 'tblEstoqueMovimentos',       pk: 'id' },
   solicitacaoCompras:      { name: 'tblSolicitacaoCompras',      pk: 'id' },
   solicitacaoComprasItens: { name: 'tblSolicitacaoComprasItens', pk: 'id' },
+  solicitacaoInterna:      { name: 'tblSolicitacaoInterna',      pk: 'id' },
 };
 
 module.exports = T;

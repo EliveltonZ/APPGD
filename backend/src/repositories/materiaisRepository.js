@@ -22,7 +22,10 @@ async function buscarPorId(id) {
 async function listarOpcoes() {
   return Materiais.findAll({
     where: { ativo: true },
-    attributes: ['id', 'codigoInterno', 'descricao', 'unidadeBase'],
+    // m2PorUnidade entra aqui (mesmo sendo a versão "leve") porque é um dado
+    // de conversão, não de preço — a Nota Fiscal precisa dele pra converter
+    // chapa comprada em m² pra UN (chapa inteira) na hora de vincular o item.
+    attributes: ['id', 'codigoInterno', 'descricao', 'unidadeBase', 'm2PorUnidade'],
     order: [['descricao', 'ASC']],
     raw: true,
   });

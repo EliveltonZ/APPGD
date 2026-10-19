@@ -1,0 +1,83 @@
+.ipt-table__wrapper {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.ipt-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.ipt-table__th {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+.ipt-table__th:first-child { border-radius: 12px 0 0 0; }
+.ipt-table__th:last-child  { border-radius: 0 12px 0 0; }
+
+.ipt-table__th--center { text-align: center; }
+
+.ipt-table__td {
+  padding: 9px 12px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.ipt-table__row:last-child .ipt-table__td { border-bottom: none; }
+
+.ipt-table__td--center { text-align: center; }
+
+.ipt-table__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+
+.ipt-table__badge--pendente {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+}
+
+.ipt-table__badge--reservado {
+  background: rgba(32, 128, 197, 0.12);
+  color: #2080c5;
+}
+
+.ipt-table__badge--executado {
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+}
+
+.ipt-table__badge--cancelado {
+  background: rgba(107, 99, 117, 0.12);
+  color: var(--text);
+}
+
+.ipt-table__empty {
+  padding: 32px;
+  text-align: center;
+  color: var(--text);
+  opacity: 0.5;
+  font-size: 13px;
+}

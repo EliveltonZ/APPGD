@@ -48,3 +48,69 @@
   color: #dc2626;
   font-weight: 600;
 }
+
+/* ── Modal "Onde está o material" ────────────────────────── */
+
+.estq-detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.estq-detalhe__material {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  color: var(--text-h);
+}
+
+.estq-detalhe__msg {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.estq-detalhe__msg--erro {
+  color: #dc2626;
+}
+
+.estq-detalhe__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.estq-detalhe__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--content-bg);
+}
+
+.estq-detalhe__item__local {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.estq-detalhe__item__desc {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.estq-detalhe__item__saldo {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  flex-shrink: 0;
+}

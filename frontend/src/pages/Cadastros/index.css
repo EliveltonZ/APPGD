@@ -121,7 +121,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--input-bg, var(--surface));
-  color: var(--text);
+  color: var(--text) !important;
   font-size: 13px;
   outline: none;
   transition: border-color 0.15s;
@@ -129,6 +129,11 @@
 
 .cad-field__input:focus {
   border-color: var(--primary, #3b82f6);
+}
+
+select.cad-field__input option {
+  color: var(--text);
+  background: var(--bg);
 }
 
 /* ── Sidebar toggle (mobile only) ────────────────────────────────────────── */

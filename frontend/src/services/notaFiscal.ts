@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './api';
+import { apiGet, apiPost, apiPut, apiDelete } from './api';
 
 export interface NotaFiscalResumo {
   id: number;
@@ -39,6 +39,7 @@ export interface NotaFiscalItemPayload {
   precoUn: number | null;
   salvarVinculo: boolean;
   fator: number | null;
+  pedidoItemId?: number | null;
 }
 
 export interface NotaFiscalPayload {
@@ -71,6 +72,37 @@ export const criarNotaFiscal = (payload: NotaFiscalPayload): Promise<{ id: numbe
 
 export const fetchVinculo = (materialId: number, fornecedorId: number): Promise<VinculoCodigoNF | null> =>
   apiGet(`/nota-fiscal/vinculo/${materialId}/${fornecedorId}`);
+
+// Consulta e correção de vínculos já salvos — pra quando o time vincula um
+// item errado (material errado, ou fator errado) durante o lançamento de
+// uma nota e precisa achar e corrigir depois.
+export interface VinculoListItem {
+  id: number;
+  material_id: number;
+  fornecedor_id: number;
+  codigo_nf: string;
+  unidade_compra: string;
+  m2_por_unidade: number | null;
+  codigo_interno: string;
+  material_descricao: string;
+  unidade_base: string;
+  fornecedor_nome: string;
+}
+
+export const fetchVinculos = (): Promise<VinculoListItem[]> =>
+  apiGet('/nota-fiscal/vinculos');
+
+export interface VinculoUpdatePayload {
+  material_id?: number;
+  unidade_compra?: string;
+  m2_por_unidade: number | null;
+}
+
+export const atualizarVinculo = (id: number, payload: VinculoUpdatePayload): Promise<VinculoCodigoNF> =>
+  apiPut(`/nota-fiscal/vinculos/${id}`, payload);
+
+export const excluirVinculo = (id: number): Promise<void> =>
+  apiDelete(`/nota-fiscal/vinculos/${id}`);
 
 // Prévia da leitura de um XML de NF-e — nada é gravado, só o parse + o
 // casamento de fornecedor (por CNPJ) e itens (por vínculo já salvo).

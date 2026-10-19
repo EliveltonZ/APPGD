@@ -17,7 +17,10 @@ const ORIGEM_LABEL: Record<string, string> = { XML: "XML", MANUAL: "Manual" };
 
 function fmtQtd(item: PendingItem): string {
   const base = `${item.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[item.unidade] ?? item.unidade}`;
-  if (item.unidade === "UN") return base; // ferragem: já é a própria quantidade a reservar
+  // Ferragem (un) e fita (m, estoque controlado em metro) já são a própria
+  // quantidade a reservar — só chapa (m²) precisa da conversão pra "quantas
+  // chapas inteiras", por isso só ela mostra o "· X un" extra.
+  if (item.unidade !== "M2") return base;
   const un = item.qtdUnConfirmada != null ? `${item.qtdUnConfirmada} un` : "— un";
   return `${base} · ${un}`;
 }
@@ -54,7 +57,7 @@ export function PendingItemsTable({
             </tr>
           )}
           {items.map((item) => {
-            const precisaQtd = item.unidade !== "UN" && item.qtdUnConfirmada == null;
+            const precisaQtd = item.unidade === "M2" && item.qtdUnConfirmada == null;
             const podeExcluir = item.origem === "MANUAL" && item.status === "PENDENTE";
             return (
               <tr key={item.id} className="pend-items-row">

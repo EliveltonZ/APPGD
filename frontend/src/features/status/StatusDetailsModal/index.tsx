@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "../../../components/Modal";
 import { StatusBadge } from "../StatusBadge";
 import { ProjectInfoSection } from "./sections/ProjectInfoSection";
-import { AcessoriosTable } from "../../../components/AcessoriosTable";
-import type { AcessorioRow } from "../../../components/AcessoriosTable";
+import { ItensPedidoTable } from "../../../components/ItensPedidoTable";
 import { ProductionStageCard } from "../../../components/ProductionStageCard";
 import { fetchStatusDetail } from "../../../services/status";
 import { fetchPendingItems } from "../../../services/pending";
@@ -64,23 +63,6 @@ export function StatusDetailsModal({
         .finally(() => setLoading(false));
     }
   }, [isOpen, project?.numOC]);
-
-  const accessoryRows = useMemo<AcessorioRow[]>(
-    () =>
-      // Rastreamento de compra/previsão/recebimento ainda não existe nessa
-      // versão da fonte de dados (tblXmlConsumo) — fica em branco até essa
-      // etapa ser migrada também.
-      accessories.map((a) => ({
-        id: String(a.id),
-        descricao: a.descricao ?? "",
-        medida: a.detalhes ?? "",
-        qtd: a.quantidade,
-        compra: "—",
-        previsao: "—",
-        recebido: "",
-      })),
-    [accessories],
-  );
 
   const title = project
     ? `${project.numOC} — ${project.cliente}`
@@ -191,8 +173,8 @@ export function StatusDetailsModal({
             {loadingDetail ? (
               <p className="plan-modal__empty">Carregando...</p>
             ) : (
-              <AcessoriosTable
-                rows={accessoryRows}
+              <ItensPedidoTable
+                items={accessories}
                 emptyMessage="Nenhum material cadastrado."
               />
             )}

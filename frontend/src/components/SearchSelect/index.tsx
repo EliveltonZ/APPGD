@@ -130,32 +130,31 @@ export function SearchSelect({
 
   return (
     <div className="ssel" ref={wrapperRef}>
-      <div className="ssel__field" onClick={openList}>
-        <input
-          ref={inputRef}
-          className="ssel__input"
-          type="text"
-          value={open ? query : (selected?.label ?? "")}
-          placeholder={selected ? undefined : placeholder}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={openList}
-          onKeyDown={handleKeyDown}
-        />
-        {selected && !open && (
-          <button
-            type="button"
-            className="ssel__clear"
-            title="Limpar seleção"
-            onClick={(e) => {
-              e.stopPropagation();
-              onChange(null);
-            }}
-          >
-            <X size={13} />
-          </button>
-        )}
-        <ChevronDown size={14} className="ssel__chevron" />
-      </div>
+      <input
+        ref={inputRef}
+        className="ssel__input"
+        type="text"
+        value={open ? query : (selected?.label ?? "")}
+        placeholder={selected ? undefined : placeholder}
+        onChange={(e) => setQuery(e.target.value)}
+        onFocus={openList}
+        onClick={openList}
+        onKeyDown={handleKeyDown}
+      />
+      {selected && !open && (
+        <button
+          type="button"
+          className="ssel__clear"
+          title="Limpar seleção"
+          onClick={(e) => {
+            e.stopPropagation();
+            onChange(null);
+          }}
+        >
+          <X size={13} />
+        </button>
+      )}
+      <ChevronDown size={14} className="ssel__chevron" />
 
       {open && coords &&
         createPortal(

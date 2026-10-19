@@ -50,9 +50,10 @@ async function adicionarManual({ ordemdecompra, materialId, quantidade, detalhes
   if (!material) throw erro('Material não encontrado.', 404, 'VALIDACAO');
 
   const unidade = material.unidadeBase;
-  // Ferragem (UN) já nasce com a quantidade confirmada — não precisa do
-  // passo de "informar quantas UN" que chapa/fita exigem.
-  const qtdUn = unidade === 'UN' ? quantidade : null;
+  // Ferragem (UN) e fita (M, controlada em metro — não em rolo inteiro) já
+  // nascem com a quantidade confirmada. Só chapa (M2) precisa do passo de
+  // "informar quantas chapas inteiras".
+  const qtdUn = unidade === 'M2' ? null : quantidade;
 
   return repo.criarConsumoManual({
     importacaoId:    null,

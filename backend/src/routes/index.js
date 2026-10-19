@@ -39,5 +39,7 @@ router.use('/transferencias', require('./transferencias'))
 router.use('/estoque',        require('./estoque'))
 router.use('/fornecedores',   require('./fornecedores'))
 router.use('/nota-fiscal',    require('./notaFiscal'))
+router.use('/solicitacao-compras', require('./solicitacaoCompras'))
+router.use('/solicitacao-interna', require('./solicitacaoInterna'))
 
 module.exports = router

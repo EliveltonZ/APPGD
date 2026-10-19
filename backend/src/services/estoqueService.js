@@ -1,5 +1,6 @@
 'use strict';
 const repo = require('../repositories/estoqueRepository');
+const localizacoesRepo = require('../repositories/localizacoesRepository');
 
 function erro(mensagem, status, code) {
   return Object.assign(new Error(mensagem), { status, code });
@@ -169,7 +170,11 @@ async function liberarReserva(xmlConsumoId) {
   return linha;
 }
 
-async function darBaixa(xmlConsumoId, { qtdUnBaixada, localizacaoId, usuarioId }) {
+// `splits`: [{ localizacaoId, qtd }, ...] — a baixa pode sair de mais de uma
+// localização numa ação só (ex.: material com 40 precisado, mas espalhado
+// 15 numa prateleira e 25 noutra — sem isso o usuário era obrigado a
+// transferir tudo pra um lugar só antes de poder dar baixa).
+async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
   if (!['PENDENTE', 'RESERVADO'].includes(linha.status)) {
@@ -182,17 +187,54 @@ async function darBaixa(xmlConsumoId, { qtdUnBaixada, localizacaoId, usuarioId }
     throw erro('Este material exige reserva antes da baixa.', 409, 'RESERVA_OBRIGATORIA');
   }
 
-  const qtd = Number(qtdUnBaixada);
-  if (!qtd || qtd <= 0) {
-    throw erro('Informe a quantidade realmente consumida.', 400, 'VALIDACAO');
+  if (!Array.isArray(splits) || splits.length === 0) {
+    throw erro('Informe de onde o material está saindo.', 400, 'VALIDACAO');
   }
-  if (!localizacaoId) {
-    throw erro('Informe a localização de onde o material está saindo.', 400, 'VALIDACAO');
+
+  // Mescla splits repetidos da mesma localização (defensivo — a UI não deve
+  // mandar duplicata, mas evita validar/baixar a mesma localização duas vezes).
+  const porLocalizacao = new Map();
+  for (const s of splits) {
+    const localizacaoId = Number(s.localizacaoId);
+    const qtd = Number(s.qtd);
+    if (!localizacaoId) {
+      throw erro('Informe a localização de onde o material está saindo.', 400, 'VALIDACAO');
+    }
+    if (!qtd || qtd <= 0) {
+      throw erro('Informe a quantidade realmente consumida.', 400, 'VALIDACAO');
+    }
+    porLocalizacao.set(localizacaoId, (porLocalizacao.get(localizacaoId) || 0) + qtd);
+  }
+  const splitsMesclados = Array.from(porLocalizacao, ([localizacaoId, qtd]) => ({ localizacaoId, qtd }));
+  const qtdTotal = splitsMesclados.reduce((acc, s) => acc + s.qtd, 0);
+
+  // Recebimento é só a gaveta de entrada da nota fiscal, aguardando
+  // transferência pra localização definitiva — material parado lá ainda
+  // está "em processamento de localização", não dá pra dar baixa direto dali.
+  const recebimento = await localizacoesRepo.buscarRecebimento();
+  if (recebimento && splitsMesclados.some((s) => s.localizacaoId === recebimento.id)) {
+    throw erro(
+      'Esse material ainda está no Recebimento, aguardando ser transferido pra localização definitiva. Transfira antes de dar baixa.',
+      409, 'LOCALIZACAO_RECEBIMENTO',
+    );
+  }
+
+  // Cada localização tem que ter saldo físico suficiente pra sua própria
+  // parte — reserva/saldo geral não bastam, senão uma localização sem
+  // estoque nenhum fica negativa enquanto outra nem é tocada.
+  for (const s of splitsMesclados) {
+    const saldoLocal = await repo.saldoPorLocalizacao(linha.materialId, s.localizacaoId);
+    if (saldoLocal < s.qtd) {
+      throw erro(
+        `Saldo insuficiente numa das localizações escolhidas (tem ${saldoLocal}, precisa de ${s.qtd} ali). Confira a divisão ou transfira o material antes de dar baixa.`,
+        409, 'SALDO_INSUFICIENTE_LOCALIZACAO',
+      );
+    }
   }
 
   // Se baixar mais do que foi reservado, o excedente também precisa caber no saldo.
   const reservadoNestaLinha = linha.status === 'RESERVADO' ? Number(linha.qtdUnConfirmada) : 0;
-  const excedente = qtd - reservadoNestaLinha;
+  const excedente = qtdTotal - reservadoNestaLinha;
   if (excedente > 0) {
     const saldo = await calcularSaldo(linha.materialId);
     if (saldo.saldoBloqueio < excedente) {
@@ -207,23 +249,25 @@ async function darBaixa(xmlConsumoId, { qtdUnBaixada, localizacaoId, usuarioId }
 
   return repo.sequelize.transaction(async (t) => {
     linha.status = 'EXECUTADO';
-    linha.qtdUnBaixada = qtd;
+    linha.qtdUnBaixada = qtdTotal;
     linha.precoUnSnapshot = preco;
     linha.custoCalculado = custo;
     linha.dataBaixa = new Date();
     linha.usuarioBaixaId = usuarioId;
     await linha.save({ transaction: t });
 
-    await repo.criarMovimento({
-      materialId: linha.materialId,
-      localizacaoId,
-      tipo: 'BAIXA',
-      qtdUn: -qtd,
-      precoUn: preco,
-      ordemdecompra: linha.ordemdecompra,
-      xmlConsumoId: linha.id,
-      usuarioId,
-    }, { transaction: t });
+    for (const s of splitsMesclados) {
+      await repo.criarMovimento({
+        materialId: linha.materialId,
+        localizacaoId: s.localizacaoId,
+        tipo: 'BAIXA',
+        qtdUn: -s.qtd,
+        precoUn: preco,
+        ordemdecompra: linha.ordemdecompra,
+        xmlConsumoId: linha.id,
+        usuarioId,
+      }, { transaction: t });
+    }
 
     return linha;
   });
@@ -231,6 +275,18 @@ async function darBaixa(xmlConsumoId, { qtdUnBaixada, localizacaoId, usuarioId }
 
 async function listarAlertaMinimo() {
   return repo.listarAbaixoDoMinimo();
+}
+
+// Lista de Compras — só informativa por enquanto, não grava nada em
+// tblSolicitacaoComprasItens (esse fluxo ainda não existe). Duas origens:
+// material pedido por algum projeto sem saldo em lugar nenhum, e material
+// abaixo do estoque mínimo configurado.
+async function listarListaCompras() {
+  const [semEstoque, abaixoMinimo] = await Promise.all([
+    repo.listarSemEstoqueParaPedidos(),
+    repo.listarAbaixoDoMinimo(),
+  ]);
+  return { semEstoque, abaixoMinimo };
 }
 
 // Saldo real por material — "o que eu tenho", não fila de ação.
@@ -285,6 +341,13 @@ async function listarProntoParaBaixa() {
   }));
 }
 
+// Lista de separação física pra impressão — todo item ainda não baixado de
+// um pedido, com a localização de cada material (quando tem saldo em
+// alguma), pro almoxarifado ir atrás fisicamente.
+async function listarItensPedidoParaSeparacao(ordemdecompra) {
+  return repo.listarItensPedidoParaSeparacao(ordemdecompra);
+}
+
 // Saldo físico de um material numa localização — base pro ajuste por
 // contagem mostrar "o sistema acha que tem X aqui" antes do usuário
 // informar o que contou de verdade.
@@ -292,12 +355,26 @@ async function saldoPorLocalizacao(materialId, localizacaoId) {
   return repo.saldoPorLocalizacao(materialId, localizacaoId);
 }
 
+// Quebra do saldo físico por localização — consulta rápida do Estoque.
+async function saldoPorLocalizacoes(materialId) {
+  return repo.saldoPorLocalizacoes(materialId);
+}
+
 // Ajuste de estoque por contagem (inventário periódico) — usuário informa
 // quanto contou de verdade numa localização, o sistema calcula a diferença
 // contra o saldo atual e lança um único movimento tipo AJUSTE com ela (nunca
 // grava a contagem em si, só a diferença, igual a qualquer outro movimento).
 // Contagem igual ao saldo atual não lança nada (nada mudou).
-async function ajustarEstoque({ materialId, localizacaoId, contagem, observacoes, usuarioId }) {
+//
+// precoUn é opcional: inventário inicial de item sem nenhuma nota fiscal
+// (nunca comprado pelo sistema) não tem de onde puxar custo — sem isso,
+// qualquer pedido que use esse material fica com custo nulo pra sempre.
+// Quando informado, grava no próprio movimento (preço vigente nesse
+// instante) e também atualiza material.ultimoPrecoUn/dataUltimoPreco —
+// mesma regra de "só sobrescreve se mais novo" já usada pra preço de NF,
+// então uma nota fiscal real posterior sempre pode corrigir essa
+// estimativa inicial.
+async function ajustarEstoque({ materialId, localizacaoId, contagem, observacoes, precoUn, usuarioId }) {
   if (!materialId) throw erro('Selecione o material.', 400, 'VALIDACAO');
   if (!localizacaoId) throw erro('Selecione a localização.', 400, 'VALIDACAO');
   const contagemNum = Number(contagem);
@@ -305,24 +382,53 @@ async function ajustarEstoque({ materialId, localizacaoId, contagem, observacoes
     throw erro('Informe a quantidade contada (zero ou mais).', 400, 'VALIDACAO');
   }
 
-  const saldoAtual = await repo.saldoPorLocalizacao(materialId, localizacaoId);
-  const diferenca = Math.round((contagemNum - saldoAtual) * 1000) / 1000;
-
-  if (diferenca === 0) {
-    return { ajustado: false, diferenca: 0, saldoAnterior: saldoAtual, saldoNovo: saldoAtual };
+  let precoUnNum = null;
+  if (precoUn != null && String(precoUn).trim() !== '') {
+    precoUnNum = Number(precoUn);
+    if (!Number.isFinite(precoUnNum) || precoUnNum <= 0) {
+      throw erro('Informe um preço unitário válido (maior que zero).', 400, 'VALIDACAO');
+    }
   }
 
-  await repo.criarMovimento({
-    materialId,
-    localizacaoId,
-    tipo: 'AJUSTE',
-    qtdUn: diferenca,
-    data: new Date(),
-    usuarioId,
-    observacoes: observacoes || null,
-  });
+  const saldoAtual = await repo.saldoPorLocalizacao(materialId, localizacaoId);
+  const diferenca = Math.round((contagemNum - saldoAtual) * 1000) / 1000;
+  const agora = new Date();
 
-  return { ajustado: true, diferenca, saldoAnterior: saldoAtual, saldoNovo: contagemNum };
+  if (diferenca === 0 && precoUnNum == null) {
+    return { ajustado: false, diferenca: 0, saldoAnterior: saldoAtual, saldoNovo: saldoAtual, precoAtualizado: false };
+  }
+
+  if (diferenca !== 0) {
+    await repo.criarMovimento({
+      materialId,
+      localizacaoId,
+      tipo: 'AJUSTE',
+      qtdUn: diferenca,
+      precoUn: precoUnNum,
+      data: agora,
+      usuarioId,
+      observacoes: observacoes || null,
+    });
+  }
+
+  if (precoUnNum != null) {
+    await repo.atualizarPrecoSeMaisNovo(materialId, precoUnNum, agora);
+  }
+
+  return {
+    ajustado: diferenca !== 0,
+    diferenca,
+    saldoAnterior: saldoAtual,
+    saldoNovo: contagemNum,
+    precoAtualizado: precoUnNum != null,
+  };
+}
+
+// Histórico de ajustes — consulta: todos os ajustes de um material, ou
+// todos os ajustes feitos por um usuário (filtro fica no front, aqui só
+// traz tudo com material/localização/usuário já resolvidos).
+async function listarHistoricoAjustes() {
+  return repo.listarHistoricoAjustes();
 }
 
 module.exports = {
@@ -334,8 +440,12 @@ module.exports = {
   liberarReserva,
   darBaixa,
   listarAlertaMinimo,
+  listarListaCompras,
   listarSaldoPorMaterial,
   listarProntoParaBaixa,
+  listarItensPedidoParaSeparacao,
   saldoPorLocalizacao,
+  saldoPorLocalizacoes,
   ajustarEstoque,
+  listarHistoricoAjustes,
 };

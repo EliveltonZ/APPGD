@@ -68,6 +68,11 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     almoxarifado_baixas: true,
     almoxarifado_nota_fiscal: true,
     almoxarifado_ajuste: true,
+    almoxarifado_vinculos: true,
+    compras_necessidades: true,
+    compras_confirmar: true,
+    compras_pedidos: true,
+    fabrica_solicitacao_interna: true,
   };
   return {
     id:          String(r.id    ?? ''),

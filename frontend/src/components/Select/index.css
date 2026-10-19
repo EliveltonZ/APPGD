@@ -41,11 +41,16 @@
   border-radius: var(--field-radius);
   font-family: var(--sans);
   font-size: var(--field-font-size);
-  color: var(--text-h);
+  color: var(--text-h) !important;
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s;
   box-sizing: border-box;
+}
+
+.select-field option {
+  color: var(--text-h);
+  background: var(--bg);
 }
 
 .select-field:focus {

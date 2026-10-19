@@ -1,0 +1,84 @@
+.vinc-page {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vinc-page__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.vinc-page__title {
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  margin: 0 0 2px !important;
+}
+
+.vinc-page__subtitle {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+  max-width: 680px;
+}
+
+.vinc-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .vinc-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Ações ──────────────────────────────────────────────── */
+
+.vinc-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.vinc-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.vinc-action-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
+/* ── Modal de edição ────────────────────────────────────── */
+
+.vinc-edit__info {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.vinc-edit__hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}

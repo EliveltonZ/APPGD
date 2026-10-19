@@ -18,9 +18,21 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async getListaCompras(req, res, next) {
+    try {
+      res.json(await service.listarListaCompras());
+    } catch (err) { next(err); }
+  },
+
   async getProntoParaBaixa(req, res, next) {
     try {
       res.json(await service.listarProntoParaBaixa());
+    } catch (err) { next(err); }
+  },
+
+  async getListaSeparacao(req, res, next) {
+    try {
+      res.json(await service.listarItensPedidoParaSeparacao(req.params.ordemdecompra));
     } catch (err) { next(err); }
   },
 
@@ -72,10 +84,11 @@ module.exports = {
   async postBaixa(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      const { qtd_un_baixada, localizacao_id } = req.body;
+      const splits = Array.isArray(req.body.splits)
+        ? req.body.splits.map((s) => ({ localizacaoId: s.localizacao_id, qtd: s.qtd_un_baixada }))
+        : [{ localizacaoId: req.body.localizacao_id, qtd: req.body.qtd_un_baixada }];
       const linha = await service.darBaixa(Number(req.params.id), {
-        qtdUnBaixada: qtd_un_baixada,
-        localizacaoId: localizacao_id,
+        splits,
         usuarioId,
       });
       if (!linha) return notFound(res);
@@ -91,17 +104,31 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async getSaldoLocalizacoes(req, res, next) {
+    try {
+      const materialId = Number(req.params.materialId);
+      res.json(await service.saldoPorLocalizacoes(materialId));
+    } catch (err) { next(err); }
+  },
+
   async postAjuste(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      const { material_id, localizacao_id, contagem, observacoes } = req.body;
+      const { material_id, localizacao_id, contagem, observacoes, preco_un } = req.body;
       res.json(await service.ajustarEstoque({
         materialId: material_id,
         localizacaoId: localizacao_id,
         contagem,
         observacoes,
+        precoUn: preco_un,
         usuarioId,
       }));
+    } catch (err) { next(err); }
+  },
+
+  async getHistoricoAjustes(req, res, next) {
+    try {
+      res.json(await service.listarHistoricoAjustes());
     } catch (err) { next(err); }
   },
 };

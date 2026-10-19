@@ -100,6 +100,9 @@ export const ROUTE_ITEMS = [
 
   buildSidebarList('compras_lista', '/compras/lista', 'compras', 'Compras', true),
   buildSidebarList('compras_pendencias', '/compras/itens-pedido', 'compras', 'Itens Pedido'),
+  buildSidebarList('compras_necessidades', '/compras/necessidades', 'compras', 'Necessidades de Compra'),
+  buildSidebarList('compras_confirmar', '/compras/confirmar', 'compras', 'Confirmar Compras'),
+  buildSidebarList('compras_pedidos', '/compras/pedidos', 'compras', 'Pedidos de Compra'),
   
   // ── PCP ────────────────────────────────────────────────────────────────────
   buildSidebarList('pcp_painel', '/fabrica/pcp', 'fabrica', 'Painel PCP'),
@@ -110,6 +113,7 @@ export const ROUTE_ITEMS = [
   buildSidebarList('paradas_maquina', '/fabrica/paradas', 'fabrica', 'Paradas'),
   buildSidebarList('paradas_admin', '/fabrica/paradas', 'fabrica', 'Paradas Admin', false, true),
   buildSidebarList('estoque_reservar', '/fabrica/validar-xml', 'fabrica', 'Validar XML'),
+  buildSidebarList('fabrica_solicitacao_interna', '/fabrica/solicitacao-interna', 'fabrica', 'Solicitação Interna'),
 
   // ── Logística ──────────────────────────────────────────────────────────────
   buildSidebarList('logistica_status', '/logistica/status', 'logistica', 'Status'),
@@ -174,6 +178,12 @@ export const ROUTE_ITEMS = [
     '/almoxarifado/ajuste',
     'almoxarifado',
     'Ajuste de Estoque'
+  ),
+  buildSidebarList(
+    'almoxarifado_vinculos',
+    '/almoxarifado/vinculos',
+    'almoxarifado',
+    'Vínculos NF'
   ),
 
 ] as const satisfies ReadonlyArray<RouteItem>;

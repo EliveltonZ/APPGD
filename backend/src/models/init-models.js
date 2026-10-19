@@ -11,6 +11,7 @@ var _Transferencias          = require("./tblTransferencias");
 var _EstoqueMovimentos       = require("./tblEstoqueMovimentos");
 var _SolicitacaoCompras      = require("./tblSolicitacaoCompras");
 var _SolicitacaoComprasItens = require("./tblSolicitacaoComprasItens");
+var _SolicitacaoInterna      = require("./tblSolicitacaoInterna");
 var _Acessorios              = require("./tblAcessorios");
 var _Maquinas           = require("./tblMaquinas");
 var _TipoRequisicao     = require("./tblTipoRequisicao");
@@ -57,6 +58,7 @@ function initModels(sequelize) {
   var EstoqueMovimentos       = _EstoqueMovimentos(sequelize, DataTypes);
   var SolicitacaoCompras      = _SolicitacaoCompras(sequelize, DataTypes);
   var SolicitacaoComprasItens = _SolicitacaoComprasItens(sequelize, DataTypes);
+  var SolicitacaoInterna      = _SolicitacaoInterna(sequelize, DataTypes);
   var Acessorios              = _Acessorios(sequelize, DataTypes);
   var Maquinas           = _Maquinas(sequelize, DataTypes);
   var TipoRequisicao     = _TipoRequisicao(sequelize, DataTypes);
@@ -146,6 +148,9 @@ function initModels(sequelize) {
   SolicitacaoComprasItens.belongsTo(NotasFiscaisItens,   { as: "nfItem",      foreignKey: "nfItemId"      });
   SolicitacaoCompras.hasMany(SolicitacaoComprasItens,    { as: "itens",       foreignKey: "solicitacaoId" });
 
+  SolicitacaoInterna.belongsTo(Materiais, { as: "material",    foreignKey: "materialId" });
+  SolicitacaoInterna.belongsTo(Usuario,   { as: "solicitante", foreignKey: "usuarioId"  });
+
   return {
     Acessorios,
     Assistencias,
@@ -191,6 +196,7 @@ function initModels(sequelize) {
     EstoqueMovimentos,
     SolicitacaoCompras,
     SolicitacaoComprasItens,
+    SolicitacaoInterna,
   };
 }
 module.exports = initModels;

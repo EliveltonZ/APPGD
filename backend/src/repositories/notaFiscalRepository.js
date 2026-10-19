@@ -1,7 +1,8 @@
 'use strict';
-const { sequelize, NotasFiscais, NotasFiscaisItens, EstoqueMovimentos, Materiais } = require('../client/db');
+const { sequelize, NotasFiscais, NotasFiscaisItens, EstoqueMovimentos, Materiais, SolicitacaoComprasItens } = require('../client/db');
 const codigoNFRepo = require('./materiaisCodigoNFRepository');
 const localizacoesRepo = require('./localizacoesRepository');
+const { NotaFiscalValidator } = require('../validation');
 
 async function listar() {
   const [rows] = await sequelize.query(
@@ -50,18 +51,16 @@ async function buscarItens(notaFiscalId) {
   return rows;
 }
 
-function validarItem(item) {
-  if (!item.materialId) throw new Error('Selecione o material.');
-  const qtdNf = Number(item.qtdNf);
-  const qtdUn = Number(item.qtdUn);
-  if (!Number.isFinite(qtdNf) || qtdNf <= 0) throw new Error('Quantidade (NF) inválida.');
-  if (!Number.isFinite(qtdUn) || qtdUn <= 0) throw new Error('Quantidade (UN) inválida.');
-  if (!item.unidadeCompra?.trim()) throw new Error('Informe a unidade de compra.');
-  const precoNf = item.precoNf != null ? Number(item.precoNf) : null;
-  const precoUn = item.precoUn != null ? Number(item.precoUn) : null;
-  if (precoNf != null && !Number.isFinite(precoNf)) throw new Error('Preço (NF) inválido.');
-  if (precoUn != null && !Number.isFinite(precoUn)) throw new Error('Preço (UN) inválido.');
-  return { qtdNf, qtdUn, precoNf, precoUn };
+// Converte os valores do item pra número — a validação de que são válidos
+// já rodou (NotaFiscalValidator, primeira linha de criar()), então aqui é
+// só normalização, não checagem.
+function normalizarItem(item) {
+  return {
+    qtdNf: Number(item.qtdNf),
+    qtdUn: Number(item.qtdUn),
+    precoNf: item.precoNf != null ? Number(item.precoNf) : null,
+    precoUn: item.precoUn != null ? Number(item.precoUn) : null,
+  };
 }
 
 // Lança uma nota fiscal completa: cabeçalho + itens + entrada de estoque por
@@ -74,16 +73,14 @@ function validarItem(item) {
 // (Cadastros > Localizações). Os responsáveis transferem pra localização
 // definitiva depois, via Transferências.
 async function criar(body, usuarioId) {
-  if (!body.fornecedorId) throw new Error('Selecione o fornecedor.');
-  if (!body.numeroNota?.trim()) throw new Error('Informe o número da nota.');
-  if (!body.dataEntrada) throw new Error('Informe a data de entrada.');
-  if (!Array.isArray(body.itens) || body.itens.length === 0) {
-    throw new Error('Adicione ao menos um item.');
-  }
+  new NotaFiscalValidator(body).throwIfInvalid();
 
   const recebimento = await localizacoesRepo.buscarRecebimento();
   if (!recebimento) {
-    throw new Error('Nenhuma localização de recebimento configurada — marque uma em Cadastros > Localizações.');
+    throw Object.assign(
+      new Error('Nenhuma localização de recebimento configurada — marque uma em Cadastros > Localizações.'),
+      { status: 400 },
+    );
   }
 
   const fornecedorId = Number(body.fornecedorId);
@@ -103,7 +100,7 @@ async function criar(body, usuarioId) {
 
   return sequelize.transaction(async (t) => {
     let valorTotal = 0;
-    const itensValidados = body.itens.map((item) => ({ item, ...validarItem(item) }));
+    const itensValidados = body.itens.map((item) => ({ item, ...normalizarItem(item) }));
     for (const { precoNf, qtdNf } of itensValidados) {
       if (precoNf != null) valorTotal += precoNf * qtdNf;
     }
@@ -157,6 +154,32 @@ async function criar(body, usuarioId) {
           material.dataUltimoPreco = dataEntrada;
           await material.save({ transaction: t });
         }
+      }
+
+      // Item veio marcado como "é a chegada de tal pedido" — vincula esse
+      // item de compra à nota fiscal (nf_item_id) e marca a data em que
+      // efetivamente chegou (data_comprado). A partir daqui esse pedido
+      // aparece como "concluído" em Compras > Pedidos.
+      if (item.pedidoItemId) {
+        const pedidoItem = await SolicitacaoComprasItens.findOne({
+          where: {
+            id: Number(item.pedidoItemId),
+            materialId,
+            fornecedorId,
+            nfItemId: null,
+            cancelado: false,
+          },
+          transaction: t,
+        });
+        if (!pedidoItem) {
+          throw Object.assign(
+            new Error(`O pedido selecionado pra "${item.codigoNf || materialId}" não é mais válido — já pode ter sido recebido ou cancelado.`),
+            { status: 400 },
+          );
+        }
+        pedidoItem.nfItemId = nfItem.id;
+        pedidoItem.dataComprado = dataEntrada;
+        await pedidoItem.save({ transaction: t });
       }
 
       if (item.salvarVinculo && item.codigoNf?.trim()) {

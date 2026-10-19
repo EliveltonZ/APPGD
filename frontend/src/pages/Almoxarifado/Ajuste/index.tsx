@@ -6,46 +6,71 @@ import { Input } from "../../../components/Input";
 import { Select } from "../../../components/Select";
 import { SearchSelect } from "../../../components/SearchSelect";
 import { ConfirmModal } from "../../../components/ConfirmModal";
+import { DataTable } from "../../../components/DataTable";
+import type { TableColumn } from "../../../components/DataTable";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
+import { fmtDateTime } from "../../../utils/dateUtils";
 import { fetchLocalizacoes } from "../../../services/localizacoes";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
-import { fetchSaldoLocalizacao, criarAjusteEstoque } from "../../../services/estoque";
+import { fetchSaldoLocalizacao, criarAjusteEstoque, fetchHistoricoAjustes } from "../../../services/estoque";
+import type { HistoricoAjusteItem } from "../../../services/estoque";
 import "./index.css";
 
-interface AjusteFeito {
-  _key: number;
-  codigoInterno: string;
-  descricao: string;
-  localizacaoCodigo: string;
-  saldoAnterior: number;
-  saldoNovo: number;
-  diferenca: number;
-  hora: string;
-}
-
 function fmtQtd(v: number): string {
-  return v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+  return Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 }
 
-let nextKey = 1;
+const HISTORICO_COLUMNS: TableColumn<HistoricoAjusteItem>[] = [
+  { key: "data", label: "Data/Hora", type: "text", sortable: true, minWidth: 130, render: (v) => fmtDateTime(String(v)) },
+  { key: "codigo_interno", label: "Código", type: "text", sortable: true, filterable: true, minWidth: 90 },
+  { key: "material_descricao", label: "Material", type: "text", sortable: true, filterable: true, minWidth: 200 },
+  {
+    key: "localizacao_codigo",
+    label: "Localização",
+    type: "text",
+    sortable: true,
+    filterable: true,
+    minWidth: 130,
+    render: (v, row) => `${v}${row.localizacao_descricao ? ` — ${row.localizacao_descricao}` : ""}`,
+  },
+  {
+    key: "qtd_un",
+    label: "Diferença",
+    type: "number",
+    sortable: true,
+    align: "right",
+    minWidth: 100,
+    render: (v) => {
+      const n = Number(v);
+      return (
+        <span className={n > 0 ? "aju-diferenca--positiva" : "aju-diferenca--negativa"}>
+          {n > 0 ? "+" : ""}
+          {fmtQtd(n)}
+        </span>
+      );
+    },
+  },
+  { key: "usuario_login", label: "Usuário", type: "text", sortable: true, filterable: true, minWidth: 120 },
+  { key: "observacoes", label: "Observações", type: "text", minWidth: 160, render: (v) => (v ? String(v) : "—") },
+];
 
 export function AlmoxarifadoAjustePage() {
   const toast = useToast();
   const { data: localizacoes = [] } = useApiData(fetchLocalizacoes);
   const { data: materiais = [] } = useApiData(fetchMateriaisOpcoes);
+  const { data: historico = [], loading: loadingHistorico, refetch: refetchHistorico } = useApiData(fetchHistoricoAjustes);
 
   const [localizacaoId, setLocalizacaoId] = useState("");
   const [materialId, setMaterialId] = useState<number | null>(null);
   const [saldoAtual, setSaldoAtual] = useState<number | null>(null);
   const [loadingSaldo, setLoadingSaldo] = useState(false);
   const [contagem, setContagem] = useState("");
+  const [precoUn, setPrecoUn] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [saving, setSaving] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-
-  const [sessao, setSessao] = useState<AjusteFeito[]>([]);
 
   const localizacoesOptions = localizacoes
     .filter((l) => l.ativo)
@@ -99,6 +124,13 @@ export function AlmoxarifadoAjustePage() {
       toast.error("Informe a quantidade contada (zero ou mais).");
       return;
     }
+    if (precoUn.trim()) {
+      const precoNum = Number(precoUn.replace(",", "."));
+      if (!Number.isFinite(precoNum) || precoNum <= 0) {
+        toast.error("Informe um preço unitário válido (maior que zero), ou deixe em branco.");
+        return;
+      }
+    }
     setConfirmOpen(true);
   }
 
@@ -112,36 +144,28 @@ export function AlmoxarifadoAjustePage() {
         localizacao_id: Number(localizacaoId),
         contagem: contagemNum,
         observacoes: observacoes.trim() || null,
+        preco_un: precoUn.trim() ? Number(precoUn.replace(",", ".")) : null,
       });
 
-      const material = materiais.find((m) => m.id === materialId);
-      const localizacao = localizacoes.find((l) => String(l.id) === localizacaoId);
-
+      const partes: string[] = [];
       if (resultado.ajustado) {
-        setSessao((prev) => [
-          {
-            _key: nextKey++,
-            codigoInterno: material?.codigoInterno ?? "",
-            descricao: material?.descricao ?? "",
-            localizacaoCodigo: localizacao?.codigo ?? "",
-            saldoAnterior: resultado.saldoAnterior,
-            saldoNovo: resultado.saldoNovo,
-            diferenca: resultado.diferenca,
-            hora: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-          },
-          ...prev,
-        ]);
-        toast.success(
+        partes.push(
           `Ajuste lançado: ${resultado.diferenca > 0 ? "+" : ""}${fmtQtd(resultado.diferenca)} un (saldo agora ${fmtQtd(resultado.saldoNovo)} un).`,
         );
       } else {
-        toast.success("Contagem bate com o sistema — nenhum ajuste necessário.");
+        partes.push("Contagem bate com o sistema — nenhum ajuste de quantidade necessário.");
       }
+      if (resultado.precoAtualizado) {
+        partes.push("Preço unitário do material atualizado.");
+      }
+      toast.success(partes.join(" "));
+      if (resultado.ajustado || resultado.precoAtualizado) refetchHistorico();
 
       // mantém a localização selecionada (contagem costuma ser por prateleira,
-      // um material atrás do outro) e limpa só o material/contagem
+      // um material atrás do outro) e limpa só o material/contagem/preço
       setMaterialId(null);
       setContagem("");
+      setPrecoUn("");
       setObservacoes("");
       setSaldoAtual(null);
     } catch (err) {
@@ -204,6 +228,20 @@ export function AlmoxarifadoAjustePage() {
           {diferenca === 0 && <p className="aju-hint">Bate com o sistema — nenhum ajuste será lançado.</p>}
 
           <Input
+            label="Preço unitário"
+            type="text"
+            inputMode="decimal"
+            value={precoUn}
+            onChange={(e) => setPrecoUn(e.target.value)}
+            placeholder="Opcional — pra item sem nenhuma nota fiscal ainda"
+          />
+          {precoUn.trim() && (
+            <p className="aju-hint">
+              Vira o preço vigente deste material (até uma nota fiscal real vir com data mais nova e substituir).
+            </p>
+          )}
+
+          <Input
             label="Observações"
             value={observacoes}
             onChange={(e) => setObservacoes(e.target.value)}
@@ -217,36 +255,29 @@ export function AlmoxarifadoAjustePage() {
         </aside>
 
         <section className="aju-sessao-panel">
-          <h2 className="aju-panel-title">Ajustes desta sessão</h2>
-          {sessao.length === 0 ? (
-            <p style={{ padding: "12px 0", opacity: 0.5, fontSize: 13 }}>Nenhum ajuste lançado ainda.</p>
-          ) : (
-            <div className="aju-sessao-lista">
-              {sessao.map((a) => (
-                <div key={a._key} className="aju-sessao-item">
-                  <div className="aju-sessao-item__info">
-                    <strong>{a.codigoInterno}</strong> — {a.descricao}
-                    <span className="aju-sessao-item__detalhe">
-                      {a.localizacaoCodigo} · {fmtQtd(a.saldoAnterior)} → {fmtQtd(a.saldoNovo)} un · {a.hora}
-                    </span>
-                  </div>
-                  <span className={`aju-sessao-item__diff ${a.diferenca > 0 ? "aju-diferenca--positiva" : "aju-diferenca--negativa"}`}>
-                    {a.diferenca > 0 ? "+" : ""}
-                    {fmtQtd(a.diferenca)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 className="aju-panel-title">Histórico de ajustes</h2>
+          <p className="aju-hint">
+            Filtre por material (coluna Código/Material) ou por usuário pra consultar ajustes anteriores.
+          </p>
+          <DataTable
+            columns={HISTORICO_COLUMNS}
+            data={historico}
+            rowKey="id"
+            loading={loadingHistorico}
+            storageKey="almoxarifado-ajuste-historico"
+            emptyMessage="Nenhum ajuste lançado ainda."
+          />
         </section>
       </div>
 
       <ConfirmModal
         isOpen={confirmOpen}
         message={
-          diferenca === 0
-            ? "A contagem bate com o sistema — nenhum ajuste será lançado. Confirmar mesmo assim?"
-            : `Isso vai lançar um ajuste de ${diferenca != null && diferenca > 0 ? "+" : ""}${diferenca != null ? fmtQtd(diferenca) : ""} un (saldo vai de ${saldoAtual != null ? fmtQtd(saldoAtual) : "—"} pra ${contagemNum != null ? fmtQtd(contagemNum) : "—"}). Confirmar?`
+          (diferenca === 0
+            ? "A contagem bate com o sistema — nenhum ajuste de quantidade será lançado."
+            : `Isso vai lançar um ajuste de ${diferenca != null && diferenca > 0 ? "+" : ""}${diferenca != null ? fmtQtd(diferenca) : ""} un (saldo vai de ${saldoAtual != null ? fmtQtd(saldoAtual) : "—"} pra ${contagemNum != null ? fmtQtd(contagemNum) : "—"}).`) +
+          (precoUn.trim() ? ` Também vai gravar R$ ${precoUn} como preço unitário vigente deste material.` : "") +
+          " Confirmar?"
         }
         confirmLabel="Confirmar"
         onConfirm={handleConfirmar}

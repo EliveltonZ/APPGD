@@ -1,11 +1,14 @@
-import { Boxes } from "lucide-react";
+import { useState } from "react";
+import { Boxes, MapPin } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { DataTable } from "../../../components/DataTable";
 import type { TableColumn } from "../../../components/DataTable";
+import { Modal } from "../../../components/Modal";
 import { useApiData } from "../../../hooks/useApiData";
-import { fetchSaldoPorMaterial } from "../../../services/estoque";
-import type { SaldoMaterial } from "../../../services/estoque";
+import { fetchSaldoPorMaterial, fetchSaldoPorLocalizacoes } from "../../../services/estoque";
+import type { SaldoMaterial, SaldoLocalizacaoItem } from "../../../services/estoque";
+import { getErrorMessage } from "../../../utils/errorMessage";
 import "./index.css";
 
 // `unidadeBase` é a unidade de CÁLCULO DO PROJETO (m²/m/un no XML) — não a
@@ -26,8 +29,27 @@ function abaixoDoMinimo(row: SaldoMaterial): boolean {
 export function AlmoxarifadoEstoquePage() {
   const { data: materiais = [], loading } = useApiData(fetchSaldoPorMaterial);
 
+  const [detalhe, setDetalhe] = useState<SaldoMaterial | null>(null);
+  const [localizacoes, setLocalizacoes] = useState<SaldoLocalizacaoItem[]>([]);
+  const [loadingLocalizacoes, setLoadingLocalizacoes] = useState(false);
+  const [erroLocalizacoes, setErroLocalizacoes] = useState<string | null>(null);
+
   const comEstoque = materiais.filter((m) => m.fisico > 0).length;
   const abaixoMinimo = materiais.filter(abaixoDoMinimo).length;
+
+  async function abrirDetalhe(material: SaldoMaterial) {
+    setDetalhe(material);
+    setLocalizacoes([]);
+    setErroLocalizacoes(null);
+    setLoadingLocalizacoes(true);
+    try {
+      setLocalizacoes(await fetchSaldoPorLocalizacoes(material.id));
+    } catch (err) {
+      setErroLocalizacoes(getErrorMessage(err, "Erro ao carregar localizações."));
+    } finally {
+      setLoadingLocalizacoes(false);
+    }
+  }
 
   const columns: TableColumn<SaldoMaterial>[] = [
     { key: "codigoInterno", label: "Código", type: "text", sortable: true, filterable: true, minWidth: 90 },
@@ -145,8 +167,53 @@ export function AlmoxarifadoEstoquePage() {
           loading={loading}
           storageKey="almoxarifado-estoque-saldo"
           emptyMessage="Nenhum material ativo cadastrado."
+          onRowClick={abrirDetalhe}
         />
       </div>
+
+      <Modal
+        title="Onde está o material"
+        isOpen={!!detalhe}
+        onClose={() => setDetalhe(null)}
+      >
+        {detalhe && (
+          <div className="estq-detalhe">
+            <p className="estq-detalhe__material">
+              <strong>{detalhe.codigoInterno}</strong> — {detalhe.descricao}
+            </p>
+
+            {loadingLocalizacoes && <p className="estq-detalhe__msg">Carregando...</p>}
+            {erroLocalizacoes && <p className="estq-detalhe__msg estq-detalhe__msg--erro">{erroLocalizacoes}</p>}
+
+            {!loadingLocalizacoes && !erroLocalizacoes && (
+              localizacoes.length === 0 ? (
+                <p className="estq-detalhe__msg">
+                  Sem saldo físico em nenhuma localização — tem {fmtQtd(detalhe.fisico)} un no total, mas não bate
+                  localização nenhuma (pode ter sido lançado direto sem endereçamento).
+                </p>
+              ) : (
+                <>
+                  <p className="estq-detalhe__msg">
+                    Em {localizacoes.length} {localizacoes.length === 1 ? "localização" : "localizações"}:
+                  </p>
+                  <ul className="estq-detalhe__lista">
+                    {localizacoes.map((l) => (
+                      <li key={l.localizacao_id} className="estq-detalhe__item">
+                        <span className="estq-detalhe__item__local">
+                          <MapPin size={13} />
+                          <strong>{l.codigo}</strong>
+                          {l.descricao && <span className="estq-detalhe__item__desc">— {l.descricao}</span>}
+                        </span>
+                        <span className="estq-detalhe__item__saldo">{fmtQtd(l.saldo)} un</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )
+            )}
+          </div>
+        )}
+      </Modal>
     </AppLayout>
   );
 }

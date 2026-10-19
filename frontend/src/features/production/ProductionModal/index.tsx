@@ -5,7 +5,7 @@ import { Modal } from "../../../components/Modal";
 import { Button } from "../../../components/Button";
 import { ConfirmModal } from "../../../components/ConfirmModal";
 import { ProductionSector } from "../ProductionSector";
-import { MaterialsTable } from "../../../components/MaterialsTable";
+import { ItensPedidoTable } from "../../../components/ItensPedidoTable";
 import { EmployeesModal } from "../EmployeesModal";
 import {
   PRODUCTION_SECTORS,
@@ -16,6 +16,7 @@ import {
   fetchEmployees,
   saveProductionData,
 } from "../../../services/production";
+import { fetchPendingItems } from "../../../services/pending";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import type {
@@ -24,6 +25,7 @@ import type {
   SectorData,
   Employee,
 } from "../../../types/production";
+import type { PendingItem } from "../../../types/pending";
 import "./index.css";
 
 interface ProductionModalProps {
@@ -42,6 +44,7 @@ export function ProductionModal({
   const toast = useToast();
   const [form, setForm] = useState<ProductionDetail | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
+  const [pendingItems, setPendingItems] = useState<PendingItem[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(true);
   const [saving, setSaving] = useState(false);
   const [empOpen, setEmpOpen] = useState(false);
@@ -51,6 +54,10 @@ export function ProductionModal({
   useEffect(() => {
     setLoadingDetail(true);
     setForm(null);
+    setPendingItems([]);
+    fetchPendingItems(order.ordemdecompra)
+      .then(setPendingItems)
+      .catch(() => setPendingItems([]));
     Promise.all([fetchProductionDetail(order.ordemdecompra), fetchEmployees()])
       .then(([detail, emps]) => {
         setEmployees(emps);
@@ -278,7 +285,7 @@ export function ProductionModal({
             {/* ── Materials ─────────────────────────────── */}
             <section className="prod-modal__section">
               <h3 className="prod-modal__section-title">Materiais</h3>
-              <MaterialsTable materials={form.materiais} />
+              <ItensPedidoTable items={pendingItems} />
             </section>
           </div>
         )}

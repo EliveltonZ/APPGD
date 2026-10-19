@@ -18,10 +18,12 @@ async function previsualizar(xmlString) {
 }
 
 // Quantidade inicial em unidade: ferragem já vem pronta do XML (não precisa
-// de conversão); chapa e fita ficam em branco — o operador informa manualmente
-// quantas UN (chapas inteiras / rolos) o pedido vai usar antes de reservar.
+// de conversão), e fita também — o estoque de fita é controlado em metro
+// (não em rolo inteiro), então o metro do XML já É a unidade de estoque.
+// Só chapa fica em branco — o operador informa manualmente quantas chapas
+// inteiras o pedido vai usar antes de reservar.
 function quantidadeUnInicial(item) {
-  return item.unidade === 'UN' ? item.quantidade : null;
+  return item.unidade === 'M2' ? null : item.quantidade;
 }
 
 // Recebe a lista já revisada pelo usuário (toda linha com materialId

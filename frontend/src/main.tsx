@@ -35,6 +35,9 @@ import { ExcluirProjetoPage } from "./pages/Pedidos/ExcluirProjeto";
 // ── Compras ───────────────────────────────────────────────────────────────────
 import { RelatorioComprasPage } from "./pages/Compras/Relatorio";
 import { ItensPedidoPage } from "./pages/Compras/ItensPedido";
+import { ComprasNecessidadesPage } from "./pages/Compras/Necessidades";
+import { ComprasConfirmarPage } from "./pages/Compras/Confirmar";
+import { ComprasPedidosPage } from "./pages/Compras/Pedidos";
 
 // ── Fábrica ───────────────────────────────────────────────────────────────────
 import { PcpPage } from "./pages/Fabrica/Painel";
@@ -44,6 +47,7 @@ import { ExpedicaoPage } from "./pages/Fabrica/Expedicao";
 import { RelatoriosPcpPage } from "./pages/Fabrica/Relatorios";
 import { ParadasPage } from "./pages/Fabrica/Paradas";
 import { FabricaValidarXmlPage } from "./pages/Fabrica/ValidarXml";
+import { FabricaSolicitacaoInternaPage } from "./pages/Fabrica/SolicitacaoInterna";
 
 // ── Logística ─────────────────────────────────────────────────────────────────
 import { LogisticaStatusPage } from "./pages/Logistica/Status";
@@ -71,6 +75,7 @@ import { AlmoxarifadoBaixasPage } from "./pages/Almoxarifado/Baixas";
 import { AlmoxarifadoNotaFiscalPage } from "./pages/Almoxarifado/NotaFiscal";
 import { AlmoxarifadoTransferenciasPage } from "./pages/Almoxarifado/Transferencias";
 import { AlmoxarifadoAjustePage } from "./pages/Almoxarifado/Ajuste";
+import { AlmoxarifadoVinculosPage } from "./pages/Almoxarifado/Vinculos";
 
 // ── Cadastros ─────────────────────────────────────────────────────────────────
 import { CadastrosPage } from "./pages/Cadastros";
@@ -86,6 +91,8 @@ import {
   CapaVerificacaoPage,
   CapaAssistenciaPage,
 } from "./pages/CapaImpressao";
+import { ListaSeparacaoPage } from "./pages/Almoxarifado/ListaSeparacao";
+import { OrcamentoImpressaoPage } from "./pages/Compras/OrcamentoImpressao";
 
 // ── Sandbox (desenvolvimento) ─────────────────────────────────────────────────
 import { SandboxPage } from "./pages/Sandbox";
@@ -106,6 +113,9 @@ const PAGE_MAP: Record<string, ComponentType> = {
   pedidos_excluir: ExcluirProjetoPage,
   compras_lista: RelatorioComprasPage,
   compras_pendencias: ItensPedidoPage,
+  compras_necessidades: ComprasNecessidadesPage,
+  compras_confirmar: ComprasConfirmarPage,
+  compras_pedidos: ComprasPedidosPage,
   pcp_painel: PcpPage,
   pcp_producao: ProducaoPage,
   pcp_apontamento: ApontamentoPage,
@@ -113,6 +123,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   logistica_planejamento: PlanejamentoPage,
   pcp_relatorios: RelatoriosPcpPage,
   estoque_reservar: FabricaValidarXmlPage,
+  fabrica_solicitacao_interna: FabricaSolicitacaoInternaPage,
   logistica_status: LogisticaStatusPage,
   assistencias_nova: AssistenciasNovaPage,
   assistencias_producao: AssistenciasProducaoPage,
@@ -137,6 +148,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   almoxarifado_nota_fiscal: AlmoxarifadoNotaFiscalPage,
   almoxarifado_transferencias: AlmoxarifadoTransferenciasPage,
   almoxarifado_ajuste: AlmoxarifadoAjustePage,
+  almoxarifado_vinculos: AlmoxarifadoVinculosPage,
 };
 
 createRoot(document.getElementById("root")!).render(
@@ -194,6 +206,8 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/impressao/capa-pendencias" element={<CapaPendenciasPage />} />
             <Route path="/impressao/capa-verificacao" element={<CapaVerificacaoPage />} />
             <Route path="/impressao/capa-assistencia" element={<CapaAssistenciaPage />} />
+            <Route path="/impressao/lista-separacao" element={<ListaSeparacaoPage />} />
+            <Route path="/impressao/orcamento" element={<OrcamentoImpressaoPage />} />
 
             {/* Sandbox — apenas em desenvolvimento */}
             {import.meta.env.DEV && <Route path="/sandbox" element={<SandboxPage />} />}

@@ -1,5 +1,5 @@
 'use strict';
-const { MateriaisCodigoNF } = require('../client/db');
+const { sequelize, MateriaisCodigoNF } = require('../client/db');
 
 // Vínculo mais recente entre material+fornecedor — usado pra auto-preencher
 // código NF/unidade de compra/fator ao lançar uma nova nota fiscal. Pode
@@ -48,4 +48,49 @@ async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra
   }, { transaction: options.transaction });
 }
 
-module.exports = { buscarVinculo, listarPorMaterial, upsertVinculo, buscarPorCodigoFornecedor };
+// Lista completa de vínculos pra consulta/correção — o time de almoxarifado
+// pode vincular um item errado durante o lançamento de uma nota (material
+// errado, ou fator errado pra fita), e precisa achar e corrigir depois sem
+// ter que lançar uma nota nova só pra sobrescrever.
+async function listarTodos() {
+  return sequelize.query(
+    `SELECT v.id, v.material_id, v.fornecedor_id, v.codigo_nf, v.unidade_compra, v.m2_por_unidade,
+            m.codigo_interno, m.descricao AS material_descricao, m.unidade_base,
+            f.nome AS fornecedor_nome
+     FROM "tblMateriaisCodigoNF" v
+     JOIN "tblMateriais" m     ON m.id = v.material_id
+     JOIN "tblFornecedores" f  ON f.id = v.fornecedor_id
+     ORDER BY f.nome ASC, m.codigo_interno ASC`,
+    { type: sequelize.QueryTypes.SELECT },
+  );
+}
+
+// Corrige um vínculo já salvo — permite trocar pra qual material ele aponta
+// (vínculo errado) e/ou o fator (m²-por-unidade — significa metros por
+// rolo pra fita, m² por chapa pra chapa). Nunca troca fornecedor/código NF:
+// isso mudaria a própria identidade do vínculo (a chave única da tabela) —
+// pra isso o jeito correto é excluir este e criar um novo.
+async function atualizarVinculo(id, { materialId, unidadeCompra, m2PorUnidade }) {
+  const vinculo = await MateriaisCodigoNF.findByPk(id);
+  if (!vinculo) return null;
+  if (materialId != null) vinculo.materialId = materialId;
+  if (unidadeCompra != null) vinculo.unidadeCompra = unidadeCompra;
+  vinculo.m2PorUnidade = m2PorUnidade ?? null;
+  await vinculo.save();
+  return vinculo;
+}
+
+async function excluirVinculo(id) {
+  const n = await MateriaisCodigoNF.destroy({ where: { id } });
+  return n > 0;
+}
+
+module.exports = {
+  buscarVinculo,
+  listarPorMaterial,
+  upsertVinculo,
+  buscarPorCodigoFornecedor,
+  listarTodos,
+  atualizarVinculo,
+  excluirVinculo,
+};

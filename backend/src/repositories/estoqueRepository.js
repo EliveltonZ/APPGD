@@ -22,20 +22,27 @@ async function saldoReservado(materialId) {
   return Number(total) || 0;
 }
 
+// "Comprado" = já tem pedido confirmado com um fornecedor (fornecedorId
+// setado na confirmação de compra), mas ainda não chegou fisicamente (sem
+// nf_item_id vinculado). Conta a favor do saldo porque já está garantido,
+// mesmo não estando no estoque físico ainda.
 async function saldoComprado(materialId) {
   const total = await SolicitacaoComprasItens.sum('quantidade', {
     where: {
       materialId, cancelado: false,
-      dataComprado: { [Op.ne]: null },
+      fornecedorId: { [Op.ne]: null },
       nfItemId: null,
     },
   });
   return Number(total) || 0;
 }
 
+// "Solicitado" = ainda em orçamento, sem fornecedor confirmado — não conta
+// a favor do saldo (pode não vingar com nenhum fornecedor), só informa que
+// já tem compra em andamento.
 async function saldoSolicitado(materialId) {
   const total = await SolicitacaoComprasItens.sum('quantidade', {
-    where: { materialId, cancelado: false, dataComprado: null },
+    where: { materialId, cancelado: false, fornecedorId: null },
   });
   return Number(total) || 0;
 }
@@ -116,6 +123,22 @@ async function criarMovimento(dados, options) {
   return EstoqueMovimentos.create(dados, options);
 }
 
+// Mesma regra já usada em notaFiscalRepository.criar() pro preço vindo de
+// NF: só atualiza o "último preço" do material se a data desta atualização
+// for >= a data já registrada — uma nota fiscal real posterior sempre
+// pode sobrescrever um valor estimado de inventário, nunca o contrário
+// numa ordem fora de sequência.
+async function atualizarPrecoSeMaisNovo(materialId, precoUn, data) {
+  const material = await Materiais.findByPk(materialId);
+  if (!material) return;
+  const dataAtual = material.dataUltimoPreco;
+  if (!dataAtual || new Date(data) >= new Date(dataAtual)) {
+    material.ultimoPrecoUn = precoUn;
+    material.dataUltimoPreco = data;
+    await material.save();
+  }
+}
+
 async function buscarMateriaisPorId(ids) {
   return Materiais.findAll({ where: { id: { [Op.in]: ids } }, raw: true });
 }
@@ -176,7 +199,12 @@ async function listarAbaixoDoMinimo() {
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
             COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
             COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'RESERVADO'), 0) AS reservado,
-            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND data_comprado IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
+            EXISTS (
+              SELECT 1 FROM "tblXmlConsumo" xc
+              JOIN "tblProjetos" p ON p.ordemdecompra = xc.ordemdecompra
+              WHERE xc.material_id = m.id AND xc.status IN ('PENDENTE', 'RESERVADO') AND p.urgente = true
+            ) AS tem_pedido_urgente
      FROM "tblMateriais" m
      WHERE m.ativo = true AND m.estoque_minimo_un IS NOT NULL AND m.estoque_minimo_un > 0`,
     { type: QueryTypes.SELECT },
@@ -188,9 +216,67 @@ async function listarAbaixoDoMinimo() {
       descricao: r.descricao,
       unidadeBase: r.unidade_base,
       estoqueMinimoUn: Number(r.estoque_minimo_un),
+      fisico: Number(r.fisico),
+      reservado: Number(r.reservado),
+      comprado: Number(r.comprado),
       saldoBloqueio: Number(r.fisico) - Number(r.reservado) + Number(r.comprado),
+      temPedidoUrgente: !!r.tem_pedido_urgente,
     }))
-    .filter(r => r.saldoBloqueio <= r.estoqueMinimoUn);
+    .filter(r => r.saldoBloqueio <= r.estoqueMinimoUn)
+    .sort((a, b) => Number(b.temPedidoUrgente) - Number(a.temPedidoUrgente));
+}
+
+// Materiais pedidos por algum projeto (item de XML ainda PENDENTE/RESERVADO,
+// ou seja, que ainda vai precisar ser baixado) mas que não têm NENHUM saldo
+// físico em NENHUMA localização — compras precisa comprar antes de alguém
+// conseguir reservar/dar baixa nesse material. Agrupado por material, com a
+// lista de pedidos/ambientes que estão esperando por ele.
+async function listarSemEstoqueParaPedidos() {
+  const rows = await sequelize.query(
+    `SELECT xc.material_id, xc.ordemdecompra, xc.qtd_un_confirmada, xc.unidade_xml, xc.qtd_xml,
+            m.codigo_interno, m.descricao, m.unidade_base,
+            p.contrato, p.ambiente, p.urgente, c.name AS cliente,
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado
+     FROM "tblXmlConsumo" xc
+     JOIN "tblMateriais" m ON m.id = xc.material_id
+     JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
+     LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
+     WHERE xc.status IN ('PENDENTE', 'RESERVADO')
+       AND COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) <= 0
+     ORDER BY m.codigo_interno, p.contrato`,
+    { type: QueryTypes.SELECT },
+  );
+
+  const porMaterial = new Map();
+  for (const r of rows) {
+    let grupo = porMaterial.get(r.material_id);
+    if (!grupo) {
+      grupo = {
+        id: r.material_id,
+        codigoInterno: r.codigo_interno,
+        descricao: r.descricao,
+        unidadeBase: r.unidade_base,
+        comprado: Number(r.comprado),
+        pedidos: [],
+      };
+      porMaterial.set(r.material_id, grupo);
+    }
+    grupo.pedidos.push({
+      ordemdecompra: r.ordemdecompra,
+      contrato: r.contrato,
+      ambiente: r.ambiente,
+      cliente: r.cliente,
+      urgente: !!r.urgente,
+      quantidade: r.qtd_un_confirmada != null ? Number(r.qtd_un_confirmada) : Number(r.qtd_xml),
+      unidade: r.qtd_un_confirmada != null ? 'UN' : r.unidade_xml,
+    });
+  }
+
+  // Material com pedido urgente primeiro — prioridade de compra fica óbvia
+  // sem precisar abrir cada grupo pra conferir.
+  return Array.from(porMaterial.values())
+    .map((grupo) => ({ ...grupo, temUrgente: grupo.pedidos.some((p) => p.urgente) }))
+    .sort((a, b) => Number(b.temUrgente) - Number(a.temUrgente));
 }
 
 // Saldo real por material — "o que eu realmente tenho em estoque", não fila
@@ -201,8 +287,8 @@ async function listarSaldoPorMaterial() {
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
             COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
             COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'RESERVADO'), 0) AS reservado,
-            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND data_comprado IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
-            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND data_comprado IS NULL), 0) AS solicitado
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
+            COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NULL), 0) AS solicitado
      FROM "tblMateriais" m
      WHERE m.ativo = true
      ORDER BY m.codigo_interno ASC`,
@@ -232,12 +318,124 @@ async function listarProntosParaBaixa() {
   );
 }
 
+// Lista de separação física — todo item ainda não baixado (PENDENTE ou
+// RESERVADO) de um pedido, pra imprimir e o almoxarifado ir atrás fisicamente.
+// Já traz a quebra de saldo por localização de cada material, pra dizer
+// pra onde ir (recebimento entra junto, só marcado, porque mesmo "aguardando
+// transferência" é informação útil de "onde está agora").
+async function listarItensPedidoParaSeparacao(ordemdecompra) {
+  const itens = await sequelize.query(
+    `SELECT xc.id, xc.material_id, xc.qtd_xml, xc.unidade_xml, xc.qtd_un_confirmada,
+            xc.detalhes, xc.status,
+            m.codigo_interno, m.descricao, m.unidade_base,
+            p.contrato, p.ambiente, p.pedido, c.name AS cliente
+     FROM "tblXmlConsumo" xc
+     JOIN "tblMateriais" m ON m.id = xc.material_id
+     JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
+     LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
+     WHERE xc.ordemdecompra = :ordemdecompra
+       AND xc.status IN ('PENDENTE', 'RESERVADO')
+     ORDER BY m.codigo_interno ASC`,
+    { replacements: { ordemdecompra }, type: QueryTypes.SELECT },
+  );
+  if (itens.length === 0) return { contrato: null, ambiente: null, cliente: null, pedido: null, itens: [] };
+
+  const materialIds = [...new Set(itens.map((i) => i.material_id))];
+  const saldos = await sequelize.query(
+    `SELECT em.material_id,
+            (l.rua || '-' || l.prateleira || '-' || l.nivel || '-' || l.divisao) AS codigo,
+            l.padrao_recebimento,
+            CAST(SUM(em.qtd_un) AS FLOAT) AS saldo
+     FROM "tblEstoqueMovimentos" em
+     JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
+     WHERE em.material_id IN (:materialIds)
+     GROUP BY em.material_id, l.id, l.rua, l.prateleira, l.nivel, l.divisao, l.padrao_recebimento
+     HAVING SUM(em.qtd_un) > 0
+     ORDER BY l.padrao_recebimento ASC, l.rua, l.prateleira, l.nivel, l.divisao`,
+    { replacements: { materialIds }, type: QueryTypes.SELECT },
+  );
+
+  const localizacoesPorMaterial = new Map();
+  for (const s of saldos) {
+    if (!localizacoesPorMaterial.has(s.material_id)) localizacoesPorMaterial.set(s.material_id, []);
+    localizacoesPorMaterial.get(s.material_id).push({
+      codigo: s.codigo,
+      saldo: Number(s.saldo),
+      padraoRecebimento: s.padrao_recebimento,
+    });
+  }
+
+  const primeiro = itens[0];
+  return {
+    contrato: primeiro.contrato,
+    ambiente: primeiro.ambiente,
+    cliente: primeiro.cliente,
+    pedido: primeiro.pedido,
+    itens: itens.map((i) => ({
+      id: i.id,
+      codigoInterno: i.codigo_interno,
+      descricao: i.descricao,
+      detalhes: i.detalhes,
+      unidadeBase: i.unidade_base,
+      quantidade: i.qtd_un_confirmada != null ? Number(i.qtd_un_confirmada) : Number(i.qtd_xml),
+      unidade: i.qtd_un_confirmada != null ? 'UN' : i.unidade_xml,
+      status: i.status,
+      localizacoes: localizacoesPorMaterial.get(i.material_id) || [],
+    })),
+  };
+}
+
 // Saldo físico de um material numa localização específica — base pro ajuste
 // por contagem (inventário): mostra o que o sistema acha que tem ali antes
 // do usuário informar o que contou de verdade.
 async function saldoPorLocalizacao(materialId, localizacaoId) {
   const total = await EstoqueMovimentos.sum('qtdUn', { where: { materialId, localizacaoId } });
   return Number(total) || 0;
+}
+
+// Quebra do saldo físico de um material por localização — usado na consulta
+// rápida do Estoque (clicar num material e ver onde ele está fisicamente).
+// "codigo" da localização não existe como coluna — é sempre montado a
+// partir de rua/prateleira/nível/divisão.
+async function saldoPorLocalizacoes(materialId) {
+  const rows = await sequelize.query(
+    `SELECT
+       em.localizacao_id,
+       (l.rua || '-' || l.prateleira || '-' || l.nivel || '-' || l.divisao) AS codigo,
+       l.descricao,
+       l.padrao_recebimento,
+       CAST(SUM(em.qtd_un) AS FLOAT) AS saldo
+     FROM "tblEstoqueMovimentos" em
+     JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
+     WHERE em.material_id = :materialId
+     GROUP BY em.localizacao_id, l.id, l.rua, l.prateleira, l.nivel, l.divisao, l.descricao, l.padrao_recebimento
+     HAVING SUM(em.qtd_un) > 0
+     ORDER BY l.rua, l.prateleira, l.nivel, l.divisao`,
+    { replacements: { materialId: Number(materialId) }, type: QueryTypes.SELECT },
+  );
+  return rows;
+}
+
+// Histórico de ajustes de estoque (tipo AJUSTE em tblEstoqueMovimentos) —
+// pra consulta: "quando foi ajustado esse material" e "o que esse usuário
+// ajustou". Filtro fica por conta do DataTable no front (coluna material/
+// usuário já filtrável) — aqui só traz tudo com o contexto já resolvido.
+async function listarHistoricoAjustes() {
+  return sequelize.query(
+    `SELECT em.id, em.data, em.qtd_un, em.observacoes,
+            m.codigo_interno, m.descricao AS material_descricao,
+            (l.rua || '-' || l.prateleira || '-' || l.nivel || '-' || l.divisao) AS localizacao_codigo,
+            l.descricao AS localizacao_descricao,
+            u.login AS usuario_login
+     FROM "tblEstoqueMovimentos" em
+     JOIN "tblMateriais" m     ON m.id = em.material_id
+     JOIN "tblLocalizacoes" l  ON l.id = em.localizacao_id
+     JOIN "tblUsuario" u       ON u.id = em.usuario_id
+     WHERE em.tipo = 'AJUSTE'
+     ORDER BY em.data DESC, em.id DESC
+     LIMIT 500`,
+    { type: QueryTypes.SELECT },
+  );
 }
 
 module.exports = {
@@ -256,10 +454,15 @@ module.exports = {
   listarOrdensDoLote,
   listarPendentesOuReservados,
   criarMovimento,
+  atualizarPrecoSeMaisNovo,
   listarAbaixoDoMinimo,
   listarSaldoPorMaterial,
   listarProntosParaBaixa,
+  listarItensPedidoParaSeparacao,
+  listarSemEstoqueParaPedidos,
   saldoPorLocalizacao,
+  saldoPorLocalizacoes,
+  listarHistoricoAjustes,
   buscarMateriaisPorId,
   criarImportacao,
   criarConsumos,
