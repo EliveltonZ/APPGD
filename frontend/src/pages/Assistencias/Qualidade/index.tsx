@@ -205,6 +205,7 @@ export function AssistenciasQualidadePage() {
           data={data}
           loading={loading}
           onRowClick={handleRowClick}
+          falhaOptions={falhaOptions}
         />
       </div>
 
