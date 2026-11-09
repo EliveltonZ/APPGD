@@ -21,7 +21,10 @@ interface SearchSelectProps {
 /**
  * Combobox com busca — pensado pra listas grandes (centenas/milhares de
  * itens), onde um <select> nativo obriga a rolar tudo pra achar um item.
- * Filtra por substring (case/acento-insensível) contra label + searchHint.
+ * Filtra por palavra (case/acento-insensível) contra label + searchHint —
+ * cada palavra digitada precisa aparecer em algum lugar do texto, em
+ * qualquer ordem (ex.: "35 branco" acha "FITA ... 35MM BRANCO TX" mesmo
+ * sem as palavras estarem coladas uma na outra no cadastro).
  */
 export function SearchSelect({
   options,
@@ -44,12 +47,12 @@ export function SearchSelect({
     s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
   const filtered = useMemo(() => {
-    const q = normalized(query.trim());
-    const base = q
-      ? options.filter(
-          (o) => normalized(o.label).includes(q) || (o.searchHint && normalized(o.searchHint).includes(q)),
-        )
-      : options;
+    const tokens = normalized(query.trim()).split(/\s+/).filter(Boolean);
+    if (tokens.length === 0) return options.slice(0, maxResults);
+    const base = options.filter((o) => {
+      const texto = `${normalized(o.label)} ${o.searchHint ? normalized(o.searchHint) : ""}`;
+      return tokens.every((t) => texto.includes(t));
+    });
     return base.slice(0, maxResults);
   }, [options, query, maxResults]);
 
