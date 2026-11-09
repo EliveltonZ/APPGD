@@ -21,6 +21,7 @@ import type { NFePreviewDuplicata } from "../../../services/notaFiscal";
 import { fetchPedidosAbertosPorFornecedor } from "../../../services/solicitacaoCompras";
 import type { PedidoAbertoPorFornecedor } from "../../../services/solicitacaoCompras";
 import { validateNotaFiscalItem, validateNotaFiscal } from "../../../validation";
+import { normalizarUnidadeCompra } from "../../../utils/unidadeCompra";
 import "./index.css";
 
 interface ItemRascunho {
@@ -56,6 +57,8 @@ interface ItemRascunho {
 function fmtQtd(v: number): string {
   return v.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 }
+
+const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 
 function fmtMoeda(v: number | null): string {
   if (v == null) return "—";
@@ -143,12 +146,17 @@ export function AlmoxarifadoNotaFiscalPage() {
   // assumir 1:1 silenciosamente.
   function precisaFator(matId: number | null, unCompra: string): boolean {
     const material = materiais.find((m) => m.id === matId);
-    return material?.unidadeBase === "M" && unCompra.trim().toUpperCase() !== "M";
+    return material?.unidadeBase === "M" && normalizarUnidadeCompra(unCompra) !== "M";
   }
 
   // Dado material + unidade de compra + quantidades, resolve qtdUn/precoUn
   // de estoque — ou sinaliza que falta informação pra fazer essa conta com
   // segurança, em vez de arriscar salvar a quantidade errada no estoque.
+  // unidadeCompra é normalizada primeiro (UN/UND/UNID → UN, M²→M2 etc.) —
+  // fornecedores diferentes escrevem a mesma unidade de jeitos diferentes
+  // na nota (ex.: LEO Madeiras manda chapa em "UN", a Arauco na mesma
+  // chapa em "M2") e a identificação da conversão precisa ser automática
+  // independente de como cada um escreveu.
   function resolverConversao(
     matId: number | null,
     unCompra: string,
@@ -157,21 +165,35 @@ export function AlmoxarifadoNotaFiscalPage() {
     fatorConhecido: number | null,
   ): { qtdUn: number; precoUn: number | null; needsFator: boolean; fator: number | null } {
     const material = materiais.find((m) => m.id === matId);
-    const unCompraNorm = unCompra.trim().toUpperCase();
+    const unCompraNorm = normalizarUnidadeCompra(unCompra);
 
-    // Chapa comprada em m² (alguns fornecedores faturam por área, não por
-    // chapa inteira) — a conversão pra UN (chapa inteira) usa o m²/chapa
-    // fixo do próprio cadastro do material, nunca precisa ser digitada: ao
-    // contrário do rolo de fita, a área de uma chapa não muda por
-    // fornecedor, então uma vez cadastrada já resolve sozinho pra sempre.
-    if (material?.unidadeBase === "M2" && unCompraNorm === "M2") {
-      const m2PorChapa = material.m2PorUnidade;
-      if (!m2PorChapa) {
-        return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
+    if (material?.unidadeBase === "M2") {
+      // Chapa comprada em m² (alguns fornecedores faturam por área, não
+      // por chapa inteira) — a conversão pra UN (chapa inteira) usa o
+      // m²/chapa fixo do próprio cadastro do material, nunca precisa ser
+      // digitada: ao contrário do rolo de fita, a área de uma chapa não
+      // muda por fornecedor, então uma vez cadastrada já resolve sozinho
+      // pra sempre.
+      if (unCompraNorm === "M2") {
+        const m2PorChapa = material.m2PorUnidade;
+        if (!m2PorChapa) {
+          return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
+        }
+        const qtdUn = Math.round((qtdNfVal / m2PorChapa) * 1000) / 1000;
+        const precoUn = precoNfVal != null ? Math.round(precoNfVal * m2PorChapa * 10000) / 10000 : null;
+        return { qtdUn, precoUn, needsFator: false, fator: m2PorChapa };
       }
-      const qtdUn = Math.round((qtdNfVal / m2PorChapa) * 1000) / 1000;
-      const precoUn = precoNfVal != null ? Math.round(precoNfVal * m2PorChapa * 10000) / 10000 : null;
-      return { qtdUn, precoUn, needsFator: false, fator: m2PorChapa };
+      // Chapa comprada direto em UN (ex.: LEO Madeiras) — 1 unidade
+      // comprada = 1 chapa inteira de estoque, sem conversão nenhuma.
+      if (unCompraNorm === "UN") {
+        return { qtdUn: qtdNfVal, precoUn: precoNfVal, needsFator: false, fator: null };
+      }
+      // Unidade que não é nem M2 nem UN pra uma chapa — não arrisca
+      // assumir 1:1 silenciosamente (era exatamente esse o bug: qualquer
+      // unidade desconhecida caía na conta de "sem conversão", tratando
+      // área como se fosse unidade inteira). Bloqueia e pede resolução
+      // manual, igual já acontece pra fita sem fator.
+      return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
     }
 
     if (!precisaFator(matId, unCompra)) {
@@ -352,6 +374,27 @@ export function AlmoxarifadoNotaFiscalPage() {
   function handlePedidoItemChange(key: number, pedidoItemIdStr: string) {
     const pedidoItemId = pedidoItemIdStr ? Number(pedidoItemIdStr) : null;
     setItens((prev) => prev.map((i) => (i._key === key ? { ...i, pedidoItemId } : i)));
+  }
+
+  // Usuário corrigiu a unidade de compra de um item de chapa que veio com
+  // uma unidade não reconhecida (ex.: "CH" de um fornecedor que ainda não
+  // tínhamos visto) — recalcula a conversão com a unidade corrigida e já
+  // marca pra salvar vínculo, pra essa abreviação não travar de novo numa
+  // próxima nota do mesmo fornecedor.
+  function handleCorrigirUnidadeCompra(key: number, novaUnidade: string) {
+    setItens((prev) =>
+      prev.map((i) => {
+        if (i._key !== key) return i;
+        const { qtdUn, precoUn, needsFator, fator } = resolverConversao(
+          i.materialId,
+          novaUnidade,
+          i.qtdNf,
+          i.precoNf,
+          i.fator,
+        );
+        return { ...i, unidadeCompra: novaUnidade, qtdUn, precoUn, needsFator, fator, salvarVinculo: !needsFator };
+      }),
+    );
   }
 
   // Usuário informou o fator (metros por rolo) pra um item que precisava —
@@ -750,6 +793,8 @@ export function AlmoxarifadoNotaFiscalPage() {
               {itens.map((i) => {
                 const materialDoItem = materiais.find((m) => m.id === i.materialId);
                 const ehChapa = materialDoItem?.unidadeBase === "M2";
+                const unidadeChapaDesconhecida =
+                  ehChapa && !["M2", "UN"].includes(normalizarUnidadeCompra(i.unidadeCompra));
                 return i.materialId == null ? (
                   <div key={i._key} className="nf-item-row nf-item-row--evidencia">
                     <div className="nf-item-row__info" style={{ flex: 1 }}>
@@ -780,7 +825,29 @@ export function AlmoxarifadoNotaFiscalPage() {
                   <div key={i._key} className="nf-item-row nf-item-row--evidencia">
                     <div className="nf-item-row__info" style={{ flex: 1 }}>
                       <strong>{i.codigoInterno}</strong> — {i.descricao}
-                      {ehChapa ? (
+                      {unidadeChapaDesconhecida ? (
+                        <>
+                          <span className="nf-item-row__qtd">
+                            {fmtQtd(i.qtdNf)} {i.unidadeCompra}
+                            {i.precoNf != null ? ` · ${fmtMoeda(i.precoNf)}/${i.unidadeCompra}` : ""} — unidade de
+                            compra não reconhecida pra chapa (esperado UN ou M2)
+                          </span>
+                          <span className="nf-item-row__hint">
+                            Corrija a unidade de compra deste item (ou troque o material, se foi casado errado).
+                          </span>
+                          <Input
+                            type="text"
+                            uppercase
+                            maxLength={10}
+                            defaultValue={i.unidadeCompra}
+                            placeholder="Ex: UN ou M2"
+                            onBlur={(e) => handleCorrigirUnidadeCompra(i._key, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                            }}
+                          />
+                        </>
+                      ) : ehChapa ? (
                         <>
                           <span className="nf-item-row__qtd">
                             {fmtQtd(i.qtdNf)} {i.unidadeCompra}
@@ -802,7 +869,11 @@ export function AlmoxarifadoNotaFiscalPage() {
                             type="text"
                             inputMode="decimal"
                             placeholder="Metros por rolo (ex: 20)"
-                            onChange={(e) => handleResolverFator(i._key, e.target.value)}
+                            defaultValue={i.fator != null ? String(i.fator) : ""}
+                            onBlur={(e) => handleResolverFator(i._key, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") e.currentTarget.blur();
+                            }}
                           />
                         </>
                       )}
@@ -822,8 +893,8 @@ export function AlmoxarifadoNotaFiscalPage() {
                     <div className="nf-item-row__info">
                       <strong>{i.codigoInterno}</strong> — {i.descricao}
                       <span className="nf-item-row__qtd">
-                        {fmtQtd(i.qtdNf)} {i.unidadeCompra} → {fmtQtd(i.qtdUn)} un
-                        {i.precoUn != null ? ` · ${fmtMoeda(i.precoUn)}/un` : ""}
+                        {fmtQtd(i.qtdNf)} {i.unidadeCompra} → {fmtQtd(i.qtdUn)} {UNIDADE_LABEL[materialDoItem?.unidadeBase ?? "UN"] ?? materialDoItem?.unidadeBase}
+                        {i.precoUn != null ? ` · ${fmtMoeda(i.precoUn)}/${UNIDADE_LABEL[materialDoItem?.unidadeBase ?? "UN"] ?? materialDoItem?.unidadeBase}` : ""}
                       </span>
                       {(() => {
                         const candidatos = pedidosAbertos.filter((p) => p.material_id === i.materialId);
@@ -837,7 +908,7 @@ export function AlmoxarifadoNotaFiscalPage() {
                             <option value="">Não veio de um pedido</option>
                             {candidatos.map((p) => (
                               <option key={p.id} value={p.id}>
-                                Pedido #{p.solicitacao_id} — {fmtQtd(p.quantidade)} un (
+                                Pedido #{p.solicitacao_id} — {fmtQtd(p.quantidade)} {UNIDADE_LABEL[materialDoItem?.unidadeBase ?? "UN"] ?? materialDoItem?.unidadeBase} (
                                 {new Date(p.data_pedido).toLocaleDateString("pt-BR")})
                               </option>
                             ))}

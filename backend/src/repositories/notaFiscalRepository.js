@@ -3,6 +3,7 @@ const { sequelize, NotasFiscais, NotasFiscaisItens, EstoqueMovimentos, Materiais
 const codigoNFRepo = require('./materiaisCodigoNFRepository');
 const localizacoesRepo = require('./localizacoesRepository');
 const { NotaFiscalValidator } = require('../validation');
+const { normalizarUnidadeCompra } = require('../utils/unidadeCompra');
 
 async function listar() {
   const [rows] = await sequelize.query(
@@ -125,7 +126,7 @@ async function criar(body, usuarioId) {
         codigoNf:      item.codigoNf?.trim() || null,
         materialId,
         descricaoNf:   item.descricaoNf?.trim() || null,
-        unidadeCompra: item.unidadeCompra.trim().toUpperCase(),
+        unidadeCompra: normalizarUnidadeCompra(item.unidadeCompra),
         qtdNf,
         qtdUn,
         precoNf,
@@ -187,7 +188,7 @@ async function criar(body, usuarioId) {
           materialId,
           fornecedorId,
           codigoNf:      item.codigoNf.trim(),
-          unidadeCompra: item.unidadeCompra.trim().toUpperCase(),
+          unidadeCompra: normalizarUnidadeCompra(item.unidadeCompra),
           m2PorUnidade:  item.fator != null ? Number(item.fator) : null,
         }, { transaction: t });
       }

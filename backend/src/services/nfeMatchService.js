@@ -37,6 +37,11 @@ async function preview(xmlText) {
       }
       return {
         ...item,
+        // Fornecedor já vinculado antes: confia na unidade que o vínculo
+        // guardou (confirmada por alguém na vez anterior) em vez da que
+        // esta nota específica trouxe — cobre variação de escrita da
+        // mesma unidade entre notas do mesmo fornecedor.
+        unidadeCompra: vinculo.unidadeCompra || item.unidadeCompra,
         materialId: material.id,
         codigoInterno: material.codigoInterno,
         materialDescricao: material.descricao,

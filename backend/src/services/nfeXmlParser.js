@@ -1,5 +1,6 @@
 'use strict';
 const { XMLParser } = require('fast-xml-parser');
+const { normalizarUnidadeCompra } = require('../utils/unidadeCompra');
 
 // parseTagValue desligado de propósito — por padrão o fast-xml-parser
 // converte texto "numérico" em number automaticamente, o que derruba zeros à
@@ -82,7 +83,7 @@ function parseNFeXml(xmlText) {
       return {
         codigoNf: texto(p.cProd),
         descricao: texto(p.xProd),
-        unidadeCompra: texto(p.uCom),
+        unidadeCompra: normalizarUnidadeCompra(texto(p.uCom)),
         qtdNf: numero(p.qCom),
         precoNf: numero(p.vUnCom),
         total: numero(p.vProd),
