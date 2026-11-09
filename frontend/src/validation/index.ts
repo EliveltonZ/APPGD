@@ -7,7 +7,6 @@ export { validateCriarUsuario, validateAlterarSenha } from "./usuario";
 export type { CriarUsuarioForm, AlterarSenhaForm } from "./usuario";
 export { validateParadaEdit } from "./parada";
 export type { ParadaEditForm } from "./parada";
-export { validateCompra } from "./compra";
 export { validateOperadorId, validateOperadorIdOuNome } from "./operador";
 export { validateOrcamento } from "./orcamento";
 export type { OrcamentoItemForm } from "./orcamento";

@@ -33,7 +33,6 @@ import { EditaProjetoPage } from "./pages/Pedidos/EditaProjeto";
 import { ExcluirProjetoPage } from "./pages/Pedidos/ExcluirProjeto";
 
 // ── Compras ───────────────────────────────────────────────────────────────────
-import { RelatorioComprasPage } from "./pages/Compras/Relatorio";
 import { ItensPedidoPage } from "./pages/Compras/ItensPedido";
 import { ComprasNecessidadesPage } from "./pages/Compras/Necessidades";
 import { ComprasConfirmarPage } from "./pages/Compras/Confirmar";
@@ -111,7 +110,6 @@ const PAGE_MAP: Record<string, ComponentType> = {
   pedidos_novo: NovoProjetoPage,
   pedidos_editar: EditaProjetoPage,
   pedidos_excluir: ExcluirProjetoPage,
-  compras_lista: RelatorioComprasPage,
   compras_pendencias: ItensPedidoPage,
   compras_necessidades: ComprasNecessidadesPage,
   compras_confirmar: ComprasConfirmarPage,

@@ -98,7 +98,6 @@ export const ROUTE_ITEMS = [
   buildSidebarList('pedidos_excluir', '/pedidos/excluir', 'pedidos', 'Excluir Pedido'),
   // ── Compras ────────────────────────────────────────────────────────────────
 
-  buildSidebarList('compras_lista', '/compras/lista', 'compras', 'Compras', true),
   buildSidebarList('compras_pendencias', '/compras/itens-pedido', 'compras', 'Itens Pedido'),
   buildSidebarList('compras_necessidades', '/compras/necessidades', 'compras', 'Necessidades de Compra'),
   buildSidebarList('compras_confirmar', '/compras/confirmar', 'compras', 'Confirmar Compras'),
