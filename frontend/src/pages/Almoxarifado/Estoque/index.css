@@ -49,6 +49,30 @@
   font-weight: 600;
 }
 
+.estq-summary__filtro {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  border-radius: 10px;
+  transition: box-shadow 0.15s ease;
+}
+
+.estq-summary__filtro:hover {
+  box-shadow: 0 0 0 2px var(--accent2, #be1e1e);
+}
+
+.estq-summary__filtro--ativo {
+  box-shadow: 0 0 0 2px var(--accent2, #be1e1e);
+}
+
+.estq-link {
+  all: unset;
+  cursor: pointer;
+  color: var(--primary, #2563eb);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
 /* ── Modal "Onde está o material" ────────────────────────── */
 
 .estq-detalhe {

@@ -33,9 +33,11 @@ export function AlmoxarifadoEstoquePage() {
   const [localizacoes, setLocalizacoes] = useState<SaldoLocalizacaoItem[]>([]);
   const [loadingLocalizacoes, setLoadingLocalizacoes] = useState(false);
   const [erroLocalizacoes, setErroLocalizacoes] = useState<string | null>(null);
+  const [somenteAbaixoMinimo, setSomenteAbaixoMinimo] = useState(false);
 
   const comEstoque = materiais.filter((m) => m.fisico > 0).length;
   const abaixoMinimo = materiais.filter(abaixoDoMinimo).length;
+  const materiaisExibidos = somenteAbaixoMinimo ? materiais.filter(abaixoDoMinimo) : materiais;
 
   async function abrirDetalhe(material: SaldoMaterial) {
     setDetalhe(material);
@@ -151,22 +153,38 @@ export function AlmoxarifadoEstoquePage() {
             icon={<Boxes size={13} />}
             loading={loading}
           />
-          <SummaryCard
-            label="Abaixo do mínimo"
-            value={abaixoMinimo}
-            accent="var(--accent2, #be1e1e)"
-            icon={<Boxes size={13} />}
-            loading={loading}
-          />
+          <button
+            type="button"
+            className={`estq-summary__filtro${somenteAbaixoMinimo ? " estq-summary__filtro--ativo" : ""}`}
+            onClick={() => setSomenteAbaixoMinimo((v) => !v)}
+            title={somenteAbaixoMinimo ? "Clique pra ver todos os materiais" : "Clique pra ver só os abaixo do mínimo"}
+          >
+            <SummaryCard
+              label="Abaixo do mínimo"
+              value={abaixoMinimo}
+              accent="var(--accent2, #be1e1e)"
+              icon={<Boxes size={13} />}
+              loading={loading}
+            />
+          </button>
         </div>
+
+        {somenteAbaixoMinimo && (
+          <p className="estq-page__subtitle">
+            Mostrando só os {materiaisExibidos.length} material(is) abaixo do mínimo configurado.{" "}
+            <button type="button" className="estq-link" onClick={() => setSomenteAbaixoMinimo(false)}>
+              Ver todos
+            </button>
+          </p>
+        )}
 
         <DataTable
           columns={columns}
-          data={materiais}
+          data={materiaisExibidos}
           rowKey="id"
           loading={loading}
           storageKey="almoxarifado-estoque-saldo"
-          emptyMessage="Nenhum material ativo cadastrado."
+          emptyMessage={somenteAbaixoMinimo ? "Nenhum material abaixo do mínimo." : "Nenhum material ativo cadastrado."}
           onRowClick={abrirDetalhe}
         />
       </div>
