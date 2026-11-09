@@ -87,6 +87,8 @@ export interface VinculoListItem {
   material_descricao: string;
   unidade_base: string;
   fornecedor_nome: string;
+  criado_por: string | null;
+  criado_em: string;
 }
 
 export const fetchVinculos = (): Promise<VinculoListItem[]> =>

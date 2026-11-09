@@ -32,6 +32,17 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       field:     'm2_por_unidade',
     },
+    criadoPorId: {
+      type:      DataTypes.INTEGER,
+      allowNull: true,
+      field:     'criado_por_id',
+    },
+    criadoEm: {
+      type:         DataTypes.DATE,
+      allowNull:    false,
+      defaultValue: DataTypes.NOW,
+      field:        'criado_em',
+    },
   }, {
     sequelize,
     tableName:  T.materiaisCodigoNF.name,

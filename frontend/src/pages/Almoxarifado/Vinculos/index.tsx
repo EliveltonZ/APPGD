@@ -12,6 +12,7 @@ import { ConfirmModal } from "../../../components/ConfirmModal";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
+import { fmtDateTime } from "../../../utils/dateUtils";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import {
   fetchVinculos,
@@ -101,6 +102,23 @@ export function AlmoxarifadoVinculosPage() {
       align: "right",
       minWidth: 120,
       render: (_v, row) => fmtFator(row),
+    },
+    {
+      key: "criado_por",
+      label: "Criado por",
+      type: "text",
+      sortable: true,
+      filterable: true,
+      minWidth: 120,
+      render: (v) => (v ? String(v) : "—"),
+    },
+    {
+      key: "criado_em",
+      label: "Criado em",
+      type: "text",
+      sortable: true,
+      minWidth: 130,
+      render: (v) => fmtDateTime(String(v)),
     },
     {
       key: "id",

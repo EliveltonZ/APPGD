@@ -31,7 +31,9 @@ async function buscarPorCodigoFornecedor(fornecedorId, codigoNf) {
 // Cria ou atualiza o vínculo (material, fornecedor, código NF) — mesma
 // chave única do banco. Chamado ao lançar NF quando o usuário marca
 // "salvar vínculo pra próxima vez".
-async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra, m2PorUnidade }, options = {}) {
+// "criado por/em" só é gravado na criação — um upsert que caiu no update
+// (vínculo já existia) não deve apagar a autoria original.
+async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra, m2PorUnidade, usuarioId }, options = {}) {
   const existente = await MateriaisCodigoNF.findOne({
     where: { materialId, fornecedorId, codigoNf },
     transaction: options.transaction,
@@ -45,6 +47,7 @@ async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra
   return MateriaisCodigoNF.create({
     materialId, fornecedorId, codigoNf, unidadeCompra,
     m2PorUnidade: m2PorUnidade ?? null,
+    criadoPorId: usuarioId ?? null,
   }, { transaction: options.transaction });
 }
 
@@ -55,11 +58,13 @@ async function upsertVinculo({ materialId, fornecedorId, codigoNf, unidadeCompra
 async function listarTodos() {
   return sequelize.query(
     `SELECT v.id, v.material_id, v.fornecedor_id, v.codigo_nf, v.unidade_compra, v.m2_por_unidade,
+            v.criado_em, u.login AS criado_por,
             m.codigo_interno, m.descricao AS material_descricao, m.unidade_base,
             f.nome AS fornecedor_nome
      FROM "tblMateriaisCodigoNF" v
-     JOIN "tblMateriais" m     ON m.id = v.material_id
-     JOIN "tblFornecedores" f  ON f.id = v.fornecedor_id
+     JOIN "tblMateriais" m         ON m.id = v.material_id
+     JOIN "tblFornecedores" f      ON f.id = v.fornecedor_id
+     LEFT JOIN "tblUsuario" u      ON u.id = v.criado_por_id
      ORDER BY f.nome ASC, m.codigo_interno ASC`,
     { type: sequelize.QueryTypes.SELECT },
   );

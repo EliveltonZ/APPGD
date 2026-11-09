@@ -120,6 +120,7 @@ function initModels(sequelize) {
   // Estoque de Matéria Prima
   MateriaisCodigoNF.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });
   MateriaisCodigoNF.belongsTo(Fornecedores, { as: "fornecedor", foreignKey: "fornecedorId" });
+  MateriaisCodigoNF.belongsTo(Usuario,      { as: "criadoPor",  foreignKey: "criadoPorId"  });
 
   MateriaisReferenciaPromob.belongsTo(Materiais, { as: "material", foreignKey: "materialId" });
 

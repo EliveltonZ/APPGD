@@ -190,6 +190,7 @@ async function criar(body, usuarioId) {
           codigoNf:      item.codigoNf.trim(),
           unidadeCompra: normalizarUnidadeCompra(item.unidadeCompra),
           m2PorUnidade:  item.fator != null ? Number(item.fator) : null,
+          usuarioId:     Number(usuarioId),
         }, { transaction: t });
       }
     }
