@@ -128,18 +128,6 @@ export function AlmoxarifadoNotaFiscalPage() {
       });
   }, [fornecedorId]);
 
-  // fator = quantidade física (em metros, pra fita) que cabe em 1 unidade de
-  // compra (1 rolo). Rolo de 20m comprando 5 rolos → 5 × 20 = 100m de
-  // estoque, não 5 — era isso que estava invertido (dividia em vez de
-  // multiplicar).
-  function recomputeQtdUn(qtdNfStr: string, fatorStr: string): string {
-    const qn = toNumber(qtdNfStr);
-    const f = toNumber(fatorStr);
-    if (!qn) return "";
-    if (!f || f === 1) return String(qn);
-    return String(Math.round(qn * f * 1000) / 1000);
-  }
-
   // Material cuja unidade de estoque (metros — fita) é diferente da unidade
   // que ele é comprado (ex: rolo) — precisa de um fator de conversão
   // informado por fornecedor (comprimento do rolo varia), nunca pode
@@ -209,29 +197,46 @@ export function AlmoxarifadoNotaFiscalPage() {
     return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
   }
 
-  function recomputePrecoUn(qtdNfStr: string, precoNfStr: string, qtdUnStr: string): string {
+  // Recalcula qtdUn/precoUn do item em edição com a mesma lógica usada pro
+  // XML importado (resolverConversao) — chapa sempre converte dividindo
+  // pelo m²/chapa do cadastro (nunca pelo "fator" digitado, que é só pra
+  // fita), então não existe mais caminho pra lançar chapa em m² sem cair
+  // na conversão automática pra unidade inteira.
+  function recomputeAndSet(matId: number | null, unCompra: string, qtdNfStr: string, precoNfStr: string, fatorStr: string) {
     const qn = toNumber(qtdNfStr);
+    if (qn == null) {
+      setQtdUn("");
+      setPrecoUn("");
+      return;
+    }
     const pn = toNumber(precoNfStr);
-    const qu = toNumber(qtdUnStr);
-    if (!qn || !pn || !qu) return "";
-    return String(Math.round(((qn * pn) / qu) * 10000) / 10000);
+    const fatorNum = toNumber(fatorStr);
+    const { qtdUn, precoUn } = resolverConversao(matId, unCompra, qn, pn, fatorNum);
+    setQtdUn(String(qtdUn));
+    setPrecoUn(precoUn != null ? String(precoUn) : "");
   }
 
   async function handleMaterialChange(id: number | null) {
     setMaterialId(id);
     setVinculoCarregado(false);
-    if (!id || !fornecedorId) return;
+    if (!id || !fornecedorId) {
+      recomputeAndSet(id, unidadeCompra, qtdNf, precoNf, fator);
+      return;
+    }
     try {
       const vinculo = await fetchVinculo(id, Number(fornecedorId));
+      const unCompra = vinculo ? vinculo.unidadeCompra : unidadeCompra;
+      const fatorStr = vinculo ? (vinculo.m2PorUnidade != null ? String(vinculo.m2PorUnidade) : "") : fator;
       if (vinculo) {
         setCodigoNf(vinculo.codigoNf);
-        setUnidadeCompra(vinculo.unidadeCompra);
-        setFator(vinculo.m2PorUnidade != null ? String(vinculo.m2PorUnidade) : "");
+        setUnidadeCompra(unCompra);
+        setFator(fatorStr);
         setSalvarVinculo(false);
         setVinculoCarregado(true);
       } else {
         setSalvarVinculo(true);
       }
+      recomputeAndSet(id, unCompra, qtdNf, precoNf, fatorStr);
     } catch (err) {
       // fetchVinculo resolve null (não lança) quando simplesmente não existe
       // vínculo salvo — chegar aqui é falha real de rede/servidor, não "sem
@@ -242,20 +247,22 @@ export function AlmoxarifadoNotaFiscalPage() {
 
   function handleQtdNfChange(v: string) {
     setQtdNf(v);
-    setQtdUn(recomputeQtdUn(v, fator));
-    setPrecoUn(recomputePrecoUn(v, precoNf, recomputeQtdUn(v, fator)));
+    recomputeAndSet(materialId, unidadeCompra, v, precoNf, fator);
   }
 
   function handleFatorChange(v: string) {
     setFator(v);
-    const novoQtdUn = recomputeQtdUn(qtdNf, v);
-    setQtdUn(novoQtdUn);
-    setPrecoUn(recomputePrecoUn(qtdNf, precoNf, novoQtdUn));
+    recomputeAndSet(materialId, unidadeCompra, qtdNf, precoNf, v);
   }
 
   function handlePrecoNfChange(v: string) {
     setPrecoNf(v);
-    setPrecoUn(recomputePrecoUn(qtdNf, v, qtdUn));
+    recomputeAndSet(materialId, unidadeCompra, qtdNf, v, fator);
+  }
+
+  function handleUnidadeCompraChange(v: string) {
+    setUnidadeCompra(v);
+    recomputeAndSet(materialId, v, qtdNf, precoNf, fator);
   }
 
   function resetItemForm() {
@@ -700,7 +707,7 @@ export function AlmoxarifadoNotaFiscalPage() {
               uppercase
               maxLength={10}
               value={unidadeCompra}
-              onChange={(e) => setUnidadeCompra(e.target.value)}
+              onChange={(e) => handleUnidadeCompraChange(e.target.value)}
               placeholder="UN"
               error={itemErrors.unidadeCompra}
             />
