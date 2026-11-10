@@ -179,7 +179,9 @@ export function AlmoxarifadoNotaFiscalPage() {
         if (!m2PorChapa) {
           return { qtdUn: 0, precoUn: null, needsFator: true, fator: null };
         }
-        const qtdUn = Math.round((qtdNfVal / m2PorChapa) * 1000) / 1000;
+        // Arredonda pra baixo — estoque de chapa não trabalha fracionado,
+        // então a sobra de área (ex.: 0,675 chapa) não entra como saldo.
+        const qtdUn = Math.floor(qtdNfVal / m2PorChapa);
         const precoUn = precoNfVal != null ? Math.round(precoNfVal * m2PorChapa * 10000) / 10000 : null;
         return { qtdUn, precoUn, needsFator: false, fator: m2PorChapa };
       }
