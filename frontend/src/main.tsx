@@ -95,6 +95,9 @@ import { OrcamentoImpressaoPage } from "./pages/Compras/OrcamentoImpressao";
 
 // ── Sandbox (desenvolvimento) ─────────────────────────────────────────────────
 import { SandboxPage } from "./pages/Sandbox";
+// Temporária — ver comentário no próprio arquivo. Remover junto com o
+// service/rota de backend quando a decisão sobre o XML "LISTING" for tomada.
+import { XmlLogisticaAnaliseTempPage } from "./pages/XmlLogisticaAnaliseTemp";
 
 import "./index.css";
 
@@ -209,6 +212,9 @@ createRoot(document.getElementById("root")!).render(
 
             {/* Sandbox — apenas em desenvolvimento */}
             {import.meta.env.DEV && <Route path="/sandbox" element={<SandboxPage />} />}
+            {import.meta.env.DEV && (
+              <Route path="/xml-logistica-temp" element={<XmlLogisticaAnaliseTempPage />} />
+            )}
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
