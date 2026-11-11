@@ -12,6 +12,7 @@ const pedidoC = require('../controllers/pedidoItensController');
 router.get('/alerta-minimo',        c.getAlertaMinimo);
 router.get('/lista-compras',        c.getListaCompras);
 router.get('/pronto-para-baixa',    c.getProntoParaBaixa);
+router.get('/pendentes-liberados',  c.getPendentesLiberados);
 router.get('/lista-separacao/:ordemdecompra', c.getListaSeparacao);
 router.get('/saldo-materiais',      c.getSaldoPorMaterial);
 router.get('/saldo/:materialId',    c.getSaldo);

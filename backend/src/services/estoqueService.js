@@ -412,6 +412,31 @@ async function listarProntoParaBaixa() {
   }));
 }
 
+// Tudo que ainda não foi baixado, de todo pedido em aberto — base da tela
+// de Compras pra decidir o que liberar (sem filtro de estoque mínimo, ao
+// contrário da fila de baixa do almoxarifado).
+async function listarPendentesOuLiberadosGeral() {
+  const rows = await repo.listarPendentesOuLiberadosGeral();
+  return rows.map(r => ({
+    id: r.id,
+    ordemdecompra: r.ordemdecompra,
+    materialId: r.material_id,
+    codigoInterno: r.codigo_interno,
+    descricao: r.descricao,
+    unidade: r.unidade_xml,
+    tipo: TIPO_POR_UNIDADE[r.unidade_xml] ?? 'FERRAGEM',
+    quantidade: r.qtd_xml != null ? Number(r.qtd_xml) : null,
+    qtdUnConfirmada: r.qtd_un_confirmada != null ? Number(r.qtd_un_confirmada) : null,
+    detalhes: r.detalhes,
+    status: r.status,
+    origem: r.importacao_id != null ? 'XML' : 'MANUAL',
+    contrato: r.contrato,
+    ambiente: r.ambiente,
+    lote: r.lote || null,
+    cliente: r.cliente,
+  }));
+}
+
 // Lista de separação física pra impressão — todo item ainda não baixado de
 // um pedido, com a localização de cada material (quando tem saldo em
 // alguma), pro almoxarifado ir atrás fisicamente.
@@ -516,6 +541,7 @@ module.exports = {
   listarListaCompras,
   listarSaldoPorMaterial,
   listarProntoParaBaixa,
+  listarPendentesOuLiberadosGeral,
   listarItensPedidoParaSeparacao,
   saldoPorLocalizacao,
   saldoPorLocalizacoes,

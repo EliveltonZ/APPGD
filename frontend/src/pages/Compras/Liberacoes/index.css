@@ -1,0 +1,223 @@
+.lib-page {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lib-page__top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.lib-page__title {
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  margin: 0 0 2px !important;
+}
+
+.lib-page__subtitle {
+  font-size: 14px;
+  color: var(--text);
+  margin: 0;
+  max-width: 640px;
+}
+
+.lib-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .lib-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Status badges ─────────────────────────────────────── */
+
+.lib-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.lib-badge--pendente {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text-h);
+}
+.lib-badge--liberado {
+  background: rgba(32, 128, 197, 0.14);
+  color: #2080c5;
+}
+
+.lib-vazio {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--text-muted);
+}
+
+/* ── Grupos (projeto/pedido) ────────────────────────────── */
+
+.lib-grupos {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.lib-grupo {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.lib-grupo-header {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.lib-grupo-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-h);
+  font-family: var(--sans);
+  font-size: 13px;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.lib-grupo-trigger:hover {
+  background: var(--hover);
+}
+
+.lib-grupo-chevron {
+  flex-shrink: 0;
+  color: var(--text);
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+.lib-grupo--aberto .lib-grupo-chevron {
+  transform: rotate(90deg);
+}
+
+.lib-grupo-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.lib-grupo-count {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.lib-grupo-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  flex-shrink: 0;
+}
+
+/* Truque de CSS grid pra animar altura de 0 até auto */
+.lib-grupo-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.2s ease;
+}
+
+.lib-grupo--aberto .lib-grupo-wrap {
+  grid-template-rows: 1fr;
+}
+
+.lib-grupo-table {
+  overflow: hidden;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.lib-grupo-table thead th {
+  text-align: left;
+  padding: 8px 14px;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: var(--content-bg);
+}
+
+.lib-grupo-table tbody td {
+  padding: 8px 14px;
+  color: var(--text-h);
+  border-bottom: 1px solid var(--border);
+}
+
+.lib-grupo-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.lib-grupo-table__center {
+  text-align: center;
+}
+
+/* ── Actions ────────────────────────────────────────────── */
+
+.lib-actions {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lib-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text);
+  transition:
+    background 0.12s,
+    color 0.12s,
+    border-color 0.12s;
+}
+
+.lib-action-btn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  color: var(--accent);
+}

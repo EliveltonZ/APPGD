@@ -7,8 +7,10 @@ interface Props {
   onDefinirQuantidade: (item: PendingItem) => void;
   onLiberar: (item: PendingItem) => void;
   onCancelarLiberacao: (item: PendingItem) => void;
-  onBaixa: (item: PendingItem) => void;
-  onDelete: (id: number) => void;
+  // Opcionais — telas que não lidam com baixa/exclusão (ex.: Compras só
+  // libera) simplesmente não passam, e a coluna correspondente não aparece.
+  onBaixa?: (item: PendingItem) => void;
+  onDelete?: (id: number) => void;
 }
 
 const TIPO_LABEL: Record<string, string> = { CHAPA: "Chapa", FITA: "Fita", FERRAGEM: "Ferragem" };
@@ -95,14 +97,16 @@ export function PendingItemsTable({
                   )}
                   {item.status === "LIBERADO" && (
                     <>
-                      <button
-                        type="button"
-                        className="pend-action-btn"
-                        title="Dar baixa"
-                        onClick={() => onBaixa(item)}
-                      >
-                        <PackageCheck size={13} />
-                      </button>
+                      {onBaixa && (
+                        <button
+                          type="button"
+                          className="pend-action-btn"
+                          title="Dar baixa"
+                          onClick={() => onBaixa(item)}
+                        >
+                          <PackageCheck size={13} />
+                        </button>
+                      )}
                       <button
                         type="button"
                         className="pend-action-btn"
@@ -113,21 +117,23 @@ export function PendingItemsTable({
                       </button>
                     </>
                   )}
-                  <button
-                    type="button"
-                    className="pend-action-btn pend-action-btn--delete"
-                    onClick={() => onDelete(item.id)}
-                    title={
-                      item.origem === "XML"
-                        ? "Item veio do XML — não pode ser excluído por aqui"
-                        : item.status !== "PENDENTE"
-                          ? "Só é possível excluir item pendente"
-                          : "Excluir"
-                    }
-                    disabled={!podeExcluir}
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  {onDelete && (
+                    <button
+                      type="button"
+                      className="pend-action-btn pend-action-btn--delete"
+                      onClick={() => onDelete(item.id)}
+                      title={
+                        item.origem === "XML"
+                          ? "Item veio do XML — não pode ser excluído por aqui"
+                          : item.status !== "PENDENTE"
+                            ? "Só é possível excluir item pendente"
+                            : "Excluir"
+                      }
+                      disabled={!podeExcluir}
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
                 </td>
               </tr>
             );

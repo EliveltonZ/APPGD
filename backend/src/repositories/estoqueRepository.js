@@ -361,6 +361,27 @@ async function listarProntosParaBaixa() {
   );
 }
 
+// Tudo que ainda não foi baixado (PENDENTE ou LIBERADO), de todo pedido em
+// aberto (ainda sem entrega) — ao contrário de listarProntosParaBaixa, não
+// filtra por estoque mínimo controlado, porque aqui quem decide é quem vai
+// liberar (Compras), não a fila de baixa do almoxarifado.
+async function listarPendentesOuLiberadosGeral() {
+  return sequelize.query(
+    `SELECT xc.id, xc.ordemdecompra, xc.material_id, xc.qtd_xml, xc.unidade_xml,
+            xc.qtd_un_confirmada, xc.detalhes, xc.status, xc.importacao_id,
+            m.codigo_interno, m.descricao, m.unidade_base,
+            p.contrato, p.ambiente, p.lote, c.name AS cliente
+     FROM "tblXmlConsumo" xc
+     JOIN "tblMateriais" m ON m.id = xc.material_id
+     JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
+     LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
+     WHERE xc.status IN ('PENDENTE', 'LIBERADO')
+       AND p.entrega IS NULL
+     ORDER BY xc.id ASC`,
+    { type: QueryTypes.SELECT },
+  );
+}
+
 // Lista de separação física — todo item ainda não baixado (PENDENTE ou
 // LIBERADO) de um pedido, pra imprimir e o almoxarifado ir atrás fisicamente.
 // Já traz a quebra de saldo por localização de cada material, pra dizer
@@ -508,6 +529,7 @@ module.exports = {
   listarAbaixoDoMinimo,
   listarSaldoPorMaterial,
   listarProntosParaBaixa,
+  listarPendentesOuLiberadosGeral,
   listarItensPedidoParaSeparacao,
   listarSemEstoqueParaPedidos,
   saldoPorLocalizacao,

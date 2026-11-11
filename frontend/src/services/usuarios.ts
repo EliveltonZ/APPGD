@@ -68,6 +68,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     almoxarifado_nota_fiscal: true,
     almoxarifado_ajuste: true,
     almoxarifado_vinculos: true,
+    compras_liberacoes: true,
     compras_necessidades: true,
     compras_confirmar: true,
     compras_pedidos: true,

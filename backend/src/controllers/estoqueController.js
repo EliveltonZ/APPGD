@@ -30,6 +30,12 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async getPendentesLiberados(req, res, next) {
+    try {
+      res.json(await service.listarPendentesOuLiberadosGeral());
+    } catch (err) { next(err); }
+  },
+
   async getListaSeparacao(req, res, next) {
     try {
       res.json(await service.listarItensPedidoParaSeparacao(req.params.ordemdecompra));

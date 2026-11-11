@@ -77,6 +77,16 @@ export interface EstoquePendenteItem extends PendingItem {
 export const fetchProntoParaBaixa = (): Promise<EstoquePendenteItem[]> =>
   apiGet('/estoque/pronto-para-baixa')
 
+// Tela de Compras — todo item PENDENTE ou LIBERADO de todo pedido em aberto
+// (sem entrega), sem filtro de estoque mínimo — quem decide o que liberar
+// aqui é Compras, não a fila de baixa do almoxarifado.
+export interface PendenteLiberadoItem extends EstoquePendenteItem {
+  lote: number | null
+}
+
+export const fetchPendentesLiberados = (): Promise<PendenteLiberadoItem[]> =>
+  apiGet('/estoque/pendentes-liberados')
+
 // Saldo real por material — "o que eu tenho em estoque", não fila de ação.
 export interface SaldoMaterial {
   id: number
