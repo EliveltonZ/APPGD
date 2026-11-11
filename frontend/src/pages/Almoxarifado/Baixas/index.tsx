@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PackageCheck, Undo2, Boxes, FolderOpen, ChevronRight, Printer } from "lucide-react";
+import { PackageCheck, Undo2, Boxes, FolderOpen, ChevronRight, Printer, Layers } from "lucide-react";
+import { Button } from "../../../components/Button";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { SummaryCard } from "../../../components/SummaryCard";
 import { BaixaModal } from "../../../features/pending/PendingControlModal/sections/BaixaModal";
@@ -10,6 +11,7 @@ import {
   fetchProntoParaBaixa,
   cancelarLiberacao as apiCancelarLiberacao,
   darBaixa as apiDarBaixa,
+  baixarPedidoCompleto as apiBaixarPedidoCompleto,
 } from "../../../services/estoque";
 import type { EstoquePendenteItem, BaixaSplit } from "../../../services/estoque";
 import { PEND_STATUS_LABELS } from "../../../data/pendingConfig";
@@ -63,6 +65,7 @@ export function AlmoxarifadoBaixasPage() {
 
   const [baixaItem, setBaixaItem] = useState<EstoquePendenteItem | null>(null);
   const [acting, setActing] = useState(false);
+  const [cascataLoading, setCascataLoading] = useState<number | null>(null);
   const [expandidos, setExpandidos] = useState<Set<number>>(new Set());
   const [printSrc, setPrintSrc] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -105,6 +108,20 @@ export function AlmoxarifadoBaixasPage() {
       toast.success("Liberação cancelada.");
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao cancelar liberação."));
+    }
+  }
+
+  async function handleBaixaCascata(e: React.MouseEvent, ordemdecompra: number) {
+    e.stopPropagation();
+    setCascataLoading(ordemdecompra);
+    try {
+      const resumo = await apiBaixarPedidoCompleto(ordemdecompra);
+      await refetch();
+      toast.success(`${resumo.totalItens} ite${resumo.totalItens === 1 ? "m" : "ns"} baixado${resumo.totalItens === 1 ? "" : "s"} em cascata.`);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Não foi possível dar baixa em cascata — ainda falta saldo pra algum item."));
+    } finally {
+      setCascataLoading(null);
     }
   }
 
@@ -177,6 +194,16 @@ export function AlmoxarifadoBaixasPage() {
                       {grupo.itens.length} {grupo.itens.length === 1 ? "item" : "itens"}
                     </span>
                   </button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    loading={cascataLoading === grupo.ordemdecompra}
+                    title="Só funciona se o pedido inteiro já tiver saldo no Almoxarifado"
+                    onClick={(e) => handleBaixaCascata(e, grupo.ordemdecompra)}
+                  >
+                    <Layers size={13} />
+                    Baixa em cascata
+                  </Button>
                   <button
                     type="button"
                     className="baix-grupo-print"

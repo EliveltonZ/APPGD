@@ -3,7 +3,7 @@ const { Op, QueryTypes } = require('sequelize');
 const {
   sequelize, Materiais, XmlConsumo, XmlImportacoes,
   EstoqueMovimentos, SolicitacaoComprasItens, Projetos, MateriaisCodigoNF,
-  Clientes,
+  Clientes, Transferencias,
 } = require('../client/db');
 
 async function buscarMaterial(id) {
@@ -130,6 +130,14 @@ async function listarPendentesOuLiberados(materialId) {
 
 async function criarMovimento(dados, options) {
   return EstoqueMovimentos.create(dados, options);
+}
+
+// Cabeçalho de uma transferência interna entre depósitos (Almoxarifado →
+// Fábrica na baixa, Fábrica → Expedição quando o pedido fica pronto) — os
+// dois movimentos (saída/entrada) ficam vinculados a este registro, igual à
+// transferência manual entre prateleiras (transferenciasRepository.criar).
+async function criarTransferencia(dados, options) {
+  return Transferencias.create(dados, options);
 }
 
 // Mesma regra já usada em notaFiscalRepository.criar() pro preço vindo de
@@ -349,15 +357,17 @@ async function listarItensPedidoParaSeparacao(ordemdecompra) {
   );
   if (itens.length === 0) return { contrato: null, ambiente: null, cliente: null, pedido: null, itens: [] };
 
+  // Só Almoxarifado — Fábrica/Expedição são depósito de material já
+  // destacado por OUTRO pedido, não dá pra "separar" dali pra este.
   const materialIds = [...new Set(itens.map((i) => i.material_id))];
   const saldos = await sequelize.query(
-    `SELECT em.material_id,
+    `SELECT em.material_id, l.id AS localizacao_id,
             (l.rua || '-' || l.prateleira || '-' || l.nivel || '-' || l.divisao) AS codigo,
             l.padrao_recebimento,
             CAST(SUM(em.qtd_un) AS FLOAT) AS saldo
      FROM "tblEstoqueMovimentos" em
      JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
-     WHERE em.material_id IN (:materialIds)
+     WHERE em.material_id IN (:materialIds) AND l.deposito = 'ALMOXARIFADO'
      GROUP BY em.material_id, l.id, l.rua, l.prateleira, l.nivel, l.divisao, l.padrao_recebimento
      HAVING SUM(em.qtd_un) > 0
      ORDER BY l.padrao_recebimento ASC, l.rua, l.prateleira, l.nivel, l.divisao`,
@@ -368,6 +378,7 @@ async function listarItensPedidoParaSeparacao(ordemdecompra) {
   for (const s of saldos) {
     if (!localizacoesPorMaterial.has(s.material_id)) localizacoesPorMaterial.set(s.material_id, []);
     localizacoesPorMaterial.get(s.material_id).push({
+      localizacaoId: s.localizacao_id,
       codigo: s.codigo,
       saldo: Number(s.saldo),
       padraoRecebimento: s.padrao_recebimento,
@@ -382,6 +393,7 @@ async function listarItensPedidoParaSeparacao(ordemdecompra) {
     pedido: primeiro.pedido,
     itens: itens.map((i) => ({
       id: i.id,
+      materialId: i.material_id,
       codigoInterno: i.codigo_interno,
       descricao: i.descricao,
       detalhes: i.detalhes,
@@ -463,6 +475,7 @@ module.exports = {
   listarOrdensDoLote,
   listarPendentesOuLiberados,
   criarMovimento,
+  criarTransferencia,
   atualizarPrecoSeMaisNovo,
   listarAbaixoDoMinimo,
   listarSaldoPorMaterial,

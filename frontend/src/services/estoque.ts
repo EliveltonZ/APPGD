@@ -61,6 +61,16 @@ export const liberarPedido = (ordemdecompra: number): Promise<LiberacaoPedidoRes
 export const liberarLote = (ordemdecompra: number): Promise<LiberacaoLoteResumo> =>
   apiPost(`/estoque/pedido/${ordemdecompra}/liberar-lote`, {})
 
+export interface BaixaPedidoResumo {
+  totalItens: number
+  resultados: { id: number; codigoInterno: string }[]
+}
+
+// Só funciona se TODO item pendente/liberado do pedido já tiver saldo físico
+// de Almoxarifado suficiente — escolhe a(s) localização(ões) automaticamente.
+export const baixarPedidoCompleto = (ordemdecompra: number): Promise<BaixaPedidoResumo> =>
+  apiPost(`/estoque/pedido/${ordemdecompra}/baixar-tudo`, {})
+
 // Fila do almoxarifado — tudo que já pode ser baixado agora, cruzando
 // pedidos diferentes (LIBERADO de qualquer material, ou PENDENTE de
 // material sem controle de estoque mínimo, que pula a liberação).

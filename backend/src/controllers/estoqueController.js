@@ -96,6 +96,13 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
+  async postBaixarPedidoCompleto(req, res, next) {
+    try {
+      const usuarioId = Number(req.user.sub);
+      res.json(await service.baixarPedidoCompleto(Number(req.params.ordemdecompra), usuarioId));
+    } catch (err) { next(err); }
+  },
+
   async getSaldoLocalizacao(req, res, next) {
     try {
       const materialId = Number(req.params.materialId);

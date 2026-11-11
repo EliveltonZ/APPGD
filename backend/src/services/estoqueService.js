@@ -159,6 +159,28 @@ async function cancelarLiberacao(xmlConsumoId) {
   return linha;
 }
 
+// Move quantidade de uma localização pra a posição única de um depósito
+// (FABRICA ou EXPEDICAO), gerando o par de movimentos TRANSF_SAIDA/
+// TRANSF_ENTRADA vinculado a um registro de transferência — mesmo mecanismo
+// da transferência manual entre prateleiras, só que automático. `extra`
+// carrega campos de rastreio (ordemdecompra, xmlConsumoId, precoUn) que vão
+// iguais nos dois movimentos.
+async function moverParaDeposito({ materialId, localizacaoOrigemId, deposito, qtd, usuarioId, observacoes, extra }, transaction) {
+  if (!(qtd > 0)) return;
+  const destino = await localizacoesRepo.buscarPorDeposito(deposito);
+  if (!destino) {
+    throw erro(`Localização do depósito ${deposito} não encontrada.`, 500, 'DEPOSITO_NAO_ENCONTRADO');
+  }
+  const data = new Date();
+  const transferencia = await repo.criarTransferencia({
+    materialId, localizacaoOrigemId, localizacaoDestinoId: destino.id, qtdUn: qtd, data, usuarioId,
+    observacoes: observacoes || null,
+  }, { transaction });
+  const base = { materialId, transferenciaId: transferencia.id, data, usuarioId, observacoes: observacoes || null, ...extra };
+  await repo.criarMovimento({ ...base, localizacaoId: localizacaoOrigemId, tipo: 'TRANSF_SAIDA', qtdUn: -qtd }, { transaction });
+  await repo.criarMovimento({ ...base, localizacaoId: destino.id, tipo: 'TRANSF_ENTRADA', qtdUn: qtd }, { transaction });
+}
+
 // `splits`: [{ localizacaoId, qtd }, ...] — a baixa pode sair de mais de uma
 // localização numa ação só (ex.: material com 40 precisado, mas espalhado
 // 15 numa prateleira e 25 noutra — sem isso o usuário era obrigado a
@@ -236,20 +258,77 @@ async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
     await linha.save({ transaction: t });
 
     for (const s of splitsMesclados) {
-      await repo.criarMovimento({
+      await moverParaDeposito({
         materialId: linha.materialId,
-        localizacaoId: s.localizacaoId,
-        tipo: 'BAIXA',
-        qtdUn: -s.qtd,
-        precoUn: preco,
-        ordemdecompra: linha.ordemdecompra,
-        xmlConsumoId: linha.id,
+        localizacaoOrigemId: s.localizacaoId,
+        deposito: 'FABRICA',
+        qtd: s.qtd,
         usuarioId,
-      }, { transaction: t });
+        observacoes: `Baixa do pedido ${linha.ordemdecompra}`,
+        extra: { precoUn: preco, ordemdecompra: linha.ordemdecompra, xmlConsumoId: linha.id },
+      }, t);
     }
 
     return linha;
   });
+}
+
+// Baixa em cascata: só executa se TODO item pendente/liberado do pedido já
+// tem saldo físico de Almoxarifado suficiente pra cobrir 100% — escolhe a(s)
+// localização(ões) automaticamente (maior saldo primeiro), sem perguntar pro
+// usuário item a item. Se faltar qualquer coisa, não baixa nada.
+async function baixarPedidoCompleto(ordemdecompra, usuarioId) {
+  const separacao = await repo.listarItensPedidoParaSeparacao(ordemdecompra);
+  if (!separacao.itens.length) {
+    throw erro('Não há item pendente de baixa nesse pedido.', 400, 'VALIDACAO');
+  }
+
+  const semQtd = separacao.itens.filter((i) => i.unidade !== 'UN');
+  if (semQtd.length) {
+    throw erro(
+      `${semQtd.length} item(ns) ainda sem quantidade definida em UN — defina antes de dar baixa em cascata.`,
+      409, 'QUANTIDADE_PENDENTE',
+    );
+  }
+
+  const problemas = [];
+  for (const item of separacao.itens) {
+    const disponivel = item.localizacoes.reduce((acc, l) => acc + l.saldo, 0);
+    if (disponivel < item.quantidade) {
+      problemas.push(`${item.codigoInterno}: falta saldo (tem ${disponivel}, precisa ${item.quantidade})`);
+      continue;
+    }
+    // darBaixa exige liberação prévia pra material com mínimo controlado —
+    // checa aqui também, senão a cascata pode começar a baixar e travar no
+    // meio por um item que nem chegou a ser avaliado por saldo.
+    if (item.status === 'PENDENTE') {
+      const material = await repo.buscarMaterial(item.materialId);
+      if (Number(material.estoqueMinimoUn) > 0) {
+        problemas.push(`${item.codigoInterno}: precisa ser liberado antes da baixa`);
+      }
+    }
+  }
+  if (problemas.length) {
+    throw erro(`Não dá pra baixar tudo ainda: ${problemas.join('; ')}.`, 409, 'SALDO_INSUFICIENTE');
+  }
+
+  const resultados = [];
+  for (const item of separacao.itens) {
+    const locaisOrdenados = [...item.localizacoes].sort((a, b) => b.saldo - a.saldo);
+    const splits = [];
+    let restante = item.quantidade;
+    for (const loc of locaisOrdenados) {
+      if (restante <= 0) break;
+      const qtd = Math.min(loc.saldo, restante);
+      if (qtd <= 0) continue;
+      splits.push({ localizacaoId: loc.localizacaoId, qtd });
+      restante -= qtd;
+    }
+    await darBaixa(item.id, { splits, usuarioId });
+    resultados.push({ id: item.id, codigoInterno: item.codigoInterno });
+  }
+
+  return { totalItens: resultados.length, resultados };
 }
 
 async function listarAlertaMinimo() {
@@ -418,6 +497,7 @@ module.exports = {
   liberarLote,
   cancelarLiberacao,
   darBaixa,
+  baixarPedidoCompleto,
   listarAlertaMinimo,
   listarListaCompras,
   listarSaldoPorMaterial,

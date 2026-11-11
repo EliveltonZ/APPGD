@@ -45,4 +45,8 @@ router.delete('/pedido/itens/:id',          pedidoC.deleteItem);
 router.post('/pedido/:ordemdecompra/liberar-tudo', c.postLiberarPedido);
 router.post('/pedido/:ordemdecompra/liberar-lote', c.postLiberarLote);
 
+// Baixa em cascata — só funciona se o pedido inteiro já tiver saldo físico
+// de Almoxarifado suficiente pra todo item pendente/liberado.
+router.post('/pedido/:ordemdecompra/baixar-tudo', c.postBaixarPedidoCompleto);
+
 module.exports = router;
