@@ -10,8 +10,12 @@ function comCodigo(row) {
   return { ...row, codigo: `${row.rua}-${row.prateleira}-${row.nivel}-${row.divisao}` };
 }
 
+// Só Almoxarifado — Fábrica e Expedição são posições únicas e agregadas,
+// geridas automaticamente (baixa/pronto), nunca aparecem pra escolher numa
+// tela (cadastro, transferência, baixa, nota fiscal).
 async function listar() {
   const rows = await Localizacoes.findAll({
+    where: { deposito: 'ALMOXARIFADO' },
     order: [['rua', 'ASC'], ['prateleira', 'ASC'], ['nivel', 'ASC'], ['divisao', 'ASC']],
     raw: true,
   });
@@ -23,6 +27,13 @@ async function listar() {
 // transferem pra localização definitiva depois via Transferências.
 async function buscarRecebimento() {
   const row = await Localizacoes.findOne({ where: { padraoRecebimento: true }, raw: true });
+  return row ? comCodigo(row) : null;
+}
+
+// Localização única e agregada de um depósito (FABRICA ou EXPEDICAO) — não
+// tem prateleira de verdade, só existe uma de cada, criada pela migration.
+async function buscarPorDeposito(deposito) {
+  const row = await Localizacoes.findOne({ where: { deposito }, raw: true });
   return row ? comCodigo(row) : null;
 }
 
@@ -80,4 +91,4 @@ async function excluir(id) {
   return n > 0;
 }
 
-module.exports = { listar, criar, atualizar, excluir, buscarRecebimento };
+module.exports = { listar, criar, atualizar, excluir, buscarRecebimento, buscarPorDeposito };

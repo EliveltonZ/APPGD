@@ -10,9 +10,18 @@ async function buscarMaterial(id) {
   return Materiais.findByPk(id, { raw: true });
 }
 
+// Físico do Almoxarifado especificamente — material já destacado pra
+// Fábrica/Expedição (baixa/pronto) não conta mais como disponível pro
+// almoxarifado nem pra outro pedido puxar dele.
 async function saldoFisico(materialId) {
-  const total = await EstoqueMovimentos.sum('qtdUn', { where: { materialId } });
-  return Number(total) || 0;
+  const rows = await sequelize.query(
+    `SELECT COALESCE(SUM(em.qtd_un), 0) AS total
+     FROM "tblEstoqueMovimentos" em
+     JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
+     WHERE em.material_id = :materialId AND l.deposito = 'ALMOXARIFADO'`,
+    { replacements: { materialId }, type: QueryTypes.SELECT },
+  );
+  return Number(rows[0]?.total) || 0;
 }
 
 async function saldoLiberado(materialId) {
@@ -197,7 +206,7 @@ async function removerConsumoManual(id) {
 async function listarAbaixoDoMinimo() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
-            COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
+            COALESCE((SELECT SUM(em.qtd_un) FROM "tblEstoqueMovimentos" em JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id WHERE em.material_id = m.id AND l.deposito = 'ALMOXARIFADO'), 0) AS fisico,
             COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'LIBERADO'), 0) AS liberado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
             EXISTS (
@@ -242,7 +251,7 @@ async function listarSemEstoqueParaPedidos() {
      JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
      LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
      WHERE xc.status IN ('PENDENTE', 'LIBERADO')
-       AND COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) <= 0
+       AND COALESCE((SELECT SUM(em.qtd_un) FROM "tblEstoqueMovimentos" em JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id WHERE em.material_id = m.id AND l.deposito = 'ALMOXARIFADO'), 0) <= 0
      ORDER BY m.codigo_interno, p.contrato`,
     { type: QueryTypes.SELECT },
   );
@@ -285,7 +294,7 @@ async function listarSemEstoqueParaPedidos() {
 async function listarSaldoPorMaterial() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
-            COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
+            COALESCE((SELECT SUM(em.qtd_un) FROM "tblEstoqueMovimentos" em JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id WHERE em.material_id = m.id AND l.deposito = 'ALMOXARIFADO'), 0) AS fisico,
             COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'LIBERADO'), 0) AS liberado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NULL), 0) AS solicitado

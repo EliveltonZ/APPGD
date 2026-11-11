@@ -38,6 +38,13 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: false,
       field:        'padrao_recebimento',
     },
+    // ALMOXARIFADO (padrão, com posição de prateleira de verdade) | FABRICA
+    // | EXPEDICAO (posições únicas e agregadas, sem prateleira de verdade).
+    deposito: {
+      type:         DataTypes.STRING(20),
+      allowNull:    false,
+      defaultValue: 'ALMOXARIFADO',
+    },
   }, {
     sequelize,
     tableName:  T.localizacoes.name,
