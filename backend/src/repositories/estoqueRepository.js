@@ -128,6 +128,20 @@ async function listarPendentesOuLiberados(materialId) {
   });
 }
 
+// Soma por material tudo que esse pedido já tem baixado (EXECUTADO) — base
+// pra mover de Fábrica pra Expedição quando o pedido fica pronto (não há um
+// xmlConsumoId único, é agregado por pedido).
+async function somarBaixadoPorMaterial(ordemdecompra) {
+  const rows = await sequelize.query(
+    `SELECT material_id AS "materialId", COALESCE(SUM(qtd_un_baixada), 0) AS qtd
+     FROM "tblXmlConsumo"
+     WHERE ordemdecompra = :ordemdecompra AND status = 'EXECUTADO'
+     GROUP BY material_id`,
+    { replacements: { ordemdecompra }, type: QueryTypes.SELECT },
+  );
+  return rows.map((r) => ({ materialId: r.materialId, qtd: Number(r.qtd) }));
+}
+
 async function criarMovimento(dados, options) {
   return EstoqueMovimentos.create(dados, options);
 }
@@ -474,6 +488,7 @@ module.exports = {
   buscarLote,
   listarOrdensDoLote,
   listarPendentesOuLiberados,
+  somarBaixadoPorMaterial,
   criarMovimento,
   criarTransferencia,
   atualizarPrecoSeMaisNovo,

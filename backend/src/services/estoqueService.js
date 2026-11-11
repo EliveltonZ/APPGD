@@ -181,6 +181,33 @@ async function moverParaDeposito({ materialId, localizacaoOrigemId, deposito, qt
   await repo.criarMovimento({ ...base, localizacaoId: destino.id, tipo: 'TRANSF_ENTRADA', qtdUn: qtd }, { transaction });
 }
 
+// Fábrica → Expedição: chamado quando o pedido é marcado "pronto" pela
+// primeira vez (ver expedicaoRepository.atualizarProjetoExpedicao). Move,
+// por material, tudo que esse pedido já tem baixado (soma de
+// qtd_un_baixada em tblXmlConsumo, status EXECUTADO) — precisa rodar dentro
+// da mesma transação que grava o "pronto", senão fica um pedido marcado
+// pronto sem o material ter ido pra Expedição (ou vice-versa).
+async function moverPedidoParaExpedicao(ordemdecompra, usuarioId, transaction) {
+  const totais = await repo.somarBaixadoPorMaterial(ordemdecompra);
+  if (!totais.length) return;
+  const fabrica = await localizacoesRepo.buscarPorDeposito('FABRICA');
+  if (!fabrica) {
+    throw erro('Localização do depósito FABRICA não encontrada.', 500, 'DEPOSITO_NAO_ENCONTRADO');
+  }
+  for (const { materialId, qtd } of totais) {
+    if (!(qtd > 0)) continue;
+    await moverParaDeposito({
+      materialId,
+      localizacaoOrigemId: fabrica.id,
+      deposito: 'EXPEDICAO',
+      qtd,
+      usuarioId,
+      observacoes: `Pedido ${ordemdecompra} pronto`,
+      extra: { ordemdecompra },
+    }, transaction);
+  }
+}
+
 // `splits`: [{ localizacaoId, qtd }, ...] — a baixa pode sair de mais de uma
 // localização numa ação só (ex.: material com 40 precisado, mas espalhado
 // 15 numa prateleira e 25 noutra — sem isso o usuário era obrigado a
@@ -498,6 +525,7 @@ module.exports = {
   cancelarLiberacao,
   darBaixa,
   baixarPedidoCompleto,
+  moverPedidoParaExpedicao,
   listarAlertaMinimo,
   listarListaCompras,
   listarSaldoPorMaterial,

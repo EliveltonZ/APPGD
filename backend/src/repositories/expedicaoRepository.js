@@ -1,9 +1,10 @@
 const { Op } = require("sequelize");
 const {
-  Projetos, Clientes, Etapa, Acessorios,
+  sequelize, Projetos, Clientes, Etapa, Acessorios,
   Producao, Avulsos, Usuario,
 } = require("../client/db");
 const { producaoStatus, countPending, hasBullet } = require("../utils/calcStatus");
+const estoqueService = require("../services/estoqueService");
 
 async function _getLoginName(id) {
   if (!id) return null;
@@ -196,70 +197,84 @@ async function listarAcessoriosExpedicao(ordemdecompra) {
   });
 }
 
-async function atualizarProjetoExpedicao(body) {
+async function atualizarProjetoExpedicao(body, usuarioId) {
   const oc = body.ordemdecompra;
 
-  await Projetos.update(
-    {
-      pronto:    body.pronto    ?? null,
-      entrega:   body.entrega   ?? null,
-      pendencia: body.pendencia ?? false,
-      parceado:  body.parcial   ?? false,
-    },
-    { where: { ordemdecompra: oc } },
-  );
+  return sequelize.transaction(async (t) => {
+    const atual = await Projetos.findOne({
+      where: { ordemdecompra: oc }, attributes: ['pronto'], transaction: t,
+    });
+    // Só dispara na transição PENDENTE→pronto (primeira vez que a data é
+    // preenchida) — editar a data depois, ou desmarcar, não move estoque
+    // de novo (o material já saiu de Fábrica uma vez só).
+    const virouPronto = !atual?.pronto && !!body.pronto;
 
-  await Producao.update(
-    {
-      separacao:       body.separacao       ?? null,
-      conferido:       body.conferido       ?? null,
-      motorista:       body.motorista       ?? null,
-      embalageminicio: body.embalageminicio ?? null,
-      embalagemfim:    body.embalagemfim    ?? null,
-      embalagempausa:  body.embalagempausa  ?? false,
-      embalagemresp:   body.embalagemresp   ?? null,
-      tamanho:         body.tamanho         ?? null,
-      observacoes:     body.observacoes     ?? null,
-    },
-    { where: { ordemdecompra: oc } },
-  );
+    await Projetos.update(
+      {
+        pronto:    body.pronto    ?? null,
+        entrega:   body.entrega   ?? null,
+        pendencia: body.pendencia ?? false,
+        parceado:  body.parcial   ?? false,
+      },
+      { where: { ordemdecompra: oc }, transaction: t },
+    );
 
-  await Avulsos.update(
-    {
-      avulso:         body.avulso          ?? false,
-      avulsol:        body.avulsol         ?? null,
-      avulsoq:        body.avulsoq         ?? 0,
-      cabide:         body.cabide          ?? false,
-      cabidel:        body.cabidel         ?? null,
-      cabideq:        body.cabideq         ?? 0,
-      paineis:        body.paineis         ?? false,
-      paineisl:       body.paineisl        ?? null,
-      paineisq:       body.paineisq        ?? 0,
-      pecaspintadas:  body.pecaspintadas   ?? false,
-      pecaspintadasl: body.pecaspintadasl  ?? null,
-      pecaspintadasq: body.pecaspintadasq  ?? 0,
-      portaaluminio:  body.portaaluminio   ?? false,
-      portaaluminiol: body.portaaluminiol  ?? null,
-      portaaluminioq: body.portaaluminioq  ?? 0,
-      serralheria:    body.serralheria     ?? false,
-      serralherial:   body.serralherial    ?? null,
-      serralheriaq:   body.serralheriaq    ?? 0,
-      tapecaria:      body.tapecaria       ?? false,
-      tapecarial:     body.tapecarial      ?? null,
-      tapecariaq:     body.tapecariaq      ?? 0,
-      trilho:         body.trilho          ?? false,
-      trilhol:        body.trilhol         ?? null,
-      trilhoq:        body.trilhoq         ?? 0,
-      vidros:         body.vidros          ?? false,
-      vidrosl:        body.vidrosl         ?? null,
-      vidrosq:        body.vidrosq         ?? 0,
-      volmod:         body.volmod          ?? false,
-      modulosl:       body.modulosl        ?? null,
-      modulosq:       body.modulosq        ?? 0,
-      totalvolumes:   body.totalvolumes    ?? 0,
-    },
-    { where: { ordemdecompra: oc } },
-  );
+    if (virouPronto) {
+      await estoqueService.moverPedidoParaExpedicao(oc, usuarioId, t);
+    }
+
+    await Producao.update(
+      {
+        separacao:       body.separacao       ?? null,
+        conferido:       body.conferido       ?? null,
+        motorista:       body.motorista       ?? null,
+        embalageminicio: body.embalageminicio ?? null,
+        embalagemfim:    body.embalagemfim    ?? null,
+        embalagempausa:  body.embalagempausa  ?? false,
+        embalagemresp:   body.embalagemresp   ?? null,
+        tamanho:         body.tamanho         ?? null,
+        observacoes:     body.observacoes     ?? null,
+      },
+      { where: { ordemdecompra: oc }, transaction: t },
+    );
+
+    await Avulsos.update(
+      {
+        avulso:         body.avulso          ?? false,
+        avulsol:        body.avulsol         ?? null,
+        avulsoq:        body.avulsoq         ?? 0,
+        cabide:         body.cabide          ?? false,
+        cabidel:        body.cabidel         ?? null,
+        cabideq:        body.cabideq         ?? 0,
+        paineis:        body.paineis         ?? false,
+        paineisl:       body.paineisl        ?? null,
+        paineisq:       body.paineisq        ?? 0,
+        pecaspintadas:  body.pecaspintadas   ?? false,
+        pecaspintadasl: body.pecaspintadasl  ?? null,
+        pecaspintadasq: body.pecaspintadasq  ?? 0,
+        portaaluminio:  body.portaaluminio   ?? false,
+        portaaluminiol: body.portaaluminiol  ?? null,
+        portaaluminioq: body.portaaluminioq  ?? 0,
+        serralheria:    body.serralheria     ?? false,
+        serralherial:   body.serralherial    ?? null,
+        serralheriaq:   body.serralheriaq    ?? 0,
+        tapecaria:      body.tapecaria       ?? false,
+        tapecarial:     body.tapecarial      ?? null,
+        tapecariaq:     body.tapecariaq      ?? 0,
+        trilho:         body.trilho          ?? false,
+        trilhol:        body.trilhol         ?? null,
+        trilhoq:        body.trilhoq         ?? 0,
+        vidros:         body.vidros          ?? false,
+        vidrosl:        body.vidrosl         ?? null,
+        vidrosq:        body.vidrosq         ?? 0,
+        volmod:         body.volmod          ?? false,
+        modulosl:       body.modulosl        ?? null,
+        modulosq:       body.modulosq        ?? 0,
+        totalvolumes:   body.totalvolumes    ?? 0,
+      },
+      { where: { ordemdecompra: oc }, transaction: t },
+    );
+  });
 }
 
 module.exports = {
