@@ -1,5 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react';
-import './index.css';
+import type { CSSProperties, ReactNode } from "react";
+import "./index.css";
 
 interface SummaryCardProps {
   label: string;
@@ -10,9 +10,16 @@ interface SummaryCardProps {
   loading?: boolean;
 }
 
-export function SummaryCard({ label, value, accent, icon, secondary, loading }: SummaryCardProps) {
+export function SummaryCard({
+  label,
+  value,
+  accent,
+  icon,
+  secondary,
+  loading,
+}: SummaryCardProps) {
   return (
-    <div className="sc-card" style={{ '--sc-accent': accent } as CSSProperties}>
+    <div className="sc-card" style={{ "--sc-accent": accent } as CSSProperties}>
       {icon ? (
         <div className="sc-card__header">
           <span className="sc-card__icon">{icon}</span>
@@ -21,10 +28,14 @@ export function SummaryCard({ label, value, accent, icon, secondary, loading }: 
       ) : (
         <span className="sc-card__label">{label}</span>
       )}
-      <span className={`sc-card__value${loading ? ' sc-card__value--loading' : ''}`}>
-        {loading ? '—' : value}
+      <span
+        className={`sc-card__value${loading ? " sc-card__value--loading" : ""}`}
+      >
+        {loading ? "—" : value}
       </span>
-      {secondary && !loading && <span className="sc-card__secondary">{secondary}</span>}
+      {secondary && !loading && (
+        <span className="sc-card__secondary">{secondary}</span>
+      )}
     </div>
   );
 }

@@ -15,9 +15,9 @@ async function saldoFisico(materialId) {
   return Number(total) || 0;
 }
 
-async function saldoReservado(materialId) {
+async function saldoLiberado(materialId) {
   const total = await XmlConsumo.sum('qtdUnConfirmada', {
-    where: { materialId, status: 'RESERVADO' },
+    where: { materialId, status: 'LIBERADO' },
   });
   return Number(total) || 0;
 }
@@ -92,7 +92,7 @@ async function listarXmlConsumoPorPedido(ordemdecompra) {
 }
 
 // Todo item PENDENTE de um pedido — inclui quem ainda não tem a quantidade
-// em UN definida, de propósito: a reserva em massa precisa enxergar quem
+// em UN definida, de propósito: a liberação em massa precisa enxergar quem
 // falta resolver pra travar o lote inteiro, não só pular quem não está
 // pronto.
 async function listarPendentesDoPedido(ordemdecompra) {
@@ -112,9 +112,9 @@ async function listarOrdensDoLote(lote) {
   return rows.map(r => r.ordemdecompra);
 }
 
-async function listarPendentesOuReservados(materialId) {
+async function listarPendentesOuLiberados(materialId) {
   return XmlConsumo.findAll({
-    where: { materialId, status: { [Op.in]: ['PENDENTE', 'RESERVADO'] } },
+    where: { materialId, status: { [Op.in]: ['PENDENTE', 'LIBERADO'] } },
     order: [['dataImportacao', 'ASC']],
   });
 }
@@ -187,7 +187,7 @@ async function criarConsumoManual(dados) {
 }
 
 // Só remove item que nunca passou por importação real (importacaoId null) E
-// ainda está PENDENTE — depois de reservado/baixado, excluir por aqui
+// ainda está PENDENTE — depois de liberado/baixado, excluir por aqui
 // apagaria o rastro sem desfazer reserva/movimento.
 async function removerConsumoManual(id) {
   const n = await XmlConsumo.destroy({ where: { id: Number(id), importacaoId: null, status: 'PENDENTE' } });
@@ -198,12 +198,12 @@ async function listarAbaixoDoMinimo() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
             COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
-            COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'RESERVADO'), 0) AS reservado,
+            COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'LIBERADO'), 0) AS liberado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
             EXISTS (
               SELECT 1 FROM "tblXmlConsumo" xc
               JOIN "tblProjetos" p ON p.ordemdecompra = xc.ordemdecompra
-              WHERE xc.material_id = m.id AND xc.status IN ('PENDENTE', 'RESERVADO') AND p.urgente = true
+              WHERE xc.material_id = m.id AND xc.status IN ('PENDENTE', 'LIBERADO') AND p.urgente = true
             ) AS tem_pedido_urgente
      FROM "tblMateriais" m
      WHERE m.ativo = true AND m.estoque_minimo_un IS NOT NULL AND m.estoque_minimo_un > 0`,
@@ -217,19 +217,19 @@ async function listarAbaixoDoMinimo() {
       unidadeBase: r.unidade_base,
       estoqueMinimoUn: Number(r.estoque_minimo_un),
       fisico: Number(r.fisico),
-      reservado: Number(r.reservado),
+      liberado: Number(r.liberado),
       comprado: Number(r.comprado),
-      saldoBloqueio: Number(r.fisico) - Number(r.reservado) + Number(r.comprado),
+      saldoProjetado: Number(r.fisico) - Number(r.liberado) + Number(r.comprado),
       temPedidoUrgente: !!r.tem_pedido_urgente,
     }))
-    .filter(r => r.saldoBloqueio <= r.estoqueMinimoUn)
+    .filter(r => r.saldoProjetado <= r.estoqueMinimoUn)
     .sort((a, b) => Number(b.temPedidoUrgente) - Number(a.temPedidoUrgente));
 }
 
-// Materiais pedidos por algum projeto (item de XML ainda PENDENTE/RESERVADO,
+// Materiais pedidos por algum projeto (item de XML ainda PENDENTE/LIBERADO,
 // ou seja, que ainda vai precisar ser baixado) mas que não têm NENHUM saldo
 // físico em NENHUMA localização — compras precisa comprar antes de alguém
-// conseguir reservar/dar baixa nesse material. Agrupado por material, com a
+// conseguir dar baixa nesse material. Agrupado por material, com a
 // lista de pedidos/ambientes que estão esperando por ele.
 async function listarSemEstoqueParaPedidos() {
   const rows = await sequelize.query(
@@ -241,7 +241,7 @@ async function listarSemEstoqueParaPedidos() {
      JOIN "tblMateriais" m ON m.id = xc.material_id
      JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
      LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
-     WHERE xc.status IN ('PENDENTE', 'RESERVADO')
+     WHERE xc.status IN ('PENDENTE', 'LIBERADO')
        AND COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) <= 0
      ORDER BY m.codigo_interno, p.contrato`,
     { type: QueryTypes.SELECT },
@@ -286,7 +286,7 @@ async function listarSaldoPorMaterial() {
   const rows = await sequelize.query(
     `SELECT m.id, m.codigo_interno, m.descricao, m.unidade_base, m.estoque_minimo_un,
             COALESCE((SELECT SUM(qtd_un) FROM "tblEstoqueMovimentos" WHERE material_id = m.id), 0) AS fisico,
-            COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'RESERVADO'), 0) AS reservado,
+            COALESCE((SELECT SUM(qtd_un_confirmada) FROM "tblXmlConsumo" WHERE material_id = m.id AND status = 'LIBERADO'), 0) AS liberado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NOT NULL AND nf_item_id IS NULL), 0) AS comprado,
             COALESCE((SELECT SUM(quantidade) FROM "tblSolicitacaoComprasItens" WHERE material_id = m.id AND cancelado = false AND fornecedor_id IS NULL), 0) AS solicitado
      FROM "tblMateriais" m
@@ -297,9 +297,9 @@ async function listarSaldoPorMaterial() {
   return rows;
 }
 
-// Fila de baixa do almoxarifado: todo item já RESERVADO (qualquer material)
+// Fila de baixa do almoxarifado: todo item já LIBERADO (qualquer material)
 // + todo item PENDENTE de material sem estoque mínimo controlado (pula a
-// reserva por regra — ver estoqueService.darBaixa). Cruza pedido/cliente
+// liberação por regra — ver estoqueService.darBaixa). Cruza pedido/cliente
 // pra dar contexto de qual OC/ambiente cada linha pertence.
 async function listarProntosParaBaixa() {
   return sequelize.query(
@@ -311,7 +311,7 @@ async function listarProntosParaBaixa() {
      JOIN "tblMateriais" m ON m.id = xc.material_id
      JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
      LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
-     WHERE xc.status = 'RESERVADO'
+     WHERE xc.status = 'LIBERADO'
         OR (xc.status = 'PENDENTE' AND COALESCE(m.estoque_minimo_un, 0) <= 0)
      ORDER BY xc.id ASC`,
     { type: QueryTypes.SELECT },
@@ -319,7 +319,7 @@ async function listarProntosParaBaixa() {
 }
 
 // Lista de separação física — todo item ainda não baixado (PENDENTE ou
-// RESERVADO) de um pedido, pra imprimir e o almoxarifado ir atrás fisicamente.
+// LIBERADO) de um pedido, pra imprimir e o almoxarifado ir atrás fisicamente.
 // Já traz a quebra de saldo por localização de cada material, pra dizer
 // pra onde ir (recebimento entra junto, só marcado, porque mesmo "aguardando
 // transferência" é informação útil de "onde está agora").
@@ -334,7 +334,7 @@ async function listarItensPedidoParaSeparacao(ordemdecompra) {
      JOIN "tblProjetos" p  ON p.ordemdecompra = xc.ordemdecompra
      LEFT JOIN "tblClientes" c ON c.id = p.id_cliente
      WHERE xc.ordemdecompra = :ordemdecompra
-       AND xc.status IN ('PENDENTE', 'RESERVADO')
+       AND xc.status IN ('PENDENTE', 'LIBERADO')
      ORDER BY m.codigo_interno ASC`,
     { replacements: { ordemdecompra }, type: QueryTypes.SELECT },
   );
@@ -441,7 +441,7 @@ async function listarHistoricoAjustes() {
 module.exports = {
   buscarMaterial,
   saldoFisico,
-  saldoReservado,
+  saldoLiberado,
   saldoComprado,
   saldoSolicitado,
   buscarPrecoNaData,
@@ -452,7 +452,7 @@ module.exports = {
   listarPendentesDoPedido,
   buscarLote,
   listarOrdensDoLote,
-  listarPendentesOuReservados,
+  listarPendentesOuLiberados,
   criarMovimento,
   atualizarPrecoSeMaisNovo,
   listarAbaixoDoMinimo,

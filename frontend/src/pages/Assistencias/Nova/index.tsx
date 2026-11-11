@@ -54,7 +54,6 @@ function validate(req: ServiceRequest): FormErrors {
 }
 
 // ── Component ────────────────────────────────────────────
-
 export function AssistenciasNovaPage() {
   const toast = useToast();
   const { user } = useAuth();
@@ -90,8 +89,10 @@ export function AssistenciasNovaPage() {
 
   function scrollToFirstError() {
     requestAnimationFrame(() => {
-      const el = document.querySelector<HTMLElement>('.input-has-error, .select-has-error');
-      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const el = document.querySelector<HTMLElement>(
+        ".input-has-error, .select-has-error",
+      );
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 
@@ -162,11 +163,14 @@ export function AssistenciasNovaPage() {
       setSubmitted(true);
     } catch (e) {
       const fieldErrors = getFieldErrors(e);
-      const msg = getErrorMessage(e, "Erro ao enviar solicitação. Tente novamente.");
+      const msg = getErrorMessage(
+        e,
+        "Erro ao enviar solicitação. Tente novamente.",
+      );
       if (fieldErrors) {
         setErrors((prev) => ({ ...prev, ...fieldErrors }));
         scrollToFirstError();
-      } else if (msg.toLowerCase().includes('já cadastrado')) {
+      } else if (msg.toLowerCase().includes("já cadastrado")) {
         setErrors((prev) => ({ ...prev, numSolicitacao: msg }));
         scrollToFirstError();
       } else {

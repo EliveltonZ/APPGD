@@ -23,7 +23,7 @@ function fmtQtd(v: number): string {
 }
 
 function abaixoDoMinimo(row: SaldoMaterial): boolean {
-  return row.estoqueMinimoUn != null && row.estoqueMinimoUn > 0 && row.saldoBloqueio <= row.estoqueMinimoUn;
+  return row.estoqueMinimoUn != null && row.estoqueMinimoUn > 0 && row.saldoProjetado <= row.estoqueMinimoUn;
 }
 
 export function AlmoxarifadoEstoquePage() {
@@ -74,8 +74,8 @@ export function AlmoxarifadoEstoquePage() {
       render: (v) => fmtQtd(Number(v)),
     },
     {
-      key: "reservado",
-      label: "Reservado (un)",
+      key: "liberado",
+      label: "Liberado (un)",
       type: "number",
       sortable: true,
       align: "right",
@@ -101,7 +101,7 @@ export function AlmoxarifadoEstoquePage() {
       render: (v) => fmtQtd(Number(v)),
     },
     {
-      key: "saldoBloqueio",
+      key: "saldoProjetado",
       label: "Saldo (un)",
       type: "number",
       sortable: true,

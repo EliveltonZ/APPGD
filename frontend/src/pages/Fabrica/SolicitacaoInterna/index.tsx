@@ -71,7 +71,7 @@ export function FabricaSolicitacaoInternaPage() {
   // ── Modo "pra um pedido" — reaproveita exatamente a mesma ação de
   // "adicionar item manual" que Itens Pedido já usa (busca + insert em
   // tblXmlConsumo), só que numa tela sem as outras capacidades daquela
-  // tela (remover item, reservar, dar baixa) — segura pra dar acesso à
+  // tela (remover item, liberar, dar baixa) — segura pra dar acesso à
   // produção sem abrir o resto do PCP pra ela.
   const [contrato, setContrato] = useState("");
   const [buscandoContrato, setBuscandoContrato] = useState(false);

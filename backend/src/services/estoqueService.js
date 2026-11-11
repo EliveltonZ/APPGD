@@ -7,16 +7,16 @@ function erro(mensagem, status, code) {
 }
 
 async function calcularSaldo(materialId) {
-  const [fisico, reservado, comprado, solicitado] = await Promise.all([
+  const [fisico, liberado, comprado, solicitado] = await Promise.all([
     repo.saldoFisico(materialId),
-    repo.saldoReservado(materialId),
+    repo.saldoLiberado(materialId),
     repo.saldoComprado(materialId),
     repo.saldoSolicitado(materialId),
   ]);
-  const disponivel      = fisico - reservado;
-  const saldoBloqueio   = fisico - reservado + comprado;
-  const saldoVisibilidade = saldoBloqueio + solicitado;
-  return { fisico, reservado, comprado, solicitado, disponivel, saldoBloqueio, saldoVisibilidade };
+  const disponivel        = fisico - liberado;
+  const saldoProjetado     = fisico - liberado + comprado;
+  const saldoVisibilidade  = saldoProjetado + solicitado;
+  return { fisico, liberado, comprado, solicitado, disponivel, saldoProjetado, saldoVisibilidade };
 }
 
 // Custo = quantidade do XML (m², metro ou unidade) × preço por m²/metro/unidade
@@ -46,11 +46,11 @@ async function calcularCusto(xmlConsumo, material) {
 }
 
 // Define/edita a quantidade em unidade (chapas inteiras ou rolos de fita)
-// que o pedido vai usar — só antes de reservar. Ferragem não precisa disso
+// que o pedido vai usar — só antes de liberar. Ferragem não precisa disso
 // (já vem pronta do XML em unidade).
 //
 // Zero é um valor válido — ex.: um pedaço pequeno de chapa que já sobrou de
-// outro corte, sem precisar reservar nenhuma chapa inteira pra esse item.
+// outro corte, sem precisar liberar nenhuma chapa inteira pra esse item.
 // Por isso o cheque é `== null`/NaN, não falsy — `!0` seria true e barraria
 // exatamente o caso que precisa passar.
 async function definirQuantidade(xmlConsumoId, qtdUnConfirmada) {
@@ -68,45 +68,34 @@ async function definirQuantidade(xmlConsumoId, qtdUnConfirmada) {
   return linha;
 }
 
-async function reservar(xmlConsumoId, usuarioId) {
+// Liberar nunca bloqueia por saldo — pedidos não disputam mais estoque entre
+// si. O saldo (físico - liberado) só informa, e pode ficar negativo; quem
+// decide se dá pra atender de verdade é a baixa (saída física real).
+async function liberar(xmlConsumoId, usuarioId) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
   if (linha.status !== 'PENDENTE') {
-    throw erro('Só é possível reservar um item PENDENTE.', 409, 'STATUS_INVALIDO');
+    throw erro('Só é possível liberar um item PENDENTE.', 409, 'STATUS_INVALIDO');
   }
   if (linha.qtdUnConfirmada == null) {
-    throw erro('Defina a quantidade em unidade antes de reservar (pode ser zero).', 400, 'VALIDACAO');
-  }
-  const qtd = Number(linha.qtdUnConfirmada);
-
-  // Reservar zero não mexe em saldo nenhum — não faz sentido gastar a
-  // consulta nem arriscar barrar por "saldo insuficiente" num caso que
-  // nunca precisou de saldo.
-  if (qtd > 0) {
-    const saldo = await calcularSaldo(linha.materialId);
-    if (saldo.saldoBloqueio < qtd) {
-      throw erro(
-        `Saldo insuficiente para reservar (disponível com compras: ${saldo.saldoBloqueio}, necessário: ${qtd}).`,
-        409, 'SALDO_INSUFICIENTE',
-      );
-    }
+    throw erro('Defina a quantidade em unidade antes de liberar (pode ser zero).', 400, 'VALIDACAO');
   }
 
-  linha.status = 'RESERVADO';
-  linha.dataReserva = new Date();
-  linha.usuarioReservaId = usuarioId;
+  linha.status = 'LIBERADO';
+  linha.dataLiberacao = new Date();
+  linha.usuarioLiberacaoId = usuarioId;
   await linha.save();
   return linha;
 }
 
-// Reserva uma lista de itens um por um — continua mesmo se algum falhar
-// (saldo insuficiente de um material não deve travar os outros), e devolve
-// o resultado de cada um pra tela mostrar o que deu certo e o que não deu.
-async function reservarVarios(linhas, usuarioId) {
+// Libera uma lista de itens um por um — como liberar nunca falha por saldo,
+// só falha mesmo por item sem quantidade definida; mesmo assim mantém o
+// padrão de continuar mesmo se algum item falhar, pra não travar os outros.
+async function liberarVarios(linhas, usuarioId) {
   const resultados = [];
   for (const linha of linhas) {
     try {
-      await reservar(linha.id, usuarioId);
+      await liberar(linha.id, usuarioId);
       resultados.push({ id: linha.id, ordemdecompra: linha.ordemdecompra, ok: true });
     } catch (err) {
       resultados.push({ id: linha.id, ordemdecompra: linha.ordemdecompra, ok: false, erro: err.message });
@@ -115,36 +104,36 @@ async function reservarVarios(linhas, usuarioId) {
   return resultados;
 }
 
-// Trava da reserva em massa: só prossegue se TODO item PENDENTE do escopo já
+// Trava da liberação em massa: só prossegue se TODO item PENDENTE do escopo já
 // tem quantidade definida (zero conta como definida — só null bloqueia).
-// Reservar em massa ignorando quem ainda falta passava despercebido; agora
+// Liberar em massa ignorando quem ainda falta passava despercebido; agora
 // nem começa, e avisa exatamente quantos itens faltam resolver antes.
 function garantirTodosComQuantidade(linhas, ondeMsg) {
   const semQtd = linhas.filter(l => l.qtdUnConfirmada == null);
   if (semQtd.length) {
     throw erro(
-      `${semQtd.length} item(ns) ${ondeMsg} ainda sem quantidade definida — defina antes de reservar tudo.`,
+      `${semQtd.length} item(ns) ${ondeMsg} ainda sem quantidade definida — defina antes de liberar tudo.`,
       409, 'QUANTIDADE_PENDENTE',
     );
   }
 }
 
-// Reserva tudo que está PENDENTE num pedido só — todos precisam já ter
-// quantidade em UN definida (zero vale), senão nada é reservado.
-async function reservarPedido(ordemdecompra, usuarioId) {
+// Libera tudo que está PENDENTE num pedido só — todos precisam já ter
+// quantidade em UN definida (zero vale), senão nada é liberado.
+async function liberarPedido(ordemdecompra, usuarioId) {
   const linhas = await repo.listarPendentesDoPedido(ordemdecompra);
   garantirTodosComQuantidade(linhas, 'nesse pedido');
-  const resultados = await reservarVarios(linhas, usuarioId);
+  const resultados = await liberarVarios(linhas, usuarioId);
   return { totalItens: linhas.length, resultados };
 }
 
-// Reserva tudo que está PENDENTE em TODOS os pedidos que compartilham o
+// Libera tudo que está PENDENTE em TODOS os pedidos que compartilham o
 // mesmo lote do pedido informado — lote é o agrupamento do Corte Certo,
 // então um lote normalmente cobre vários pedidos cortados juntos.
-async function reservarLote(ordemdecompraReferencia, usuarioId) {
+async function liberarLote(ordemdecompraReferencia, usuarioId) {
   const lote = await repo.buscarLote(ordemdecompraReferencia);
   if (!lote) {
-    throw erro('Este pedido não tem lote definido — não dá pra reservar por lote.', 400, 'VALIDACAO');
+    throw erro('Este pedido não tem lote definido — não dá pra liberar por lote.', 400, 'VALIDACAO');
   }
   const ordens = await repo.listarOrdensDoLote(lote);
   let linhas = [];
@@ -153,19 +142,19 @@ async function reservarLote(ordemdecompraReferencia, usuarioId) {
     linhas = linhas.concat(doPedido.map(l => ({ id: l.id, ordemdecompra, qtdUnConfirmada: l.qtdUnConfirmada })));
   }
   garantirTodosComQuantidade(linhas, `no lote ${lote}`);
-  const resultados = await reservarVarios(linhas, usuarioId);
+  const resultados = await liberarVarios(linhas, usuarioId);
   return { lote, totalPedidos: ordens.length, totalItens: linhas.length, resultados };
 }
 
-async function liberarReserva(xmlConsumoId) {
+async function cancelarLiberacao(xmlConsumoId) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
-  if (linha.status !== 'RESERVADO') {
-    throw erro('Só é possível liberar um item RESERVADO.', 409, 'STATUS_INVALIDO');
+  if (linha.status !== 'LIBERADO') {
+    throw erro('Só é possível cancelar a liberação de um item LIBERADO.', 409, 'STATUS_INVALIDO');
   }
   linha.status = 'PENDENTE';
-  linha.dataReserva = null;
-  linha.usuarioReservaId = null;
+  linha.dataLiberacao = null;
+  linha.usuarioLiberacaoId = null;
   await linha.save();
   return linha;
 }
@@ -177,14 +166,14 @@ async function liberarReserva(xmlConsumoId) {
 async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
-  if (!['PENDENTE', 'RESERVADO'].includes(linha.status)) {
+  if (!['PENDENTE', 'LIBERADO'].includes(linha.status)) {
     throw erro('Item já foi baixado ou está cancelado.', 409, 'STATUS_INVALIDO');
   }
 
   const material = await repo.buscarMaterial(linha.materialId);
   const minimoControlado = Number(material.estoqueMinimoUn) > 0;
-  if (minimoControlado && linha.status !== 'RESERVADO') {
-    throw erro('Este material exige reserva antes da baixa.', 409, 'RESERVA_OBRIGATORIA');
+  if (minimoControlado && linha.status !== 'LIBERADO') {
+    throw erro('Este material exige liberação antes da baixa.', 409, 'LIBERACAO_OBRIGATORIA');
   }
 
   if (!Array.isArray(splits) || splits.length === 0) {
@@ -220,7 +209,7 @@ async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
   }
 
   // Cada localização tem que ter saldo físico suficiente pra sua própria
-  // parte — reserva/saldo geral não bastam, senão uma localização sem
+  // parte — liberado/saldo geral não bastam, senão uma localização sem
   // estoque nenhum fica negativa enquanto outra nem é tocada.
   for (const s of splitsMesclados) {
     const saldoLocal = await repo.saldoPorLocalizacao(linha.materialId, s.localizacaoId);
@@ -232,19 +221,9 @@ async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
     }
   }
 
-  // Se baixar mais do que foi reservado, o excedente também precisa caber no saldo.
-  const reservadoNestaLinha = linha.status === 'RESERVADO' ? Number(linha.qtdUnConfirmada) : 0;
-  const excedente = qtdTotal - reservadoNestaLinha;
-  if (excedente > 0) {
-    const saldo = await calcularSaldo(linha.materialId);
-    if (saldo.saldoBloqueio < excedente) {
-      throw erro(
-        `Saldo insuficiente para a baixa (excedente sobre o reservado: ${excedente}, disponível: ${saldo.saldoBloqueio}).`,
-        409, 'SALDO_INSUFICIENTE',
-      );
-    }
-  }
-
+  // Não há mais trava de saldo global sobre o excedente — liberado é só
+  // informativo, nunca bloqueia. A única coisa que importa pra baixa é ter
+  // saldo físico real na localização escolhida (já validado acima).
   const { preco, custo } = await calcularCusto(linha, material);
 
   return repo.sequelize.transaction(async (t) => {
@@ -294,11 +273,11 @@ async function listarSaldoPorMaterial() {
   const rows = await repo.listarSaldoPorMaterial();
   return rows.map(r => {
     const fisico = Number(r.fisico);
-    const reservado = Number(r.reservado);
+    const liberado = Number(r.liberado);
     const comprado = Number(r.comprado);
     const solicitado = Number(r.solicitado);
-    const disponivel = fisico - reservado;
-    const saldoBloqueio = disponivel + comprado;
+    const disponivel = fisico - liberado;
+    const saldoProjetado = disponivel + comprado;
     return {
       id: r.id,
       codigoInterno: r.codigo_interno,
@@ -306,12 +285,12 @@ async function listarSaldoPorMaterial() {
       unidadeBase: r.unidade_base,
       estoqueMinimoUn: r.estoque_minimo_un != null ? Number(r.estoque_minimo_un) : null,
       fisico,
-      reservado,
+      liberado,
       disponivel,
       comprado,
       solicitado,
-      saldoBloqueio,
-      saldoVisibilidade: saldoBloqueio + solicitado,
+      saldoProjetado,
+      saldoVisibilidade: saldoProjetado + solicitado,
     };
   });
 }
@@ -434,10 +413,10 @@ async function listarHistoricoAjustes() {
 module.exports = {
   calcularSaldo,
   definirQuantidade,
-  reservar,
-  reservarPedido,
-  reservarLote,
-  liberarReserva,
+  liberar,
+  liberarPedido,
+  liberarLote,
+  cancelarLiberacao,
   darBaixa,
   listarAlertaMinimo,
   listarListaCompras,

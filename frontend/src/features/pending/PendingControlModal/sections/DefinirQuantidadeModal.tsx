@@ -28,7 +28,7 @@ export function DefinirQuantidadeModal({ item, saving, onClose, onConfirm }: Pro
   function handleConfirm() {
     if (!qtd.trim()) return;
     // Zero é válido — ex.: um pedaço pequeno de chapa que já sobrou de outro
-    // corte, sem precisar reservar nenhuma chapa inteira pra esse item.
+    // corte, sem precisar liberar nenhuma chapa inteira pra esse item.
     const n = Number(qtd.replace(",", "."));
     if (Number.isNaN(n) || n < 0) return;
     onConfirm(n);
@@ -36,7 +36,7 @@ export function DefinirQuantidadeModal({ item, saving, onClose, onConfirm }: Pro
 
   return (
     <Modal
-      title="Definir quantidade pra reserva"
+      title="Definir quantidade pra liberação"
       isOpen={!!item}
       onClose={onClose}
       maxWidth={420}
@@ -59,7 +59,7 @@ export function DefinirQuantidadeModal({ item, saving, onClose, onConfirm }: Pro
           {item.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 4 })}{" "}
           {UNIDADE_LABEL[item.unidade] ?? item.unidade}. Quantos{" "}
           {UN_LABEL[item.tipo] ?? "UN"} o pedido vai usar? Pode ser 0 se for
-          usar um pedaço que já sobrou de outro corte, sem precisar reservar
+          usar um pedaço que já sobrou de outro corte, sem precisar liberar
           nenhuma chapa inteira.
         </p>
         <Input

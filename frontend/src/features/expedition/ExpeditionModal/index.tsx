@@ -18,11 +18,11 @@ import type { PickRole } from './sections/OperationalStatusSection';
 import './index.css';
 
 // Pedido só pode ser expedido depois que o almoxarifado separou tudo
-// (todo item em PENDENTE/RESERVADO bloqueia) — a não ser que seja expedido
+// (todo item em PENDENTE/LIBERADO bloqueia) — a não ser que seja expedido
 // com pendência marcada de propósito (mesma válvula de escape que já existe
 // pras outras validações abaixo).
 function temItemNaoSeparado(itens: PendingItem[]): boolean {
-  return itens.some((i) => i.status === 'PENDENTE' || i.status === 'RESERVADO');
+  return itens.some((i) => i.status === 'PENDENTE' || i.status === 'LIBERADO');
 }
 
 function validate(f: ExpeditionDetail, pendingItems: PendingItem[]): string | null {

@@ -16,13 +16,13 @@ import {
 } from "../../../services/pending";
 import {
   definirQuantidade as apiDefinirQuantidade,
-  reservar as apiReservar,
-  reservarPedido as apiReservarPedido,
-  reservarLote as apiReservarLote,
-  liberarReserva as apiLiberarReserva,
+  liberar as apiLiberar,
+  liberarPedido as apiLiberarPedido,
+  liberarLote as apiLiberarLote,
+  cancelarLiberacao as apiCancelarLiberacao,
   darBaixa as apiDarBaixa,
 } from "../../../services/estoque";
-import type { ReservaResultado, BaixaSplit } from "../../../services/estoque";
+import type { LiberacaoResultado, BaixaSplit } from "../../../services/estoque";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import type { PendingProject, PendingItem } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
@@ -162,75 +162,67 @@ export function PendingControlModal({
     }
   }
 
-  async function handleReservar(item: PendingItem) {
+  async function handleLiberar(item: PendingItem) {
     try {
-      await apiReservar(item.id);
+      await apiLiberar(item.id);
       await refetchItens();
-      toast.success("Item reservado.");
+      toast.success("Item liberado.");
     } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao reservar."));
+      toast.error(getErrorMessage(err, "Erro ao liberar."));
     }
   }
 
-  function resumoReserva(resultados: ReservaResultado[]): { ok: number; falhas: number } {
+  function resumoLiberacao(resultados: LiberacaoResultado[]): { ok: number; falhas: number } {
     const falhas = resultados.filter((r) => !r.ok).length;
     return { ok: resultados.length - falhas, falhas };
   }
 
-  async function handleReservarPedido() {
+  async function handleLiberarPedido() {
     if (!localProject) return;
     setActing(true);
     try {
-      const resumo = await apiReservarPedido(localProject.id);
+      const resumo = await apiLiberarPedido(localProject.id);
       await refetchItens();
       if (resumo.totalItens === 0) {
-        toast.error("Nenhum item pronto pra reservar nesse pedido (sem itens, ou chapa/fita ainda sem quantidade definida).");
+        toast.error("Nenhum item pronto pra liberar nesse pedido (sem itens, ou chapa/fita ainda sem quantidade definida).");
         return;
       }
-      const { ok, falhas } = resumoReserva(resumo.resultados);
-      if (falhas === 0) {
-        toast.success(`${ok} ite${ok === 1 ? "m" : "ns"} reservado${ok === 1 ? "" : "s"}.`);
-      } else {
-        toast.error(`${ok} reservado(s), ${falhas} sem saldo suficiente.`);
-      }
+      const { ok } = resumoLiberacao(resumo.resultados);
+      toast.success(`${ok} ite${ok === 1 ? "m" : "ns"} liberado${ok === 1 ? "" : "s"}.`);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao reservar o pedido."));
+      toast.error(getErrorMessage(err, "Erro ao liberar o pedido."));
     } finally {
       setActing(false);
     }
   }
 
-  async function handleReservarLote() {
+  async function handleLiberarLote() {
     if (!localProject) return;
     setActing(true);
     try {
-      const resumo = await apiReservarLote(localProject.id);
+      const resumo = await apiLiberarLote(localProject.id);
       await refetchItens();
       if (resumo.totalItens === 0) {
-        toast.error(`Nenhum item pronto pra reservar no lote ${resumo.lote}.`);
+        toast.error(`Nenhum item pronto pra liberar no lote ${resumo.lote}.`);
         return;
       }
-      const { ok, falhas } = resumoReserva(resumo.resultados);
+      const { ok } = resumoLiberacao(resumo.resultados);
       const pedidos = `${resumo.totalPedidos} pedido${resumo.totalPedidos === 1 ? "" : "s"}`;
-      if (falhas === 0) {
-        toast.success(`Lote ${resumo.lote}: ${ok} ite${ok === 1 ? "m" : "ns"} reservado${ok === 1 ? "" : "s"} em ${pedidos}.`);
-      } else {
-        toast.error(`Lote ${resumo.lote}: ${ok} reservado(s), ${falhas} sem saldo suficiente (${pedidos}).`);
-      }
+      toast.success(`Lote ${resumo.lote}: ${ok} ite${ok === 1 ? "m" : "ns"} liberado${ok === 1 ? "" : "s"} em ${pedidos}.`);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao reservar o lote."));
+      toast.error(getErrorMessage(err, "Erro ao liberar o lote."));
     } finally {
       setActing(false);
     }
   }
 
-  async function handleLiberar(item: PendingItem) {
+  async function handleCancelarLiberacao(item: PendingItem) {
     try {
-      await apiLiberarReserva(item.id);
+      await apiCancelarLiberacao(item.id);
       await refetchItens();
-      toast.success("Reserva liberada.");
+      toast.success("Liberação cancelada.");
     } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao liberar reserva."));
+      toast.error(getErrorMessage(err, "Erro ao cancelar liberação."));
     }
   }
 
@@ -278,9 +270,9 @@ export function PendingControlModal({
                   variant="secondary"
                   size="sm"
                   loading={acting}
-                  onClick={handleReservarPedido}
+                  onClick={handleLiberarPedido}
                 >
-                  Reservar tudo do pedido
+                  Liberar tudo do pedido
                 </Button>
                 <Button
                   variant="secondary"
@@ -288,9 +280,9 @@ export function PendingControlModal({
                   loading={acting}
                   disabled={!localProject.lote}
                   title={!localProject.lote ? "Este pedido não tem lote definido" : undefined}
-                  onClick={handleReservarLote}
+                  onClick={handleLiberarLote}
                 >
-                  Reservar tudo do lote{localProject.lote ? ` (${localProject.lote})` : ""}
+                  Liberar tudo do lote{localProject.lote ? ` (${localProject.lote})` : ""}
                 </Button>
               </div>
               {loadingItems ? (
@@ -301,8 +293,8 @@ export function PendingControlModal({
                 <PendingItemsTable
                   items={localProject.itens}
                   onDefinirQuantidade={setQtdModalItem}
-                  onReservar={handleReservar}
                   onLiberar={handleLiberar}
+                  onCancelarLiberacao={handleCancelarLiberacao}
                   onBaixa={setBaixaModalItem}
                   onDelete={setDeleteId}
                 />

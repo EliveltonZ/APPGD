@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, Lock, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, Unlock, XCircle } from "lucide-react";
 import type { PendingItem, PendingStatus } from "../../types/pending";
 import "./index.css";
 
@@ -9,14 +9,14 @@ const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 // (já foi retirado do estoque), não "Executado".
 const STATUS_LABEL: Record<PendingStatus, string> = {
   PENDENTE: "Pendente",
-  RESERVADO: "Reservado",
+  LIBERADO: "Liberado",
   EXECUTADO: "Separado",
   CANCELADO: "Cancelado",
 };
 
 const STATUS_ICON: Record<PendingStatus, typeof Clock> = {
   PENDENTE: Clock,
-  RESERVADO: Lock,
+  LIBERADO: Unlock,
   EXECUTADO: CheckCircle2,
   CANCELADO: XCircle,
 };

@@ -57,7 +57,7 @@
   background: rgba(107, 99, 117, 0.1);
   color: var(--text-h);
 }
-.baix-badge--reservado {
+.baix-badge--liberado {
   background: rgba(32, 128, 197, 0.14);
   color: #2080c5;
 }

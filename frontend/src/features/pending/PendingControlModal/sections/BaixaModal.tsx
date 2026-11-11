@@ -105,7 +105,7 @@ export function BaixaModal({ item, saving, onClose, onConfirm }: Props) {
       <div className="cad-modal-body">
         <p className="baixa-modal__intro">
           <strong>{item.descricao}</strong> — informe o que realmente foi consumido (pode ser diferente do
-          reservado) e de onde está saindo. Se o material estiver espalhado em mais de uma localização, dá
+          liberado) e de onde está saindo. Se o material estiver espalhado em mais de uma localização, dá
           pra dividir numa ação só.
         </p>
 

@@ -16,10 +16,10 @@ router.get('/lista-separacao/:ordemdecompra', c.getListaSeparacao);
 router.get('/saldo-materiais',      c.getSaldoPorMaterial);
 router.get('/saldo/:materialId',    c.getSaldo);
 router.get('/saldo-localizacoes/:materialId', c.getSaldoLocalizacoes);
-router.put('/:id/quantidade',       c.putQuantidade);
-router.post('/:id/reservar',        c.postReservar);
-router.post('/:id/liberar-reserva', c.postLiberarReserva);
-router.post('/:id/baixa',           c.postBaixa);
+router.put('/:id/quantidade',          c.putQuantidade);
+router.post('/:id/liberar',            c.postLiberar);
+router.post('/:id/cancelar-liberacao', c.postCancelarLiberacao);
+router.post('/:id/baixa',              c.postBaixa);
 
 // Ajuste de estoque por contagem (inventário periódico) — informa o saldo
 // atual de um material numa localização, e lança a diferença contra o que
@@ -39,10 +39,10 @@ router.get('/pedido/:ordemdecompra/itens', pedidoC.getItens);
 router.post('/pedido/:ordemdecompra/itens', pedidoC.postItem);
 router.delete('/pedido/itens/:id',          pedidoC.deleteItem);
 
-// Reserva em lote — por pedido inteiro ou por todos os pedidos do mesmo
-// lote de corte. Reaproveita a mesma validação de saldo do reservar
-// individual, item por item (não trava tudo se um material faltar saldo).
-router.post('/pedido/:ordemdecompra/reservar-tudo', c.postReservarPedido);
-router.post('/pedido/:ordemdecompra/reservar-lote', c.postReservarLote);
+// Liberação em lote — por pedido inteiro ou por todos os pedidos do mesmo
+// lote de corte. Item por item (não trava tudo se um item ainda não tiver
+// quantidade definida).
+router.post('/pedido/:ordemdecompra/liberar-tudo', c.postLiberarPedido);
+router.post('/pedido/:ordemdecompra/liberar-lote', c.postLiberarLote);
 
 module.exports = router;

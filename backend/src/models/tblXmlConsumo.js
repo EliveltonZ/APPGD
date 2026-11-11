@@ -58,7 +58,7 @@ module.exports = function(sequelize, DataTypes) {
       type:         DataTypes.STRING(10),
       allowNull:    false,
       defaultValue: 'PENDENTE',
-      // PENDENTE | RESERVADO | EXECUTADO | CANCELADO
+      // PENDENTE | LIBERADO | EXECUTADO | CANCELADO
     },
     qtdUnBaixada: {
       type:      DataTypes.DECIMAL(10, 3),
@@ -75,15 +75,15 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: DataTypes.NOW,
       field:        'data_importacao',
     },
-    dataReserva: {
+    dataLiberacao: {
       type:      DataTypes.DATE,
       allowNull: true,
-      field:     'data_reserva',
+      field:     'data_liberacao',
     },
-    usuarioReservaId: {
+    usuarioLiberacaoId: {
       type:      DataTypes.INTEGER,
       allowNull: true,
-      field:     'usuario_reserva_id',
+      field:     'usuario_liberacao_id',
     },
     dataBaixa: {
       type:      DataTypes.DATE,

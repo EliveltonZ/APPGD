@@ -8,7 +8,7 @@ import { useToast } from "../../../context/ToastContext";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import {
   fetchProntoParaBaixa,
-  liberarReserva as apiLiberarReserva,
+  cancelarLiberacao as apiCancelarLiberacao,
   darBaixa as apiDarBaixa,
 } from "../../../services/estoque";
 import type { EstoquePendenteItem, BaixaSplit } from "../../../services/estoque";
@@ -21,7 +21,7 @@ const UNIDADE_LABEL: Record<string, string> = { M2: "m²", M: "m", UN: "un" };
 function fmtQtd(item: EstoquePendenteItem): string {
   const base = `${item.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[item.unidade] ?? item.unidade}`;
   // Ferragem (un) e fita (m, estoque controlado em metro) já são a própria
-  // quantidade a reservar/baixar — só chapa (m²) precisa da conversão pra
+  // quantidade a liberar/baixar — só chapa (m²) precisa da conversão pra
   // "quantas chapas inteiras", por isso só ela mostra o "· X un" extra.
   if (item.unidade !== "M2") return base;
   const un = item.qtdUnConfirmada != null ? `${item.qtdUnConfirmada} un` : "— un";
@@ -98,13 +98,13 @@ export function AlmoxarifadoBaixasPage() {
     setPrintSrc(`/impressao/lista-separacao?ordemdecompra=${ordemdecompra}`);
   }
 
-  async function handleLiberar(item: EstoquePendenteItem) {
+  async function handleCancelarLiberacao(item: EstoquePendenteItem) {
     try {
-      await apiLiberarReserva(item.id);
+      await apiCancelarLiberacao(item.id);
       await refetch();
-      toast.success("Reserva liberada.");
+      toast.success("Liberação cancelada.");
     } catch (err) {
-      toast.error(getErrorMessage(err, "Erro ao liberar reserva."));
+      toast.error(getErrorMessage(err, "Erro ao cancelar liberação."));
     }
   }
 
@@ -130,8 +130,8 @@ export function AlmoxarifadoBaixasPage() {
           <div>
             <h1 className="baix-page__title">Baixas</h1>
             <p className="baix-page__subtitle">
-              Fila de baixa do almoxarifado, agrupada por projeto — tudo que já está reservado, ou
-              pendente de material sem controle de estoque mínimo (que não precisa de reserva prévia).
+              Fila de baixa do almoxarifado, agrupada por projeto — tudo que já está liberado, ou
+              pendente de material sem controle de estoque mínimo (que não precisa de liberação prévia).
             </p>
           </div>
         </div>
@@ -223,12 +223,12 @@ export function AlmoxarifadoBaixasPage() {
                               >
                                 <PackageCheck size={13} />
                               </button>
-                              {item.status === "RESERVADO" && (
+                              {item.status === "LIBERADO" && (
                                 <button
                                   type="button"
                                   className="baix-action-btn"
-                                  title="Liberar reserva"
-                                  onClick={() => handleLiberar(item)}
+                                  title="Cancelar liberação"
+                                  onClick={() => handleCancelarLiberacao(item)}
                                 >
                                   <Undo2 size={13} />
                                 </button>

@@ -1,4 +1,4 @@
-export type PendingStatus = 'PENDENTE' | 'RESERVADO' | 'EXECUTADO' | 'CANCELADO';
+export type PendingStatus = 'PENDENTE' | 'LIBERADO' | 'EXECUTADO' | 'CANCELADO';
 export type PendingItemTipo = 'CHAPA' | 'FITA' | 'FERRAGEM';
 export type PendingItemOrigem = 'XML' | 'MANUAL';
 
@@ -10,9 +10,9 @@ export interface PendingItem {
   unidade: string;
   tipo: PendingItemTipo;
   quantidade: number;
-  // Quantidade em UN (chapas inteiras / rolos de fita) a reservar — só
+  // Quantidade em UN (chapas inteiras / rolos de fita) a liberar — só
   // ferragem já nasce com isso preenchido; chapa/fita precisa ser definida
-  // antes de reservar.
+  // antes de liberar.
   qtdUnConfirmada: number | null;
   detalhes: string | null;
   origem: PendingItemOrigem;

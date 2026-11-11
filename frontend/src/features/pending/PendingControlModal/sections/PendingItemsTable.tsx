@@ -1,12 +1,12 @@
-import { Hash, Lock, PackageCheck, Trash2, Undo2 } from "lucide-react";
+import { Hash, Unlock, PackageCheck, Trash2, Undo2 } from "lucide-react";
 import { PEND_STATUS_LABELS } from "../../../../data/pendingConfig";
 import type { PendingItem } from "../../../../types/pending";
 
 interface Props {
   items: PendingItem[];
   onDefinirQuantidade: (item: PendingItem) => void;
-  onReservar: (item: PendingItem) => void;
   onLiberar: (item: PendingItem) => void;
+  onCancelarLiberacao: (item: PendingItem) => void;
   onBaixa: (item: PendingItem) => void;
   onDelete: (id: number) => void;
 }
@@ -18,7 +18,7 @@ const ORIGEM_LABEL: Record<string, string> = { XML: "XML", MANUAL: "Manual" };
 function fmtQtd(item: PendingItem): string {
   const base = `${item.quantidade.toLocaleString("pt-BR", { maximumFractionDigits: 4 })} ${UNIDADE_LABEL[item.unidade] ?? item.unidade}`;
   // Ferragem (un) e fita (m, estoque controlado em metro) já são a própria
-  // quantidade a reservar — só chapa (m²) precisa da conversão pra "quantas
+  // quantidade a liberar — só chapa (m²) precisa da conversão pra "quantas
   // chapas inteiras", por isso só ela mostra o "· X un" extra.
   if (item.unidade !== "M2") return base;
   const un = item.qtdUnConfirmada != null ? `${item.qtdUnConfirmada} un` : "— un";
@@ -28,8 +28,8 @@ function fmtQtd(item: PendingItem): string {
 export function PendingItemsTable({
   items,
   onDefinirQuantidade,
-  onReservar,
   onLiberar,
+  onCancelarLiberacao,
   onBaixa,
   onDelete,
 }: Props) {
@@ -77,7 +77,7 @@ export function PendingItemsTable({
                     <button
                       type="button"
                       className="pend-action-btn"
-                      title="Definir quantidade em UN antes de reservar"
+                      title="Definir quantidade em UN antes de liberar"
                       onClick={() => onDefinirQuantidade(item)}
                     >
                       <Hash size={13} />
@@ -87,13 +87,13 @@ export function PendingItemsTable({
                     <button
                       type="button"
                       className="pend-action-btn"
-                      title="Reservar"
-                      onClick={() => onReservar(item)}
+                      title="Liberar"
+                      onClick={() => onLiberar(item)}
                     >
-                      <Lock size={13} />
+                      <Unlock size={13} />
                     </button>
                   )}
-                  {item.status === "RESERVADO" && (
+                  {item.status === "LIBERADO" && (
                     <>
                       <button
                         type="button"
@@ -106,8 +106,8 @@ export function PendingItemsTable({
                       <button
                         type="button"
                         className="pend-action-btn"
-                        title="Liberar reserva"
-                        onClick={() => onLiberar(item)}
+                        title="Cancelar liberação"
+                        onClick={() => onCancelarLiberacao(item)}
                       >
                         <Undo2 size={13} />
                       </button>

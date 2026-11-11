@@ -50,32 +50,32 @@ module.exports = {
     } catch (err) { next(err); }
   },
 
-  async postReservar(req, res, next) {
+  async postLiberar(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      const linha = await service.reservar(Number(req.params.id), usuarioId);
+      const linha = await service.liberar(Number(req.params.id), usuarioId);
       if (!linha) return notFound(res);
       res.json(linha);
     } catch (err) { next(err); }
   },
 
-  async postReservarPedido(req, res, next) {
+  async postLiberarPedido(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      res.json(await service.reservarPedido(Number(req.params.ordemdecompra), usuarioId));
+      res.json(await service.liberarPedido(Number(req.params.ordemdecompra), usuarioId));
     } catch (err) { next(err); }
   },
 
-  async postReservarLote(req, res, next) {
+  async postLiberarLote(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      res.json(await service.reservarLote(Number(req.params.ordemdecompra), usuarioId));
+      res.json(await service.liberarLote(Number(req.params.ordemdecompra), usuarioId));
     } catch (err) { next(err); }
   },
 
-  async postLiberarReserva(req, res, next) {
+  async postCancelarLiberacao(req, res, next) {
     try {
-      const linha = await service.liberarReserva(Number(req.params.id));
+      const linha = await service.cancelarLiberacao(Number(req.params.id));
       if (!linha) return notFound(res);
       res.json(linha);
     } catch (err) { next(err); }

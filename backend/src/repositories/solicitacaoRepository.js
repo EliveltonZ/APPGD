@@ -1,78 +1,125 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes } = require("sequelize");
 const {
   sequelize,
-  Config, EquipSat, Montador,
-  Falhas, Ocorrencia, Pecas,
-  Projetos, Clientes, Liberador,
-} = require('../client/db');
+  Config,
+  EquipSat,
+  Montador,
+  Falhas,
+  Ocorrencia,
+  Pecas,
+  Projetos,
+  Clientes,
+  Liberador,
+  TipoAssistencia,
+} = require("../client/db");
 
 async function getConfig() {
-  const rows = await Config.findAll({ order: [['cod', 'ASC']] });
-  return rows.map(r => ({ cod: r.cod, descricao: r.descricao }));
+  const rows = await Config.findAll({ order: [["cod", "ASC"]] });
+  return rows.map((r) => ({ cod: r.cod, descricao: r.descricao }));
+}
+
+async function getTipoAssistencias() {
+  const rows = await TipoAssistencia.findAll({ order: [["id", "ASC"]] });
+  return rows.map((r) => ({ id: r.id, name: r.name }));
 }
 
 async function inserirEquipeSat(idSat, idMontador) {
-  await EquipSat.create({ idSat: String(idSat), idMontador: Number(idMontador) });
+  await EquipSat.create({
+    idSat: String(idSat),
+    idMontador: Number(idMontador),
+  });
 }
 
 async function getPecas(idAssistencia) {
   const rows = await Pecas.findAll({
     where: { idAssistencia: String(idAssistencia) },
-    attributes: ['codigo', 'qtd', 'peca', 'dimensoes', 'cor', 'lado', 'idOcorrencia', 'idFalha', 'observacoes'],
+    attributes: [
+      "codigo",
+      "qtd",
+      "peca",
+      "dimensoes",
+      "cor",
+      "lado",
+      "idOcorrencia",
+      "idFalha",
+      "observacoes",
+    ],
     include: [
-      { model: Ocorrencia, as: 'ocorrencia', attributes: ['descricao'], required: true },
-      { model: Falhas,     as: 'falha',      attributes: ['descricao'], required: true },
+      {
+        model: Ocorrencia,
+        as: "ocorrencia",
+        attributes: ["descricao"],
+        required: true,
+      },
+      { model: Falhas, as: "falha", attributes: ["descricao"], required: true },
     ],
   });
-  return rows.map(pk => ({
-    codigo:        pk.codigo,
-    qtd:           pk.qtd,
-    peca:          pk.peca,
-    dimensoes:     pk.dimensoes,
-    cor:           pk.cor,
-    lado:          pk.lado,
+  return rows.map((pk) => ({
+    codigo: pk.codigo,
+    qtd: pk.qtd,
+    peca: pk.peca,
+    dimensoes: pk.dimensoes,
+    cor: pk.cor,
+    lado: pk.lado,
     id_ocorrencia: pk.idOcorrencia,
-    ocorrencia:    pk.ocorrencia?.descricao ?? null,
-    id_falha:      pk.idFalha,
-    falha:         pk.falha?.descricao      ?? null,
-    observacoes:   pk.observacoes,
+    ocorrencia: pk.ocorrencia?.descricao ?? null,
+    id_falha: pk.idFalha,
+    falha: pk.falha?.descricao ?? null,
+    observacoes: pk.observacoes,
   }));
 }
 
 async function listarFalhas() {
-  const rows = await Falhas.findAll({ order: [['codigo', 'ASC']] });
-  return rows.map(r => ({ codigo: r.codigo, descricao: r.descricao }));
+  const rows = await Falhas.findAll({ order: [["codigo", "ASC"]] });
+  return rows.map((r) => ({ codigo: r.codigo, descricao: r.descricao }));
 }
 
 async function listarOcorrencias() {
   const rows = await Ocorrencia.findAll();
-  return rows.map(r => ({
-    cod:           r.cod,
-    descricao:     r.descricao,
-    dias_fabrica:  r.diasFabrica,
+  return rows.map((r) => ({
+    cod: r.cod,
+    descricao: r.descricao,
+    dias_fabrica: r.diasFabrica,
     dias_logistica: r.diasLogistica,
   }));
 }
 
 async function listarMontadores() {
-  const rows = await Montador.findAll({ where: { ativo: true }, order: [['name', 'ASC']] });
-  return rows.map(r => ({ codigo: r.id, nome: r.name }));
+  const rows = await Montador.findAll({
+    where: { ativo: true },
+    order: [["name", "ASC"]],
+  });
+  return rows.map((r) => ({ codigo: r.id, nome: r.name }));
 }
 
 async function buscarContratoAssistencia(contrato) {
   const rows = await Projetos.findAll({
     where: { contrato: Number(contrato) },
-    attributes: ['idCliente'],
+    attributes: ["idCliente"],
     include: [
-      { model: Clientes,  as: 'tblCliente',   attributes: ['name'], required: true  },
-      { model: Liberador, as: 'tblLiberador',  attributes: ['name'], required: false },
+      {
+        model: Clientes,
+        as: "tblCliente",
+        attributes: ["name"],
+        required: true,
+      },
+      {
+        model: Liberador,
+        as: "tblLiberador",
+        attributes: ["name"],
+        required: false,
+      },
     ],
   });
 
   const seen = new Set();
   return rows
-    .map(p => ({ id_cliente: p.idCliente, cliente: p.tblCliente.name, liberador: p.tblLiberador?.name ?? null }))
-    .filter(item => {
+    .map((p) => ({
+      id_cliente: p.idCliente,
+      cliente: p.tblCliente.name,
+      liberador: p.tblLiberador?.name ?? null,
+    }))
+    .filter((item) => {
       const key = `${item.id_cliente}|${item.cliente}|${item.liberador}`;
       if (seen.has(key)) return false;
       seen.add(key);

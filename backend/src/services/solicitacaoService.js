@@ -1,12 +1,15 @@
 const repo = require("../repositories/solicitacaoRepository");
 
-const getConfig                 = ()                           => repo.getConfig();
-const inserirEquipeSat          = (idSat, idMontador)         => repo.inserirEquipeSat(idSat, idMontador);
-const getPecas                  = (idAssistencia)             => repo.getPecas(idAssistencia);
-const listarFalhas              = ()                           => repo.listarFalhas();
-const listarOcorrencias         = ()                           => repo.listarOcorrencias();
-const listarMontadores          = ()                           => repo.listarMontadores();
-const buscarContratoAssistencia = (contrato)                   => repo.buscarContratoAssistencia(contrato);
+const getConfig = () => repo.getConfig();
+const inserirEquipeSat = (idSat, idMontador) =>
+  repo.inserirEquipeSat(idSat, idMontador);
+const getPecas = (idAssistencia) => repo.getPecas(idAssistencia);
+const listarFalhas = () => repo.listarFalhas();
+const listarOcorrencias = () => repo.listarOcorrencias();
+const listarMontadores = () => repo.listarMontadores();
+const buscarContratoAssistencia = (contrato) =>
+  repo.buscarContratoAssistencia(contrato);
+const tipoAssistencia = () => repo.tipoassistencia();
 
 module.exports = {
   getConfig,
@@ -16,4 +19,5 @@ module.exports = {
   listarOcorrencias,
   listarMontadores,
   buscarContratoAssistencia,
+  tipoAssistencia,
 };

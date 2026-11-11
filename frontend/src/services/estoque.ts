@@ -3,11 +3,11 @@ import type { PendingItem } from '../types/pending'
 
 export interface Saldo {
   fisico: number
-  reservado: number
+  liberado: number
   comprado: number
   solicitado: number
   disponivel: number
-  saldoBloqueio: number
+  saldoProjetado: number
   saldoVisibilidade: number
 }
 
@@ -17,11 +17,11 @@ export const fetchSaldo = (materialId: number): Promise<Saldo> =>
 export const definirQuantidade = (id: number, qtdUnConfirmada: number) =>
   apiPut(`/estoque/${id}/quantidade`, { qtd_un_confirmada: qtdUnConfirmada })
 
-export const reservar = (id: number) =>
-  apiPost(`/estoque/${id}/reservar`, {})
+export const liberar = (id: number) =>
+  apiPost(`/estoque/${id}/liberar`, {})
 
-export const liberarReserva = (id: number) =>
-  apiPost(`/estoque/${id}/liberar-reserva`, {})
+export const cancelarLiberacao = (id: number) =>
+  apiPost(`/estoque/${id}/cancelar-liberacao`, {})
 
 export interface BaixaSplit {
   localizacaoId: number
@@ -36,34 +36,34 @@ export const darBaixa = (id: number, splits: BaixaSplit[]) =>
     splits: splits.map((s) => ({ localizacao_id: s.localizacaoId, qtd_un_baixada: s.qtd })),
   })
 
-export interface ReservaResultado {
+export interface LiberacaoResultado {
   id: number
   ordemdecompra: number
   ok: boolean
   erro?: string
 }
 
-export interface ReservaLoteResumo {
+export interface LiberacaoLoteResumo {
   lote: number
   totalPedidos: number
   totalItens: number
-  resultados: ReservaResultado[]
+  resultados: LiberacaoResultado[]
 }
 
-export interface ReservaPedidoResumo {
+export interface LiberacaoPedidoResumo {
   totalItens: number
-  resultados: ReservaResultado[]
+  resultados: LiberacaoResultado[]
 }
 
-export const reservarPedido = (ordemdecompra: number): Promise<ReservaPedidoResumo> =>
-  apiPost(`/estoque/pedido/${ordemdecompra}/reservar-tudo`, {})
+export const liberarPedido = (ordemdecompra: number): Promise<LiberacaoPedidoResumo> =>
+  apiPost(`/estoque/pedido/${ordemdecompra}/liberar-tudo`, {})
 
-export const reservarLote = (ordemdecompra: number): Promise<ReservaLoteResumo> =>
-  apiPost(`/estoque/pedido/${ordemdecompra}/reservar-lote`, {})
+export const liberarLote = (ordemdecompra: number): Promise<LiberacaoLoteResumo> =>
+  apiPost(`/estoque/pedido/${ordemdecompra}/liberar-lote`, {})
 
 // Fila do almoxarifado — tudo que já pode ser baixado agora, cruzando
-// pedidos diferentes (RESERVADO de qualquer material, ou PENDENTE de
-// material sem controle de estoque mínimo, que pula a reserva).
+// pedidos diferentes (LIBERADO de qualquer material, ou PENDENTE de
+// material sem controle de estoque mínimo, que pula a liberação).
 export interface EstoquePendenteItem extends PendingItem {
   ordemdecompra: number
   contrato: string
@@ -82,11 +82,11 @@ export interface SaldoMaterial {
   unidadeBase: string
   estoqueMinimoUn: number | null
   fisico: number
-  reservado: number
+  liberado: number
   disponivel: number
   comprado: number
   solicitado: number
-  saldoBloqueio: number
+  saldoProjetado: number
   saldoVisibilidade: number
 }
 
@@ -163,9 +163,9 @@ export interface ListaComprasAbaixoMinimoItem {
   unidadeBase: string
   estoqueMinimoUn: number
   fisico: number
-  reservado: number
+  liberado: number
   comprado: number
-  saldoBloqueio: number
+  saldoProjetado: number
   temPedidoUrgente: boolean
 }
 

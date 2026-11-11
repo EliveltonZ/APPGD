@@ -359,7 +359,7 @@ export function ComprasNecessidadesPage() {
                   <th>Código</th>
                   <th>Descrição</th>
                   <th>Saldo</th>
-                  <th>Reservado</th>
+                  <th>Liberado</th>
                   <th>Comprado</th>
                   <th>Mínimo</th>
                   <th>Falta</th>
@@ -369,15 +369,15 @@ export function ComprasNecessidadesPage() {
               </thead>
               <tbody>
                 {abaixoMinimo.map((m) => {
-                  const falta = Math.max(0, m.estoqueMinimoUn - m.saldoBloqueio);
+                  const falta = Math.max(0, m.estoqueMinimoUn - m.saldoProjetado);
                   const noCarrinho = carrinho.has(m.id);
                   return (
                     <tr key={m.id} className={m.temPedidoUrgente ? "nec-tabela__row--urgente" : undefined}>
                       <td>{m.codigoInterno}</td>
                       <td>{m.descricao}</td>
-                      <td>{fmtQtd(m.saldoBloqueio)} un</td>
-                      <td className={m.reservado > 0 ? "nec-tabela__reservado" : undefined}>
-                        {m.reservado > 0 ? `${fmtQtd(m.reservado)} un` : "—"}
+                      <td>{fmtQtd(m.saldoProjetado)} un</td>
+                      <td className={m.liberado > 0 ? "nec-tabela__liberado" : undefined}>
+                        {m.liberado > 0 ? `${fmtQtd(m.liberado)} un` : "—"}
                       </td>
                       <td className={m.comprado > 0 ? "nec-tabela__comprado" : undefined}>
                         {m.comprado > 0 ? `${fmtQtd(m.comprado)} un` : "—"}
