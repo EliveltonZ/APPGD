@@ -1,5 +1,7 @@
 import { apiGet, apiPost, apiPut, apiDelete } from './api';
 
+export type Deposito = 'ALMOXARIFADO' | 'FABRICA' | 'EXPEDICAO';
+
 export interface Localizacao {
   id: number;
   codigo: string;
@@ -10,6 +12,7 @@ export interface Localizacao {
   nivel: string;
   divisao: string;
   padraoRecebimento: boolean;
+  deposito: Deposito;
 }
 
 export interface LocalizacaoPayload {
@@ -20,6 +23,7 @@ export interface LocalizacaoPayload {
   nivel: string;
   divisao: string;
   padrao_recebimento: boolean;
+  deposito: Deposito;
 }
 
 export const fetchLocalizacoes   = (): Promise<Localizacao[]>              => apiGet('/localizacoes');

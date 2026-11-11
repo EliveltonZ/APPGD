@@ -13,7 +13,7 @@ import {
   darBaixa as apiDarBaixa,
   baixarPedidoCompleto as apiBaixarPedidoCompleto,
 } from "../../../services/estoque";
-import type { EstoquePendenteItem, BaixaSplit } from "../../../services/estoque";
+import type { EstoquePendenteItem } from "../../../services/estoque";
 import { PEND_STATUS_LABELS } from "../../../data/pendingConfig";
 import "./index.css";
 
@@ -125,11 +125,11 @@ export function AlmoxarifadoBaixasPage() {
     }
   }
 
-  async function handleBaixaConfirm(splits: BaixaSplit[]) {
+  async function handleBaixaConfirm(qtd: number) {
     if (!baixaItem) return;
     setActing(true);
     try {
-      await apiDarBaixa(baixaItem.id, splits);
+      await apiDarBaixa(baixaItem.id, qtd);
       await refetch();
       toast.success("Baixa registrada.");
       setBaixaItem(null);

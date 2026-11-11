@@ -1,10 +1,9 @@
 const { Op } = require("sequelize");
 const {
   sequelize, Projetos, Clientes, Etapa, Acessorios,
-  Producao, Avulsos, Usuario,
+  Producao, Avulsos, Usuario, XmlConsumo,
 } = require("../client/db");
 const { producaoStatus, countPending, hasBullet } = require("../utils/calcStatus");
-const estoqueService = require("../services/estoqueService");
 
 async function _getLoginName(id) {
   if (!id) return null;
@@ -197,18 +196,27 @@ async function listarAcessoriosExpedicao(ordemdecompra) {
   });
 }
 
-async function atualizarProjetoExpedicao(body, usuarioId) {
+async function atualizarProjetoExpedicao(body) {
   const oc = body.ordemdecompra;
 
-  return sequelize.transaction(async (t) => {
-    const atual = await Projetos.findOne({
-      where: { ordemdecompra: oc }, attributes: ['pronto'], transaction: t,
+  // "Pronto" não pode ser marcado enquanto o pedido tiver item de material
+  // ainda não baixado (PENDENTE ou LIBERADO) — não movimenta estoque, é só
+  // uma trava de consistência. "Entrega" com pendência marcada continua
+  // possível independente disso (válvula de escape já existente).
+  if (body.pronto) {
+    const pendente = await XmlConsumo.findOne({
+      where: { ordemdecompra: oc, status: { [Op.in]: ['PENDENTE', 'LIBERADO'] } },
+      attributes: ['id'],
     });
-    // Só dispara na transição PENDENTE→pronto (primeira vez que a data é
-    // preenchida) — editar a data depois, ou desmarcar, não move estoque
-    // de novo (o material já saiu de Fábrica uma vez só).
-    const virouPronto = !atual?.pronto && !!body.pronto;
+    if (pendente) {
+      throw Object.assign(
+        new Error('Este pedido ainda tem item de material pendente de baixa — não é possível marcar como pronto.'),
+        { status: 409 },
+      );
+    }
+  }
 
+  return sequelize.transaction(async (t) => {
     await Projetos.update(
       {
         pronto:    body.pronto    ?? null,
@@ -218,10 +226,6 @@ async function atualizarProjetoExpedicao(body, usuarioId) {
       },
       { where: { ordemdecompra: oc }, transaction: t },
     );
-
-    if (virouPronto) {
-      await estoqueService.moverPedidoParaExpedicao(oc, usuarioId, t);
-    }
 
     await Producao.update(
       {

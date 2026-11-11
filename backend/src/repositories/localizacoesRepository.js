@@ -4,19 +4,15 @@ const { Localizacoes, sequelize } = require('../client/db');
 
 // "codigo" (ex.: 01-01-03-D) não é uma coluna — é só a junção de
 // rua/prateleira/nivel/divisao, calculada aqui pra todo consumidor que só
-// quer mostrar/selecionar o endereço como texto (Transferências, Nota
-// Fiscal, Baixas) continuar funcionando sem precisar montar isso sozinho.
+// quer mostrar/selecionar o endereço como texto (Transferências, Ajuste,
+// Cadastro) continuar funcionando sem precisar montar isso sozinho.
 function comCodigo(row) {
   return { ...row, codigo: `${row.rua}-${row.prateleira}-${row.nivel}-${row.divisao}` };
 }
 
-// Só Almoxarifado — Fábrica e Expedição são posições únicas e agregadas,
-// geridas automaticamente (baixa/pronto), nunca aparecem pra escolher numa
-// tela (cadastro, transferência, baixa, nota fiscal).
 async function listar() {
   const rows = await Localizacoes.findAll({
-    where: { deposito: 'ALMOXARIFADO' },
-    order: [['rua', 'ASC'], ['prateleira', 'ASC'], ['nivel', 'ASC'], ['divisao', 'ASC']],
+    order: [['deposito', 'ASC'], ['rua', 'ASC'], ['prateleira', 'ASC'], ['nivel', 'ASC'], ['divisao', 'ASC']],
     raw: true,
   });
   return rows.map(comCodigo);
@@ -50,6 +46,7 @@ function camposEndereco(body) {
     descricao:         body.descricao?.trim() || null,
     ativo:             body.ativo ?? true,
     padraoRecebimento: body.padrao_recebimento ?? false,
+    deposito:          body.deposito || 'ALMOXARIFADO',
   };
 }
 

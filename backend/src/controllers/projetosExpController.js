@@ -30,10 +30,10 @@ module.exports = {
 
   async setDataExpedicao(req, res) {
     try {
-      await service.atualizarProjetoExpedicao(req.body, Number(req.user.sub));
+      await service.atualizarProjetoExpedicao(req.body);
       res.json({ success: true });
     } catch (err) {
-      res.status(500).json({ message: "Erro ao atualizar expedição", error: err.message });
+      res.status(err.status ?? 500).json({ message: "Erro ao atualizar expedição", error: err.message });
     }
   },
 };

@@ -22,7 +22,7 @@ import {
   cancelarLiberacao as apiCancelarLiberacao,
   darBaixa as apiDarBaixa,
 } from "../../../services/estoque";
-import type { LiberacaoResultado, BaixaSplit } from "../../../services/estoque";
+import type { LiberacaoResultado } from "../../../services/estoque";
 import { fetchMateriaisOpcoes } from "../../../services/materiais";
 import type { PendingProject, PendingItem } from "../../../types/pending";
 import { useToast } from "../../../context/ToastContext";
@@ -226,11 +226,11 @@ export function PendingControlModal({
     }
   }
 
-  async function handleBaixaConfirm(splits: BaixaSplit[]) {
+  async function handleBaixaConfirm(qtd: number) {
     if (!baixaModalItem) return;
     setActing(true);
     try {
-      await apiDarBaixa(baixaModalItem.id, splits);
+      await apiDarBaixa(baixaModalItem.id, qtd);
       await refetchItens();
       toast.success("Baixa registrada.");
       setBaixaModalItem(null);

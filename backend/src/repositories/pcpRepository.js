@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
-const { Projetos, Clientes, Vendedor } = require("../client/db");
+const { sequelize, Projetos, Clientes, Vendedor } = require("../client/db");
 const { formatDateBR } = require("../utils/calcStatus");
+const estoqueService = require("../services/estoqueService");
 
 async function buscarProjetoPcp(ordemdecompra) {
   const found = await Projetos.findOne({
@@ -78,11 +79,28 @@ async function reverterLote(lote) {
   );
 }
 
-async function atualizarIniciarLote(lote, iniciado) {
-  await Projetos.update(
-    { iniciado: iniciado ?? null },
-    { where: { lote: Number(lote) } },
-  );
+// Iniciar o lote move, por pedido, a quantidade LIBERADA de cada material
+// do Almoxarifado pra Fábrica (ver estoqueService.moverPedidoParaFabrica) —
+// só pra pedido que ainda não tinha sido iniciado antes, senão moveria de
+// novo a cada edição de data.
+async function atualizarIniciarLote(lote, iniciado, usuarioId) {
+  return sequelize.transaction(async (t) => {
+    const ordens = await Projetos.findAll({
+      where: { lote: Number(lote) }, attributes: ['ordemdecompra', 'iniciado'], transaction: t,
+    });
+
+    await Projetos.update(
+      { iniciado: iniciado ?? null },
+      { where: { lote: Number(lote) }, transaction: t },
+    );
+
+    if (iniciado) {
+      for (const p of ordens) {
+        if (p.iniciado) continue;
+        await estoqueService.moverPedidoParaFabrica(p.ordemdecompra, usuarioId, t);
+      }
+    }
+  });
 }
 
 async function atualizarLote(ordemdecompra, lote) {

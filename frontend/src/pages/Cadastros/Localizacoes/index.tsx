@@ -14,12 +14,27 @@ import {
   updateLocalizacao,
   deleteLocalizacao,
 } from '../../../services/localizacoes'
-import type { Localizacao, LocalizacaoPayload } from '../../../services/localizacoes'
+import type { Localizacao, LocalizacaoPayload, Deposito } from '../../../services/localizacoes'
 import { getErrorMessage } from '../../../utils/errorMessage'
 import '../index.css'
 
+const DEPOSITO_LABEL: Record<Deposito, string> = {
+  ALMOXARIFADO: 'Almoxarifado',
+  FABRICA: 'Fábrica',
+  EXPEDICAO: 'Expedição',
+}
+
 const COLUMNS: TableColumn<Localizacao>[] = [
   { key: 'codigo',     label: 'Código',     type: 'text', sortable: true, filterable: true, minWidth: 130 },
+  {
+    key: 'deposito',
+    label: 'Depósito',
+    type: 'text',
+    sortable: true,
+    filterable: true,
+    minWidth: 110,
+    render: (v) => DEPOSITO_LABEL[v as Deposito] ?? String(v),
+  },
   { key: 'rua',        label: 'Rua',        type: 'text', sortable: true, filterable: true, minWidth: 70, align: 'center' },
   { key: 'prateleira', label: 'Prateleira', type: 'text', sortable: true, filterable: true, minWidth: 90, align: 'center' },
   { key: 'nivel',       label: 'Nível',      type: 'text', sortable: true, filterable: true, minWidth: 70, align: 'center' },
@@ -80,10 +95,11 @@ interface FormState {
   descricao:  string
   ativo:      boolean
   padraoRecebimento: boolean
+  deposito:   Deposito
 }
 
 function emptyForm(): FormState {
-  return { rua: '', prateleira: '', nivel: '', divisao: '', descricao: '', ativo: true, padraoRecebimento: false }
+  return { rua: '', prateleira: '', nivel: '', divisao: '', descricao: '', ativo: true, padraoRecebimento: false, deposito: 'ALMOXARIFADO' }
 }
 
 function fromLocalizacao(l: Localizacao): FormState {
@@ -95,6 +111,7 @@ function fromLocalizacao(l: Localizacao): FormState {
     descricao: l.descricao ?? '',
     ativo: l.ativo,
     padraoRecebimento: l.padraoRecebimento,
+    deposito: l.deposito,
   }
 }
 
@@ -107,6 +124,7 @@ function toPayload(f: FormState): LocalizacaoPayload {
     descricao:  f.descricao.trim() || null,
     ativo:      f.ativo,
     padrao_recebimento: f.padraoRecebimento,
+    deposito:   f.deposito,
   }
 }
 
@@ -244,6 +262,19 @@ export function CadastrosLocalizacoesPage() {
           <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>
             Endereço: <strong style={{ color: 'var(--text-h)' }}>{previewCodigo(form)}</strong>
           </p>
+
+          <label className="cad-field">
+            <span className="cad-field__label">Depósito</span>
+            <select
+              className="cad-field__input"
+              value={form.deposito}
+              onChange={(e) => field('deposito', e.target.value as Deposito)}
+            >
+              {Object.entries(DEPOSITO_LABEL).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </label>
 
           <div className="frow frow--2">
             <label className="cad-field">

@@ -17,20 +17,20 @@ import type { PendingItem } from '../../../types/pending';
 import type { PickRole } from './sections/OperationalStatusSection';
 import './index.css';
 
-// Pedido só pode ser expedido depois que o almoxarifado separou tudo
-// (todo item em PENDENTE/LIBERADO bloqueia) — a não ser que seja expedido
-// com pendência marcada de propósito (mesma válvula de escape que já existe
-// pras outras validações abaixo).
 function temItemNaoSeparado(itens: PendingItem[]): boolean {
   return itens.some((i) => i.status === 'PENDENTE' || i.status === 'LIBERADO');
 }
 
 function validate(f: ExpeditionDetail, pendingItems: PendingItem[]): string | null {
+  // "Pronto" não pode ser marcado com item ainda não baixado — trava de
+  // consistência de estoque, sem válvula de escape por pendência (essa
+  // é só pra entrega, abaixo).
+  if (f.pronto && temItemNaoSeparado(pendingItems)) return 'Separação do almoxarifado pendente';
+
   if (f.pendencia) return null;
   if (!f.entrega && !f.pronto) return null;
   if (f.entrega && !f.pronto) return 'Projeto não finalizado';
   if (!f.etapa) return 'Etapas de produção em aberto';
-  if (temItemNaoSeparado(pendingItems)) return 'Separação do almoxarifado pendente';
   return null;
 }
 

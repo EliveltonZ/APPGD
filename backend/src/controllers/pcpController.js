@@ -38,7 +38,11 @@ module.exports = {
 
   async setStartLote(req, res) {
     try {
-      await service.atualizarIniciarLote(req.body.lote, req.body.iniciado ?? req.body.datainicio ?? null);
+      await service.atualizarIniciarLote(
+        req.body.lote,
+        req.body.iniciado ?? req.body.datainicio ?? null,
+        Number(req.user.sub),
+      );
       ok(res, { success: true });
     } catch (e) { err(res, "Erro ao iniciar lote", e); }
   },

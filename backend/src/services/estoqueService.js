@@ -181,38 +181,102 @@ async function moverParaDeposito({ materialId, localizacaoOrigemId, deposito, qt
   await repo.criarMovimento({ ...base, localizacaoId: destino.id, tipo: 'TRANSF_ENTRADA', qtdUn: qtd }, { transaction });
 }
 
-// Fábrica → Expedição: chamado quando o pedido é marcado "pronto" pela
-// primeira vez (ver expedicaoRepository.atualizarProjetoExpedicao). Move,
-// por material, tudo que esse pedido já tem baixado (soma de
-// qtd_un_baixada em tblXmlConsumo, status EXECUTADO) — precisa rodar dentro
-// da mesma transação que grava o "pronto", senão fica um pedido marcado
-// pronto sem o material ter ido pra Expedição (ou vice-versa).
-async function moverPedidoParaExpedicao(ordemdecompra, usuarioId, transaction) {
-  const totais = await repo.somarBaixadoPorMaterial(ordemdecompra);
-  if (!totais.length) return;
+// Almoxarifado → Fábrica: chamado quando um LOTE é marcado como "iniciado"
+// (ver pcpRepository.atualizarIniciarLote) — move, por pedido e por
+// material, a quantidade já LIBERADA (qtd_un_confirmada) pra Fábrica. O
+// status do item continua LIBERADO (só desloca o saldo físico); a baixa de
+// verdade (EXECUTADO) acontece depois, manualmente. Busca a quantidade em
+// cada localização de Almoxarifado com saldo (maior primeiro, nunca no
+// Recebimento) — se não achar o bastante, move o que der e deixa negativo
+// (liberado nunca bloqueia).
+async function moverPedidoParaFabrica(ordemdecompra, usuarioId, transaction) {
+  const itens = await repo.listarLiberadosDoPedido(ordemdecompra);
+  if (!itens.length) return;
+
+  const recebimento = await localizacoesRepo.buscarRecebimento();
+  for (const item of itens) {
+    const qtd = Number(item.qtdUnConfirmada);
+    if (!(qtd > 0)) continue;
+    const locais = (await repo.saldoPorLocalizacoesDeposito(item.materialId, 'ALMOXARIFADO'))
+      .filter((l) => !recebimento || l.localizacaoId !== recebimento.id);
+
+    let restante = qtd;
+    for (const loc of locais) {
+      if (restante <= 0) break;
+      const usar = Math.min(loc.saldo, restante);
+      if (usar <= 0) continue;
+      await moverParaDeposito({
+        materialId: item.materialId,
+        localizacaoOrigemId: loc.localizacaoId,
+        deposito: 'FABRICA',
+        qtd: usar,
+        usuarioId,
+        observacoes: `Lote ${ordemdecompra} iniciado`,
+        extra: { ordemdecompra, xmlConsumoId: item.id },
+      }, transaction);
+      restante -= usar;
+    }
+    if (restante > 0 && locais.length) {
+      // Sobrou depois de esgotar todas as localizações com saldo — tira o
+      // resto da última mesmo assim (fica negativa, é só informativo).
+      const ultima = locais[locais.length - 1];
+      await moverParaDeposito({
+        materialId: item.materialId,
+        localizacaoOrigemId: ultima.localizacaoId,
+        deposito: 'FABRICA',
+        qtd: restante,
+        usuarioId,
+        observacoes: `Lote ${ordemdecompra} iniciado`,
+        extra: { ordemdecompra, xmlConsumoId: item.id },
+      }, transaction);
+    }
+  }
+}
+
+// Baixa sempre sai da Fábrica pra Expedição; se a Fábrica não tiver saldo
+// suficiente pra esse material (consumo real maior que o planejado no
+// iniciado), busca automaticamente o excedente no Almoxarifado (maior saldo
+// primeiro, nunca no Recebimento) — nunca bloqueia, mesmo que no fim nem
+// Fábrica nem Almoxarifado cubram tudo (fica negativo).
+async function consumirParaExpedicao({ materialId, qtd, usuarioId, observacoes, extra }, transaction) {
   const fabrica = await localizacoesRepo.buscarPorDeposito('FABRICA');
   if (!fabrica) {
     throw erro('Localização do depósito FABRICA não encontrada.', 500, 'DEPOSITO_NAO_ENCONTRADO');
   }
-  for (const { materialId, qtd } of totais) {
-    if (!(qtd > 0)) continue;
+
+  const saldoFabrica = await repo.saldoPorLocalizacao(materialId, fabrica.id);
+  const daFabrica = Math.min(Math.max(saldoFabrica, 0), qtd);
+  if (daFabrica > 0) {
     await moverParaDeposito({
-      materialId,
-      localizacaoOrigemId: fabrica.id,
-      deposito: 'EXPEDICAO',
-      qtd,
-      usuarioId,
-      observacoes: `Pedido ${ordemdecompra} pronto`,
-      extra: { ordemdecompra },
+      materialId, localizacaoOrigemId: fabrica.id, deposito: 'EXPEDICAO', qtd: daFabrica, usuarioId, observacoes, extra,
+    }, transaction);
+  }
+
+  let restante = qtd - daFabrica;
+  if (restante <= 0) return;
+
+  const recebimento = await localizacoesRepo.buscarRecebimento();
+  const locais = (await repo.saldoPorLocalizacoesDeposito(materialId, 'ALMOXARIFADO'))
+    .filter((l) => !recebimento || l.localizacaoId !== recebimento.id);
+  for (const loc of locais) {
+    if (restante <= 0) break;
+    const usar = Math.min(loc.saldo, restante);
+    if (usar <= 0) continue;
+    await moverParaDeposito({
+      materialId, localizacaoOrigemId: loc.localizacaoId, deposito: 'EXPEDICAO', qtd: usar, usuarioId, observacoes, extra,
+    }, transaction);
+    restante -= usar;
+  }
+  if (restante > 0) {
+    // Nem Fábrica nem Almoxarifado cobrem — sai da própria Fábrica mesmo
+    // assim, só pra fechar a conta (fica negativa, é só informativo).
+    await moverParaDeposito({
+      materialId, localizacaoOrigemId: fabrica.id, deposito: 'EXPEDICAO', qtd: restante, usuarioId, observacoes, extra,
     }, transaction);
   }
 }
 
-// `splits`: [{ localizacaoId, qtd }, ...] — a baixa pode sair de mais de uma
-// localização numa ação só (ex.: material com 40 precisado, mas espalhado
-// 15 numa prateleira e 25 noutra — sem isso o usuário era obrigado a
-// transferir tudo pra um lugar só antes de poder dar baixa).
-async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
+async function darBaixa(xmlConsumoId, { qtd, usuarioId }) {
   const linha = await repo.buscarXmlConsumo(xmlConsumoId);
   if (!linha) return null;
   if (!['PENDENTE', 'LIBERADO'].includes(linha.status)) {
@@ -225,54 +289,11 @@ async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
     throw erro('Este material exige liberação antes da baixa.', 409, 'LIBERACAO_OBRIGATORIA');
   }
 
-  if (!Array.isArray(splits) || splits.length === 0) {
-    throw erro('Informe de onde o material está saindo.', 400, 'VALIDACAO');
+  const qtdTotal = Number(qtd);
+  if (!qtdTotal || qtdTotal <= 0) {
+    throw erro('Informe a quantidade realmente consumida.', 400, 'VALIDACAO');
   }
 
-  // Mescla splits repetidos da mesma localização (defensivo — a UI não deve
-  // mandar duplicata, mas evita validar/baixar a mesma localização duas vezes).
-  const porLocalizacao = new Map();
-  for (const s of splits) {
-    const localizacaoId = Number(s.localizacaoId);
-    const qtd = Number(s.qtd);
-    if (!localizacaoId) {
-      throw erro('Informe a localização de onde o material está saindo.', 400, 'VALIDACAO');
-    }
-    if (!qtd || qtd <= 0) {
-      throw erro('Informe a quantidade realmente consumida.', 400, 'VALIDACAO');
-    }
-    porLocalizacao.set(localizacaoId, (porLocalizacao.get(localizacaoId) || 0) + qtd);
-  }
-  const splitsMesclados = Array.from(porLocalizacao, ([localizacaoId, qtd]) => ({ localizacaoId, qtd }));
-  const qtdTotal = splitsMesclados.reduce((acc, s) => acc + s.qtd, 0);
-
-  // Recebimento é só a gaveta de entrada da nota fiscal, aguardando
-  // transferência pra localização definitiva — material parado lá ainda
-  // está "em processamento de localização", não dá pra dar baixa direto dali.
-  const recebimento = await localizacoesRepo.buscarRecebimento();
-  if (recebimento && splitsMesclados.some((s) => s.localizacaoId === recebimento.id)) {
-    throw erro(
-      'Esse material ainda está no Recebimento, aguardando ser transferido pra localização definitiva. Transfira antes de dar baixa.',
-      409, 'LOCALIZACAO_RECEBIMENTO',
-    );
-  }
-
-  // Cada localização tem que ter saldo físico suficiente pra sua própria
-  // parte — liberado/saldo geral não bastam, senão uma localização sem
-  // estoque nenhum fica negativa enquanto outra nem é tocada.
-  for (const s of splitsMesclados) {
-    const saldoLocal = await repo.saldoPorLocalizacao(linha.materialId, s.localizacaoId);
-    if (saldoLocal < s.qtd) {
-      throw erro(
-        `Saldo insuficiente numa das localizações escolhidas (tem ${saldoLocal}, precisa de ${s.qtd} ali). Confira a divisão ou transfira o material antes de dar baixa.`,
-        409, 'SALDO_INSUFICIENTE_LOCALIZACAO',
-      );
-    }
-  }
-
-  // Não há mais trava de saldo global sobre o excedente — liberado é só
-  // informativo, nunca bloqueia. A única coisa que importa pra baixa é ter
-  // saldo físico real na localização escolhida (já validado acima).
   const { preco, custo } = await calcularCusto(linha, material);
 
   return repo.sequelize.transaction(async (t) => {
@@ -284,26 +305,22 @@ async function darBaixa(xmlConsumoId, { splits, usuarioId }) {
     linha.usuarioBaixaId = usuarioId;
     await linha.save({ transaction: t });
 
-    for (const s of splitsMesclados) {
-      await moverParaDeposito({
-        materialId: linha.materialId,
-        localizacaoOrigemId: s.localizacaoId,
-        deposito: 'FABRICA',
-        qtd: s.qtd,
-        usuarioId,
-        observacoes: `Baixa do pedido ${linha.ordemdecompra}`,
-        extra: { precoUn: preco, ordemdecompra: linha.ordemdecompra, xmlConsumoId: linha.id },
-      }, t);
-    }
+    await consumirParaExpedicao({
+      materialId: linha.materialId,
+      qtd: qtdTotal,
+      usuarioId,
+      observacoes: `Baixa do pedido ${linha.ordemdecompra}`,
+      extra: { precoUn: preco, ordemdecompra: linha.ordemdecompra, xmlConsumoId: linha.id },
+    }, t);
 
     return linha;
   });
 }
 
-// Baixa em cascata: só executa se TODO item pendente/liberado do pedido já
-// tem saldo físico de Almoxarifado suficiente pra cobrir 100% — escolhe a(s)
-// localização(ões) automaticamente (maior saldo primeiro), sem perguntar pro
-// usuário item a item. Se faltar qualquer coisa, não baixa nada.
+// Baixa em cascata: dá baixa de todo item pendente/liberado do pedido de
+// uma vez, com a quantidade já confirmada de cada um — baixa nunca bloqueia
+// por saldo (busca automaticamente no Almoxarifado se faltar na Fábrica),
+// então só falta mesmo quantidade em UN ainda não definida (chapa/fita).
 async function baixarPedidoCompleto(ordemdecompra, usuarioId) {
   const separacao = await repo.listarItensPedidoParaSeparacao(ordemdecompra);
   if (!separacao.itens.length) {
@@ -318,40 +335,9 @@ async function baixarPedidoCompleto(ordemdecompra, usuarioId) {
     );
   }
 
-  const problemas = [];
-  for (const item of separacao.itens) {
-    const disponivel = item.localizacoes.reduce((acc, l) => acc + l.saldo, 0);
-    if (disponivel < item.quantidade) {
-      problemas.push(`${item.codigoInterno}: falta saldo (tem ${disponivel}, precisa ${item.quantidade})`);
-      continue;
-    }
-    // darBaixa exige liberação prévia pra material com mínimo controlado —
-    // checa aqui também, senão a cascata pode começar a baixar e travar no
-    // meio por um item que nem chegou a ser avaliado por saldo.
-    if (item.status === 'PENDENTE') {
-      const material = await repo.buscarMaterial(item.materialId);
-      if (Number(material.estoqueMinimoUn) > 0) {
-        problemas.push(`${item.codigoInterno}: precisa ser liberado antes da baixa`);
-      }
-    }
-  }
-  if (problemas.length) {
-    throw erro(`Não dá pra baixar tudo ainda: ${problemas.join('; ')}.`, 409, 'SALDO_INSUFICIENTE');
-  }
-
   const resultados = [];
   for (const item of separacao.itens) {
-    const locaisOrdenados = [...item.localizacoes].sort((a, b) => b.saldo - a.saldo);
-    const splits = [];
-    let restante = item.quantidade;
-    for (const loc of locaisOrdenados) {
-      if (restante <= 0) break;
-      const qtd = Math.min(loc.saldo, restante);
-      if (qtd <= 0) continue;
-      splits.push({ localizacaoId: loc.localizacaoId, qtd });
-      restante -= qtd;
-    }
-    await darBaixa(item.id, { splits, usuarioId });
+    await darBaixa(item.id, { qtd: item.quantidade, usuarioId });
     resultados.push({ id: item.id, codigoInterno: item.codigoInterno });
   }
 
@@ -525,7 +511,7 @@ module.exports = {
   cancelarLiberacao,
   darBaixa,
   baixarPedidoCompleto,
-  moverPedidoParaExpedicao,
+  moverPedidoParaFabrica,
   listarAlertaMinimo,
   listarListaCompras,
   listarSaldoPorMaterial,

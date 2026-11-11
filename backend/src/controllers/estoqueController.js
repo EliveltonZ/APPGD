@@ -84,11 +84,8 @@ module.exports = {
   async postBaixa(req, res, next) {
     try {
       const usuarioId = Number(req.user.sub);
-      const splits = Array.isArray(req.body.splits)
-        ? req.body.splits.map((s) => ({ localizacaoId: s.localizacao_id, qtd: s.qtd_un_baixada }))
-        : [{ localizacaoId: req.body.localizacao_id, qtd: req.body.qtd_un_baixada }];
       const linha = await service.darBaixa(Number(req.params.id), {
-        splits,
+        qtd: req.body.qtd_un_baixada,
         usuarioId,
       });
       if (!linha) return notFound(res);

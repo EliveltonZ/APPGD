@@ -128,18 +128,30 @@ async function listarPendentesOuLiberados(materialId) {
   });
 }
 
-// Soma por material tudo que esse pedido já tem baixado (EXECUTADO) — base
-// pra mover de Fábrica pra Expedição quando o pedido fica pronto (não há um
-// xmlConsumoId único, é agregado por pedido).
-async function somarBaixadoPorMaterial(ordemdecompra) {
+// Todo item LIBERADO de um pedido — base pro "iniciar lote" mover
+// Almoxarifado→Fábrica (ver estoqueService.moverPedidoParaFabrica).
+async function listarLiberadosDoPedido(ordemdecompra) {
+  return XmlConsumo.findAll({
+    where: { ordemdecompra, status: 'LIBERADO' },
+    order: [['id', 'ASC']],
+  });
+}
+
+// Saldo físico de um material, só dentro de um depósito específico,
+// quebrado por localização (maior saldo primeiro) — base pra escolher de
+// onde tirar automaticamente numa movimentação entre depósitos.
+async function saldoPorLocalizacoesDeposito(materialId, deposito) {
   const rows = await sequelize.query(
-    `SELECT material_id AS "materialId", COALESCE(SUM(qtd_un_baixada), 0) AS qtd
-     FROM "tblXmlConsumo"
-     WHERE ordemdecompra = :ordemdecompra AND status = 'EXECUTADO'
-     GROUP BY material_id`,
-    { replacements: { ordemdecompra }, type: QueryTypes.SELECT },
+    `SELECT l.id AS localizacao_id, CAST(SUM(em.qtd_un) AS FLOAT) AS saldo
+     FROM "tblEstoqueMovimentos" em
+     JOIN "tblLocalizacoes" l ON l.id = em.localizacao_id
+     WHERE em.material_id = :materialId AND l.deposito = :deposito
+     GROUP BY l.id
+     HAVING SUM(em.qtd_un) > 0
+     ORDER BY saldo DESC`,
+    { replacements: { materialId, deposito }, type: QueryTypes.SELECT },
   );
-  return rows.map((r) => ({ materialId: r.materialId, qtd: Number(r.qtd) }));
+  return rows.map((r) => ({ localizacaoId: r.localizacao_id, saldo: Number(r.saldo) }));
 }
 
 async function criarMovimento(dados, options) {
@@ -488,7 +500,8 @@ module.exports = {
   buscarLote,
   listarOrdensDoLote,
   listarPendentesOuLiberados,
-  somarBaixadoPorMaterial,
+  listarLiberadosDoPedido,
+  saldoPorLocalizacoesDeposito,
   criarMovimento,
   criarTransferencia,
   atualizarPrecoSeMaisNovo,

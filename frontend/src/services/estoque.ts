@@ -23,18 +23,11 @@ export const liberar = (id: number) =>
 export const cancelarLiberacao = (id: number) =>
   apiPost(`/estoque/${id}/cancelar-liberacao`, {})
 
-export interface BaixaSplit {
-  localizacaoId: number
-  qtd: number
-}
-
-// A baixa pode sair de mais de uma localização numa ação só (ex.: material
-// com saldo espalhado em duas prateleiras) — cada split vira um movimento
-// de estoque próprio, todos ligados ao mesmo item do pedido.
-export const darBaixa = (id: number, splits: BaixaSplit[]) =>
-  apiPost(`/estoque/${id}/baixa`, {
-    splits: splits.map((s) => ({ localizacao_id: s.localizacaoId, qtd_un_baixada: s.qtd })),
-  })
+// Sai sempre da Fábrica pra Expedição (busca automaticamente no Almoxarifado
+// se a Fábrica não tiver saldo suficiente pra esse material) — não escolhe
+// localização, só a quantidade realmente consumida.
+export const darBaixa = (id: number, qtd: number) =>
+  apiPost(`/estoque/${id}/baixa`, { qtd_un_baixada: qtd })
 
 export interface LiberacaoResultado {
   id: number
