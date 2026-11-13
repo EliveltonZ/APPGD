@@ -59,8 +59,8 @@ export interface BaixaPedidoResumo {
   resultados: { id: number; codigoInterno: string }[]
 }
 
-// Só funciona se TODO item pendente/liberado do pedido já tiver saldo físico
-// de Almoxarifado suficiente — escolhe a(s) localização(ões) automaticamente.
+// Dá baixa de todo item pendente/liberado do pedido de uma vez, com a
+// quantidade já confirmada de cada um — nunca bloqueia por saldo.
 export const baixarPedidoCompleto = (ordemdecompra: number): Promise<BaixaPedidoResumo> =>
   apiPost(`/estoque/pedido/${ordemdecompra}/baixar-tudo`, {})
 

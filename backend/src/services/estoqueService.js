@@ -216,19 +216,26 @@ async function moverPedidoParaFabrica(ordemdecompra, usuarioId, transaction) {
       }, transaction);
       restante -= usar;
     }
-    if (restante > 0 && locais.length) {
-      // Sobrou depois de esgotar todas as localizações com saldo — tira o
-      // resto da última mesmo assim (fica negativa, é só informativo).
-      const ultima = locais[locais.length - 1];
-      await moverParaDeposito({
-        materialId: item.materialId,
-        localizacaoOrigemId: ultima.localizacaoId,
-        deposito: 'FABRICA',
-        qtd: restante,
-        usuarioId,
-        observacoes: `Lote ${ordemdecompra} iniciado`,
-        extra: { ordemdecompra, xmlConsumoId: item.id },
-      }, transaction);
+    if (restante > 0) {
+      // Sobrou depois de esgotar todas as localizações com saldo (ou não
+      // havia nenhuma com saldo nenhum) — tira o resto de algum lugar do
+      // Almoxarifado mesmo assim (fica negativo, é só informativo). Usa a
+      // última localização com saldo, ou, se não houver nenhuma, o
+      // Recebimento como origem de último recurso — nunca pula o movimento
+      // silenciosamente, senão a Fábrica fica sem registro nenhum da
+      // quantidade que deveria ter entrado.
+      const origemFallback = locais.length ? locais[locais.length - 1].localizacaoId : recebimento?.id;
+      if (origemFallback) {
+        await moverParaDeposito({
+          materialId: item.materialId,
+          localizacaoOrigemId: origemFallback,
+          deposito: 'FABRICA',
+          qtd: restante,
+          usuarioId,
+          observacoes: `Lote ${ordemdecompra} iniciado`,
+          extra: { ordemdecompra, xmlConsumoId: item.id },
+        }, transaction);
+      }
     }
   }
 }

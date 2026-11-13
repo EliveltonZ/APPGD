@@ -184,7 +184,7 @@ export function PendingControlModal({
       const resumo = await apiLiberarPedido(localProject.id);
       await refetchItens();
       if (resumo.totalItens === 0) {
-        toast.error("Nenhum item pronto pra liberar nesse pedido (sem itens, ou chapa/fita ainda sem quantidade definida).");
+        toast.error("Não há item pendente pra liberar nesse pedido (já liberado/baixado, ou nunca teve nenhum).");
         return;
       }
       const { ok } = resumoLiberacao(resumo.resultados);
@@ -203,7 +203,7 @@ export function PendingControlModal({
       const resumo = await apiLiberarLote(localProject.id);
       await refetchItens();
       if (resumo.totalItens === 0) {
-        toast.error(`Nenhum item pronto pra liberar no lote ${resumo.lote}.`);
+        toast.error(`Não há item pendente pra liberar no lote ${resumo.lote} (já liberado/baixado, ou nunca teve nenhum).`);
         return;
       }
       const { ok } = resumoLiberacao(resumo.resultados);

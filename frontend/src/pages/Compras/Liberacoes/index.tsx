@@ -125,7 +125,7 @@ export function ComprasLiberacoesPage() {
       const resumo = await apiLiberarPedido(ordemdecompra);
       await refetch();
       if (resumo.totalItens === 0) {
-        toast.error("Nenhum item pronto pra liberar nesse pedido (chapa/fita ainda sem quantidade definida).");
+        toast.error("Não há item pendente pra liberar nesse pedido (já liberado/baixado, ou nunca teve nenhum).");
         return;
       }
       toast.success(`${resumo.resultados.filter((r) => r.ok).length} item(ns) liberado(s).`);
@@ -143,7 +143,7 @@ export function ComprasLiberacoesPage() {
       const resumo = await apiLiberarLote(lote);
       await refetch();
       if (resumo.totalItens === 0) {
-        toast.error(`Nenhum item pronto pra liberar no lote ${lote}.`);
+        toast.error(`Não há item pendente pra liberar no lote ${lote} (já liberado/baixado, ou nunca teve nenhum).`);
         return;
       }
       toast.success(`Lote ${lote}: ${resumo.resultados.filter((r) => r.ok).length} item(ns) liberado(s).`);

@@ -119,7 +119,7 @@ export function AlmoxarifadoBaixasPage() {
       await refetch();
       toast.success(`${resumo.totalItens} ite${resumo.totalItens === 1 ? "m" : "ns"} baixado${resumo.totalItens === 1 ? "" : "s"} em cascata.`);
     } catch (err) {
-      toast.error(getErrorMessage(err, "Não foi possível dar baixa em cascata — ainda falta saldo pra algum item."));
+      toast.error(getErrorMessage(err, "Não foi possível dar baixa em cascata."));
     } finally {
       setCascataLoading(null);
     }
@@ -198,7 +198,7 @@ export function AlmoxarifadoBaixasPage() {
                     variant="secondary"
                     size="sm"
                     loading={cascataLoading === grupo.ordemdecompra}
-                    title="Só funciona se o pedido inteiro já tiver saldo no Almoxarifado"
+                    title="Dá baixa de todo item do pedido de uma vez, com a quantidade já confirmada de cada um"
                     onClick={(e) => handleBaixaCascata(e, grupo.ordemdecompra)}
                   >
                     <Layers size={13} />
