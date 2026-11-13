@@ -6,7 +6,6 @@ const {
   Paradas,
   ParadasHistorico,
   Projetos,
-  Assistencias,
   Clientes,
   Usuario,
 } = require('../client/db');
@@ -33,12 +32,12 @@ async function buscarPedido(id_tipo, pedido) {
     return { pedido: row.pedido, cliente: row.tblCliente?.name ?? null, ambiente: row.ambiente };
   }
 
-  const row = await Assistencias.findOne({
-    where: { pedido },
-    attributes: ['pedido', 'cliente', 'ambiente'],
+  const row = await Projetos.findOne({
+    where: { tipoProjeto: 'ASSISTENCIA', pedidoAssistencia: pedido },
+    attributes: ['pedidoAssistencia', 'cliente', 'ambiente'],
   });
   if (!row) return null;
-  return { pedido: row.pedido, cliente: row.cliente, ambiente: row.ambiente };
+  return { pedido: row.pedidoAssistencia, cliente: row.cliente, ambiente: row.ambiente };
 }
 
 // ─── Estado atual ─────────────────────────────────────────────────────────────

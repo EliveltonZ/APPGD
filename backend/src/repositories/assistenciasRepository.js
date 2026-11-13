@@ -1,27 +1,24 @@
 const { Op, literal } = require("sequelize");
-const {
-  sequelize,
-  Assistencias,
-  Projetos,
-  Liberador,
-  EquipSat,
-  Pecas,
-} = require("../client/db");
+const { Projetos, Liberador } = require("../client/db");
 const { assistenciaStatus, diasRestantes } = require("../utils/calcStatus");
-const { fmtDate } = require("../utils/dateBR");
 
+// Produção/Logística/Qualidade/Capa continuam falando com "solicitacao" como
+// se fosse o identificador real (é só uma string opaca pra eles). Por baixo,
+// assistência agora é uma linha de tblProjetos (tipo_pedido='ASSISTENCIA'),
+// identificada de verdade por ordemdecompra; numero_solicitacao faz o papel
+// do antigo "solicitacao". tblAssistencias fica congelada como histórico.
 async function listarAssistencias(data) {
-  const rows = await Assistencias.findAll({
-    where: { datasolicitacao: { [Op.gte]: data } },
+  const rows = await Projetos.findAll({
+    where: { tipoProjeto: 'ASSISTENCIA', dataSolicitacao: { [Op.gte]: data } },
     attributes: [
-      "solicitacao",
-      "corte",
-      "pedido",
+      "numeroSolicitacao",
+      "lote",
+      "pedidoAssistencia",
       "contrato",
       "cliente",
       "ambiente",
-      "datasolicitacao",
-      "prazof",
+      "dataSolicitacao",
+      "prazoFabrica",
       "iniciado",
       "previsao",
       "pronto",
@@ -34,38 +31,38 @@ async function listarAssistencias(data) {
     ],
     order: [
       [literal("CASE WHEN dataentrega IS NOT NULL THEN 2 WHEN pronto IS NOT NULL THEN 1 ELSE 0 END"), "ASC"],
-      [literal("CASE WHEN LOWER(COALESCE(urgente, '')) = 'sim' THEN 0 ELSE 1 END"), "ASC"],
-      ["datasolicitacao", "DESC"],
+      [literal("CASE WHEN urgente THEN 0 ELSE 1 END"), "ASC"],
+      ["dataSolicitacao", "DESC"],
     ],
   });
   return rows.map((a) => ({
-    solicitacao:     a.solicitacao,
-    corte:           a.corte,
-    pedido:          a.pedido,
+    solicitacao:     a.numeroSolicitacao,
+    corte:           a.lote,
+    pedido:          a.pedidoAssistencia,
     contrato:        a.contrato,
     cliente:         a.cliente,
     ambiente:        a.ambiente,
-    datasolicitacao: a.datasolicitacao,
-    prazo:           a.prazof ? diasRestantes(a.prazof) : null,
+    datasolicitacao: a.dataSolicitacao,
+    prazo:           a.prazoFabrica ? diasRestantes(a.prazoFabrica) : null,
     status:          assistenciaStatus(a),
     iniciado:        a.iniciado,
     previsao:        a.previsao,
     pronto:          a.pronto,
     dataentrega:     a.dataentrega,
-    urgente:         a.urgente,
+    urgente:         a.urgente ? 'sim' : 'nao',
   }));
 }
 
 async function buscarAssistencia(solicitacao) {
-  const a = await Assistencias.findOne({
-    where: { solicitacao },
+  const a = await Projetos.findOne({
+    where: { numeroSolicitacao: solicitacao, tipoProjeto: 'ASSISTENCIA' },
   });
   if (!a) return [];
 
   let liberadorName = null;
   if (a.contrato) {
     const projeto = await Projetos.findOne({
-      where: { contrato: a.contrato },
+      where: { contrato: a.contrato, tipoProjeto: 'PROJETO' },
       attributes: ["idLiberador"],
     });
     if (projeto?.idLiberador) {
@@ -78,25 +75,27 @@ async function buscarAssistencia(solicitacao) {
 
   return [
     {
-      solicitacao:     a.solicitacao,
+      solicitacao:     a.numeroSolicitacao,
       contrato:        a.contrato,
-      solicitante:     a.solicitante,
-      datasolicitacao: a.datasolicitacao,
+      solicitante:     a.responsavel,
+      datasolicitacao: a.dataSolicitacao,
       previsao:        a.previsao,
       cliente:         a.cliente,
-      pedido:          a.pedido,
-      corte:           a.corte,
+      pedido:          a.pedidoAssistencia,
+      corte:           a.lote,
       ambiente:        a.ambiente,
       situacao:        assistenciaStatus(a),
-      urgente:         a.urgente,
-      observacao:      a.observacoes,
-      observacao2:     a.observacoes2,
+      urgente:         a.urgente ? 'sim' : 'nao',
+      // Nota de fábrica/logística (livremente editadas depois, não é a nota
+      // original do pedido) — por isso lê de observacoes2, não observacoes.
+      observacao:      a.observacoes2,
+      observacao2:     a.observacoes,
       iniciado:        a.iniciado,
       pronto:          a.pronto,
       conferente:      a.conferente,
       liberacao:       a.liberacao,
       liberador:       liberadorName,
-      responsavel:     a.responsavel,
+      responsavel:     a.motorista,
       dataentrega:     a.dataentrega,
       supervisor:      a.supervisor,
       escritorio:      a.escritorio,
@@ -108,17 +107,17 @@ async function buscarAssistencia(solicitacao) {
 }
 
 async function atualizarAssistencia(body) {
-  await Assistencias.update(
+  await Projetos.update(
     {
-      pedido: body.pedido != null && body.pedido !== '' ? Number(body.pedido) : null,
-      corte:  body.corte  != null && body.corte  !== '' ? Number(body.corte)  : null,
-      observacoes: body.observacao ?? null,
-      observacoes2: body.observacao2 ?? null,
+      pedidoAssistencia: body.pedido != null && body.pedido !== '' ? Number(body.pedido) : null,
+      lote:  body.corte  != null && body.corte  !== '' ? Number(body.corte)  : null,
+      observacoes2: body.observacao ?? null,
+      observacoes: body.observacao2 ?? null,
       iniciado: body.iniciado || null,
       pronto: body.pronto || null,
       previsao: body.previsao || null,
       conferente: body.conferente ?? null,
-      responsavel: body.responsavel ?? null,
+      motorista: body.responsavel ?? null,
       liberacao: body.liberacao ?? null,
       dataentrega: body.dataentrega || null,
       escritorio: body.escritorio ?? false,
@@ -126,22 +125,22 @@ async function atualizarAssistencia(body) {
       semMaterial: body.sem_material ?? false,
       pendencia: body.pendencia ?? false,
     },
-    { where: { solicitacao: body.solicitacao } },
+    { where: { numeroSolicitacao: body.solicitacao, tipoProjeto: 'ASSISTENCIA' } },
   );
 }
 
 async function buscarCapaAssistencia(solicitacao) {
-  const a = await Assistencias.findOne({
-    where: { solicitacao },
+  const a = await Projetos.findOne({
+    where: { numeroSolicitacao: solicitacao, tipoProjeto: 'ASSISTENCIA' },
     attributes: [
       "contrato",
-      "solicitacao",
-      "datasolicitacao",
+      "numeroSolicitacao",
+      "dataSolicitacao",
       "urgente",
       "cliente",
       "ambiente",
       "montador",
-      "solicitante",
+      "responsavel",
       "supervisor",
     ],
   });
@@ -149,107 +148,16 @@ async function buscarCapaAssistencia(solicitacao) {
   return [
     {
       contrato:        a.contrato,
-      solicitacao:     a.solicitacao,
-      datasolicitacao: a.datasolicitacao,
-      urgente:         a.urgente,
+      solicitacao:     a.numeroSolicitacao,
+      datasolicitacao: a.dataSolicitacao,
+      urgente:         a.urgente ? 'sim' : 'nao',
       cliente:         a.cliente,
       ambiente:        a.ambiente,
       montador:        a.montador,
-      solicitante:     a.solicitante,
+      solicitante:     a.responsavel,
       supervisor:      a.supervisor,
     },
   ];
-}
-
-async function _gerarSolicitacaoId() {
-  const year = Number(fmtDate().slice(0, 4));
-  const count = await Assistencias.count({
-    where: { solicitacao: { [Op.like]: `AS-${year}-%` } },
-  });
-  return `AS-${year}-${String(count + 1).padStart(3, "0")}`;
-}
-
-async function inserirSolicitacao(body) {
-  const solicitacao = String(body.solicitacao ?? '').trim();
-  if (!solicitacao) throw new Error('Número da solicitação é obrigatório');
-  await Assistencias.create({
-    solicitacao,
-    contrato:        body.contrato ? Number(body.contrato) : null,
-    cliente:         body.cliente ?? "",
-    ambiente:        body.ambiente ?? null,
-    datasolicitacao: body.datasolicitacao ? fmtDate(body.datasolicitacao) : fmtDate(),
-    solicitante:     body.solicitante ?? null,
-    urgente:         body.urgente ?? null,
-    observacoes2:    body.observacoes ?? null,
-    bairro:          body.bairro ?? null,
-    tempo:           body.tempo ?? null,
-    destino:         body.destino ?? null,
-    supervisor:      body.supervisor ?? null,
-    montador:        body.montador ?? null,
-    montagem:        body.montagem ?? false,
-    promob:          body.promob ?? false,
-    entrega:         body.entrega ?? false,
-    cobrada:         body.cobrada ?? false,
-    tipoassistencia: body.tipoassistencia ? Number(body.tipoassistencia) : 0,
-  });
-  return [{ solicitacao }];
-}
-
-async function inserirSolicitacaoCompleta(body) {
-  return sequelize.transaction(async (t) => {
-    const solicitacao = String(body.solicitacao ?? '').trim();
-    if (!solicitacao) throw new Error('Número da solicitação é obrigatório');
-
-    await Assistencias.create({
-      solicitacao,
-      contrato:        body.contrato ? Number(body.contrato) : null,
-      cliente:         body.cliente ?? "",
-      ambiente:        body.ambiente ?? null,
-      datasolicitacao: body.datasolicitacao ? fmtDate(body.datasolicitacao) : fmtDate(),
-      solicitante:     body.solicitante ?? null,
-      urgente:         body.urgente ?? null,
-      observacoes2:    body.observacoes ?? null,
-      bairro:          body.bairro ?? null,
-      tempo:           body.tempo ?? null,
-      destino:         body.destino ?? null,
-      supervisor:      body.supervisor ?? null,
-      montador:        body.montador ?? null,
-      montagem:        body.montagem ?? false,
-      promob:          body.promob ?? false,
-      entrega:         body.entrega ?? false,
-      cobrada:         body.cobrada ?? false,
-      tipoassistencia: body.tipoassistencia ? Number(body.tipoassistencia) : 0,
-    }, { transaction: t });
-
-    for (const m of (body.equipe ?? [])) {
-      await EquipSat.create({
-        idSat: solicitacao,
-        idMontador: Number(m.id_montador ?? m.id),
-      }, { transaction: t });
-    }
-
-    for (const r of (body.pecas ?? [])) {
-      if (!r.qtd || Number(r.qtd) < 1)
-        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui quantidade informada.`);
-      if (!r.id_falha || Number(r.id_falha) === 0)
-        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui tipo de falha informado.`);
-      if (!r.id_ocorrencia || Number(r.id_ocorrencia) === 0)
-        throw new Error(`Peça "${r.peca ?? 'sem nome'}" não possui ocorrência informada.`);
-      await Pecas.create({
-        idAssistencia: solicitacao,
-        qtd:          Number(r.qtd),
-        peca:         r.peca ?? null,
-        dimensoes:    r.dimensoes ?? null,
-        cor:          r.cor ?? null,
-        lado:         r.lado ?? null,
-        idOcorrencia: Number(r.id_ocorrencia),
-        idFalha:      Number(r.id_falha),
-        observacoes:  r.observacoes ?? null,
-      }, { transaction: t });
-    }
-
-    return [{ solicitacao }];
-  });
 }
 
 module.exports = {
@@ -257,6 +165,4 @@ module.exports = {
   buscarAssistencia,
   atualizarAssistencia,
   buscarCapaAssistencia,
-  inserirSolicitacao,
-  inserirSolicitacaoCompleta,
 };

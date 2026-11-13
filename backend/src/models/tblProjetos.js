@@ -271,6 +271,78 @@ module.exports = function (sequelize, DataTypes) {
         allowNull: true,
         field: "origem_entrega",
       },
+      // Ciclo de vida da Assistência (Produção/Logística/Qualidade/Capa) —
+      // ficam null em qualquer linha tipo_pedido='PROJETO'.
+      montador: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      conferente: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      liberacao: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      semMaterial: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: "sem_material",
+      },
+      impresso: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      producao: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      escritorio: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      dataAgendamento: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: "data_agendamento",
+      },
+      finalizada: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+      },
+      prazoFabrica: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: "prazo_fabrica",
+      },
+      prazoLogistica: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: "prazo_logistica",
+      },
+      observacoes2: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      pedidoAssistencia: {
+        type: DataTypes.SMALLINT,
+        allowNull: true,
+        field: "pedido_assistencia",
+      },
+      // Quem entrega/executa a assistência (atribuído depois pela
+      // Logística) — distinto de `responsavel` (quem lançou o pedido).
+      motorista: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      // Hora exata da solicitação da assistência — `dataCriacao` é só data
+      // (DATEONLY), não serve pra mostrar "Data/Hora" em Produção/Logística.
+      dataSolicitacao: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: "data_solicitacao",
+      },
     },
     {
       sequelize,

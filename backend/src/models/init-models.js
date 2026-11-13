@@ -115,7 +115,9 @@ function initModels(sequelize) {
 
   Pecas.belongsTo(Ocorrencia,   { as: "ocorrencia",  foreignKey: "idOcorrencia", targetKey: "cod"      });
   Pecas.belongsTo(Falhas,       { as: "falha",       foreignKey: "idFalha",      targetKey: "codigo"   });
-  Pecas.belongsTo(Assistencias, { as: "assistencia", foreignKey: "idAssistencia", targetKey: "solicitacao" });
+  // Pecas.idAssistencia guarda a OC (texto) de tblProjetos (Projeto ou
+  // Assistência) — não dá pra declarar como belongsTo direto (TEXT vs
+  // BIGINT); quem precisa (qualidadeRepository) faz a junção em SQL.
 
   // Estoque de Matéria Prima
   MateriaisCodigoNF.belongsTo(Materiais,    { as: "material",   foreignKey: "materialId"   });

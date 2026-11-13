@@ -25,19 +25,4 @@ module.exports = {
     try { ok(res, await service.buscarCapaAssistencia(req.query.solicitacao)); }
     catch (e) { err(res, "Erro ao buscar capa assistência", e); }
   },
-
-  async setNewOrder(req, res) {
-    try { ok(res, await service.inserirSolicitacao(req.body)); }
-    catch (e) { err(res, "Erro ao inserir solicitação", e); }
-  },
-
-  async setNewOrderCompleta(req, res) {
-    try { ok(res, await service.inserirSolicitacaoCompleta(req.body)); }
-    catch (e) {
-      if (e.name === 'SequelizeUniqueConstraintError') {
-        return res.status(409).json({ message: 'Número de solicitação já cadastrado.' });
-      }
-      err(res, "Erro ao inserir solicitação completa", e);
-    }
-  },
 };
