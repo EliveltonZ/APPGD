@@ -16,29 +16,38 @@
   font-size: 20px;
   font-weight: 700;
   margin: 0;
+  color: var(--text-h);
 }
 
 .acc-page__subtitle {
   margin: 4px 0 0;
   font-size: 13px;
-  opacity: 0.6;
+  color: var(--text);
 }
 
 .acc-filter-label {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text);
 }
 
 .acc-filter-input {
   padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border, #2a2f3a);
-  background: var(--input-bg, transparent);
-  color: inherit;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text-h);
   min-width: 220px;
+  font-size: 13px;
+  outline: none;
+}
+
+.acc-filter-input:focus {
+  border-color: var(--accent);
 }
 
 .acc-summary {

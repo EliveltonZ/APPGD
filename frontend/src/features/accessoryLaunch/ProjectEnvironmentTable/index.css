@@ -1,6 +1,6 @@
 .penv-table__wrapper {
   overflow-x: auto;
-  border: 1px solid var(--border, #2a2f3a);
+  border: 1px solid var(--border);
   border-radius: 8px;
 }
 
@@ -8,6 +8,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  color: var(--text-h);
 }
 
 .penv-table th,
@@ -21,8 +22,8 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  opacity: 0.6;
-  border-bottom: 1px solid var(--border, #2a2f3a);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
 }
 
 .penv-th--center,
@@ -32,15 +33,15 @@
 
 .penv-row {
   cursor: pointer;
-  border-bottom: 1px solid var(--border, #2a2f3a);
+  border-bottom: 1px solid var(--border);
 }
 
 .penv-row:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--accent-bg);
 }
 
 .penv-row--alert {
-  background: rgba(239, 68, 68, 0.06);
+  background: rgba(239, 68, 68, 0.08);
 }
 
 .penv-count {
@@ -57,12 +58,12 @@
 }
 
 .penv-count--ok {
-  opacity: 0.5;
+  color: var(--text);
 }
 
 .penv-table__empty {
   padding: 24px;
   text-align: center;
-  opacity: 0.6;
+  color: var(--text);
   font-size: 13px;
 }
