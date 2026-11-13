@@ -3,7 +3,7 @@ import { ConfirmModal } from "../../../components/ConfirmModal";
 import { useApiData } from "../../../hooks/useApiData";
 import { useToast } from "../../../context/ToastContext";
 import { useAuth } from "../../../context/AuthContext";
-import { ClipboardList, Wrench, Save, X, Search } from "lucide-react";
+import { Save, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "../../../components/Layout/AppLayout";
 import { Button } from "../../../components/Button";
@@ -14,13 +14,10 @@ import {
   EnvironmentSection,
   ScheduleSection,
   FinancialSection,
-  AssistenciaSection,
   ClientModal,
   ContractSelectModal,
   validate,
 } from "../../../features/pedidos/novo";
-import { FormSection } from "../../../components/FormSection";
-import { Input } from "../../../components/Input";
 import {
   emptyProjectForm,
   type ProjectFormData,
@@ -41,16 +38,10 @@ import {
 } from "../../../services/utils";
 import "../../../features/pedidos/common/projeto-page.css";
 
-type TipoProjeto = 'PROJETO' | 'ASSISTENCIA';
-
 export function NovoProjetoPage() {
   const navigate = useNavigate();
   const toast    = useToast();
   const { user } = useAuth();
-
-  const hasProjeto     = user?.permissions.pedidos_novo     ?? false;
-  const hasAssistencia = user?.permissions.assistencias_nova ?? false;
-  const needsPicker    = hasProjeto && hasAssistencia;
 
   const { data: optionsLiberador    = [] } = useApiData(fetchLiberadores);
   const { data: optionsVendedor     = [] } = useApiData(fetchVendedores);
@@ -59,10 +50,6 @@ export function NovoProjetoPage() {
   const { data: optionsTipoContrato = [] } = useApiData(fetchTiposContrato);
   const { data: optionsTipoAmbiente = [] } = useApiData(fetchTiposAmbiente);
   const { data: optionsTipoCliente  = [] } = useApiData(fetchTiposCliente);
-
-  const [tipoProjeto, setTipoProjeto] = useState<TipoProjeto | null>(() =>
-    needsPicker ? null : hasAssistencia ? 'ASSISTENCIA' : 'PROJETO'
-  );
 
   const [form, setForm] = useState<ProjectFormData>(emptyProjectForm);
   const [errors, setErrors] = useState<ProjectFormErrors>({});
@@ -73,12 +60,7 @@ export function NovoProjetoPage() {
   const [contractOptions, setContractOptions] = useState<ContractOption[]>([]);
   const [contractModalOpen, setContractModalOpen] = useState(false);
 
-  function handlePickType(tipo: TipoProjeto) {
-    setTipoProjeto(tipo);
-    setForm((prev) => ({ ...prev, tipoProjeto: tipo, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
-  }
-
-  // Inicializa responsavel com o usuário logado ao montar (para usuários sem picker)
+  // Inicializa responsavel com o usuário logado ao montar
   useEffect(() => {
     setForm((prev) => ({ ...prev, responsavel: user?.nome ?? '', idResponsavel: user?.id ? Number(user.id) : null }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,13 +153,9 @@ export function NovoProjetoPage() {
     setConfirmOpen(false);
     setSaving(true);
     try {
-      const { ordemdecompra } = await saveProject(form);
-      toast.success(
-        tipoProjeto === 'ASSISTENCIA'
-          ? `Assistência salva com sucesso. Nº OC: ${ordemdecompra}`
-          : "Projeto salvo com sucesso."
-      );
-      setForm({ ...emptyProjectForm(), tipoProjeto: tipoProjeto! });
+      await saveProject(form);
+      toast.success("Projeto salvo com sucesso.");
+      setForm(emptyProjectForm());
       setErrors({});
     } catch (err) {
       const fieldErrors = getFieldErrors(err);
@@ -192,48 +170,10 @@ export function NovoProjetoPage() {
     }
   }
 
-  const isAssistencia = tipoProjeto === 'ASSISTENCIA';
-  const pageTitle     = isAssistencia ? 'Nova Assistência' : 'Novo Projeto';
-  const pageSubtitle  = isAssistencia
-    ? 'Assistência técnica vinculada a um projeto existente'
-    : 'Preencha os campos para cadastrar uma nova ordem';
-  const saveLabel     = isAssistencia ? 'Salvar Assistência' : 'Salvar Projeto';
-  const confirmMsg    = isAssistencia
-    ? 'Confirmar cadastro da nova assistência?'
-    : 'Confirmar cadastro do novo projeto?';
-
-  // Picker — exibido apenas para quem tem as duas permissões e ainda não escolheu
-  if (tipoProjeto === null) {
-    return (
-      <AppLayout pageTitle="Novo Pedido">
-        <div className="projeto-page">
-          <div className="projeto-tipo-picker">
-            <p className="projeto-tipo-picker__label">Selecione o tipo de lançamento</p>
-            <div className="projeto-tipo-picker__cards">
-              <button
-                className="projeto-tipo-picker__card"
-                onClick={() => handlePickType('PROJETO')}
-                type="button"
-              >
-                <ClipboardList size={40} className="projeto-tipo-picker__card-icon" />
-                <span className="projeto-tipo-picker__card-title">Projeto</span>
-                <span className="projeto-tipo-picker__card-desc">Novo projeto de móveis planejados</span>
-              </button>
-              <button
-                className="projeto-tipo-picker__card"
-                onClick={() => handlePickType('ASSISTENCIA')}
-                type="button"
-              >
-                <Wrench size={40} className="projeto-tipo-picker__card-icon" />
-                <span className="projeto-tipo-picker__card-title">Assistência</span>
-                <span className="projeto-tipo-picker__card-desc">Assistência técnica de projeto existente</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
+  const pageTitle    = 'Novo Projeto';
+  const pageSubtitle = 'Preencha os campos para cadastrar uma nova ordem';
+  const saveLabel    = 'Salvar Projeto';
+  const confirmMsg   = 'Confirmar cadastro do novo projeto?';
 
   return (
     <AppLayout pageTitle={pageTitle}>
@@ -241,18 +181,7 @@ export function NovoProjetoPage() {
         <div className="projeto-page__top">
           <div>
             <h1 className="projeto-page__title">{pageTitle}</h1>
-            <p className="projeto-page__subtitle">
-              {pageSubtitle}
-              {needsPicker && (
-                <button
-                  className="projeto-tipo-picker__back-link"
-                  onClick={() => setTipoProjeto(null)}
-                  type="button"
-                >
-                  Alterar tipo
-                </button>
-              )}
-            </p>
+            <p className="projeto-page__subtitle">{pageSubtitle}</p>
           </div>
           <div className="projeto-page__top-actions">
             <Button
@@ -272,85 +201,49 @@ export function NovoProjetoPage() {
         </div>
 
         <div className="projeto-page__form" onKeyDown={handleFormKeyDown}>
-          {isAssistencia ? (
-            <>
-              <FormSection step={1} title="Identificação da Assistência">
-                <div className="frow frow--3">
-                  <Input label="Nº OC" value={form.numOC} placeholder="Gerado ao salvar" readOnly />
-                  <div className="ffield-with-action">
-                    <Input
-                      label="Cliente *"
-                      value={form.clienteNome}
-                      readOnly
-                      placeholder="Selecione um cliente..."
-                      error={errors.clienteNome}
-                    />
-                    <Button type="button" variant="secondary" size="md" onClick={() => setClientModalOpen(true)}>
-                      <Search size={14} />
-                    </Button>
-                  </div>
-                  <Input
-                    label="Ambiente *"
-                    value={form.ambiente}
-                    onChange={(e) => handleChange("ambiente", e.target.value)}
-                    error={errors.ambiente}
-                    placeholder="Ex: Cozinha, Dormitório..."
-                  />
-                </div>
-              </FormSection>
-              <AssistenciaSection
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-              />
-            </>
-          ) : (
-            <>
-              <IdentificationSection
-                mode="novo"
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-                onContractBlur={handleContractBlur}
-                onNumOCDoubleClick={handleNumOCDoubleClick}
-                loadingContract={loadingContract}
-                numOCReadOnly={false}
-                optionsTipoContrato={optionsTipoContrato}
-                optionsEtapa={optionsEtapa}
-              />
-              <ClientSection
-                form={form}
-                onChange={handleChange}
-                onOpenModal={() => setClientModalOpen(true)}
-                errors={errors}
-                optionsTipoCliente={optionsTipoCliente}
-              />
-              <CommercialSection
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-                optionsVendedor={optionsVendedor}
-                optionsLiberador={optionsLiberador}
-                optionsLoja={optionsLoja}
-              />
-              <EnvironmentSection
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-                optionsTipoAmbiente={optionsTipoAmbiente}
-              />
-              <ScheduleSection
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-              />
-              <FinancialSection
-                form={form}
-                onChange={handleChange}
-                errors={errors}
-              />
-            </>
-          )}
+          <IdentificationSection
+            mode="novo"
+            form={form}
+            onChange={handleChange}
+            errors={errors}
+            onContractBlur={handleContractBlur}
+            onNumOCDoubleClick={handleNumOCDoubleClick}
+            loadingContract={loadingContract}
+            numOCReadOnly={false}
+            optionsTipoContrato={optionsTipoContrato}
+            optionsEtapa={optionsEtapa}
+          />
+          <ClientSection
+            form={form}
+            onChange={handleChange}
+            onOpenModal={() => setClientModalOpen(true)}
+            errors={errors}
+            optionsTipoCliente={optionsTipoCliente}
+          />
+          <CommercialSection
+            form={form}
+            onChange={handleChange}
+            errors={errors}
+            optionsVendedor={optionsVendedor}
+            optionsLiberador={optionsLiberador}
+            optionsLoja={optionsLoja}
+          />
+          <EnvironmentSection
+            form={form}
+            onChange={handleChange}
+            errors={errors}
+            optionsTipoAmbiente={optionsTipoAmbiente}
+          />
+          <ScheduleSection
+            form={form}
+            onChange={handleChange}
+            errors={errors}
+          />
+          <FinancialSection
+            form={form}
+            onChange={handleChange}
+            errors={errors}
+          />
         </div>
 
         <div className="projeto-page__bottom">

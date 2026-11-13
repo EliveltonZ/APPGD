@@ -11,8 +11,8 @@ router.get("/clientes", add.listClients);
 router.get("/tipos-cliente", add.listTiposCliente);
 router.get("/capa", capa.fillElements);
 
-// Cadastro
-router.post("/", rp("novo_pedido"), add.createProject);
+// Cadastro — aceita pedidos_novo OU assistencias_nova (mesma lógica da edição/exclusão)
+router.post("/", rp.any("novo_pedido", "nova_solicitacao"), add.createProject);
 router.post("/cliente", rp("novo_pedido"), add.createClient);
 
 // Edição — aceita pedidos_editar OU assistencias_nova (mesma lógica do lançamento)

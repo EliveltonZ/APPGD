@@ -10,7 +10,8 @@ import { SelectedPartsTable } from "../../../features/assistencias/nova/Selected
 import { TeamModal } from "../../../features/assistencias/nova/TeamModal";
 import { PartsModal } from "../../../features/assistencias/nova/PartsModal";
 import { buildInitialRequest } from "../../../data/assistenciaMocks";
-import { submitSolicitacaoCompleta } from "../../../services/assistencia";
+import { saveProject } from "../../../services/project";
+import { emptyProjectForm } from "../../../types/project";
 import { useToast } from "../../../context/ToastContext";
 import { useAuth } from "../../../context/AuthContext";
 import {
@@ -126,40 +127,34 @@ export function AssistenciasNovaPage() {
       return;
     }
     setSending(true);
-    const dataHoraEnvio = new Date().toISOString();
     try {
-      const solicitacaoId = await submitSolicitacaoCompleta(
-        req.numSolicitacao,
-        dataHoraEnvio,
-        {
-          numContrato: req.numContrato,
-          solicitante: req.solicitante,
-          cliente: req.cliente,
-          ambiente: req.ambiente,
-          urgente: req.urgente,
-          montador: req.equipe
-            .map((m) => {
-              const parts = m.nome.trim().split(/\s+/);
-              return parts.length > 1
-                ? `${parts[0]} ${parts[parts.length - 1]}`
-                : parts[0];
-            })
-            .join(" - "),
-          bairro: req.bairro,
-          tempo: req.tempo,
-          tipoSolicitacao: req.tipoSolicitacao,
-          origemMontagem: req.origemMontagem,
-          origemPromob: req.origemPromob,
-          origemEntrega: req.origemEntrega,
-          origemCobrada: req.origemCobrada,
-          supervisor: req.supervisor,
-          destino: req.destino.toUpperCase(),
-          observacoes: req.observacoes,
-        },
-        req.pecas,
-        req.equipe,
-      );
-      setGeneratedId(solicitacaoId);
+      // Lançamento continua indo para tblProjetos (mesma tabela do Pedido),
+      // só a tela de entrada volta a ser esta — "Nova Solicitação" dedicada.
+      const { ordemdecompra } = await saveProject({
+        ...emptyProjectForm(),
+        tipoProjeto: "ASSISTENCIA",
+        contrato: req.numContrato,
+        clienteNome: req.cliente,
+        ambiente: req.ambiente,
+        numeroSolicitacao: req.numSolicitacao,
+        supervisor: req.supervisor,
+        liberadorNome: req.liberador,
+        tipoSolicitacaoAssist: req.tipoSolicitacao ? Number(req.tipoSolicitacao) : "",
+        origemMontagem: req.origemMontagem,
+        origemPromob: req.origemPromob,
+        origemEntrega: req.origemEntrega,
+        origemCobrada: req.origemCobrada,
+        observacoesAssist: req.observacoes,
+        responsavel: req.solicitante,
+        idResponsavel: user?.id ? Number(user.id) : null,
+        urgente: req.urgente === "sim",
+        bairro: req.bairro,
+        tempo: req.tempo,
+        destino: req.destino,
+        equipe: req.equipe,
+        pecas: req.pecas,
+      });
+      setGeneratedId(String(ordemdecompra));
       setSubmitted(true);
     } catch (e) {
       const fieldErrors = getFieldErrors(e);
@@ -188,7 +183,7 @@ export function AssistenciasNovaPage() {
           <div className="as-success">
             <h2>Solicitação enviada com sucesso!</h2>
             <p>
-              Número da solicitação: <strong>{generatedId}</strong>
+              Nº OC: <strong>{generatedId}</strong> · Nº Solicitação: <strong>{req.numSolicitacao}</strong>
             </p>
             <button
               className="as-btn as-btn--primary as-btn--lg"
