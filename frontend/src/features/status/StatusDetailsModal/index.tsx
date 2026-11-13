@@ -3,11 +3,13 @@ import { Modal } from "../../../components/Modal";
 import { StatusBadge } from "../StatusBadge";
 import { ProjectInfoSection } from "./sections/ProjectInfoSection";
 import { ItensPedidoTable } from "../../../components/ItensPedidoTable";
+import { AcessoriosTable } from "../../../components/AcessoriosTable";
 import { ProductionStageCard } from "../../../components/ProductionStageCard";
 import { fetchStatusDetail } from "../../../services/status";
-import { fetchPendingItems } from "../../../services/pending";
+import { fetchPendingItems, fetchAccessoryPurchases } from "../../../services/pending";
 import { fmtDate as fmtDateUtil } from "../../../utils/dateUtils";
 import type { PendingItem } from "../../../types/pending";
+import type { AcessorioRow } from "../../../components/AcessoriosTable";
 import type { StatusProject, StatusProjectDetail } from "../../../types/status";
 
 function fmtDate(iso: string | null | undefined): string {
@@ -41,24 +43,29 @@ export function StatusDetailsModal({
 }: StatusDetailsModalProps) {
   const [detail, setDetail] = useState<StatusProjectDetail | null>(null);
   const [accessories, setAccessories] = useState<PendingItem[]>([]);
+  const [purchases, setPurchases] = useState<AcessorioRow[]>([]);
   const [loadingDetail, setLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen && project) {
       setDetail(null);
       setAccessories([]);
+      setPurchases([]);
       setLoading(true);
       Promise.all([
         fetchStatusDetail(project.numOC),
         fetchPendingItems(Number(project.numOC)),
+        fetchAccessoryPurchases(Number(project.numOC)),
       ])
-        .then(([det, acc]) => {
+        .then(([det, acc, comp]) => {
           setDetail(det);
           setAccessories(acc);
+          setPurchases(comp);
         })
         .catch(() => {
           setDetail(null);
           setAccessories([]);
+          setPurchases([]);
         })
         .finally(() => setLoading(false));
     }
@@ -176,6 +183,19 @@ export function StatusDetailsModal({
               <ItensPedidoTable
                 items={accessories}
                 emptyMessage="Nenhum material cadastrado."
+              />
+            )}
+          </section>
+
+          {/* 5.1 — Compras (Acessórios) */}
+          <section className="plan-modal__section">
+            <h3 className="plan-modal__section-title">Compras (Acessórios)</h3>
+            {loadingDetail ? (
+              <p className="plan-modal__empty">Carregando...</p>
+            ) : (
+              <AcessoriosTable
+                rows={purchases}
+                emptyMessage="Nenhuma compra cadastrada."
               />
             )}
           </section>

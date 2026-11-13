@@ -1,6 +1,7 @@
 import { apiGet, apiPost, apiDelete } from './api'
-import { toDateInput } from '../utils/dateUtils'
+import { toDateInput, fmtDate } from '../utils/dateUtils'
 import type { PendingItem, PendingProject } from '../types/pending'
+import type { AcessorioRow } from '../components/AcessoriosTable'
 
 type RawRow = Record<string, unknown>
 
@@ -53,4 +54,22 @@ export async function insertPendingItem(
 
 export async function deletePendingItem(id: number): Promise<void> {
   await apiDelete(`/estoque/pedido/itens/${id}`)
+}
+
+// Fonte antiga (tblAcessorios, via /pendencias/acessorios) — mantida em
+// paralelo ao fluxo novo de Itens Pedido (tblXmlConsumo) porque é a única
+// que ainda rastreia data de compra/previsão/recebimento.
+export async function fetchAccessoryPurchases(
+  ordemdecompra: number,
+): Promise<AcessorioRow[]> {
+  const rows = await apiGet<RawRow[]>('/pendencias/acessorios', { ordemdecompra })
+  return rows.map((r) => ({
+    id:        String(r.id),
+    descricao: String(r.descricao ?? ''),
+    medida:    String(r.medida ?? ''),
+    qtd:       Number(r.qtd ?? 0),
+    compra:    fmtDate(r.datacompra as string | null),
+    previsao:  fmtDate(r.previsao as string | null),
+    recebido:  fmtDate(r.recebido as string | null),
+  }))
 }

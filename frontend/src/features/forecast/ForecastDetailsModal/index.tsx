@@ -7,7 +7,7 @@ import { ProductionStagesTimeline } from "./sections/ProductionStagesTimeline";
 import { AcessoriosTable } from "../../../components/AcessoriosTable";
 import type { AcessorioRow } from "../../../components/AcessoriosTable";
 import { fetchForecastDetail } from "../../../services/forecast";
-import { fetchPendingItems } from "../../../services/pending";
+import { fetchPendingItems, fetchAccessoryPurchases } from "../../../services/pending";
 import type { PendingItem } from "../../../types/pending";
 import type { ForecastProject, ForecastProjectDetail } from "../../../types/forecast";
 import "./index.css";
@@ -21,19 +21,22 @@ interface ForecastDetailsModalProps {
 export function ForecastDetailsModal({ isOpen, project, onClose }: ForecastDetailsModalProps) {
   const [detail, setDetail]           = useState<ForecastProjectDetail | null>(null);
   const [accessories, setAccessories] = useState<PendingItem[]>([]);
+  const [purchases, setPurchases]     = useState<AcessorioRow[]>([]);
   const [loading, setLoading]         = useState(false);
 
   useEffect(() => {
     if (isOpen && project) {
       setDetail(null);
       setAccessories([]);
+      setPurchases([]);
       setLoading(true);
       Promise.all([
         fetchForecastDetail(project.id),
         fetchPendingItems(project.id),
+        fetchAccessoryPurchases(project.id),
       ])
-        .then(([det, acc]) => { setDetail(det); setAccessories(acc); })
-        .catch(() => { setDetail(null); setAccessories([]); })
+        .then(([det, acc, comp]) => { setDetail(det); setAccessories(acc); setPurchases(comp); })
+        .catch(() => { setDetail(null); setAccessories([]); setPurchases([]); })
         .finally(() => setLoading(false));
     }
   }, [isOpen, project?.id]);
@@ -85,13 +88,23 @@ export function ForecastDetailsModal({ isOpen, project, onClose }: ForecastDetai
             )}
           </section>
 
-          {/* 3 — Acessórios */}
+          {/* 3 — Itens Pedido */}
           <section className="plan-modal__section">
-            <h3 className="plan-modal__section-title">Acessórios</h3>
+            <h3 className="plan-modal__section-title">Itens Pedido</h3>
             {loading ? (
               <p className="plan-modal__empty">Carregando...</p>
             ) : (
-              <AcessoriosTable rows={accessoryRows} emptyMessage="Nenhum acessório cadastrado." />
+              <AcessoriosTable rows={accessoryRows} emptyMessage="Nenhum item lançado." />
+            )}
+          </section>
+
+          {/* 3.1 — Compras (Acessórios) */}
+          <section className="plan-modal__section">
+            <h3 className="plan-modal__section-title">Compras (Acessórios)</h3>
+            {loading ? (
+              <p className="plan-modal__empty">Carregando...</p>
+            ) : (
+              <AcessoriosTable rows={purchases} emptyMessage="Nenhuma compra cadastrada." />
             )}
           </section>
 
