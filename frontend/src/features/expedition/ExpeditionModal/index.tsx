@@ -11,6 +11,7 @@ import { AccessoriesChecklistSection } from './sections/AccessoriesChecklistSect
 import { OperationalStatusSection } from './sections/OperationalStatusSection';
 import { NotesSection } from './sections/NotesSection';
 import { ItensPedidoTable } from '../../../components/ItensPedidoTable';
+import { AcessoriosTable } from '../../../components/AcessoriosTable';
 import { fetchPendingItems } from '../../../services/pending';
 import type { ExpeditionDetail, ExpeditionUser } from '../../../types/expedition';
 import type { PendingItem } from '../../../types/pending';
@@ -181,6 +182,13 @@ export function ExpeditionModal({
 
             <FormSection step={5} title="Materiais — Separação do Almoxarifado">
               <ItensPedidoTable items={pendingItems} />
+            </FormSection>
+
+            <FormSection step={6} title="Compras (Acessórios)">
+              <AcessoriosTable
+                rows={form.acessoriosCompra}
+                emptyMessage="Nenhuma compra cadastrada."
+              />
             </FormSection>
           </div>
         )}

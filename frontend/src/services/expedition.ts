@@ -26,9 +26,9 @@ function toMaterial(raw: RawRow): PendingAccessory {
     descricao: (raw.descricao as string) ?? '',
     medida:   (raw.medida    as string) ?? '',
     qtd:      (raw.qtd       as number) ?? 0,
-    compra:   toDateInput(raw.datacompra),
-    previsao: toDateInput(raw.previsao),
-    recebido: toDateInput(raw.recebido),
+    compra:   fmtDate(raw.datacompra as string | null),
+    previsao: fmtDate(raw.previsao   as string | null),
+    recebido: fmtDate(raw.recebido   as string | null),
   }
 }
 
