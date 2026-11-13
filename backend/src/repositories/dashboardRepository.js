@@ -20,7 +20,7 @@ async function getProjetosDash() {
      LEFT  JOIN "${T.tipoAmbiente.name}" ta ON ta.id = p.id_tipoambiente
      LEFT  JOIN "${T.vendedor.name}"     v  ON v.id  = p.id_vendedor
      LEFT  JOIN "${T.liberador.name}"    lb ON lb.id = p.id_liberador
-     WHERE p.pronto IS NOT NULL`,
+     WHERE p.pronto IS NOT NULL AND p.tipo_pedido = 'PROJETO'`,
     { type: QueryTypes.SELECT }
   );
   return rows.map((r) => ({
@@ -49,6 +49,7 @@ async function getProducaoDash() {
      FROM "${T.projetos.name}" p
      WHERE p.entrega IS NULL
        AND p.chegoufabrica IS NOT NULL
+       AND p.tipo_pedido = 'PROJETO'
      ORDER BY p.dataentrega ASC NULLS LAST`,
     { type: QueryTypes.SELECT }
   );
@@ -96,7 +97,7 @@ async function getProducaoDashDetalhada(start, end) {
        COUNT(*) FILTER (WHERE pd.acabamentofim IS NOT NULL)::int                                    AS acabamento_f
      FROM "${T.producao.name}" pd
      INNER JOIN "${T.projetos.name}" p ON p.ordemdecompra = pd.ordemdecompra
-     WHERE p.iniciado IS NOT NULL AND p.pronto IS NULL`,
+     WHERE p.iniciado IS NOT NULL AND p.pronto IS NULL AND p.tipo_pedido = 'PROJETO'`,
     { type: QueryTypes.SELECT },
   );
 
@@ -114,6 +115,7 @@ async function getProducaoDashDetalhada(start, end) {
      FROM "${T.producao.name}" pd
      INNER JOIN "${T.projetos.name}" p ON p.ordemdecompra = pd.ordemdecompra
      WHERE pd.cortefim IS NOT NULL
+       AND p.tipo_pedido = 'PROJETO'
        AND (:start IS NULL OR p.pronto >= :start::date)
        AND (:end   IS NULL OR p.pronto <= :end::date)`,
     { type: QueryTypes.SELECT, replacements: { start: start || null, end: end || null } },
@@ -126,7 +128,7 @@ async function getProducaoDashDetalhada(start, end) {
        ROUND(AVG(pronto - chegoufabrica))::int AS avg_dias,
        COUNT(*)::int                        AS total
      FROM "${T.projetos.name}"
-     WHERE pronto IS NOT NULL AND chegoufabrica IS NOT NULL
+     WHERE pronto IS NOT NULL AND chegoufabrica IS NOT NULL AND tipo_pedido = 'PROJETO'
      GROUP BY mes ORDER BY mes`,
     { type: QueryTypes.SELECT },
   );
@@ -139,7 +141,7 @@ async function getProducaoDashDetalhada(start, end) {
        COUNT(*) FILTER (WHERE pronto  > dataentrega)::int            AS atrasado,
        COUNT(*)::int                                                 AS total
      FROM "${T.projetos.name}"
-     WHERE pronto IS NOT NULL AND dataentrega IS NOT NULL
+     WHERE pronto IS NOT NULL AND dataentrega IS NOT NULL AND tipo_pedido = 'PROJETO'
      GROUP BY mes ORDER BY mes`,
     { type: QueryTypes.SELECT },
   );
@@ -150,7 +152,7 @@ async function getProducaoDashDetalhada(start, end) {
        p.parceado, p.pendencia, p.entrega, p.pronto,
        p.urgente, p.dataentrega, p.iniciado
      FROM "${T.projetos.name}" p
-     WHERE p.iniciado IS NOT NULL AND p.pronto IS NULL
+     WHERE p.iniciado IS NOT NULL AND p.pronto IS NULL AND p.tipo_pedido = 'PROJETO'
      ORDER BY p.dataentrega ASC NULLS LAST`,
     { type: QueryTypes.SELECT },
   );

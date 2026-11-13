@@ -117,7 +117,9 @@ async function buscarLote(ordemdecompra) {
 }
 
 async function listarOrdensDoLote(lote) {
-  const rows = await Projetos.findAll({ where: { lote }, attributes: ['ordemdecompra'], raw: true });
+  const rows = await Projetos.findAll({
+    where: { lote, tipoProjeto: 'PROJETO' }, attributes: ['ordemdecompra'], raw: true,
+  });
   return rows.map(r => r.ordemdecompra);
 }
 

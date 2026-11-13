@@ -5,6 +5,7 @@ const {
   Loja, TipoAmbiente, TipoContrato, Etapa,
   Usuario, EquipSat, Pecas, Montador, Falhas, Ocorrencia,
 } = require("../client/db");
+const { fmtDate } = require("../utils/dateBR");
 
 // A sessão do banco roda em UTC — usar CURRENT_DATE/NOW() do Postgres erra
 // a data entre 21h e 23h59 no horário de Brasília. Calcula em America/Sao_Paulo.
@@ -76,7 +77,7 @@ async function _buscarPecas(ordemdecompra) {
 
 async function buscarPorContrato(contrato) {
   const rows = await Projetos.findAll({
-    where: { contrato: Number(contrato) },
+    where: { contrato: Number(contrato), tipoProjeto: 'PROJETO' },
     attributes: [
       'idCliente', 'idTipocliente', 'idVendedor', 'idLiberador',
       'idLoja', 'datacontrato', 'dataassinatura', 'chegoufabrica',
@@ -182,6 +183,9 @@ async function inserirProjeto(body) {
       observacoes:            body.observacoes            ?? null,
       idResponsavel:          body.id_responsavel         ?? null,
       dataCriacao:            dataAtualBrasil(),
+      // Hora exata da solicitação, pra Produção/Logística mostrarem
+      // "Data/Hora" certo — só assistência usa; dataCriacao é só data.
+      dataSolicitacao:        body.tipo_projeto === 'ASSISTENCIA' ? fmtDate() : null,
       urgente:                body.urgente                ?? false,
     }, { transaction: t });
 

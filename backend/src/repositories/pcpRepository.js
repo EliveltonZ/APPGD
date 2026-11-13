@@ -31,7 +31,7 @@ async function buscarProjetoPcp(ordemdecompra) {
 }
 
 async function buscarUltimoLote() {
-  const lote = await Projetos.max('lote');
+  const lote = await Projetos.max('lote', { where: { tipoProjeto: 'PROJETO' } });
   return [{ lote: lote ?? 0 }];
 }
 
@@ -75,7 +75,7 @@ async function listarLotesIniciados() {
 async function reverterLote(lote) {
   await Projetos.update(
     { iniciado: null },
-    { where: { lote: Number(lote) } },
+    { where: { lote: Number(lote), tipoProjeto: 'PROJETO' } },
   );
 }
 
@@ -86,12 +86,12 @@ async function reverterLote(lote) {
 async function atualizarIniciarLote(lote, iniciado, usuarioId) {
   return sequelize.transaction(async (t) => {
     const ordens = await Projetos.findAll({
-      where: { lote: Number(lote) }, attributes: ['ordemdecompra', 'iniciado'], transaction: t,
+      where: { lote: Number(lote), tipoProjeto: 'PROJETO' }, attributes: ['ordemdecompra', 'iniciado'], transaction: t,
     });
 
     await Projetos.update(
       { iniciado: iniciado ?? null },
-      { where: { lote: Number(lote) }, transaction: t },
+      { where: { lote: Number(lote), tipoProjeto: 'PROJETO' }, transaction: t },
     );
 
     if (iniciado) {
