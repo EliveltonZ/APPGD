@@ -6,6 +6,7 @@ import { Button } from "../../../components/Button";
 import { ConfirmModal } from "../../../components/ConfirmModal";
 import { ProductionSector } from "../ProductionSector";
 import { ItensPedidoTable } from "../../../components/ItensPedidoTable";
+import { MaterialsTable } from "../../../components/MaterialsTable";
 import { EmployeesModal } from "../EmployeesModal";
 import {
   PRODUCTION_SECTORS,
@@ -286,6 +287,12 @@ export function ProductionModal({
             <section className="prod-modal__section">
               <h3 className="prod-modal__section-title">Materiais</h3>
               <ItensPedidoTable items={pendingItems} />
+            </section>
+
+            {/* ── Compras (Acessórios) ─────────────────────── */}
+            <section className="prod-modal__section">
+              <h3 className="prod-modal__section-title">Compras (Acessórios)</h3>
+              <MaterialsTable materials={form.materiais} />
             </section>
           </div>
         )}
