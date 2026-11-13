@@ -1,0 +1,8 @@
+/* Row alert for delayed purchases */
+.pur-table__row--atrasado td:first-child {
+  border-left: 2px solid #dc2626;
+}
+
+.dt-td {
+  font-size: 11px;
+}

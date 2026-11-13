@@ -1,0 +1,158 @@
+.pur-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pur-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── pfield — shared form fields ──────────────────────── */
+
+.pfield {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pfield--span2 {
+  grid-column: span 2;
+}
+.pfield--span3 {
+  grid-column: span 3;
+}
+.pfield--full {
+  grid-column: 1 / -1;
+}
+
+.pfield label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
+}
+
+.pfield input[type="text"],
+.pfield input[type="date"],
+.pfield input[type="number"],
+.pfield textarea,
+.pfield__select {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text-h);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.pfield input:focus,
+.pfield textarea:focus,
+.pfield__select:focus {
+  border-color: var(--accent);
+}
+
+.pfield input:disabled {
+  background: var(--code-bg);
+  color: var(--text);
+  cursor: default;
+  opacity: 0.75;
+}
+
+.pfield textarea {
+  resize: vertical;
+  line-height: 145%;
+}
+
+/* ── pinfo-section: section grid wrapper ──────────────── */
+
+.pinfo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── frow: grid row helpers ───────────────────────────── */
+
+.frow {
+  display: grid;
+  gap: 12px;
+}
+
+.frow--1 {
+  grid-template-columns: 1fr;
+}
+.frow--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.frow--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.frow--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .frow--3,
+  .frow--4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ── Status selector ──────────────────────────────────── */
+
+.pur-status-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.pur-status-opt {
+  padding: 5px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  opacity: 0.5;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s;
+}
+
+.pur-status-opt:hover {
+  opacity: 0.8;
+}
+
+.pur-status-opt--active {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.pur-status-opt--pendente {
+  background: rgba(107, 99, 117, 0.1);
+  color: var(--text-h);
+}
+.pur-status-opt--comprado {
+  background: rgba(32, 128, 197, 0.14);
+  color: #2080c5;
+}
+.pur-status-opt--recebido {
+  background: rgba(34, 197, 94, 0.14);
+  color: #16a34a;
+}
+.pur-status-opt--atrasado {
+  background: rgba(220, 38, 38, 0.14);
+  color: #dc2626;
+}
