@@ -24,6 +24,11 @@ const app    = express()
 const PORT   = process.env.PORT || 3001
 const PUBLIC = path.join(__dirname, '../public')
 
+// Render fica atrás de 1 proxy reverso, que seta X-Forwarded-For — sem isso o
+// express-rate-limit não confia no header e quebra tentando identificar o IP
+// de quem fez a requisição (usado pelo loginLimiter abaixo).
+app.set('trust proxy', 1)
+
 // Headers de segurança HTTP
 app.use(helmet())
 
