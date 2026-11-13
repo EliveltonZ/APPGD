@@ -73,6 +73,7 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     compras_necessidades: true,
     compras_confirmar: true,
     compras_pedidos: true,
+    compras_lancamento_acessorios: true,
     fabrica_solicitacao_interna: true,
   };
   return {

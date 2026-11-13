@@ -1,0 +1,68 @@
+.penv-table__wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border, #2a2f3a);
+  border-radius: 8px;
+}
+
+.penv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.penv-table th,
+.penv-table td {
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.penv-table thead th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+  border-bottom: 1px solid var(--border, #2a2f3a);
+}
+
+.penv-th--center,
+.penv-td--center {
+  text-align: center;
+}
+
+.penv-row {
+  cursor: pointer;
+  border-bottom: 1px solid var(--border, #2a2f3a);
+}
+
+.penv-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.penv-row--alert {
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.penv-count {
+  display: inline-block;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.penv-count--atrasado {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.penv-count--ok {
+  opacity: 0.5;
+}
+
+.penv-table__empty {
+  padding: 24px;
+  text-align: center;
+  opacity: 0.6;
+  font-size: 13px;
+}

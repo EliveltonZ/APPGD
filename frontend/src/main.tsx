@@ -39,6 +39,7 @@ import { ComprasLiberacoesPage } from "./pages/Compras/Liberacoes";
 import { ComprasNecessidadesPage } from "./pages/Compras/Necessidades";
 import { ComprasConfirmarPage } from "./pages/Compras/Confirmar";
 import { ComprasPedidosPage } from "./pages/Compras/Pedidos";
+import { LancamentoAcessoriosPage } from "./pages/Compras/LancamentoAcessorios";
 
 // ── Fábrica ───────────────────────────────────────────────────────────────────
 import { PcpPage } from "./pages/Fabrica/Painel";
@@ -121,6 +122,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   compras_necessidades: ComprasNecessidadesPage,
   compras_confirmar: ComprasConfirmarPage,
   compras_pedidos: ComprasPedidosPage,
+  compras_lancamento_acessorios: LancamentoAcessoriosPage,
   pcp_painel: PcpPage,
   pcp_producao: ProducaoPage,
   pcp_apontamento: ApontamentoPage,

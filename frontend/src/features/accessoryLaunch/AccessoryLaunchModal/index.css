@@ -1,0 +1,18 @@
+.acc-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.acc-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.acc-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
