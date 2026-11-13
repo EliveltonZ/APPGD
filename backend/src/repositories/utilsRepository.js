@@ -199,7 +199,15 @@ async function setTipo(ordemdecompra, tipo, urgente) {
   );
 }
 
-async function listarEquipSat(idSat) {
+// Produção/Logística mandam o "solicitacao"/numero da Asteca, não a
+// ordemdecompra real — mas EquipSat.idSat guarda a OC desde a migração pra
+// tblProjetos. Resolve numero_solicitacao -> OC antes de buscar.
+async function listarEquipSat(idSatParam) {
+  const projeto = await Projetos.findOne({
+    where: { numeroSolicitacao: String(idSatParam) },
+    attributes: ['ordemdecompra'],
+  });
+  const idSat = projeto ? String(projeto.ordemdecompra) : String(idSatParam);
   const rows = await EquipSat.findAll({
     where: { idSat: String(idSat) },
     attributes: ['idMontador'],

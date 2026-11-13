@@ -1,6 +1,19 @@
-const { Pecas, Ocorrencia, Falhas } = require('../client/db');
+const { Pecas, Ocorrencia, Falhas, Projetos } = require('../client/db');
 
-async function listarPecas(idAssistencia) {
+// Quem chama aqui (Capa de Assistência) manda o "solicitacao"/numero da
+// Asteca, não a ordemdecompra real — mas Pecas.idAssistencia guarda a OC
+// desde a migração pra tblProjetos. Resolve numero_solicitacao -> OC antes
+// de buscar; se não achar (ou já vier a própria OC), usa o valor como veio.
+async function _resolverIdAssistencia(idAssistencia) {
+  const projeto = await Projetos.findOne({
+    where: { numeroSolicitacao: String(idAssistencia) },
+    attributes: ['ordemdecompra'],
+  });
+  return projeto ? String(projeto.ordemdecompra) : String(idAssistencia);
+}
+
+async function listarPecas(idAssistenciaParam) {
+  const idAssistencia = await _resolverIdAssistencia(idAssistenciaParam);
   const rows = await Pecas.findAll({
     where: { idAssistencia: String(idAssistencia) },
     attributes: ['codigo', 'qtd', 'peca', 'dimensoes', 'cor', 'lado', 'idOcorrencia', 'idFalha', 'observacoes'],
@@ -24,7 +37,8 @@ async function listarPecas(idAssistencia) {
   }));
 }
 
-async function inserirPecas(idAssistencia, pecas) {
+async function inserirPecas(idAssistenciaParam, pecas) {
+  const idAssistencia = await _resolverIdAssistencia(idAssistenciaParam);
   await Pecas.bulkCreate(
     pecas.map(r => ({
       qtd:           Number(r.qtd) || 0,
