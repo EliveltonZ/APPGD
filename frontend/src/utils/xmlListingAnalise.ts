@@ -21,8 +21,10 @@ export function dimensaoTexto(i: ItemAnaliseXmlLogistica): string {
 }
 
 // "Chapa MDF 15mm Branco TX" / "Fita Borda PVC 0.45x22mm Grafito Chess" —
-// tudo depois do "Nmm" é o nome da cor/acabamento.
-const REGEX_COR = /\d+(?:[.,]\d+)?\s*mm\s+(.+)$/i;
+// tudo depois do "Nmm" é o nome da cor/acabamento. O grupo final exclui um
+// "(...)" de anotação (ex.: "... 12mm (50 unid)" não é cor nenhuma) pra não
+// capturar lixo de itens de ferragem que só por acaso têm "Nmm" no meio.
+const REGEX_COR = /\d+(?:[.,]\d+)?\s*mm\s+([^(]+?)\s*(?:\(.*\))?$/i;
 
 function extrairCorDescricao(descricao: string | null): string {
   if (!descricao) return "";
@@ -30,11 +32,17 @@ function extrairCorDescricao(descricao: string | null): string {
   return m ? m[1].trim() : "";
 }
 
-// Peça de "Montagem" (painel, base, lateral...) não carrega cor direto no
-// próprio nó — ela está na chapa ou fita de borda que é filha dela
-// (STRUCTUREKEY="CHAPA"/"FITA_BORDA", família "COM"), ligada pelo
-// parentUniqueId. Prefere CHAPA (a face maior); cai pra FITA_BORDA só se
-// não achar chapa.
+// Qualquer item (de qualquer família que passe no filtro) que tiver cor
+// precisa mostrar do mesmo jeito. Dois casos:
+// 1. O próprio item já nomeia a cor na descrição (ex.: "Fita de Borda
+//    0.45x22mm Carvalho Poro", vendida avulsa, sem filho nenhum).
+// 2. A peça física (painel de "Montagem", ou peça de "Fábrica" tipo
+//    Fundo/Costas cortada em MDF) não carrega cor no próprio nó — ela está
+//    na chapa ou fita de borda que é filha dela (STRUCTUREKEY="CHAPA" /
+//    "FITA_BORDA"/"FITA_BORDA_COMP"/"FITA_BORDA_FER", família "COM"),
+//    ligada pelo parentUniqueId. Prefere CHAPA (a face maior); cai pra fita
+//    de borda só se não achar chapa. Ferragem pura sem nenhum dos dois fica
+//    com cor vazia mesmo.
 export function enriquecerComCor(itens: ItemAnaliseXmlLogistica[]): ItemAnaliseComCor[] {
   const filhosPorPai = new Map<string, ItemAnaliseXmlLogistica[]>();
   for (const item of itens) {
@@ -45,12 +53,13 @@ export function enriquecerComCor(itens: ItemAnaliseXmlLogistica[]): ItemAnaliseC
   }
 
   return itens.map((item) => {
-    if (item.familia !== "Montagem" || item.uniqueId == null) {
-      return { ...item, cor: "" };
-    }
+    const corPropria = extrairCorDescricao(item.descricao);
+    if (corPropria) return { ...item, cor: corPropria };
+
+    if (item.uniqueId == null) return { ...item, cor: "" };
     const filhos = filhosPorPai.get(item.uniqueId) ?? [];
     const chapa = filhos.find((f) => f.estruturaChave === "CHAPA")
-      ?? filhos.find((f) => f.estruturaChave === "FITA_BORDA");
+      ?? filhos.find((f) => f.estruturaChave?.startsWith("FITA_BORDA"));
     return { ...item, cor: chapa ? extrairCorDescricao(chapa.descricao) : "" };
   });
 }
