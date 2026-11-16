@@ -43,6 +43,16 @@ interface PartErrors {
   tipo?: string;
 }
 
+// Peça vinda do XML + a Falha/Ocorrência dela — o XML não carrega nenhuma
+// das duas (não existe no Promob), então cada linha começa sem valor e o
+// usuário resolve peça a peça, ou aplica um valor em cascata pra todas de
+// uma vez (e depois ainda pode corrigir uma linha específica por cima).
+export interface PreviewPart {
+  item: ItemAnaliseComCor;
+  falha: string;
+  tipo: string;
+}
+
 // ── Component ────────────────────────────────────────────
 
 interface PartsModalProps {
@@ -71,9 +81,9 @@ export function PartsModal({
   >([]);
 
   // ── Importação de XML (Promob "LISTING") ──────────────────
-  const [previewItens, setPreviewItens] = useState<ItemAnaliseComCor[]>([]);
-  const [importFalha, setImportFalha] = useState("");
-  const [importTipo, setImportTipo] = useState("");
+  const [previewParts, setPreviewParts] = useState<PreviewPart[]>([]);
+  const [bulkFalha, setBulkFalha] = useState("");
+  const [bulkTipo, setBulkTipo] = useState("");
   const [importing, setImporting] = useState(false);
   const [importFileName, setImportFileName] = useState("");
   const importFileRef = useRef<HTMLInputElement>(null);
@@ -147,7 +157,7 @@ export function PartsModal({
   function handleClose() {
     setForm(EMPTY_FORM);
     setErrors({});
-    setPreviewItens([]);
+    setPreviewParts([]);
     setImportFileName("");
     onClose();
   }
@@ -163,24 +173,43 @@ export function PartsModal({
       const resultado = await analisarXmlLogisticaTemp(xml);
       const comCor = enriquecerComCor(resultado.itens);
       const filtrados = filtrarFamiliasRelevantes(comCor);
-      setPreviewItens(agruparESomar(filtrados));
+      const agrupados = agruparESomar(filtrados);
+      // Começa com o que já estiver selecionado no "aplicar a todas" (se o
+      // usuário já tiver escolhido antes de subir o XML); senão fica em
+      // branco pra resolver peça a peça.
+      setPreviewParts(agrupados.map((item) => ({ item, falha: bulkFalha, tipo: bulkTipo })));
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao processar o XML."));
-      setPreviewItens([]);
+      setPreviewParts([]);
     } finally {
       setImporting(false);
     }
   }
 
   function removePreviewItem(index: number) {
-    setPreviewItens((prev) => prev.filter((_, i) => i !== index));
+    setPreviewParts((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function updatePreviewFalha(index: number, value: string) {
+    setPreviewParts((prev) => prev.map((p, i) => (i === index ? { ...p, falha: value } : p)));
+  }
+
+  function updatePreviewTipo(index: number, value: string) {
+    setPreviewParts((prev) => prev.map((p, i) => (i === index ? { ...p, tipo: value } : p)));
+  }
+
+  function applyBulkToAll() {
+    if (!bulkFalha || !bulkTipo) return;
+    setPreviewParts((prev) => prev.map((p) => ({ ...p, falha: bulkFalha, tipo: bulkTipo })));
+  }
+
+  const pendentes = previewParts.filter((p) => !p.falha || !p.tipo).length;
+
   function handleConfirmImport() {
-    if (!importFalha || !importTipo || previewItens.length === 0) return;
-    const falhaOpt = falhaOptions.find((o) => o.value === importFalha);
-    const ocorrenciaOpt = ocorrenciaOptions.find((o) => o.value === importTipo);
-    for (const item of previewItens) {
+    if (previewParts.length === 0 || pendentes > 0) return;
+    for (const { item, falha, tipo } of previewParts) {
+      const falhaOpt = falhaOptions.find((o) => o.value === falha);
+      const ocorrenciaOpt = ocorrenciaOptions.find((o) => o.value === tipo);
       onAdd({
         id: crypto.randomUUID(),
         qtd: Math.max(1, Math.round(item.quantidade ?? 1)),
@@ -188,15 +217,15 @@ export function PartsModal({
         dimensoes: dimensaoTexto(item),
         cor: item.cor,
         lado: "",
-        falha: falhaOpt?.label ?? importFalha,
-        falhaId: Number(importFalha),
-        tipo: ocorrenciaOpt?.label ?? importTipo,
-        ocorrenciaId: Number(importTipo),
+        falha: falhaOpt?.label ?? falha,
+        falhaId: Number(falha),
+        tipo: ocorrenciaOpt?.label ?? tipo,
+        ocorrenciaId: Number(tipo),
         observacoes: "",
       });
     }
-    toast.success(`${previewItens.length} peça${previewItens.length !== 1 ? "s" : ""} importada${previewItens.length !== 1 ? "s" : ""} do XML.`);
-    setPreviewItens([]);
+    toast.success(`${previewParts.length} peça${previewParts.length !== 1 ? "s" : ""} importada${previewParts.length !== 1 ? "s" : ""} do XML.`);
+    setPreviewParts([]);
     setImportFileName("");
   }
 
@@ -218,69 +247,95 @@ export function PartsModal({
       <div className="pm-import">
         <h4 className="pm-form__title">Importar do XML (Promob)</h4>
 
-        <div className="frow--3">
-          <Select
-            label="Falha * (aplicada a tudo que for importado)"
-            value={importFalha}
-            onChange={(e) => setImportFalha(e.target.value)}
-            options={falhaOptions}
-            placeholder="Selecionar tipo de falha..."
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Button
+            variant="secondary"
+            onClick={() => importFileRef.current?.click()}
+            disabled={importing}
+            type="button"
+          >
+            <Upload size={14} />
+            {importing ? "Processando..." : "Escolher XML"}
+          </Button>
+          <input
+            ref={importFileRef}
+            type="file"
+            accept=".xml"
+            onChange={handleImportFile}
+            style={{ display: "none" }}
           />
-          <Select
-            label="Ocorrência *"
-            value={importTipo}
-            onChange={(e) => setImportTipo(e.target.value)}
-            options={ocorrenciaOptions}
-            placeholder="Selecionar..."
-          />
-          <div style={{ display: "flex", alignItems: "flex-end" }}>
-            <Button
-              variant="secondary"
-              onClick={() => importFileRef.current?.click()}
-              disabled={importing}
-              type="button"
-              style={{ width: "100%" }}
-            >
-              <Upload size={14} />
-              {importing ? "Processando..." : "Escolher XML"}
-            </Button>
-            <input
-              ref={importFileRef}
-              type="file"
-              accept=".xml"
-              onChange={handleImportFile}
-              style={{ display: "none" }}
-            />
-          </div>
+          {importFileName && (
+            <span className="pm-import__filename">
+              {importFileName} — {previewParts.length} item{previewParts.length !== 1 ? "s" : ""}
+              {" "}(só Montagem, Fábrica e Acessórios)
+            </span>
+          )}
         </div>
 
-        {importFileName && (
-          <p className="pm-import__filename">
-            {importFileName} — {previewItens.length} item{previewItens.length !== 1 ? "s" : ""} pra revisar
-            (só Montagem, Fábrica e Acessórios)
-          </p>
-        )}
-
-        {previewItens.length > 0 && (
+        {previewParts.length > 0 && (
           <>
-            <ImportPreviewTable itens={previewItens} onRemove={removePreviewItem} />
+            {/* O XML não carrega Falha/Ocorrência — cada peça precisa de
+                uma. Aqui aplica a mesma pra todas de uma vez; na tabela
+                abaixo dá pra corrigir uma peça específica por cima. */}
+            <div className="frow--3">
+              <Select
+                label="Falha (aplicar a todas)"
+                value={bulkFalha}
+                onChange={(e) => setBulkFalha(e.target.value)}
+                options={falhaOptions}
+                placeholder="Selecionar tipo de falha..."
+              />
+              <Select
+                label="Ocorrência (aplicar a todas)"
+                value={bulkTipo}
+                onChange={(e) => setBulkTipo(e.target.value)}
+                options={ocorrenciaOptions}
+                placeholder="Selecionar..."
+              />
+              <div style={{ display: "flex", alignItems: "flex-end" }}>
+                <Button
+                  variant="secondary"
+                  onClick={applyBulkToAll}
+                  disabled={!bulkFalha || !bulkTipo}
+                  type="button"
+                  style={{ width: "100%" }}
+                >
+                  Aplicar a todas as peças
+                </Button>
+              </div>
+            </div>
+
+            <ImportPreviewTable
+              partes={previewParts}
+              falhaOptions={falhaOptions}
+              ocorrenciaOptions={ocorrenciaOptions}
+              onRemove={removePreviewItem}
+              onChangeFalha={updatePreviewFalha}
+              onChangeTipo={updatePreviewTipo}
+            />
+
             <div className="as-modal-actions pm-form__actions">
               <button
                 className="as-btn as-btn--ghost"
-                onClick={() => { setPreviewItens([]); setImportFileName(""); }}
+                onClick={() => { setPreviewParts([]); setImportFileName(""); }}
                 type="button"
               >
                 Descartar importação
               </button>
               <div style={{ flex: 1 }} />
+              {pendentes > 0 && (
+                <span className="pm-import__pendentes">
+                  {pendentes} peça{pendentes !== 1 ? "s" : ""} sem falha/ocorrência
+                </span>
+              )}
               <button
                 className="as-btn as-btn--primary"
                 onClick={handleConfirmImport}
-                disabled={!importFalha || !importTipo}
+                disabled={pendentes > 0}
                 type="button"
               >
                 <Plus size={14} />
-                Confirmar {previewItens.length} peça{previewItens.length !== 1 ? "s" : ""}
+                Confirmar {previewParts.length} peça{previewParts.length !== 1 ? "s" : ""}
               </button>
             </div>
           </>

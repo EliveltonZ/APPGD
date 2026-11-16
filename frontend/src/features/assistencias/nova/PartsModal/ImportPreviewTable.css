@@ -1,0 +1,17 @@
+.ipt-select {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.ipt-select--empty {
+  border-color: #ef4444;
+}
+
+.ipt-row--pendente {
+  background: rgba(239, 68, 68, 0.06);
+}
