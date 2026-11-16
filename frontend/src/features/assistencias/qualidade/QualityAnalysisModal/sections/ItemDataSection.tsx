@@ -53,7 +53,7 @@ export function ItemDataSection({ data, onChange }: Props) {
       <div className="qc-section__body">
         <div className="frow--4 ap-dates-row">
           <ReadField label="Código" value={data.codigo} />
-          <ReadField label="ID Assist." value={data.idAssistencia} />
+          <ReadField label="Ordem de Compra" value={data.ordemdecompra} />
           <ReadField label="Pedido" value={data.pedido} />
           <EditField
             label="ID ERP"

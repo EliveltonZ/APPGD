@@ -27,6 +27,7 @@ function toAssistencia(r: RawRow, index: number): AssistanceProduction {
   return {
     id:             String(r.solicitacao ?? ''),
     num:            index + 1,
+    ordemdecompra:  String(r.ordemdecompra ?? ''),
     numSolicitacao: String(r.solicitacao ?? ''),
     numContrato:    String(r.contrato    ?? ''),
     corte:          String(r.corte       ?? ''),
@@ -67,6 +68,7 @@ function toAssistenciaDetail(r: RawRow): AssistanceProduction {
   return {
     id:             String(r.solicitacao ?? ''),
     num:            0,
+    ordemdecompra:  String(r.ordemdecompra ?? ''),
     numSolicitacao: String(r.solicitacao ?? ''),
     numContrato:    String(r.contrato    ?? ''),
     corte:          String(r.corte       ?? ''),

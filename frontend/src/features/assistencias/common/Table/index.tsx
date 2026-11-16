@@ -43,6 +43,13 @@ const COLUMNS: TableColumn<AssistanceProduction>[] = [
     render: (v) => <span className="ap-num">{v as number}</span>,
   },
   {
+    key: "ordemdecompra",
+    label: "O.C.",
+    type: "text",
+    filterable: true,
+    sortable: true,
+  },
+  {
     key: "numSolicitacao",
     label: "Solicitação",
     type: "text",

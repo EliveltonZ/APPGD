@@ -11,6 +11,7 @@ async function listarAssistencias(data) {
   const rows = await Projetos.findAll({
     where: { tipoProjeto: 'ASSISTENCIA', dataSolicitacao: { [Op.gte]: data } },
     attributes: [
+      "ordemdecompra",
       "numeroSolicitacao",
       "lote",
       "pedidoAssistencia",
@@ -36,6 +37,7 @@ async function listarAssistencias(data) {
     ],
   });
   return rows.map((a) => ({
+    ordemdecompra:   a.ordemdecompra,
     solicitacao:     a.numeroSolicitacao,
     corte:           a.lote,
     pedido:          a.pedidoAssistencia,
@@ -75,6 +77,7 @@ async function buscarAssistencia(solicitacao) {
 
   return [
     {
+      ordemdecompra:   a.ordemdecompra,
       solicitacao:     a.numeroSolicitacao,
       contrato:        a.contrato,
       solicitante:     a.responsavel,

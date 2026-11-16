@@ -40,7 +40,7 @@ export async function fetchQualityItems(): Promise<QualityItem[]> {
     return {
       id:            String(r.id          ?? ''),
       codigo:        String(r.id          ?? ''),
-      idAssistencia: String(r.id_assistencia ?? ''),
+      ordemdecompra: String(r.id_assistencia ?? ''),
       pedido:        String(r.pedido      ?? ''),
       idErp:         String(r.id_erp      ?? ''),
       qtd:           Number(r.qtd         ?? 0),

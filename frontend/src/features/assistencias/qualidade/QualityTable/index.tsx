@@ -14,7 +14,7 @@ const COLUMNS: TableColumn<QualityItem>[] = [
     sortable: true,
     render: (v) => <span className="qc-code">{v as string}</span>,
   },
-  { key: 'idAssistencia', label: 'ID Assistência', type: 'text', minWidth: 120, filterable: true, sortable: true },
+  { key: 'ordemdecompra', label: 'Ordem de Compra', type: 'text', minWidth: 130, filterable: true, sortable: true },
   { key: 'pedido', label: 'Pedido', type: 'text', minWidth: 90, filterable: true, sortable: true },
   { key: 'idErp',  label: 'ID ERP', type: 'text', minWidth: 90, filterable: true, sortable: true },
   {

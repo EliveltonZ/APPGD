@@ -17,6 +17,7 @@ export interface AssistanceTeamMember {
 export interface AssistanceProduction {
   id: string;
   num: number;
+  ordemdecompra: string;
   numSolicitacao: string;
   numContrato: string;
   corte: string;

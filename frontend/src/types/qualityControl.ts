@@ -19,7 +19,7 @@ export type AnalysisStatus = 'pendente' | 'analisado';
 export interface QualityItem {
   id: string;
   codigo: string;
-  idAssistencia: string;
+  ordemdecompra: string;
   pedido: string;
   idErp: string;
   qtd: number;
