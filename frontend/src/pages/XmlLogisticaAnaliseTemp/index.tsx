@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { Button } from "../../components/Button";
 import { DataTable } from "../../components/DataTable";
@@ -7,6 +7,32 @@ import { useToast } from "../../context/ToastContext";
 import { getErrorMessage } from "../../utils/errorMessage";
 import { analisarXmlLogisticaTemp } from "../../services/xmlLogisticaAnaliseTemp";
 import type { ItemAnaliseXmlLogistica } from "../../services/xmlLogisticaAnaliseTemp";
+
+// Mesma identidade usada na tabela (ambiente/categoria/descrição/referência/
+// dimensão/família/grupo/estrutura) — só a quantidade muda de item pra item
+// "igual". Ignora nível/pai/uniqueId de propósito: servem só pra reconstruir
+// a árvore, não pra dizer se duas peças são a mesma coisa.
+function chaveAgrupamento(i: ItemAnaliseXmlLogistica): string {
+  const dimensao = i.textDimension || [i.largura, i.altura, i.profundidade].filter((n) => n != null).join("x");
+  return [
+    i.ambiente, i.categoria, i.componente, i.descricao, i.referencia,
+    i.unidade, dimensao, i.familia, i.grupo, i.estruturaChave,
+  ].join("||");
+}
+
+function agruparESomar(itens: ItemAnaliseXmlLogistica[]): ItemAnaliseXmlLogistica[] {
+  const grupos = new Map<string, ItemAnaliseXmlLogistica>();
+  for (const item of itens) {
+    const chave = chaveAgrupamento(item);
+    const existente = grupos.get(chave);
+    if (existente) {
+      existente.quantidade = (existente.quantidade ?? 0) + (item.quantidade ?? 0);
+    } else {
+      grupos.set(chave, { ...item });
+    }
+  }
+  return [...grupos.values()];
+}
 
 // Tela TEMPORÁRIA — só pra ver, cru, o que o XML "LISTING" (pasta
 // "xml logistica", formato diferente do XML_BUILDER usado em Validar XML)
@@ -19,6 +45,7 @@ export function XmlLogisticaAnaliseTempPage() {
   const [totalComponentes, setTotalComponentes] = useState(0);
   const [loading, setLoading] = useState(false);
   const [soComponentes, setSoComponentes] = useState(true);
+  const [agrupar, setAgrupar] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,7 +68,10 @@ export function XmlLogisticaAnaliseTempPage() {
     }
   }
 
-  const itensExibidos = soComponentes ? itens.filter((i) => i.componente) : itens;
+  const itensExibidos = useMemo(() => {
+    const base = soComponentes ? itens.filter((i) => i.componente) : itens;
+    return agrupar ? agruparESomar(base) : base;
+  }, [itens, soComponentes, agrupar]);
 
   const columns: TableColumn<ItemAnaliseXmlLogistica>[] = [
     { key: "ambiente", label: "Ambiente", type: "text", sortable: true, filterable: true, minWidth: 140 },
@@ -101,6 +131,10 @@ export function XmlLogisticaAnaliseTempPage() {
           </span>
         )}
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, marginLeft: "auto" }}>
+          <input type="checkbox" checked={agrupar} onChange={(e) => setAgrupar(e.target.checked)} />
+          Agrupar itens iguais (somar qtd)
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
           <input type="checkbox" checked={soComponentes} onChange={(e) => setSoComponentes(e.target.checked)} />
           Mostrar só as peças (componentes)
         </label>
