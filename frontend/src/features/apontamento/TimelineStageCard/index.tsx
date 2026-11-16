@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Pause, Play, CheckCircle2, User, Clock } from "lucide-react";
+import { Pause, CheckCircle2, User, Clock } from "lucide-react";
 import { fmtDateTime } from "../../../utils/dateUtils";
 import { calcWorkMinutes, fmtWorkDuration } from "../../../utils/workTime";
 import { findPersonByIdOrName } from "../../../utils/people";
@@ -93,8 +93,10 @@ export function TimelineStageCard({
 
   const isDone    = stage.status === "finalizado";
   const canPause  = stage.status === "em_andamento";
-  const canResume = stage.status === "pausado";
-  const isActive  = canPause || canResume;
+  // Pausado não tem retorno (a flag `pausa` é usada em análise — reverter
+  // apagaria o histórico de que a etapa foi pausada). A única saída de
+  // "pausado" é escanear o código de finalizar.
+  const isActive  = canPause || stage.status === "pausado";
   const flashCls  = isDirty ? (FLASH_CLASS[stage.status] ?? "") : "";
 
   const endForCalc =
@@ -162,24 +164,14 @@ export function TimelineStageCard({
         </div>
       </div>
 
-      {(canPause || canResume) && (
+      {canPause && (
         <div className="apt-stage__actions">
-          {canPause && (
-            <button
-              className="apt-stage__btn apt-stage__btn--pause"
-              onClick={(e) => { e.stopPropagation(); onAction("pausar"); }}
-            >
-              <Pause size={13} /> Pausar
-            </button>
-          )}
-          {canResume && (
-            <button
-              className="apt-stage__btn apt-stage__btn--resume"
-              onClick={(e) => { e.stopPropagation(); onAction("retomar"); }}
-            >
-              <Play size={13} /> Retomar
-            </button>
-          )}
+          <button
+            className="apt-stage__btn apt-stage__btn--pause"
+            onClick={(e) => { e.stopPropagation(); onAction("pausar"); }}
+          >
+            <Pause size={13} /> Pausar
+          </button>
         </div>
       )}
 

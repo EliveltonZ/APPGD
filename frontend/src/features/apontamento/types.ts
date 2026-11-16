@@ -10,7 +10,7 @@ export type StageId =
 
 export type StageStatus = 'nao_iniciado' | 'em_andamento' | 'pausado' | 'finalizado';
 export type ProjectStatus = 'aguardando' | 'em_producao' | 'pausado' | 'concluido' | 'atrasado';
-export type StageAction = 'iniciar' | 'pausar' | 'retomar' | 'finalizar';
+export type StageAction = 'iniciar' | 'pausar' | 'finalizar';
 
 export const STAGE_ORDER: StageId[] = [
   'corte', 'customizacao', 'coladeira', 'usinagem',

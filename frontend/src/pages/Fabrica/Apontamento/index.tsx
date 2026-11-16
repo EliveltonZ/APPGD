@@ -152,7 +152,7 @@ export function ApontamentoPage() {
           return;
         }
         if (stage.status === "pausado") {
-          message(`${stage.label} está pausada — use o botão Retomar`, false);
+          message(`${stage.label} está pausada — escaneie o código de finalizar`, false);
           return;
         }
       }
@@ -179,9 +179,11 @@ export function ApontamentoPage() {
           updated.inicio = updated.inicio ?? now;
           updated.pausa = false;
         } else {
+          // Finalizar não mexe em `pausa` — se a etapa foi pausada em
+          // algum momento, o front precisa continuar mostrando isso mesmo
+          // depois de concluída (flag usada em análise).
           updated.status = "finalizado";
           updated.fim = now;
-          updated.pausa = false;
         }
 
         return { ...prev, etapas: { ...prev.etapas, [stageId]: updated } };
@@ -228,9 +230,6 @@ export function ApontamentoPage() {
         if (action === "pausar") {
           updated.status = "pausado";
           updated.pausa = true;
-        } else if (action === "retomar") {
-          updated.status = "em_andamento";
-          updated.pausa = false;
         }
         return { ...prev, etapas: { ...prev.etapas, [id]: updated } };
       });
