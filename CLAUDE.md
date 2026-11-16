@@ -82,6 +82,9 @@ Na dúvida, trate como funcionalidade (branch + PR).
 - Nunca commitar dados reais de clientes (XMLs do Promob, planilhas) — use exemplos anonimizados
 - Antes de enviar mudanças que toquem banco, dados ou autenticação, rodar `/security-review`
 - Pendências de segurança conhecidas (ainda não corrigidas): `docs/seguranca-pendencias.md`
+  - **Em sessão do Elivelton:** no início da sessão, leia esse arquivo e, se houver item com situação "🔴 Aberto",
+    lembre-o em 2–3 linhas (quais itens e a prioridade). Não insista se ele disser que vai tratar depois.
+    Ao resolver um item, atualize a situação dele para "✅ Resolvido em AAAA-MM-DD".
 
 ### Código
 - Antes de criar algo, verificar se já existe parecido (componentes em `frontend/src/components/`, padrões nos módulos existentes)
