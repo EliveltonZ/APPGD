@@ -17,7 +17,7 @@ import {
   fetchOcorrenciasConfig,
 } from "../../../../services/assistencia";
 import { analisarXmlLogisticaTemp } from "../../../../services/xmlLogisticaAnaliseTemp";
-import { filtrarMontagemFabrica, agruparESomar, dimensaoTexto, enriquecerComCor } from "../../../../utils/xmlListingAnalise";
+import { filtrarFamiliasRelevantes, agruparESomar, dimensaoTexto, enriquecerComCor } from "../../../../utils/xmlListingAnalise";
 import type { ItemAnaliseComCor } from "../../../../utils/xmlListingAnalise";
 import { useToast } from "../../../../context/ToastContext";
 import { getErrorMessage } from "../../../../utils/errorMessage";
@@ -162,7 +162,7 @@ export function PartsModal({
       const xml = await file.text();
       const resultado = await analisarXmlLogisticaTemp(xml);
       const comCor = enriquecerComCor(resultado.itens);
-      const filtrados = filtrarMontagemFabrica(comCor);
+      const filtrados = filtrarFamiliasRelevantes(comCor);
       setPreviewItens(agruparESomar(filtrados));
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao processar o XML."));
@@ -257,7 +257,7 @@ export function PartsModal({
         {importFileName && (
           <p className="pm-import__filename">
             {importFileName} — {previewItens.length} item{previewItens.length !== 1 ? "s" : ""} pra revisar
-            (só peças de Montagem e Fábrica)
+            (só Montagem, Fábrica e Acessórios)
           </p>
         )}
 

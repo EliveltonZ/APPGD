@@ -8,12 +8,13 @@ interface ImportPreviewTableProps {
   onRemove: (index: number) => void;
 }
 
-// Pré-visualização do que o XML trouxe (já filtrado por Montagem/Fábrica e
-// agrupado) — o usuário remove daqui o que não quer antes de confirmar;
-// nada entra na lista de peças de verdade até o clique em "Confirmar".
+// Pré-visualização do que o XML trouxe (já filtrado por Montagem/Fábrica/
+// Acessórios e agrupado) — o usuário remove daqui o que não quer antes de
+// confirmar; nada entra na lista de peças de verdade até o clique em
+// "Confirmar".
 export function ImportPreviewTable({ itens, onRemove }: ImportPreviewTableProps) {
   if (!itens.length) {
-    return <p className="as-empty">Nenhum item no XML pra essa família (Montagem/Fábrica).</p>;
+    return <p className="as-empty">Nenhum item no XML pra essas famílias (Montagem/Fábrica/Acessórios).</p>;
   }
 
   return (

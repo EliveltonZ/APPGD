@@ -1,17 +1,18 @@
 import type { ItemAnaliseXmlLogistica } from "../services/xmlLogisticaAnaliseTemp";
 
-// FAMILY do XML "LISTING" (Promob, pasta "xml logística") — só "Montagem"
-// (peças de madeira cortadas) e "Fábrica" (ferragens de montagem: cavilha,
-// minifix, tamborfix, tapa-furo...) interessam pro lançamento de peças de
-// Asteca. O resto (Roteiro Produtivo = operação de corte/borda, COM =
-// consumo de chapa/fita, categorias de orçamento) fica de fora.
-export const FAMILIAS_RELEVANTES = new Set(["Montagem", "Fábrica"]);
+// FAMILY do XML "LISTING" (Promob, pasta "xml logística") relevantes pro
+// lançamento de peças de Asteca: "Montagem" (peças de madeira cortadas),
+// "Fábrica" (ferragens de montagem: cavilha, minifix, tamborfix, tapa-
+// furo...) e "Acessórios" (item comprado avulso, ex.: fechadura, puxador).
+// O resto (Roteiro Produtivo = operação de corte/borda, COM = consumo de
+// chapa/fita, categorias de orçamento) fica de fora.
+export const FAMILIAS_RELEVANTES = new Set(["Montagem", "Fábrica", "Acessórios"]);
 
 export interface ItemAnaliseComCor extends ItemAnaliseXmlLogistica {
   cor: string;
 }
 
-export function filtrarMontagemFabrica<T extends ItemAnaliseXmlLogistica>(itens: T[]): T[] {
+export function filtrarFamiliasRelevantes<T extends ItemAnaliseXmlLogistica>(itens: T[]): T[] {
   return itens.filter((i) => i.familia != null && FAMILIAS_RELEVANTES.has(i.familia));
 }
 

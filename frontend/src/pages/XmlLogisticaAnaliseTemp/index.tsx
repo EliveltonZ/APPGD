@@ -7,7 +7,7 @@ import { useToast } from "../../context/ToastContext";
 import { getErrorMessage } from "../../utils/errorMessage";
 import { analisarXmlLogisticaTemp } from "../../services/xmlLogisticaAnaliseTemp";
 import type { ItemAnaliseXmlLogistica } from "../../services/xmlLogisticaAnaliseTemp";
-import { filtrarMontagemFabrica, agruparESomar } from "../../utils/xmlListingAnalise";
+import { filtrarFamiliasRelevantes, agruparESomar } from "../../utils/xmlListingAnalise";
 
 // Tela TEMPORÁRIA — só pra ver, cru, o que o XML "LISTING" (pasta
 // "xml logistica", formato diferente do XML_BUILDER usado em Validar XML)
@@ -19,11 +19,12 @@ export function XmlLogisticaAnaliseTempPage() {
   const [totalNos, setTotalNos] = useState(0);
   const [totalComponentes, setTotalComponentes] = useState(0);
   const [loading, setLoading] = useState(false);
-  // Com o filtro de família (Montagem/Fábrica) ligado por padrão, "só
-  // componentes" vira um refinamento à parte, desligado por padrão — senão
-  // esconderia as ferragens de Fábrica (componente=false) junto com o resto.
+  // Com o filtro de família (Montagem/Fábrica/Acessórios) ligado por padrão,
+  // "só componentes" vira um refinamento à parte, desligado por padrão —
+  // senão esconderia as ferragens de Fábrica (componente=false) junto com o
+  // resto.
   const [soComponentes, setSoComponentes] = useState(false);
-  const [soMontagemFabrica, setSoMontagemFabrica] = useState(true);
+  const [soFamiliasRelevantes, setSoFamiliasRelevantes] = useState(true);
   const [agrupar, setAgrupar] = useState(false);
   const [nomeArquivo, setNomeArquivo] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -49,10 +50,10 @@ export function XmlLogisticaAnaliseTempPage() {
 
   const itensExibidos = useMemo(() => {
     let base = itens;
-    if (soMontagemFabrica) base = filtrarMontagemFabrica(base);
+    if (soFamiliasRelevantes) base = filtrarFamiliasRelevantes(base);
     if (soComponentes) base = base.filter((i) => i.componente);
     return agrupar ? agruparESomar(base) : base;
-  }, [itens, soComponentes, soMontagemFabrica, agrupar]);
+  }, [itens, soComponentes, soFamiliasRelevantes, agrupar]);
 
   const columns: TableColumn<ItemAnaliseXmlLogistica>[] = [
     { key: "ambiente", label: "Ambiente", type: "text", sortable: true, filterable: true, minWidth: 140 },
@@ -114,10 +115,10 @@ export function XmlLogisticaAnaliseTempPage() {
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, marginLeft: "auto" }}>
           <input
             type="checkbox"
-            checked={soMontagemFabrica}
-            onChange={(e) => setSoMontagemFabrica(e.target.checked)}
+            checked={soFamiliasRelevantes}
+            onChange={(e) => setSoFamiliasRelevantes(e.target.checked)}
           />
-          Só Montagem e Fábrica
+          Só Montagem, Fábrica e Acessórios
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
           <input type="checkbox" checked={soComponentes} onChange={(e) => setSoComponentes(e.target.checked)} />
