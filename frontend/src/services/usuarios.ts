@@ -60,19 +60,19 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     paradas_maquina:           Boolean(r.paradas_maquina),
     paradas_admin:             Boolean(r.paradas_admin),
     almoxarifado_transferencias: Boolean(r.almoxarifado_transferencias),
-    // Placeholder — mesma chave usada nas rotas novas de estoque no backend.
-    // Liberado pra qualquer usuário logado por enquanto (sem coluna real em
-    // tblUsuario ainda) — permissões reais ficaram combinadas pra depois.
+    almoxarifado_estoque:     Boolean(r.almoxarifado_estoque),
+    almoxarifado_baixas:      Boolean(r.almoxarifado_baixas),
+    almoxarifado_nota_fiscal: Boolean(r.almoxarifado_nota_fiscal),
+    almoxarifado_ajuste:      Boolean(r.almoxarifado_ajuste),
+    almoxarifado_vinculos:    Boolean(r.almoxarifado_vinculos),
+    compras_liberacoes:       Boolean(r.compras_liberacoes),
+    compras_necessidades:     Boolean(r.compras_necessidades),
+    compras_confirmar:        Boolean(r.compras_confirmar),
+    compras_pedidos:          Boolean(r.compras_pedidos),
+    // Placeholders — ainda sem coluna real em tblUsuario (decisão explícita
+    // do usuário, fora do escopo da restrição de 16/11/2026). Liberado pra
+    // qualquer usuário logado.
     estoque_reservar: true,
-    almoxarifado_estoque: true,
-    almoxarifado_baixas: true,
-    almoxarifado_nota_fiscal: true,
-    almoxarifado_ajuste: true,
-    almoxarifado_vinculos: true,
-    compras_liberacoes: true,
-    compras_necessidades: true,
-    compras_confirmar: true,
-    compras_pedidos: true,
     compras_lancamento_acessorios: true,
     fabrica_solicitacao_interna: true,
   };
@@ -177,5 +177,14 @@ export async function saveAcessos(id: number, permissions: UserPermissions): Pro
     paradas_maquina:       permissions.paradas_maquina,
     paradas_admin:         permissions.paradas_admin,
     almoxarifado_transferencias: permissions.almoxarifado_transferencias,
+    compras_liberacoes:       permissions.compras_liberacoes,
+    compras_necessidades:     permissions.compras_necessidades,
+    compras_confirmar:        permissions.compras_confirmar,
+    compras_pedidos:          permissions.compras_pedidos,
+    almoxarifado_estoque:     permissions.almoxarifado_estoque,
+    almoxarifado_baixas:      permissions.almoxarifado_baixas,
+    almoxarifado_nota_fiscal: permissions.almoxarifado_nota_fiscal,
+    almoxarifado_ajuste:      permissions.almoxarifado_ajuste,
+    almoxarifado_vinculos:    permissions.almoxarifado_vinculos,
   });
 }

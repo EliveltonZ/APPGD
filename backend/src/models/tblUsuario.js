@@ -241,6 +241,60 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: false,
       field: 'cadastros_fornecedores'
+    },
+    comprasLiberacoes: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'compras_liberacoes'
+    },
+    comprasNecessidades: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'compras_necessidades'
+    },
+    comprasConfirmar: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'compras_confirmar'
+    },
+    comprasPedidos: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'compras_pedidos'
+    },
+    almoxarifadoEstoque: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_estoque'
+    },
+    almoxarifadoBaixas: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_baixas'
+    },
+    almoxarifadoNotaFiscal: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_nota_fiscal'
+    },
+    almoxarifadoAjuste: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_ajuste'
+    },
+    almoxarifadoVinculos: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'almoxarifado_vinculos'
     }
   }, {
     sequelize,

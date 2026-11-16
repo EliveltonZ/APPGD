@@ -1,14 +1,10 @@
 'use strict';
 
 const router = require('express').Router();
+const rp     = require('../middlewares/requirePermission');
 const repo   = require('../repositories/notaFiscalRepository');
 const codigoNFRepo = require('../repositories/materiaisCodigoNFRepository');
 const nfeMatchService = require('../services/nfeMatchService');
-
-// Permissões reais da feature de estoque ainda não foram desenhadas (mesma
-// decisão já tomada pra /estoque — ver comentário lá). Por enquanto, liberado
-// pra qualquer usuário autenticado (o middleware `auth` global já exige
-// token válido antes de chegar aqui).
 
 // Mesmo contrato do errorHandler.js global (status, mensagem, e `errors`
 // por campo quando for um ValidationError) — replicado aqui porque esta
@@ -34,24 +30,24 @@ function handler(fn) {
   };
 }
 
-router.get('/',          handler(() => repo.listar()));
-router.get('/:id/itens', handler((req) => repo.buscarItens(req.params.id)));
-router.post('/',         handler((req) => repo.criar(req.body, req.user?.sub)));
+router.get('/',          rp('almoxarifado_nota_fiscal'), handler(() => repo.listar()));
+router.get('/:id/itens', rp('almoxarifado_nota_fiscal'), handler((req) => repo.buscarItens(req.params.id)));
+router.post('/',         rp('almoxarifado_nota_fiscal'), handler((req) => repo.criar(req.body, req.user?.sub)));
 
 // Lê um XML de NF-e (chave, fornecedor, itens) e tenta casar fornecedor
 // (por CNPJ) e cada item (por vínculo já salvo) — nada é gravado aqui, só
 // prévia pra tela montar o rascunho.
-router.post('/xml/preview', handler((req) => nfeMatchService.preview(req.body.xml)));
+router.post('/xml/preview', rp('almoxarifado_nota_fiscal'), handler((req) => nfeMatchService.preview(req.body.xml)));
 
 // Vínculo código interno ↔ fornecedor — usado pra auto-preencher o item ao
 // escolher material+fornecedor no lançamento da nota.
-router.get('/vinculo/:materialId/:fornecedorId', handler((req) =>
+router.get('/vinculo/:materialId/:fornecedorId', rp('almoxarifado_nota_fiscal'), handler((req) =>
   codigoNFRepo.buscarVinculo(Number(req.params.materialId), Number(req.params.fornecedorId))));
 
 // Consulta e correção de vínculos já salvos — pra quando o time vincula um
 // item errado durante o lançamento e precisa achar e corrigir depois.
-router.get('/vinculos', handler(() => codigoNFRepo.listarTodos()));
-router.put('/vinculos/:id', handler(async (req) => {
+router.get('/vinculos', rp('almoxarifado_vinculos'), handler(() => codigoNFRepo.listarTodos()));
+router.put('/vinculos/:id', rp('almoxarifado_vinculos'), handler(async (req) => {
   const atualizado = await codigoNFRepo.atualizarVinculo(Number(req.params.id), {
     materialId: req.body.material_id,
     unidadeCompra: req.body.unidade_compra,
@@ -60,7 +56,7 @@ router.put('/vinculos/:id', handler(async (req) => {
   if (!atualizado) throw Object.assign(new Error('Vínculo não encontrado.'), { status: 404 });
   return atualizado;
 }));
-router.delete('/vinculos/:id', handler(async (req) => {
+router.delete('/vinculos/:id', rp('almoxarifado_vinculos'), handler(async (req) => {
   const ok = await codigoNFRepo.excluirVinculo(Number(req.params.id));
   if (!ok) throw Object.assign(new Error('Vínculo não encontrado.'), { status: 404 });
   return { ok: true };

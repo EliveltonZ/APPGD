@@ -14,6 +14,9 @@ const ACESSO_ATTRS = [
   'cadastrosClientes', 'cadastrosUsuarios', 'cadastrosMateriais', 'cadastrosLocalizacoes', 'apontamento',
   'paradasMaquina', 'paradasAdmin',
   'almoxarifadoTransferencias', 'cadastrosFornecedores',
+  'comprasLiberacoes', 'comprasNecessidades', 'comprasConfirmar', 'comprasPedidos',
+  'almoxarifadoEstoque', 'almoxarifadoBaixas', 'almoxarifadoNotaFiscal',
+  'almoxarifadoAjuste', 'almoxarifadoVinculos',
 ];
 
 // Converte instância Sequelize (camelCase) para plain object com chaves snake_case
@@ -55,6 +58,15 @@ function rowToSnake(r) {
     paradas_admin:         r.paradasAdmin         ?? false,
     almoxarifado_transferencias: r.almoxarifadoTransferencias ?? false,
     cadastros_fornecedores: r.cadastrosFornecedores ?? false,
+    compras_liberacoes:       r.comprasLiberacoes       ?? false,
+    compras_necessidades:     r.comprasNecessidades     ?? false,
+    compras_confirmar:        r.comprasConfirmar         ?? false,
+    compras_pedidos:          r.comprasPedidos           ?? false,
+    almoxarifado_estoque:     r.almoxarifadoEstoque      ?? false,
+    almoxarifado_baixas:      r.almoxarifadoBaixas       ?? false,
+    almoxarifado_nota_fiscal: r.almoxarifadoNotaFiscal   ?? false,
+    almoxarifado_ajuste:      r.almoxarifadoAjuste       ?? false,
+    almoxarifado_vinculos:    r.almoxarifadoVinculos     ?? false,
   };
 }
 
@@ -138,6 +150,15 @@ async function atualizarAcessos(body) {
       paradasAdmin:         body.paradas_admin         ?? false,
       almoxarifadoTransferencias: body.almoxarifado_transferencias ?? false,
       cadastrosFornecedores: body.cadastros_fornecedores ?? false,
+      comprasLiberacoes:     body.compras_liberacoes       ?? false,
+      comprasNecessidades:   body.compras_necessidades     ?? false,
+      comprasConfirmar:      body.compras_confirmar        ?? false,
+      comprasPedidos:        body.compras_pedidos          ?? false,
+      almoxarifadoEstoque:   body.almoxarifado_estoque     ?? false,
+      almoxarifadoBaixas:    body.almoxarifado_baixas      ?? false,
+      almoxarifadoNotaFiscal: body.almoxarifado_nota_fiscal ?? false,
+      almoxarifadoAjuste:    body.almoxarifado_ajuste      ?? false,
+      almoxarifadoVinculos:  body.almoxarifado_vinculos    ?? false,
     },
     { where: { id: body.id } }
   );
