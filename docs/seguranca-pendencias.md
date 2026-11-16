@@ -6,6 +6,19 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 > Contexto: hoje só Matheus e Elivelton têm acesso ao código, então o risco imediato é baixo.
 > Mesmo assim, os itens 1–3 devem ser resolvidos antes de o sistema ganhar mais usuários ou colaboradores.
 
+## Situação
+
+| # | Item | Prioridade | Situação |
+|---|---|---|---|
+| 1 | API pública do Supabase aberta pela chave `anon` | ALTA | 🔴 Aberto |
+| 2 | Senhas em texto puro em `tblUsuario` | ALTA | 🔴 Aberto |
+| 3 | RLS em tabelas novas | MÉDIA | 🔴 Aberto |
+| 4 | Dependências com vulnerabilidade | MÉDIA | 🔴 Aberto |
+| 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
+| 6 | Outros pontos (estoque aberto, SSL, servidor de testes, model do plano de contas, banco único) | BAIXA | 🔴 Aberto |
+
+Ao resolver um item, troque para `✅ Resolvido em AAAA-MM-DD` e anote o que foi feito na seção dele.
+
 ---
 
 ## 1. API pública do Supabase (PostgREST) aberta com a chave `anon` — ALTA
