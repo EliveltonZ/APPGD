@@ -234,7 +234,7 @@ export function PartsModal({
       title={`Peças para Assistência${pecas.length ? ` (${pecas.length})` : ""}`}
       isOpen={isOpen}
       onClose={handleClose}
-      maxWidth={860}
+      maxWidth={1280}
     >
       {/* ── Peças já inseridas ── */}
       {pecas.length > 0 && (
