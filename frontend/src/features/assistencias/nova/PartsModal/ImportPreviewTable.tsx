@@ -1,10 +1,10 @@
 import { Trash2 } from "lucide-react";
-import type { ItemAnaliseXmlLogistica } from "../../../../services/xmlLogisticaAnaliseTemp";
 import { dimensaoTexto } from "../../../../utils/xmlListingAnalise";
+import type { ItemAnaliseComCor } from "../../../../utils/xmlListingAnalise";
 import "../SelectedPartsTable/index.css";
 
 interface ImportPreviewTableProps {
-  itens: ItemAnaliseXmlLogistica[];
+  itens: ItemAnaliseComCor[];
   onRemove: (index: number) => void;
 }
 
@@ -24,6 +24,7 @@ export function ImportPreviewTable({ itens, onRemove }: ImportPreviewTableProps)
             <th style={{ width: 48 }}>Qtd</th>
             <th style={{ minWidth: 220 }}>Descrição</th>
             <th style={{ minWidth: 110 }}>Dimensões</th>
+            <th style={{ minWidth: 120 }}>Cor</th>
             <th style={{ minWidth: 90 }}>Família</th>
             <th style={{ width: 44 }}></th>
           </tr>
@@ -34,6 +35,7 @@ export function ImportPreviewTable({ itens, onRemove }: ImportPreviewTableProps)
               <td className="as-parts-table__num">{item.quantidade ?? "—"}</td>
               <td className="as-parts-table__peca">{item.descricao || "—"}</td>
               <td>{dimensaoTexto(item) || "—"}</td>
+              <td>{item.cor || "—"}</td>
               <td>{item.familia || "—"}</td>
               <td>
                 <button

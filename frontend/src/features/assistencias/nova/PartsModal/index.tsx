@@ -17,8 +17,8 @@ import {
   fetchOcorrenciasConfig,
 } from "../../../../services/assistencia";
 import { analisarXmlLogisticaTemp } from "../../../../services/xmlLogisticaAnaliseTemp";
-import type { ItemAnaliseXmlLogistica } from "../../../../services/xmlLogisticaAnaliseTemp";
-import { filtrarMontagemFabrica, agruparESomar, dimensaoTexto } from "../../../../utils/xmlListingAnalise";
+import { filtrarMontagemFabrica, agruparESomar, dimensaoTexto, enriquecerComCor } from "../../../../utils/xmlListingAnalise";
+import type { ItemAnaliseComCor } from "../../../../utils/xmlListingAnalise";
 import { useToast } from "../../../../context/ToastContext";
 import { getErrorMessage } from "../../../../utils/errorMessage";
 import "./index.css";
@@ -71,7 +71,7 @@ export function PartsModal({
   >([]);
 
   // ── Importação de XML (Promob "LISTING") ──────────────────
-  const [previewItens, setPreviewItens] = useState<ItemAnaliseXmlLogistica[]>([]);
+  const [previewItens, setPreviewItens] = useState<ItemAnaliseComCor[]>([]);
   const [importFalha, setImportFalha] = useState("");
   const [importTipo, setImportTipo] = useState("");
   const [importing, setImporting] = useState(false);
@@ -161,7 +161,8 @@ export function PartsModal({
     try {
       const xml = await file.text();
       const resultado = await analisarXmlLogisticaTemp(xml);
-      const filtrados = filtrarMontagemFabrica(resultado.itens);
+      const comCor = enriquecerComCor(resultado.itens);
+      const filtrados = filtrarMontagemFabrica(comCor);
       setPreviewItens(agruparESomar(filtrados));
     } catch (err) {
       toast.error(getErrorMessage(err, "Erro ao processar o XML."));
@@ -185,7 +186,7 @@ export function PartsModal({
         qtd: Math.max(1, Math.round(item.quantidade ?? 1)),
         peca: item.descricao ?? "",
         dimensoes: dimensaoTexto(item),
-        cor: "",
+        cor: item.cor,
         lado: "",
         falha: falhaOpt?.label ?? importFalha,
         falhaId: Number(importFalha),
