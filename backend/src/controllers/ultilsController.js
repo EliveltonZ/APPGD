@@ -4,7 +4,10 @@ function handler(fn) {
   return async (req, res) => {
     try {
       const data = await fn(req);
-      res.json(data);
+      // data undefined (ex.: setTipo/setDado não retornam nada) vira corpo
+      // vazio em res.json(), e res.json() do fetch() no frontend lança
+      // SyntaxError nesse corpo vazio — mesmo com a escrita já persistida.
+      res.json(data === undefined ? { success: true } : data);
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
