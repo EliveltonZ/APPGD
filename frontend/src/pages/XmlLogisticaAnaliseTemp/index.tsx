@@ -7,39 +7,7 @@ import { useToast } from "../../context/ToastContext";
 import { getErrorMessage } from "../../utils/errorMessage";
 import { analisarXmlLogisticaTemp } from "../../services/xmlLogisticaAnaliseTemp";
 import type { ItemAnaliseXmlLogistica } from "../../services/xmlLogisticaAnaliseTemp";
-
-// Mesma identidade usada na tabela (ambiente/categoria/descrição/referência/
-// dimensão/família/grupo/estrutura) — só a quantidade muda de item pra item
-// "igual". Ignora nível/pai/uniqueId de propósito: servem só pra reconstruir
-// a árvore, não pra dizer se duas peças são a mesma coisa.
-function chaveAgrupamento(i: ItemAnaliseXmlLogistica): string {
-  const dimensao = i.textDimension || [i.largura, i.altura, i.profundidade].filter((n) => n != null).join("x");
-  return [
-    i.ambiente, i.categoria, i.componente, i.descricao, i.referencia,
-    i.unidade, dimensao, i.familia, i.grupo, i.estruturaChave,
-  ].join("||");
-}
-
-function agruparESomar(itens: ItemAnaliseXmlLogistica[]): ItemAnaliseXmlLogistica[] {
-  const grupos = new Map<string, ItemAnaliseXmlLogistica>();
-  for (const item of itens) {
-    const chave = chaveAgrupamento(item);
-    const existente = grupos.get(chave);
-    if (existente) {
-      existente.quantidade = (existente.quantidade ?? 0) + (item.quantidade ?? 0);
-    } else {
-      grupos.set(chave, { ...item });
-    }
-  }
-  return [...grupos.values()];
-}
-
-// FAMILY do XML — só "Montagem" (peças de madeira cortadas) e "Fábrica"
-// (ferragens de montagem: cavilha, minifix, tamborfix, tapa-furo...) são
-// relevantes pro lançamento de peças das Astecas. O resto (Roteiro
-// Produtivo = operação de corte/borda, COM = consumo de chapa/fita —
-// já coberto por outro fluxo — e categorias de orçamento) fica de fora.
-const FAMILIAS_RELEVANTES = new Set(["Montagem", "Fábrica"]);
+import { filtrarMontagemFabrica, agruparESomar } from "../../utils/xmlListingAnalise";
 
 // Tela TEMPORÁRIA — só pra ver, cru, o que o XML "LISTING" (pasta
 // "xml logistica", formato diferente do XML_BUILDER usado em Validar XML)
@@ -81,7 +49,7 @@ export function XmlLogisticaAnaliseTempPage() {
 
   const itensExibidos = useMemo(() => {
     let base = itens;
-    if (soMontagemFabrica) base = base.filter((i) => i.familia != null && FAMILIAS_RELEVANTES.has(i.familia));
+    if (soMontagemFabrica) base = filtrarMontagemFabrica(base);
     if (soComponentes) base = base.filter((i) => i.componente);
     return agrupar ? agruparESomar(base) : base;
   }, [itens, soComponentes, soMontagemFabrica, agrupar]);
