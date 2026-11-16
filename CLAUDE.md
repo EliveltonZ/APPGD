@@ -52,8 +52,8 @@ Para os dois:
 5. O que entra no `main` é publicado em produção pelo Render
 
 **Funcionalidade nova ou mudança relevante (vale para os dois):** trabalhar em `claude/nome-da-feature`, criada a partir do `main`, e abrir Pull Request → `main`.
-- PR aberto em sessão do Matheus: revisado pelo Elivelton antes do merge.
-- PR aberto em sessão do Elivelton: ele mesmo faz o merge depois de testar.
+- Quem abriu o PR pode fazer o merge depois de testar — vale para o Matheus e para o Elivelton.
+- Os dois se alinham pessoalmente sobre as mudanças que cada um enviou.
 
 **Mudança simples pode ir direto ao `main`** — e só ela. Conta como simples quando **tudo** abaixo é verdade:
 - texto, ajuste visual ou correção pequena e óbvia, em poucos arquivos

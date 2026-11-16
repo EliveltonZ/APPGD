@@ -84,8 +84,8 @@ Após aprovação:
 ### Passo 2 — Deploy em produção
 Somente após confirmação, enviar ao `main`:
 - Abrir Pull Request `claude/nome-da-feature → main`
-  - Sessão do Matheus: aguardar a revisão do Elivelton antes do merge
-  - Sessão do Elivelton: ele faz o merge depois de testar
+- Quem abriu o PR (Matheus ou Elivelton) pode fazer o merge depois de testar
+- Os dois se alinham pessoalmente sobre as mudanças enviadas
 - Se a feature incluiu migration de banco, enviar o aviso descrito em `/migration` (etapa 8)
 
 Assim que entra no `main`, o Render publica automaticamente em produção.
