@@ -13,13 +13,25 @@ function toDateStr(val: unknown): string {
   return String(val).split('T')[0]
 }
 
-function toDetailStage(r: RawRow, inicioKey: string, fimKey: string): StatusStageDetail {
+// O backend já calcula o status certo de cada etapa (inclusive "pausado",
+// via tblProducao.{etapa}pausa) em logisticaRepository.stageStatus() e
+// manda pronto nesses campos — recalcular aqui só a partir de início/fim
+// (como fazia antes) nunca detectava pausa, porque esse dado nem chega
+// nesses dois campos.
+const STATUS_MAP: Record<string, StatusStageDetail['status']> = {
+  FINALIZADO: 'concluido',
+  PAUSADO:    'pausado',
+  INICIADO:   'em_andamento',
+  AGUARDE:    'nao_iniciado',
+}
+
+function toDetailStage(r: RawRow, inicioKey: string, fimKey: string, statusKey: string): StatusStageDetail {
   const inicio = r[inicioKey] ? String(r[inicioKey]) : ''
   const fim    = r[fimKey]    ? String(r[fimKey])    : ''
   return {
     inicio,
     fim,
-    status: fim ? 'concluido' : inicio ? 'em_andamento' : 'nao_iniciado',
+    status: STATUS_MAP[String(r[statusKey] ?? '')] ?? 'nao_iniciado',
   }
 }
 
@@ -50,14 +62,14 @@ function toStatusProject(r: RawRow): StatusProject {
 
 function toStatusProjectDetail(r: RawRow): StatusProjectDetail {
   const stages: StatusProjectDetailStages = {
-    corte:        toDetailStage(r, 'corteinicio',        'cortefim'),
-    customizacao: toDetailStage(r, 'customizacaoinicio', 'customizacaofim'),
-    coladeira:    toDetailStage(r, 'coladeirainicio',    'coladeirafim'),
-    usinagem:     toDetailStage(r, 'usinageminicio',     'usinagemfim'),
-    montagem:     toDetailStage(r, 'montageminicio',     'montagemfim'),
-    paineis:      toDetailStage(r, 'paineisinicio',      'paineisfim'),
-    acabamento:   toDetailStage(r, 'acabamentoinicio',   'acabamentofim'),
-    embalagem:    toDetailStage(r, 'embalageminicio',    'embalagemfim'),
+    corte:        toDetailStage(r, 'corteinicio',        'cortefim',        'scorte'),
+    customizacao: toDetailStage(r, 'customizacaoinicio', 'customizacaofim', 'scustom'),
+    coladeira:    toDetailStage(r, 'coladeirainicio',    'coladeirafim',    'scoladeira'),
+    usinagem:     toDetailStage(r, 'usinageminicio',     'usinagemfim',     'susinagem'),
+    montagem:     toDetailStage(r, 'montageminicio',     'montagemfim',     'smontagem'),
+    paineis:      toDetailStage(r, 'paineisinicio',      'paineisfim',      'spaineis'),
+    acabamento:   toDetailStage(r, 'acabamentoinicio',   'acabamentofim',   'sacabamento'),
+    embalagem:    toDetailStage(r, 'embalageminicio',    'embalagemfim',    'sembalagem'),
   }
   return {
     numOC:        String(r.ordemdecompra ?? ''),
