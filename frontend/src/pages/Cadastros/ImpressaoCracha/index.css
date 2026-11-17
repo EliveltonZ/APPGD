@@ -255,9 +255,17 @@
     print-color-adjust: exact;
   }
 
+  /* Zera a margem da página — toda a respiração fica por conta do
+     padding do próprio .ic-sheet, pra não depender da opção "Margens"
+     do diálogo de impressão do navegador (que às vezes ignora/soma
+     com o @page e deixa a prévia com uma faixa branca enorme). */
   @page {
     size: A4;
-    margin: 5mm;
+    margin: 0;
+  }
+
+  .ic-sheet {
+    padding: 6mm;
   }
 
   .no-print {
