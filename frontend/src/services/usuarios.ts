@@ -72,12 +72,9 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     compras_necessidades:     Boolean(r.compras_necessidades),
     compras_confirmar:        Boolean(r.compras_confirmar),
     compras_pedidos:          Boolean(r.compras_pedidos),
-    // Placeholders — ainda sem coluna real em tblUsuario (decisão explícita
-    // do usuário, fora do escopo da restrição de 16/11/2026). Liberado pra
-    // qualquer usuário logado.
-    estoque_reservar: true,
-    compras_lancamento_acessorios: true,
-    fabrica_solicitacao_interna: true,
+    estoque_reservar:              Boolean(r.estoque_reservar),
+    compras_lancamento_acessorios: Boolean(r.compras_lancamento_acessorios),
+    fabrica_solicitacao_interna:   Boolean(r.fabrica_solicitacao_interna),
   };
   return {
     id:          String(r.id    ?? ''),
@@ -199,5 +196,8 @@ export async function saveAcessos(id: number, permissions: UserPermissions): Pro
     almoxarifado_nota_fiscal: permissions.almoxarifado_nota_fiscal,
     almoxarifado_ajuste:      permissions.almoxarifado_ajuste,
     almoxarifado_vinculos:    permissions.almoxarifado_vinculos,
+    estoque_reservar:              permissions.estoque_reservar,
+    compras_lancamento_acessorios: permissions.compras_lancamento_acessorios,
+    fabrica_solicitacao_interna:   permissions.fabrica_solicitacao_interna,
   });
 }

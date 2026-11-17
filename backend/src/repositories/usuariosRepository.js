@@ -18,6 +18,7 @@ const ACESSO_ATTRS = [
   'comprasLiberacoes', 'comprasNecessidades', 'comprasConfirmar', 'comprasPedidos',
   'almoxarifadoEstoque', 'almoxarifadoBaixas', 'almoxarifadoNotaFiscal',
   'almoxarifadoAjuste', 'almoxarifadoVinculos',
+  'estoqueReservar', 'comprasLancamentoAcessorios', 'fabricaSolicitacaoInterna',
 ];
 
 // Converte instância Sequelize (camelCase) para plain object com chaves snake_case
@@ -68,6 +69,9 @@ function rowToSnake(r) {
     almoxarifado_nota_fiscal: r.almoxarifadoNotaFiscal   ?? false,
     almoxarifado_ajuste:      r.almoxarifadoAjuste       ?? false,
     almoxarifado_vinculos:    r.almoxarifadoVinculos     ?? false,
+    estoque_reservar:              r.estoqueReservar              ?? false,
+    compras_lancamento_acessorios: r.comprasLancamentoAcessorios  ?? false,
+    fabrica_solicitacao_interna:   r.fabricaSolicitacaoInterna    ?? false,
   };
 }
 
@@ -160,6 +164,9 @@ async function atualizarAcessos(body) {
       almoxarifadoNotaFiscal: body.almoxarifado_nota_fiscal ?? false,
       almoxarifadoAjuste:    body.almoxarifado_ajuste      ?? false,
       almoxarifadoVinculos:  body.almoxarifado_vinculos    ?? false,
+      estoqueReservar:             body.estoque_reservar              ?? false,
+      comprasLancamentoAcessorios: body.compras_lancamento_acessorios ?? false,
+      fabricaSolicitacaoInterna:   body.fabrica_solicitacao_interna   ?? false,
     },
     { where: { id: body.id } }
   );

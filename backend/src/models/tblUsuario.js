@@ -296,6 +296,24 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: false,
       field: 'almoxarifado_vinculos'
     },
+    estoqueReservar: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'estoque_reservar'
+    },
+    comprasLancamentoAcessorios: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'compras_lancamento_acessorios'
+    },
+    fabricaSolicitacaoInterna: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false,
+      field: 'fabrica_solicitacao_interna'
+    },
     crachaHash: {
       type: DataTypes.TEXT,
       allowNull: true,
