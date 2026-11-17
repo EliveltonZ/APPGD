@@ -176,8 +176,37 @@ export function ApontamentoPublicoPage() {
         message("Crachá não reconhecido", false);
         return;
       }
-      setOperadorAtual({ id: String(op.id), nome: op.nome });
-      message(`Operador identificado: ${op.nome}`, true);
+      const operador: Operator = { id: String(op.id), nome: op.nome };
+      setOperadorAtual(operador);
+
+      // Se alguma etapa já foi iniciada/pausada/finalizada nesta sessão
+      // sem operador (bipada antes de ler o crachá), aplica retroativamente
+      // nela agora — senão ficaria presa sem operador mesmo depois do scan.
+      let aplicadoEm: string[] = [];
+      setProject((prev) => {
+        if (!prev) return prev;
+        const pendentes = [...dirtyStageIds]
+          .map((id) => prev.etapas[id])
+          .filter((stage) => !stage.responsavelId);
+        if (pendentes.length === 0) return prev;
+        aplicadoEm = pendentes.map((s) => s.label);
+        const etapas = { ...prev.etapas };
+        for (const stage of pendentes) {
+          etapas[stage.id] = {
+            ...stage,
+            responsavelId: operador.id,
+            responsavelNome: operador.nome,
+          };
+        }
+        return { ...prev, etapas };
+      });
+
+      message(
+        aplicadoEm.length > 0
+          ? `Operador ${op.nome} aplicado em: ${aplicadoEm.join(", ")}`
+          : `Operador identificado: ${op.nome}`,
+        true,
+      );
     } catch (err) {
       if (!handleAuthError(err)) message("Erro ao ler crachá", false);
     }
