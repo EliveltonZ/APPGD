@@ -85,7 +85,6 @@ export function KioskHeader({
             onChange={(e) => setPedidoInput(e.target.value)}
             onKeyDown={handlePedidoKey}
             disabled={loading}
-            autoFocus
             autoComplete="off"
           />
           {hasPedido && (

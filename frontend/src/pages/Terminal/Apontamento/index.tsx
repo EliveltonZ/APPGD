@@ -342,11 +342,15 @@ export function ApontamentoPublicoPage() {
     }
   }, [project, saving]);
 
-  // Único listener global — diferencia crachá (32 caracteres) de pedido
-  // (4-6 dígitos) e etapa (9 dígitos) só pelo formato lido, evitando dois
-  // listeners brigando pelo mesmo scan.
+  // Único listener global — ativo o tempo todo (não depende de já ter um
+  // pedido carregado, senão escanear o crachá primeiro não funcionava).
+  // Diferencia crachá (32 caracteres) de pedido (4-6 dígitos) e etapa (9
+  // dígitos) só pelo formato lido via parseBarcode, evitando dois
+  // listeners brigando pelo mesmo scan. Não tem campo próprio — funciona
+  // em qualquer lugar da tela, contanto que o foco não esteja dentro de
+  // um campo de texto (aí a leitura cai no campo, não no listener).
   useEffect(() => {
-    if (!unlocked || !project) return;
+    if (!unlocked) return;
     let buffer = "";
     let lastTime = 0;
 
@@ -361,10 +365,20 @@ export function ApontamentoPublicoPage() {
       if (e.key === "Enter") {
         const code = buffer.trim();
         buffer = "";
+        if (!code) return;
+
         if (code.length === CRACHA_LENGTH) {
           handleBadgeScan(code);
-        } else if (code.length >= 4) {
+          return;
+        }
+
+        const result = parseBarcode(code);
+        if (result?.type === "pedido") {
+          handleSearch(String(result.pedido));
+        } else if (result?.type === "stage") {
           handleStage(code);
+        } else {
+          message(`Código inválido: ${code}`, false);
         }
         return;
       }
@@ -376,7 +390,7 @@ export function ApontamentoPublicoPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unlocked, project, handleStage]);
+  }, [unlocked, handleSearch, handleStage]);
 
   if (!unlocked) {
     return <PinGate onUnlock={() => setUnlocked(true)} />;
@@ -440,7 +454,9 @@ export function ApontamentoPublicoPage() {
               <div className="apt-empty__icon">🔍</div>
               <p className="apt-empty__msg">Escaneie o crachá e o pedido</p>
               <p className="apt-empty__hint">
-                Escaneie primeiro seu crachá, depois o pedido e os códigos de etapa.
+                Pode escanear em qualquer lugar da tela, sem clicar em campo
+                nenhum — primeiro o crachá, depois o pedido e os códigos de
+                etapa.
               </p>
             </>
           )}
