@@ -237,10 +237,10 @@ export function ApontamentoPublicoPage() {
           message(`${stage.label} está pausada — escaneie o código de finalizar`, false);
           return;
         }
-        if (!operadorAtual) {
-          message("Escaneie o crachá antes de iniciar uma etapa", false);
-          return;
-        }
+        // Não bloqueia mais aqui por falta de operador — dá pra iniciar
+        // sem ter escaneado o crachá ainda. A exigência passa a valer na
+        // hora de salvar (ver handleSave): toda etapa alterada nesta
+        // sessão precisa estar com operador definido pra poder gravar.
       }
 
       if (action === "finalizar") {
@@ -329,6 +329,18 @@ export function ApontamentoPublicoPage() {
 
   const handleSave = useCallback(async () => {
     if (!project || saving) return;
+
+    // Toda etapa alterada nesta sessão (bipada ou editada manualmente)
+    // precisa ter operador definido antes de gravar.
+    const semOperador = [...dirtyStageIds]
+      .map((id) => project.etapas[id])
+      .filter((stage) => !stage.responsavelId);
+    if (semOperador.length > 0) {
+      const labels = semOperador.map((s) => s.label).join(", ");
+      message(`Escaneie o crachá do operador — sem operador em: ${labels}`, false);
+      return;
+    }
+
     setSaving(true);
     try {
       await saveApontamentoPublico(project);
@@ -340,7 +352,7 @@ export function ApontamentoPublicoPage() {
     } finally {
       setSaving(false);
     }
-  }, [project, saving]);
+  }, [project, saving, dirtyStageIds]);
 
   // Único listener global — ativo o tempo todo (não depende de já ter um
   // pedido carregado, senão escanear o crachá primeiro não funcionava).
