@@ -265,19 +265,31 @@
   }
 
   .ic-print-area {
+    display: block;
     gap: 0;
   }
 
+  /* min-height:277mm (base) forçava a folha a ocupar a página inteira
+     mesmo com poucos crachás — qualquer arredondamento mm/px empurrava
+     uma sobra pra página seguinte, saindo uma folha quase em branco no
+     meio. Deixa a altura livre (continua display:grid da regra base),
+     só o conteúdo real do grid define o tamanho. */
   .ic-sheet {
     width: auto;
     height: auto;
-    min-height: 277mm;
     border: none;
     box-shadow: none;
     page-break-after: always;
+    break-after: page;
   }
 
   .ic-sheet:last-child {
     page-break-after: auto;
+    break-after: auto;
+  }
+
+  .ic-badge {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
