@@ -25,7 +25,12 @@ function GroupCheckbox({
   return <input type="checkbox" ref={ref} checked={checked} onChange={onChange} />
 }
 
-const TOTAL = ROUTE_ITEMS.length
+// ROUTE_ITEMS tem entradas ocultas que repetem a mesma permissionKey (ex.:
+// assistencias_nova aparece 3x — 1 visível + 2 ocultas, pra conceder acesso
+// a outras rotas com a mesma permissão). Contar por item inflaria o total
+// e nenhum usuário chegaria a "tudo marcado".
+const ALL_PERMISSION_KEYS = [...new Set(ROUTE_ITEMS.map((r) => r.permissionKey))] as PermissionKey[]
+const TOTAL = ALL_PERMISSION_KEYS.length
 
 export function ConfigAcessosPage() {
   const toast = useToast()
@@ -68,18 +73,22 @@ export function ConfigAcessosPage() {
     setDraft((prev) => (prev ? { ...prev, [key]: !prev[key] } : prev))
   }
 
+  function groupKeys(groupId: string): PermissionKey[] {
+    return [...new Set(
+      ROUTE_ITEMS.filter((r) => r.groupId === groupId).map((r) => r.permissionKey as PermissionKey),
+    )]
+  }
+
   function groupStats(groupId: string) {
-    const items = ROUTE_ITEMS.filter((r) => r.groupId === groupId)
-    const active = draft ? items.filter((r) => draft[r.permissionKey as PermissionKey]).length : 0
-    return { total: items.length, active }
+    const keys = groupKeys(groupId)
+    const active = draft ? keys.filter((k) => draft[k]).length : 0
+    return { total: keys.length, active }
   }
 
   function toggleGroupAll(groupId: string) {
     const { total, active } = groupStats(groupId)
     const selectAll = active < total
-    const keys = ROUTE_ITEMS
-      .filter((r) => r.groupId === groupId)
-      .map((r) => r.permissionKey as PermissionKey)
+    const keys = groupKeys(groupId)
     setDraft((prev) => {
       if (!prev) return prev
       const next = { ...prev }
