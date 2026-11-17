@@ -1,6 +1,16 @@
 const service = require('../services/usuariosService');
+const utilsService = require('../services/utilsService');
 
 module.exports = {
+  async getOperadores(req, res) {
+    try {
+      const data = await utilsService.listarOperadores();
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ message: 'Erro ao listar operadores', error: err.message });
+    }
+  },
+
   async getOperador(req, res) {
     try {
       const hash = req.query.hash;

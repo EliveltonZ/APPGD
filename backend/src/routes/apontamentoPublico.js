@@ -14,8 +14,9 @@ router.use(kioskAuth)
 // antes de salvá-lo — sem efeito colateral nenhum.
 router.get('/ping', (_req, res) => res.json({ ok: true }))
 
-router.get('/pedido',   apt.getPedido)
-router.post('/dados',   apt.setDados)
-router.get('/operador', c.getOperador)
+router.get('/pedido',     apt.getPedido)
+router.post('/dados',     apt.setDados)
+router.get('/operador',   c.getOperador)
+router.get('/operadores', c.getOperadores)
 
 module.exports = router

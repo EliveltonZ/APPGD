@@ -1,8 +1,17 @@
 import { kioskGet, kioskPost } from '../../services/kioskApi';
 import { mapRow, buildApontamentoPayload } from './service';
-import type { ApontamentoProject } from './types';
+import type { ApontamentoProject, Operator } from './types';
 
 type ApiRow = Record<string, unknown>;
+
+// Versão pública de fetchApontamentoOperators (service.ts) — aquela usa o
+// cliente autenticado (apiGet), que faz 401 -> redireciona pra /login.
+// Nesse terminal não existe login nenhum, então precisa da própria rota
+// pública pra não quebrar a tela assim que carrega.
+export async function fetchApontamentoOperatorsPublico(): Promise<Operator[]> {
+  const rows = await kioskGet<{ id: unknown; nome: unknown }[]>('/operadores');
+  return rows.map((r) => ({ id: String(r.id ?? ''), nome: String(r.nome ?? '') }));
+}
 
 export async function fetchProjectByPedidoPublico(pedido: string): Promise<ApontamentoProject[] | null> {
   const rows = await kioskGet<ApiRow[]>('/pedido', { pedido });

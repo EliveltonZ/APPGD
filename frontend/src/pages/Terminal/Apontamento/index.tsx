@@ -6,8 +6,8 @@ import {
   fetchProjectByPedidoPublico,
   saveApontamentoPublico,
   buscarOperadorPorCracha,
+  fetchApontamentoOperatorsPublico,
 } from "../../../features/apontamento/servicePublico";
-import { fetchApontamentoOperators } from "../../../features/apontamento/service";
 import type {
   ApontamentoProject,
   StageId,
@@ -104,7 +104,7 @@ export function ApontamentoPublicoPage() {
 
   useEffect(() => {
     if (!unlocked) return;
-    fetchApontamentoOperators()
+    fetchApontamentoOperatorsPublico()
       .then(setOperators)
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
