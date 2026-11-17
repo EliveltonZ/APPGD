@@ -27,12 +27,13 @@ router.get('/pronto-para-baixa',    rp('almoxarifado_baixas'), c.getProntoParaBa
 router.get('/pendentes-liberados',  rp('compras_liberacoes'), c.getPendentesLiberados);
 router.get('/saldo-materiais',      rp('almoxarifado_estoque'), c.getSaldoPorMaterial);
 router.get('/saldo-localizacoes/:materialId', rp('almoxarifado_estoque'), c.getSaldoLocalizacoes);
-router.put('/:id/quantidade',          rp('compras_liberacoes'), c.putQuantidade);
-router.post('/:id/liberar',            rp('compras_liberacoes'), c.postLiberar);
-// Cancelar liberação é usado tanto na tela de Liberações quanto na de Baixas
-// (pra desfazer antes de dar baixa).
-router.post('/:id/cancelar-liberacao', rp.any('compras_liberacoes', 'almoxarifado_baixas'), c.postCancelarLiberacao);
-router.post('/:id/baixa',              rp('almoxarifado_baixas'), c.postBaixa);
+// Ações por item (definir quantidade/liberar/cancelar/baixa) — mesmo
+// PendingControlModal embutido em Itens Pedido, Baixas e Liberações, sem
+// diferenciar botão por tela (ver comentário mais abaixo).
+router.put('/:id/quantidade',          rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.putQuantidade);
+router.post('/:id/liberar',            rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postLiberar);
+router.post('/:id/cancelar-liberacao', rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postCancelarLiberacao);
+router.post('/:id/baixa',              rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postBaixa);
 
 // Ajuste de estoque por contagem (inventário periódico) — informa o saldo
 // atual de um material numa localização, e lança a diferença contra o que
@@ -41,22 +42,32 @@ router.get('/ajuste/saldo/:materialId/:localizacaoId', rp('almoxarifado_ajuste')
 router.post('/ajuste',                                 rp('almoxarifado_ajuste'), c.postAjuste);
 router.get('/ajuste/historico',                        rp('almoxarifado_ajuste'), c.getHistoricoAjustes);
 
-// Tela "Itens Pedido" — lançamento direto no pedido, sem depender de uma
-// importação de XML (acessório de terceiro lançado na liberação, etc.).
-router.get('/pedido/buscar-contrato',      rp('compras_pendencias'), pedidoC.getBuscarContrato);
-router.get('/pedido/:ordemdecompra/itens', rp('compras_pendencias'), pedidoC.getItens);
-router.post('/pedido/:ordemdecompra/itens', rp('compras_pendencias'), pedidoC.postItem);
-router.delete('/pedido/itens/:id',          rp('compras_pendencias'), pedidoC.deleteItem);
+// Itens do pedido (tblXmlConsumo) — lançamento/consulta direto no pedido,
+// sem depender de importação de XML. Esse grupo de rotas é lido/escrito
+// por bem mais telas do que só "Itens Pedido": o mesmo PendingControlModal
+// é embutido em Itens Pedido (compras_pendencias), Baixas
+// (almoxarifado_baixas) e Liberações (compras_liberacoes) sem diferenciar
+// por tela, e a listagem (GET itens) ainda é lida, só pra exibição, pelos
+// modais de Previsão/Status/Expedição/Produção (4 permissões totalmente
+// diferentes). Solicitação Interna (fabrica_solicitacao_interna, sem
+// coluna real ainda) também usa buscar-contrato/inserir item pra abrir uma
+// pendência avulsa. Com essa variedade — e uma permissão ainda não
+// reforçada no meio — fica sem dono único pra gatekeeping real; mantido
+// liberado pra qualquer autenticado, como já era antes.
+router.get('/pedido/buscar-contrato',      pedidoC.getBuscarContrato);
+router.get('/pedido/:ordemdecompra/itens', pedidoC.getItens);
+router.post('/pedido/:ordemdecompra/itens', pedidoC.postItem);
+router.delete('/pedido/itens/:id',          pedidoC.deleteItem);
 
 // Liberação em lote — por pedido inteiro ou por todos os pedidos do mesmo
 // lote de corte. Item por item (não trava tudo se um item ainda não tiver
-// quantidade definida).
-router.post('/pedido/:ordemdecompra/liberar-tudo', rp('compras_liberacoes'), c.postLiberarPedido);
-router.post('/pedido/:ordemdecompra/liberar-lote', rp('compras_liberacoes'), c.postLiberarLote);
+// quantidade definida). Mesmo PendingControlModal das 3 telas acima.
+router.post('/pedido/:ordemdecompra/liberar-tudo', rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postLiberarPedido);
+router.post('/pedido/:ordemdecompra/liberar-lote', rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postLiberarLote);
 
 // Baixa em cascata — dá baixa de todo item pendente/liberado do pedido de
 // uma vez (nunca bloqueia por saldo); só exige que chapa/fita já tenha
 // quantidade em UN definida.
-router.post('/pedido/:ordemdecompra/baixar-tudo', rp('almoxarifado_baixas'), c.postBaixarPedidoCompleto);
+router.post('/pedido/:ordemdecompra/baixar-tudo', rp.any('compras_pendencias', 'almoxarifado_baixas', 'compras_liberacoes'), c.postBaixarPedidoCompleto);
 
 module.exports = router;
