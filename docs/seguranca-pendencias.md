@@ -16,6 +16,8 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 | 4 | Dependências com vulnerabilidade | MÉDIA | 🔴 Aberto |
 | 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
 | 6 | Outros pontos (estoque aberto, SSL, servidor de testes, model do plano de contas, banco único) | BAIXA | 🔴 Aberto |
+| 7 | Tabela do PIN do terminal (`tblKioskPin`) sem RLS | ALTA (se o item 1 não for resolvido) | 🔴 Aberto |
+| 8 | PIN do terminal sem limite de tentativas | MÉDIA | 🔴 Aberto |
 
 Ao resolver um item, troque para `✅ Resolvido em AAAA-MM-DD` e anote o que foi feito na seção dele.
 
@@ -114,3 +116,27 @@ Nenhum desses arquivos é usado pelo código — remover não afeta o funcioname
 - **Servidor de testes no Render** (`AppGD-testes`) ainda roda o sistema antigo (abril). Precisa ser reconfigurado para o monorepo novo antes de voltar a ser usado nos testes.
 - **Model `tblPlanoContas` desatualizado:** o banco já tem `codigo_dre` e `codigo_interno` (migração aplicada em 2026-06-16, fora do sequelize-cli); a coluna `codigo` não existe mais. O model ainda declara `codigo` — não quebra hoje porque nada usa o model, mas precisa ser corrigido (será feito junto com a tela Financeiro → Cadastros).
 - **Banco único:** teste e produção usam o mesmo banco. Toda migration é aplicada direto em produção — vale considerar um banco de testes separado (ex.: branch do Supabase).
+
+---
+
+## 7. Tabela do PIN do terminal sem RLS — ALTA (se o item 1 não for resolvido)
+
+Identificado em 2026-11-17, na revisão do terminal público de apontamento (commits de 17/11).
+
+- A migration `20261117110500-create-tblKioskPin` cria a tabela `tblKioskPin` **sem** `ENABLE ROW LEVEL SECURITY`.
+- A tabela guarda o PIN que libera o terminal. Como a chave `anon` antiga ainda funciona (item 1), **quem tem essa chave consegue ler o PIN direto pela API pública** e usar o terminal sem precisar do PIN verdadeiro.
+- Também vale para as migrations novas de permissões em `tblUsuario`, que só adicionam colunas (sem RLS extra, pois a tabela já existia).
+
+**Correção sugerida:** nova migration com `ALTER TABLE "tblKioskPin" ENABLE ROW LEVEL SECURITY;` (sem policy para `anon`/`public`). Tratar junto com o item 1.
+
+---
+
+## 8. PIN do terminal sem limite de tentativas — MÉDIA
+
+Identificado em 2026-11-17, na mesma revisão.
+
+- O PIN do terminal tem **6 dígitos** (1 milhão de combinações).
+- O `server.js` aplica limite de tentativas **só** em `/api/auth/login`. As rotas `/api/apontamento-publico/*` não têm limite, então alguém poderia testar combinações até acertar.
+- Quem acerta o PIN passa a ver a lista de operadores (`/operadores`) e pode registrar apontamentos.
+
+**Correção sugerida:** aplicar um limitador de tentativas (como o do login) em `/api/apontamento-publico`, e avaliar um PIN mais longo ou bloqueio temporário após várias falhas.
