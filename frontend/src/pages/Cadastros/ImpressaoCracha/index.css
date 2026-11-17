@@ -166,17 +166,30 @@
 }
 
 .ic-badge {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2mm;
   border: 1px dashed #999;
+  border-top: 2.5mm solid #475569;
   border-radius: 3mm;
   padding: 3mm;
   overflow: hidden;
   background: #fff;
   color: #000;
+}
+
+/* Marca de furo do cordão — só um guia visual, não é furada de verdade */
+.ic-badge__furo {
+  position: absolute;
+  top: 2mm;
+  right: 2mm;
+  width: 3mm;
+  height: 3mm;
+  border-radius: 50%;
+  border: 0.4mm dashed #999;
 }
 
 .ic-badge__logo {
@@ -192,10 +205,30 @@
   color: #000;
 }
 
+.ic-badge__setor-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5mm;
+}
+
+.ic-badge__setor-dot {
+  width: 2mm;
+  height: 2mm;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .ic-badge__setor {
   font-size: 11px;
   color: #444;
   text-transform: uppercase;
+}
+
+.ic-badge__id {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #000;
 }
 
 .ic-badge__barcode {

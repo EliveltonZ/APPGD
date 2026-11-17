@@ -11,6 +11,31 @@ import "./index.css";
 
 const OPCOES_POR_FOLHA = [2, 4, 6, 8, 9, 10, 12, 15, 16];
 
+// Faixa colorida por setor — só visual, ajuda a identificar o setor de
+// longe no chão de fábrica. Setor fora da lista cai numa cor neutra fixa
+// (não aleatória, pra não mudar a cada reload).
+const COR_SETOR: Record<string, string> = {
+  PRODUCAO: "#2563eb",
+  MONTAGEM: "#16a34a",
+  MONTADOR: "#16a34a",
+  COLADEIRA: "#d97706",
+  USINAGEM: "#7c3aed",
+  SECCIONADORA: "#dc2626",
+  EMBALAGEM: "#0891b2",
+  MOTORISTA: "#52525b",
+  PCP: "#be185d",
+  LOGISTICA: "#059669",
+  ALMOXARIFADO: "#92400e",
+  EXPEDICAO: "#0d9488",
+  MANUTENCAO: "#ca8a04",
+  QUALIDADE: "#4338ca",
+};
+const COR_SETOR_PADRAO = "#475569";
+
+function corSetor(setor: string | null | undefined): string {
+  return COR_SETOR[(setor ?? "").trim().toUpperCase()] ?? COR_SETOR_PADRAO;
+}
+
 // Presets de colunas pra ficar com um grid arrumado nos casos comuns —
 // cai pra raiz quadrada arredondada pra cima pra qualquer outro valor.
 const COLUNAS_PRESET: Record<number, number> = {
@@ -187,11 +212,26 @@ export function ImpressaoCrachaPage() {
             return (
               <div className="ic-sheet" key={idx} style={style}>
                 {pagina.map((u) => (
-                  <div className="ic-badge" key={u.id}>
+                  <div
+                    className="ic-badge"
+                    key={u.id}
+                    style={{ borderTopColor: corSetor(u.setor) }}
+                  >
+                    <span
+                      className="ic-badge__furo"
+                      title="Local sugerido pro furo do cordão"
+                    />
                     <img src={logo} alt="" className="ic-badge__logo" />
                     <div className="ic-badge__nome">{u.login}</div>
-                    <div className="ic-badge__setor">{u.setor}</div>
+                    <div className="ic-badge__setor-row">
+                      <span
+                        className="ic-badge__setor-dot"
+                        style={{ background: corSetor(u.setor) }}
+                      />
+                      <span className="ic-badge__setor">{u.setor}</span>
+                    </div>
                     <div className="ic-badge__barcode">{u.crachaHash}</div>
+                    <div className="ic-badge__id">Nº {u.id}</div>
                     <div className="ic-badge__codigo">{u.crachaHash}</div>
                   </div>
                 ))}
