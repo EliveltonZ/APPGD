@@ -156,6 +156,7 @@
 .ic-sheet {
   display: grid;
   gap: 2mm;
+  width: 190mm;
   height: 287mm;
   padding: 2mm;
   background: #fff;
