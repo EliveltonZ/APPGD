@@ -6,35 +6,27 @@ import { Button } from "../../../components/Button";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchAllUsers, gerarCracha } from "../../../services/usuarios";
+import { fetchCoresSetor, salvarCorSetor, type CoresSetor } from "../../../services/corSetor";
 import { getErrorMessage } from "../../../utils/errorMessage";
 import logo from "../../../assets/gd-color.png";
 import "./index.css";
 
 const OPCOES_POR_FOLHA = [2, 4, 6, 8, 9, 10, 12, 15, 16];
 
-// Faixa colorida por setor — só visual, ajuda a identificar o setor de
-// longe no chão de fábrica. Setor fora da lista cai numa cor neutra fixa
-// (não aleatória, pra não mudar a cada reload).
-const COR_SETOR: Record<string, string> = {
-  PRODUCAO: "#2563eb",
-  MONTAGEM: "#16a34a",
-  MONTADOR: "#16a34a",
-  COLADEIRA: "#d97706",
-  USINAGEM: "#7c3aed",
-  SECCIONADORA: "#dc2626",
-  EMBALAGEM: "#0891b2",
-  MOTORISTA: "#52525b",
-  PCP: "#be185d",
-  LOGISTICA: "#059669",
-  ALMOXARIFADO: "#92400e",
-  EXPEDICAO: "#0d9488",
-  MANUTENCAO: "#ca8a04",
-  QUALIDADE: "#4338ca",
-};
+// Cor neutra pra qualquer setor que ainda não teve uma cor definida —
+// nunca fica sem faixa, mesmo um setor novo que acabou de surgir.
 const COR_SETOR_PADRAO = "#475569";
 
-function corSetor(setor: string | null | undefined): string {
-  return COR_SETOR[(setor ?? "").trim().toUpperCase()] ?? COR_SETOR_PADRAO;
+// Paleta só pra sugerir um ponto de partida decente ao definir a cor de um
+// setor novo — não é uma lista fixa de setores, é reciclada por índice.
+const SUGESTOES_COR = [
+  "#2563eb", "#16a34a", "#d97706", "#7c3aed", "#dc2626",
+  "#0891b2", "#52525b", "#be185d", "#059669", "#92400e",
+  "#0d9488", "#ca8a04", "#4338ca",
+];
+
+function sugestaoCor(indice: number): string {
+  return SUGESTOES_COR[indice % SUGESTOES_COR.length];
 }
 
 // Presets de colunas pra ficar com um grid arrumado nos casos comuns —
@@ -53,6 +45,10 @@ function chunk<T>(arr: T[], size: number): T[][] {
   return out;
 }
 
+function normSetor(setor: string | null | undefined): string {
+  return (setor ?? "").trim().toUpperCase();
+}
+
 export function ImpressaoCrachaPage() {
   const toast = useToast();
   const { data: rawUsers = [], loading, refetch } = useApiData(fetchAllUsers);
@@ -60,6 +56,18 @@ export function ImpressaoCrachaPage() {
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
   const [porFolha, setPorFolha] = useState(8);
   const [gerandoId, setGerandoId] = useState<number | null>(null);
+  const [cores, setCores] = useState<CoresSetor>({});
+  const [coresCarregadas, setCoresCarregadas] = useState(false);
+
+  useEffect(() => {
+    fetchCoresSetor()
+      .then((data) => {
+        setCores(data);
+        setCoresCarregadas(true);
+      })
+      .catch((err) => toast.error(getErrorMessage(err, "Erro ao carregar cores dos setores.")));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const lista = useMemo(
     () => rawUsers.filter((u) => u.ativo && (!soFabrica || (u.local ?? "").trim().toUpperCase() === "FABRICA")),
@@ -67,6 +75,49 @@ export function ImpressaoCrachaPage() {
   );
 
   const comCracha = useMemo(() => lista.filter((u) => u.crachaHash), [lista]);
+
+  // Setores realmente presentes na lista atual, na ordem em que aparecem —
+  // dinâmico de propósito: setor novo cadastrado em algum usuário já aparece
+  // aqui pra receber uma cor, sem precisar editar código nenhum.
+  const setoresDaLista = useMemo(() => {
+    const vistos = new Set<string>();
+    const out: string[] = [];
+    for (const u of lista) {
+      const s = normSetor(u.setor);
+      if (s && !vistos.has(s)) {
+        vistos.add(s);
+        out.push(s);
+      }
+    }
+    return out;
+  }, [lista]);
+
+  // Setor novo (nunca visto antes) ganha uma cor sugerida e já persiste no
+  // banco — assim o seletor de cor e o próprio crachá nunca mostram cores
+  // diferentes pro mesmo setor por estarem num "ainda sem cor" implícito.
+  useEffect(() => {
+    if (!coresCarregadas) return;
+    setoresDaLista.forEach((setor, idx) => {
+      if (!(setor in cores)) {
+        handleCorChange(setor, sugestaoCor(idx));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coresCarregadas, setoresDaLista]);
+
+  function corSetor(setor: string | null | undefined): string {
+    const s = normSetor(setor);
+    return cores[s] ?? COR_SETOR_PADRAO;
+  }
+
+  async function handleCorChange(setor: string, cor: string) {
+    setCores((prev) => ({ ...prev, [setor]: cor }));
+    try {
+      await salvarCorSetor(setor, cor);
+    } catch (err) {
+      toast.error(getErrorMessage(err, "Erro ao salvar cor do setor."));
+    }
+  }
 
   // Ao trocar o filtro, reseleciona por padrão todo mundo que já tem
   // crachá na lista atual.
@@ -149,6 +200,24 @@ export function ImpressaoCrachaPage() {
               </select>
             </label>
           </div>
+
+          {setoresDaLista.length > 0 && (
+            <div className="ic-cores">
+              <span className="ic-cores__label">Cor por setor</span>
+              <div className="ic-cores__list">
+                {setoresDaLista.map((setor) => (
+                  <label key={setor} className="ic-cores__item">
+                    <input
+                      type="color"
+                      value={cores[setor] ?? COR_SETOR_PADRAO}
+                      onChange={(e) => handleCorChange(setor, e.target.value)}
+                    />
+                    {setor}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="ic-list">
             <div className="ic-list__header">

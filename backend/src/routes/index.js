@@ -46,6 +46,7 @@ router.use('/nota-fiscal',    require('./notaFiscal'))
 router.use('/solicitacao-compras', require('./solicitacaoCompras'))
 router.use('/solicitacao-interna', require('./solicitacaoInterna'))
 router.use('/kiosk-pin',          require('./kioskPin'))
+router.use('/cor-setor',          require('./corSetor'))
 
 // Temporária — ver comentário em routes/xmlLogisticaAnaliseTemp.js
 router.use('/xml-logistica-analise-temp', require('./xmlLogisticaAnaliseTemp'))

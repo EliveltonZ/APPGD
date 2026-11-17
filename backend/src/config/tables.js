@@ -101,6 +101,9 @@ const T = {
 
   // ── Terminal público (apontamento sem login) ─────────────────────────────
   kioskPin: { name: 'tblKioskPin', pk: 'id' },
+
+  // ── Impressão de crachás ──────────────────────────────────────────────────
+  corSetor: { name: 'tblCorSetor', pk: 'setor' },
 };
 
 module.exports = T;
