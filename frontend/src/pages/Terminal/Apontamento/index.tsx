@@ -484,6 +484,7 @@ export function ApontamentoPublicoPage() {
             dirtyStageIds={dirtyStageIds}
             onStageAction={handleStageAction}
             onOperatorChange={handleOperatorChange}
+            operatorEditable={false}
           />
         </div>
       )}

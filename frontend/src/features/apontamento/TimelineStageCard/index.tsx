@@ -74,6 +74,9 @@ interface Props {
   isDirty: boolean;
   onAction: (action: StageAction) => void;
   onOperatorChange: (id: string, nome: string) => void;
+  /** false no terminal público — lá o operador só entra por leitura de
+   * crachá, nunca digitando o ID direto (furaria a exigência). */
+  operatorEditable?: boolean;
 }
 
 export function TimelineStageCard({
@@ -82,6 +85,7 @@ export function TimelineStageCard({
   isDirty,
   onAction,
   onOperatorChange,
+  operatorEditable = true,
 }: Props) {
   const [nowMs, setNowMs] = useState(() => Date.now());
 
@@ -121,7 +125,7 @@ export function TimelineStageCard({
       <div className="apt-stage__body">
         <div className="apt-stage__info-row apt-stage__info-row--operator">
           <User size={13} />
-          {isActive ? (
+          {isActive && operatorEditable ? (
             <OperatorInput
               key={stage.responsavelId ?? ""}
               initialId={stage.responsavelId ?? ""}

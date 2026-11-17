@@ -9,9 +9,10 @@ interface Props {
   dirtyStageIds:    ReadonlySet<StageId>;
   onStageAction:    (id: StageId, action: StageAction) => void;
   onOperatorChange: (id: StageId, operatorId: string, operatorNome: string) => void;
+  operatorEditable?: boolean;
 }
 
-export function ProductionTimeline({ project, operators, dirtyStageIds, onStageAction, onOperatorChange }: Props) {
+export function ProductionTimeline({ project, operators, dirtyStageIds, onStageAction, onOperatorChange, operatorEditable }: Props) {
   return (
     <div className="apt-timeline">
       <div className="apt-timeline__grid">
@@ -23,6 +24,7 @@ export function ProductionTimeline({ project, operators, dirtyStageIds, onStageA
             isDirty={dirtyStageIds.has(id)}
             onAction={action => onStageAction(id, action)}
             onOperatorChange={(opId, opNome) => onOperatorChange(id, opId, opNome)}
+            operatorEditable={operatorEditable}
           />
         ))}
       </div>
