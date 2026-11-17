@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, type CSSProperties } from "react";
 import { Printer } from "lucide-react";
 import { AppLayout } from "../../../components/Layout/AppLayout";
+import { Barcode } from "../../../components/Barcode";
 import { Button } from "../../../components/Button";
 import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
@@ -230,7 +231,7 @@ export function ImpressaoCrachaPage() {
                       />
                       <span className="ic-badge__setor">{u.setor}</span>
                     </div>
-                    <div className="ic-badge__barcode">{u.crachaHash}</div>
+                    <Barcode value={u.crachaHash ?? ""} className="ic-badge__barcode" />
                     <div className="ic-badge__id">Nº {u.id}</div>
                     <div className="ic-badge__codigo">{u.crachaHash}</div>
                   </div>

@@ -1,6 +1,3 @@
-/* Fonte de código de barras (Code 128 de verdade — scanner físico lê) */
-@import url("https://fonts.googleapis.com/css2?family=Libre+Barcode+128&display=swap");
-
 .ic-page {
   display: flex;
   flex-direction: column;
@@ -232,11 +229,9 @@
 }
 
 .ic-badge__barcode {
-  font-family: "Libre Barcode 128", cursive;
-  font-size: 42px;
-  line-height: 1;
-  color: #000;
-  white-space: nowrap;
+  width: 100%;
+  max-width: 45mm;
+  height: 12mm;
 }
 
 .ic-badge__codigo {
