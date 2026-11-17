@@ -6,6 +6,7 @@ import { useToast } from "../../../context/ToastContext";
 import { useApiData } from "../../../hooks/useApiData";
 import { fetchAllUsers, gerarCracha } from "../../../services/usuarios";
 import { getErrorMessage } from "../../../utils/errorMessage";
+import logo from "../../../assets/gd-color.png";
 import "./index.css";
 
 const OPCOES_POR_FOLHA = [2, 4, 6, 8, 9, 10, 12, 15, 16];
@@ -187,7 +188,7 @@ export function ImpressaoCrachaPage() {
               <div className="ic-sheet" key={idx} style={style}>
                 {pagina.map((u) => (
                   <div className="ic-badge" key={u.id}>
-                    <div className="ic-badge__empresa">GD</div>
+                    <img src={logo} alt="" className="ic-badge__logo" />
                     <div className="ic-badge__nome">{u.login}</div>
                     <div className="ic-badge__setor">{u.setor}</div>
                     <div className="ic-badge__barcode">{u.crachaHash}</div>
