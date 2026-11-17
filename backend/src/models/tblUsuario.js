@@ -295,6 +295,11 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: false,
       field: 'almoxarifado_vinculos'
+    },
+    crachaHash: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'cracha_hash'
     }
   }, {
     sequelize,

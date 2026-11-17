@@ -1,4 +1,5 @@
 const bcrypt  = require('bcryptjs');
+const crypto  = require('crypto');
 const { Usuario } = require('../client/db');
 
 const BCRYPT_ROUNDS = 12;
@@ -166,7 +167,7 @@ async function atualizarAcessos(body) {
 
 async function listarTodosUsuarios() {
   return Usuario.findAll({
-    attributes: ['id', 'login', 'setor', 'local', 'camiseta', 'calca', 'sapato', 'ativo'],
+    attributes: ['id', 'login', 'setor', 'local', 'camiseta', 'calca', 'sapato', 'ativo', 'crachaHash'],
     order:      [['id', 'ASC']],
     raw:        true,
   });
@@ -187,6 +188,23 @@ async function atualizarUsuario(id, data) {
   );
 }
 
+// Crachá do terminal público de apontamento — hash aleatório impresso como
+// código de barras, lido no lugar de digitar o ID do operador.
+async function gerarCracha(id) {
+  const hash = crypto.randomBytes(16).toString('hex');
+  await Usuario.update({ crachaHash: hash }, { where: { id: Number(id) } });
+  return hash;
+}
+
+async function buscarOperadorPorCracha(hash) {
+  if (!hash) return null;
+  const row = await Usuario.findOne({
+    where: { crachaHash: String(hash), ativo: true, local: 'FABRICA' },
+    attributes: ['id', 'login'],
+  });
+  return row ? { id: row.id, nome: row.login } : null;
+}
+
 async function alterarSenha(p_id, p_senha) {
   const senha = String(p_senha ?? '');
   if (senha.length < 6) throw new Error('A senha deve ter ao menos 6 caracteres.');
@@ -205,4 +223,6 @@ module.exports = {
   alterarSenha,
   listarTodosUsuarios,
   atualizarUsuario,
+  gerarCracha,
+  buscarOperadorPorCracha,
 };

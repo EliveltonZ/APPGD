@@ -98,6 +98,9 @@ const T = {
   solicitacaoCompras:      { name: 'tblSolicitacaoCompras',      pk: 'id' },
   solicitacaoComprasItens: { name: 'tblSolicitacaoComprasItens', pk: 'id' },
   solicitacaoInterna:      { name: 'tblSolicitacaoInterna',      pk: 'id' },
+
+  // ── Terminal público (apontamento sem login) ─────────────────────────────
+  kioskPin: { name: 'tblKioskPin', pk: 'id' },
 };
 
 module.exports = T;

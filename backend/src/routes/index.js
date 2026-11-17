@@ -8,6 +8,10 @@ router.get('/health', (_req, res) => {
 // Rota pública — login não exige token
 router.use('/auth', require('./auth'))
 
+// Terminal de apontamento sem login (chão de fábrica) — protegido só pelo
+// PIN do terminal (kioskAuth), não pelo JWT.
+router.use('/apontamento-publico', require('./apontamentoPublico'))
+
 // Todas as rotas abaixo exigem token JWT válido
 router.use(auth)
 
@@ -41,6 +45,7 @@ router.use('/fornecedores',   require('./fornecedores'))
 router.use('/nota-fiscal',    require('./notaFiscal'))
 router.use('/solicitacao-compras', require('./solicitacaoCompras'))
 router.use('/solicitacao-interna', require('./solicitacaoInterna'))
+router.use('/kiosk-pin',          require('./kioskPin'))
 
 // Temporária — ver comentário em routes/xmlLogisticaAnaliseTemp.js
 router.use('/xml-logistica-analise-temp', require('./xmlLogisticaAnaliseTemp'))

@@ -12,6 +12,7 @@ var _EstoqueMovimentos       = require("./tblEstoqueMovimentos");
 var _SolicitacaoCompras      = require("./tblSolicitacaoCompras");
 var _SolicitacaoComprasItens = require("./tblSolicitacaoComprasItens");
 var _SolicitacaoInterna      = require("./tblSolicitacaoInterna");
+var _KioskPin                = require("./tblKioskPin");
 var _Acessorios              = require("./tblAcessorios");
 var _Maquinas           = require("./tblMaquinas");
 var _TipoRequisicao     = require("./tblTipoRequisicao");
@@ -59,6 +60,7 @@ function initModels(sequelize) {
   var SolicitacaoCompras      = _SolicitacaoCompras(sequelize, DataTypes);
   var SolicitacaoComprasItens = _SolicitacaoComprasItens(sequelize, DataTypes);
   var SolicitacaoInterna      = _SolicitacaoInterna(sequelize, DataTypes);
+  var KioskPin                = _KioskPin(sequelize, DataTypes);
   var Acessorios              = _Acessorios(sequelize, DataTypes);
   var Maquinas           = _Maquinas(sequelize, DataTypes);
   var TipoRequisicao     = _TipoRequisicao(sequelize, DataTypes);
@@ -200,6 +202,7 @@ function initModels(sequelize) {
     SolicitacaoCompras,
     SolicitacaoComprasItens,
     SolicitacaoInterna,
+    KioskPin,
   };
 }
 module.exports = initModels;

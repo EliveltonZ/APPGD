@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, Barcode, Copy, Check } from 'lucide-react'
 import { AppLayout } from '../../../components/Layout/AppLayout'
 import { DataTable } from '../../../components/DataTable'
 import type { TableColumn } from '../../../components/DataTable'
@@ -14,6 +14,7 @@ import {
   updateUser,
   fetchMaxUserId,
   insertUser,
+  gerarCracha,
 } from '../../../services/usuarios'
 import type { UserRecord } from '../../../services/usuarios'
 import { validateCriarUsuario } from '../../../validation/usuario'
@@ -139,6 +140,9 @@ export function CadastrosUsuariosPage() {
     login: '', setor: '', local: '', camiseta: '', calca: '', sapato: '', ativo: true,
   })
   const [saving, setSaving] = useState(false)
+  const [crachaHash, setCrachaHash] = useState<string | null>(null)
+  const [gerandoCracha, setGerandoCracha] = useState(false)
+  const [crachaCopiado, setCrachaCopiado] = useState(false)
 
   function openEdit(row: UserRow) {
     const { status_label: _, ...user } = row
@@ -152,7 +156,31 @@ export function CadastrosUsuariosPage() {
       sapato:   user.sapato   ?? '',
       ativo:    user.ativo,
     })
+    setCrachaHash(user.crachaHash ?? null)
+    setCrachaCopiado(false)
     setEditOpen(true)
+  }
+
+  async function handleGerarCracha() {
+    if (!editUser) return
+    setGerandoCracha(true)
+    try {
+      const hash = await gerarCracha(editUser.id)
+      setCrachaHash(hash)
+      setCrachaCopiado(false)
+      toast.success('Crachá gerado — imprima o código como código de barras.')
+    } catch (err) {
+      toast.error(getErrorMessage(err, 'Erro ao gerar crachá.'))
+    } finally {
+      setGerandoCracha(false)
+    }
+  }
+
+  function handleCopyCracha() {
+    if (!crachaHash) return
+    navigator.clipboard.writeText(crachaHash).catch(() => {})
+    setCrachaCopiado(true)
+    setTimeout(() => setCrachaCopiado(false), 2000)
   }
 
   function setEdit<K extends keyof typeof editForm>(field: K, value: typeof editForm[K]) {
@@ -380,6 +408,46 @@ export function CadastrosUsuariosPage() {
                 {editForm.ativo ? 'Ativo — usuário pode acessar o sistema' : 'Inativo — acesso bloqueado'}
               </span>
             </label>
+          </FormSection>
+
+          <FormSection step={4} title="Crachá do Terminal">
+            <div className="cad-u-cracha">
+              {crachaHash ? (
+                <div className="cad-u-cracha__row">
+                  <Barcode size={15} className="cad-u-cracha__icon" />
+                  <span className="cad-u-cracha__hash">{crachaHash}</span>
+                  <button
+                    type="button"
+                    className="cad-u-cracha__copy-btn"
+                    onClick={handleCopyCracha}
+                    title="Copiar código"
+                  >
+                    {crachaCopiado ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+              ) : (
+                <p className="cad-u-cracha__empty">
+                  Nenhum crachá gerado ainda.
+                </p>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleGerarCracha}
+                disabled={gerandoCracha}
+              >
+                {gerandoCracha
+                  ? 'Gerando...'
+                  : crachaHash
+                    ? 'Gerar novo código'
+                    : 'Gerar crachá'}
+              </Button>
+              {crachaHash && (
+                <p className="cad-u-cracha__hint">
+                  Gerar um novo código invalida o crachá físico atual.
+                </p>
+              )}
+            </div>
           </FormSection>
         </div>
       </Modal>

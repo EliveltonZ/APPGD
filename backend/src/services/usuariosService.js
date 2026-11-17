@@ -32,5 +32,11 @@ const atualizarAcessos = (dados) => repo.atualizarAcessos(dados);
 const alterarSenha        = (id, senha)   => repo.alterarSenha(id, senha);
 const listarTodosUsuarios = ()            => repo.listarTodosUsuarios();
 const atualizarUsuario    = (id, data)    => repo.atualizarUsuario(id, data);
+const gerarCracha              = (id)   => repo.gerarCracha(id);
+const buscarOperadorPorCracha  = (hash) => repo.buscarOperadorPorCracha(hash);
 
-module.exports = { verificarLogin, buscarMaiorId, inserirUsuario, listarAcessos, buscarAcesso, atualizarAcessos, alterarSenha, listarTodosUsuarios, atualizarUsuario };
+module.exports = {
+  verificarLogin, buscarMaiorId, inserirUsuario, listarAcessos, buscarAcesso,
+  atualizarAcessos, alterarSenha, listarTodosUsuarios, atualizarUsuario,
+  gerarCracha, buscarOperadorPorCracha,
+};

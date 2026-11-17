@@ -10,5 +10,6 @@ router.post('/acessos',       rp('acesso'),              ac.setUserAccess)
 router.get('/acessos',        rp('acesso'),              ac.getUserAccess)
 router.get('/todos',          rp('cadastros_usuarios'),  add.listAllUsers)
 router.put('/:id',            rp('cadastros_usuarios'),  add.updateUser)
+router.post('/:id/cracha',    rp('cadastros_usuarios'),  add.gerarCracha)
 
 module.exports = router

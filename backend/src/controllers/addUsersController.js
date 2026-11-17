@@ -36,4 +36,13 @@ module.exports = {
       res.status(500).json({ message: "Erro ao atualizar usuário", error: err.message });
     }
   },
+
+  async gerarCracha(req, res) {
+    try {
+      const hash = await service.gerarCracha(req.params.id);
+      res.json({ hash });
+    } catch (err) {
+      res.status(500).json({ message: "Erro ao gerar crachá", error: err.message });
+    }
+  },
 };

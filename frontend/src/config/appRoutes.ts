@@ -139,6 +139,10 @@ export const ROUTE_ITEMS = [
 
   buildSidebarList('config_senha', '/configuracoes/senha', 'configuracoes', 'Senha'),
   buildSidebarList('config_acessos', '/configuracoes/acessos', 'configuracoes', 'Acessos'),
+  // Sem coluna própria no banco — usa o mesmo valor real de config_acessos
+  // (ver toAuthUser/saveAcessos em services/usuarios.ts). É a mesma
+  // permissão exibida em duas telas, não uma permissão nova.
+  buildSidebarList('config_terminal_pin', '/configuracoes/terminal-pin', 'configuracoes', 'PIN do Terminal'),
   // ── Cadastros ──────────────────────────────────────────────────────────────
 
   buildSidebarList('cadastros_equipe', '/cadastros/equipe', 'cadastros', 'Equipe'),

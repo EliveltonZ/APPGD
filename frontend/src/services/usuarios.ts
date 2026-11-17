@@ -48,6 +48,9 @@ export function toAuthUser(r: RawAcesso): AuthUser {
     dashboards_principal:      Boolean(r.dashboard),
     config_senha:              Boolean(r.password),
     config_acessos:            Boolean(r.acesso),
+    // Mesma permissão de config_acessos, exibida como item de menu
+    // separado — não tem coluna própria no banco (ver appRoutes.ts).
+    config_terminal_pin:       Boolean(r.acesso),
     cadastros_equipe:          Boolean(r.cadastros_equipe),
     cadastros_qualidade:       Boolean(r.cadastros_qualidade),
     cadastros_comercial:       Boolean(r.cadastros_comercial),
@@ -129,10 +132,18 @@ export interface UserRecord {
   calca:    string
   sapato:   string
   ativo:    boolean
+  crachaHash?: string | null
 }
 
 export async function fetchAllUsers(): Promise<UserRecord[]> {
   return apiGet<UserRecord[]>('/usuarios/todos')
+}
+
+// Gera (ou regenera) o hash do crachá — terminal público de apontamento lê
+// esse código no lugar de digitar o ID do operador.
+export async function gerarCracha(id: number): Promise<string> {
+  const r = await apiPost<{ hash: string }>(`/usuarios/${id}/cracha`, {})
+  return r.hash
 }
 
 export async function updateUser(id: number, data: Omit<UserRecord, 'id'>): Promise<void> {
@@ -163,7 +174,9 @@ export async function saveAcessos(id: number, permissions: UserPermissions): Pro
     valores:               permissions.financeiro_valores,
     dashboard:             permissions.dashboards_principal,
     password:              permissions.config_senha,
-    acesso:                permissions.config_acessos,
+    // config_terminal_pin é a mesma permissão exibida como item separado
+    // (sem coluna própria) — qualquer um dos dois marcados já libera.
+    acesso:                permissions.config_acessos || permissions.config_terminal_pin,
     relatorios:            permissions.pcp_relatorios,
     cadastros_equipe:      permissions.cadastros_equipe,
     cadastros_qualidade:   permissions.cadastros_qualidade,

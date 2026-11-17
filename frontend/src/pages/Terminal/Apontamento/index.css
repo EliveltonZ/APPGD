@@ -1,0 +1,117 @@
+/* Página pública roda fora do AppLayout — precisa do próprio fundo/padding
+   de página inteira que o AppLayout normalmente dá. */
+.kiosk-page {
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--code-bg);
+  box-sizing: border-box;
+}
+
+/* ── Indicador de operador no header ─────────────────────────────────── */
+
+.kiosk-header__operador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  height: 100%;
+}
+
+.kiosk-header__operador-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.kiosk-header__operador-lbl {
+  display: block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text);
+}
+
+.kiosk-header__operador-nome {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+.kiosk-header__operador-nome--empty {
+  font-weight: 400;
+  color: var(--text);
+}
+
+/* ── Portão de PIN ────────────────────────────────────────────────────── */
+
+.kiosk-pin-gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--code-bg);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.kiosk-pin-gate__card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  padding: 28px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.kiosk-pin-gate__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.kiosk-pin-gate__hint {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0 0 8px;
+}
+
+.kiosk-pin-gate__input {
+  font-size: 22px;
+  letter-spacing: 4px;
+  text-align: center;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+
+.kiosk-pin-gate__error {
+  font-size: 12px;
+  color: #ef4444;
+  margin: 0;
+}
+
+.kiosk-pin-gate__btn {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kiosk-pin-gate__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

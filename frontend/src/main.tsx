@@ -70,6 +70,7 @@ import { DashboardsPrincipalPage } from "./pages/Dashboards";
 // ── Configurações ─────────────────────────────────────────────────────────────
 import { ConfigSenhaPage } from "./pages/Configuracoes/Senha";
 import { ConfigAcessosPage } from "./pages/Configuracoes/Acessos";
+import { ConfigTerminalPinPage } from "./pages/Configuracoes/TerminalPin";
 
 // ── Almoxarifado ──────────────────────────────────────────────────────────────
 import { AlmoxarifadoEstoquePage } from "./pages/Almoxarifado/Estoque";
@@ -95,6 +96,9 @@ import {
 } from "./pages/CapaImpressao";
 import { ListaSeparacaoPage } from "./pages/Almoxarifado/ListaSeparacao";
 import { OrcamentoImpressaoPage } from "./pages/Compras/OrcamentoImpressao";
+
+// ── Terminal (público, sem login) ─────────────────────────────────────────────
+import { ApontamentoPublicoPage } from "./pages/Terminal/Apontamento";
 
 // ── Sandbox (desenvolvimento) ─────────────────────────────────────────────────
 import { SandboxPage } from "./pages/Sandbox";
@@ -140,6 +144,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   dashboards_principal: DashboardsPrincipalPage,
   config_senha: ConfigSenhaPage,
   config_acessos: ConfigAcessosPage,
+  config_terminal_pin: ConfigTerminalPinPage,
   cadastros_equipe:    CadastrosPage,
   cadastros_qualidade: CadastrosPage,
   cadastros_comercial: CadastrosPage,
@@ -215,6 +220,10 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/impressao/capa-assistencia" element={<CapaAssistenciaPage />} />
             <Route path="/impressao/lista-separacao" element={<ListaSeparacaoPage />} />
             <Route path="/impressao/orcamento" element={<OrcamentoImpressaoPage />} />
+
+            {/* Terminal público de apontamento — sem login, sem AppLayout.
+                Protegido só pelo PIN do terminal (backend: kioskAuth). */}
+            <Route path="/terminal/apontamento" element={<ApontamentoPublicoPage />} />
 
             {/* Sandbox — apenas em desenvolvimento */}
             {import.meta.env.DEV && <Route path="/sandbox" element={<SandboxPage />} />}

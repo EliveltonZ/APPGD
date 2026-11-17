@@ -22,7 +22,7 @@ function deriveStatus(inicio: string | null, fim: string | null, pausa: boolean)
   return 'nao_iniciado';
 }
 
-function mapRow(row: ApiRow, pedido: number): ApontamentoProject {
+export function mapRow(row: ApiRow, pedido: number): ApontamentoProject {
   const etapas = {} as Record<StageId, Stage>;
 
   STAGE_ORDER.forEach((id, idx) => {
@@ -78,7 +78,7 @@ export async function fetchApontamentoOperators(): Promise<Operator[]> {
   return rows.map(r => ({ id: String(r.id ?? ''), nome: String(r.nome ?? '') }));
 }
 
-export async function saveApontamento(project: ApontamentoProject): Promise<void> {
+export function buildApontamentoPayload(project: ApontamentoProject): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     ordemdecompra: project.ordemdecompra,
     previsao:      project.previsao    ?? null,
@@ -93,5 +93,9 @@ export async function saveApontamento(project: ApontamentoProject): Promise<void
     payload[`${id}pausa`]  = s.pausa;
   }
 
-  await apiPost('/apontamento/dados', payload);
+  return payload;
+}
+
+export async function saveApontamento(project: ApontamentoProject): Promise<void> {
+  await apiPost('/apontamento/dados', buildApontamentoPayload(project));
 }
