@@ -145,3 +145,27 @@
     z-index: 40;
   }
 }
+
+/* ═══════════════════════════════════════════════════════
+   IMPRESSÃO — nenhuma tela dentro do AppLayout deve sair com o
+   menu/cabeçalho junto, só o conteúdo da própria página.
+   ═══════════════════════════════════════════════════════ */
+
+@media print {
+  .sidebar,
+  .app-header,
+  .app-layout__overlay {
+    display: none !important;
+  }
+
+  .app-layout,
+  .app-layout__body,
+  .app-layout__content {
+    display: block;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
+}
