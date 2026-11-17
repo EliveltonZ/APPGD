@@ -31,6 +31,10 @@ export function mapRow(row: ApiRow, pedido: number): ApontamentoProject {
     const pausa  = Boolean(row[`${id}pausa`]);
     const resp   = row[`${id}resp`];
     const name   = row[`${id}name`];
+    // tblProducao.{etapa}resp tem defaultValue 0 (não null) pra etapa nunca
+    // atribuída, e o id 0 existe de verdade em tblUsuario (linha "-") — sem
+    // isso, "0" (string não-vazia) passa como se fosse um operador real.
+    const temResp = resp != null && Number(resp) !== 0;
 
     etapas[id] = {
       id,
@@ -40,8 +44,8 @@ export function mapRow(row: ApiRow, pedido: number): ApontamentoProject {
       inicio,
       fim,
       pausa,
-      responsavelId:   resp != null ? String(resp) : null,
-      responsavelNome: name != null ? String(name) : null,
+      responsavelId:   temResp ? String(resp) : null,
+      responsavelNome: temResp && name != null ? String(name) : null,
     };
   });
 
