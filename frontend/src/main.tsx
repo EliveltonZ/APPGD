@@ -83,6 +83,7 @@ import { AlmoxarifadoVinculosPage } from "./pages/Almoxarifado/Vinculos";
 // ── Cadastros ─────────────────────────────────────────────────────────────────
 import { CadastrosPage } from "./pages/Cadastros";
 import { CadastrosUsuariosPage } from "./pages/Cadastros/Usuarios";
+import { ImpressaoCrachaPage } from "./pages/Cadastros/ImpressaoCracha";
 import { CadastrosMateriaisPage } from "./pages/Cadastros/Materiais";
 import { CadastrosLocalizacoesPage } from "./pages/Cadastros/Localizacoes";
 import { CadastrosFornecedoresPage } from "./pages/Cadastros/Fornecedores";
@@ -150,6 +151,7 @@ const PAGE_MAP: Record<string, ComponentType> = {
   cadastros_comercial: CadastrosPage,
   cadastros_clientes:  CadastrosPage,
   cadastros_usuarios:  CadastrosUsuariosPage,
+  cadastros_impressao_cracha: ImpressaoCrachaPage,
   cadastros_materiais:    CadastrosMateriaisPage,
   cadastros_localizacoes: CadastrosLocalizacoesPage,
   cadastros_fornecedores: CadastrosFornecedoresPage,

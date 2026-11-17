@@ -150,6 +150,9 @@ export const ROUTE_ITEMS = [
   buildSidebarList('cadastros_comercial', '/cadastros/comercial', 'cadastros', 'Comercial'),
   buildSidebarList('cadastros_clientes', '/cadastros/clientes', 'cadastros', 'Clientes'),
   buildSidebarList('cadastros_usuarios', '/cadastros/usuarios', 'cadastros', 'Usuários'),
+  // Sem coluna própria no banco — usa o mesmo valor real de
+  // cadastros_usuarios (ver toAuthUser/saveAcessos em services/usuarios.ts).
+  buildSidebarList('cadastros_impressao_cracha', '/cadastros/impressao-cracha', 'cadastros', 'Imprimir Crachás'),
   buildSidebarList('cadastros_materiais', '/cadastros/materiais', 'cadastros', 'Materiais'),
   buildSidebarList('cadastros_localizacoes', '/cadastros/localizacoes', 'cadastros', 'Localizações'),
   buildSidebarList('cadastros_fornecedores', '/cadastros/fornecedores', 'cadastros', 'Fornecedores'),

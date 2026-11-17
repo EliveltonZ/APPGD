@@ -1,0 +1,246 @@
+/* Fonte de código de barras (Code 128 de verdade — scanner físico lê) */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+128&display=swap');
+
+.ic-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Controles (somem na impressão) ──────────────────────── */
+
+.ic-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.ic-controls__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ic-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.ic-subtitle {
+  font-size: 13px;
+  color: var(--text);
+  margin: 4px 0 0;
+  max-width: 480px;
+}
+
+.ic-controls__row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ic-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.ic-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.ic-field select {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+
+.ic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.ic-list__header {
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.ic-list__empty {
+  font-size: 13px;
+  color: var(--text);
+  margin: 8px 0;
+}
+
+.ic-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 4px;
+  border-radius: 6px;
+}
+
+.ic-row:hover {
+  background: var(--code-bg);
+}
+
+.ic-row__check {
+  flex: 1;
+  min-width: 0;
+}
+
+.ic-row__nome {
+  font-weight: 600;
+  color: var(--text-h);
+  margin-right: 10px;
+}
+
+.ic-row__setor {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.ic-row__ok {
+  font-size: 12px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.ic-preview-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text);
+  margin: 0;
+}
+
+.ic-print-area__empty {
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* ── Folhas de impressão ──────────────────────────────────── */
+
+.ic-print-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.ic-sheet {
+  display: grid;
+  gap: 4mm;
+  width: 190mm;
+  height: 277mm;
+  padding: 4mm;
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+}
+
+.ic-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2mm;
+  border: 1px dashed #999;
+  border-radius: 3mm;
+  padding: 3mm;
+  overflow: hidden;
+  background: #fff;
+  color: #000;
+}
+
+.ic-badge__empresa {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #666;
+}
+
+.ic-badge__nome {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: #000;
+}
+
+.ic-badge__setor {
+  font-size: 11px;
+  color: #444;
+  text-transform: uppercase;
+}
+
+.ic-badge__barcode {
+  font-family: 'Libre Barcode 128', cursive;
+  font-size: 42px;
+  line-height: 1;
+  color: #000;
+  white-space: nowrap;
+}
+
+.ic-badge__codigo {
+  font-family: monospace;
+  font-size: 8px;
+  color: #777;
+  word-break: break-all;
+  text-align: center;
+}
+
+/* ── Regras exclusivas de impressão ───────────────────────── */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .ic-print-area {
+    gap: 0;
+  }
+
+  .ic-sheet {
+    width: auto;
+    height: auto;
+    min-height: 277mm;
+    border: none;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .ic-sheet:last-child {
+    page-break-after: auto;
+  }
+}
