@@ -442,6 +442,7 @@ export function ApontamentoPublicoPage() {
       <KioskHeader
         onPedido={handlePedido}
         onStage={handleStage}
+        onBadge={handleBadgeScan}
         hasPedido={!!project}
         loading={loading}
         dirty={dirty}

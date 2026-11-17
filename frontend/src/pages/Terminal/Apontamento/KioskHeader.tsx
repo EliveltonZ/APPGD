@@ -5,6 +5,7 @@ import type { Operator } from "../../../features/apontamento/types";
 interface Props {
   onPedido: (code: string) => void;
   onStage: (code: string) => void;
+  onBadge: (hash: string) => void;
   hasPedido: boolean;
   loading: boolean;
   dirty: boolean;
@@ -22,6 +23,7 @@ interface Props {
 export function KioskHeader({
   onPedido,
   onStage,
+  onBadge,
   hasPedido,
   loading,
   dirty,
@@ -33,6 +35,7 @@ export function KioskHeader({
   const pedidoRef = useRef<HTMLInputElement>(null);
   const [pedidoInput, setPedidoInput] = useState("");
   const [stageInput, setStageInput] = useState("");
+  const [badgeInput, setBadgeInput] = useState("");
 
   function handlePedidoKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
@@ -46,6 +49,13 @@ export function KioskHeader({
     const val = e.currentTarget.value.trim();
     setStageInput("");
     if (val) onStage(val);
+  }
+
+  function handleBadgeKey(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter") return;
+    const val = e.currentTarget.value.trim();
+    setBadgeInput("");
+    if (val) onBadge(val);
   }
 
   return (
@@ -64,6 +74,22 @@ export function KioskHeader({
           >
             {operadorAtual ? operadorAtual.nome : "Escaneie o crachá"}
           </span>
+        </div>
+      </div>
+
+      <div className="apt-header__field-wrap">
+        <label className="apt-header__field-label">Crachá</label>
+        <div className="apt-header__input-wrap">
+          <IdCard className="apt-header__icon" size={16} />
+          <input
+            className="apt-header__input"
+            type="text"
+            placeholder="Escanear ou colar código + Enter"
+            value={badgeInput}
+            onChange={(e) => setBadgeInput(e.target.value)}
+            onKeyDown={handleBadgeKey}
+            autoComplete="off"
+          />
         </div>
       </div>
 
