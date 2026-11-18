@@ -109,7 +109,11 @@ export function AssistenciasNovaPage() {
   }
 
   function addPart(part: ServicePart) {
-    patch("pecas", [...req.pecas, part]);
+    // Importação de XML chama onAdd várias vezes em sequência, antes de
+    // re-renderizar — por isso precisa ler o estado mais atual (prev) em
+    // vez de "req.pecas" do fechamento, senão cada chamada sobrescreve a
+    // anterior e só a última peça sobrevive.
+    setReq((prev) => ({ ...prev, pecas: [...prev.pecas, part] }));
   }
 
   function removePart(id: string) {
