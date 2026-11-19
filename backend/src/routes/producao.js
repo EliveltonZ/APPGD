@@ -9,6 +9,7 @@ router.get('/projeto',   prod, c.getProducao)
 router.get('/barcode',   prod, c.getProducaoBarcode)
 router.post('/dados',    prod, c.setDataProducao)
 router.get('/materiais', prod, c.getMateriais)
-router.get('/capa',      prod, c.getCapaProducao)
+// Tela de Relatórios (Fábrica) também busca por aqui, com permissão própria
+router.get('/capa',      rp.any('producao', 'relatorios'), c.getCapaProducao)
 
 module.exports = router
