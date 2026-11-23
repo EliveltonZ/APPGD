@@ -141,6 +141,11 @@ export function ApontamentoPublicoPage() {
   }, []);
 
   const handleSearch = useCallback(async (pedido: string) => {
+    if (!operadorAtual) {
+      message("Escaneie o crachá do operador antes do pedido", false);
+      return;
+    }
+
     setLoading(true);
     setNotFound(false);
     setResults([]);
@@ -167,7 +172,7 @@ export function ApontamentoPublicoPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [operadorAtual]);
 
   async function handleBadgeScan(hash: string) {
     try {

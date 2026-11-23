@@ -266,7 +266,7 @@
 
 .ic-badge__barcode {
   width: 100%;
-  max-width: 45mm;
+  /* max-width: 45mm; */
   height: 12mm;
 }
 

@@ -93,7 +93,9 @@ export function KioskHeader({
         </div>
       </div>
 
-      <div className="apt-header__field-wrap">
+      <div
+        className={`apt-header__field-wrap${!operadorAtual ? " apt-header__field-wrap--disabled" : ""}`}
+      >
         <label className="apt-header__field-label">Pedido</label>
         <div className="apt-header__input-wrap">
           {loading ? (
@@ -106,11 +108,11 @@ export function KioskHeader({
             className="apt-header__input"
             type="text"
             inputMode="numeric"
-            placeholder="Escanear ou digitar + Enter"
+            placeholder={operadorAtual ? "Escanear ou digitar + Enter" : "Escaneie o crachá primeiro"}
             value={pedidoInput}
             onChange={(e) => setPedidoInput(e.target.value)}
             onKeyDown={handlePedidoKey}
-            disabled={loading}
+            disabled={loading || !operadorAtual}
             autoComplete="off"
           />
           {hasPedido && (
