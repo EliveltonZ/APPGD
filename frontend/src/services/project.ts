@@ -51,7 +51,7 @@ function assistenciaFields(form: ProjectFormData) {
     tipo_solicitacao:   form.tipoSolicitacaoAssist ? Number(form.tipoSolicitacaoAssist) : null,
     origem_montagem:    form.origemMontagem || null,
     origem_promob:      form.origemPromob   || null,
-    origem_cobrada:     form.origemCobrada  || null,
+    origem_cobrada:     form.origemCobrada,
     origem_entrega:     form.origemEntrega  || null,
     observacoes:        form.observacoesAssist || null,
     id_responsavel:     form.idResponsavel ?? null,

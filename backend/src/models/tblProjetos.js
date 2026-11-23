@@ -234,6 +234,7 @@ module.exports = function (sequelize, DataTypes) {
       origemCobrada: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
+        defaultValue: false,
         field: "origem_cobrada",
       },
       observacoes: {
