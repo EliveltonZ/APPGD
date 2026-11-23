@@ -55,6 +55,7 @@ function assistenciaFields(form: ProjectFormData) {
     origem_entrega:     form.origemEntrega  || null,
     observacoes:        form.observacoesAssist || null,
     id_responsavel:     form.idResponsavel ?? null,
+    responsavel:        form.responsavel || null,
     urgente:            form.urgente,
     bairro:             form.bairro || null,
     tempo:              form.tempo || null,

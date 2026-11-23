@@ -182,6 +182,7 @@ async function inserirProjeto(body) {
       destino:                body.destino                ?? null,
       observacoes:            body.observacoes            ?? null,
       idResponsavel:          body.id_responsavel         ?? null,
+      responsavel:            body.responsavel            ?? null,
       dataCriacao:            dataAtualBrasil(),
       // Hora exata da solicitação, pra Produção/Logística mostrarem
       // "Data/Hora" certo — só assistência usa; dataCriacao é só data.
@@ -335,6 +336,7 @@ async function atualizarProjeto(body) {
         destino:                body.destino                ?? null,
         observacoes:            body.observacoes            ?? null,
         idResponsavel:          body.id_responsavel         ?? null,
+        responsavel:            body.responsavel            ?? null,
         urgente:                body.urgente                ?? false,
       },
       { where: { ordemdecompra: oc }, transaction: t },
