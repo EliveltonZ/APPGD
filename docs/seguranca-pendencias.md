@@ -10,13 +10,13 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 
 | # | Item | Prioridade | Situação |
 |---|---|---|---|
-| 1 | API pública do Supabase aberta pela chave `anon` | ALTA | 🔴 Aberto |
+| 1 | API pública do Supabase aberta pela chave `anon` | ALTA | 🟡 Parcial — ver nota |
 | 2 | Senhas em texto puro em `tblUsuario` | ALTA | 🔴 Aberto |
-| 3 | RLS em tabelas novas | MÉDIA | 🔴 Aberto |
+| 3 | RLS em tabelas novas | MÉDIA | ✅ Resolvido em 2026-11-24 |
 | 4 | Dependências com vulnerabilidade | MÉDIA | 🔴 Aberto |
 | 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
 | 6 | Outros pontos (estoque aberto, SSL, servidor de testes, model do plano de contas, banco único) | BAIXA | 🔴 Aberto |
-| 7 | Tabela do PIN do terminal (`tblKioskPin`) sem RLS | ALTA (se o item 1 não for resolvido) | 🔴 Aberto |
+| 7 | Tabela do PIN do terminal (`tblKioskPin`) sem RLS | ALTA (se o item 1 não for resolvido) | ✅ Resolvido em 2026-11-24 |
 | 8 | PIN do terminal sem limite de tentativas | MÉDIA | 🔴 Aberto |
 
 Ao resolver um item, troque para `✅ Resolvido em AAAA-MM-DD` e anote o que foi feito na seção dele.
@@ -54,6 +54,19 @@ pela URL `https://<projeto>.supabase.co/rest/v1/...`:
    - Antes, confirmar que o usuário do `DATABASE_URL` é `postgres` (dono das tabelas / `BYPASSRLS`), senão o próprio backend é bloqueado.
 3. *Higiene:* gerar chaves novas no Supabase (ou migrar para as *publishable/secret keys* e desativar as legadas), inutilizando a que vazou.
 
+**Feito em 2026-11-24 (etapa 2 — a que fecha o acesso de verdade):** migration
+`20261124111408-lockdown-rls-public-tables` removeu a policy `all-select-policy`
+das 29 tabelas antigas que a tinham e ligou `ENABLE ROW LEVEL SECURITY` nas 15
+tabelas novas que nasceram sem (inclusive `tblKioskPin`, item 7). Confirmado
+no banco: 0 tabelas de `public` sem RLS, 0 policies restantes, e o backend
+(`postgres`, tem `BYPASSRLS`) continua lendo normal — `anon`/`authenticated`
+não têm `BYPASSRLS`, então ficam bloqueados por padrão (deny-by-default sem
+nenhuma policy). Isso já tranca o dado mesmo com a Data API ligada.
+
+**Ainda falta (etapas 1 e 3, ação manual no painel do Supabase, não dá pra fazer por aqui):**
+- Desligar o Data API / tirar `public` dos exposed schemas (defesa extra, redundante com a trava de RLS, mas fecha de vez a superfície).
+- Gerar chaves novas e desativar a `anon` antiga que vazou (ela continua "válida" como credencial, só não consegue mais ler nada — mas o ideal é invalidar de vez).
+
 ---
 
 ## 2. Senhas em texto puro em `tblUsuario` — ALTA
@@ -73,11 +86,14 @@ Depois disso, dá para remover o ramo de comparação em texto puro do `verifica
 
 ---
 
-## 3. Padrão de RLS para tabelas novas — MÉDIA
+## 3. Padrão de RLS para tabelas novas — MÉDIA — ✅ Resolvido em 2026-11-24
 
 Combinar a regra para as próximas migrations: toda `createTable` vem acompanhada de
 `ALTER TABLE "tblX" ENABLE ROW LEVEL SECURITY;` **sem** policy para `anon`/`public`.
 (Já está registrado na skill `/migration` e no `CLAUDE.md`.)
+
+As 15 tabelas que tinham nascido sem RLS (módulo compras/almoxarifado + `tblCorSetor`)
+foram corrigidas na mesma migration do item 1 (`20261124111408-lockdown-rls-public-tables`).
 
 ---
 
@@ -119,7 +135,7 @@ Nenhum desses arquivos é usado pelo código — remover não afeta o funcioname
 
 ---
 
-## 7. Tabela do PIN do terminal sem RLS — ALTA (se o item 1 não for resolvido)
+## 7. Tabela do PIN do terminal sem RLS — ALTA (se o item 1 não for resolvido) — ✅ Resolvido em 2026-11-24
 
 Identificado em 2026-11-17, na revisão do terminal público de apontamento (commits de 17/11).
 
@@ -128,6 +144,10 @@ Identificado em 2026-11-17, na revisão do terminal público de apontamento (com
 - Também vale para as migrations novas de permissões em `tblUsuario`, que só adicionam colunas (sem RLS extra, pois a tabela já existia).
 
 **Correção sugerida:** nova migration com `ALTER TABLE "tblKioskPin" ENABLE ROW LEVEL SECURITY;` (sem policy para `anon`/`public`). Tratar junto com o item 1.
+
+**Feito em 2026-11-24:** `tblKioskPin` recebeu `ENABLE ROW LEVEL SECURITY` na mesma
+migration do item 1. `tblUsuario` já tinha RLS habilitado (a policy aberta que
+vazava senha é a mesma `all-select-policy` removida no item 1).
 
 ---
 
