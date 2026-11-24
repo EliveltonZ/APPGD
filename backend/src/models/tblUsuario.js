@@ -148,7 +148,7 @@ module.exports = function(sequelize, DataTypes) {
     status: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: true
+      defaultValue: false
     },
     planejamento: {
       type: DataTypes.BOOLEAN,
@@ -164,7 +164,7 @@ module.exports = function(sequelize, DataTypes) {
     password: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
-      defaultValue: true
+      defaultValue: false
     },
     relatorios: {
       type: DataTypes.BOOLEAN,
