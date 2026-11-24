@@ -11,7 +11,7 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 | # | Item | Prioridade | Situação |
 |---|---|---|---|
 | 1 | API pública do Supabase aberta pela chave `anon` | ALTA | 🟡 Parcial — ver nota |
-| 2 | Senhas em texto puro em `tblUsuario` | ALTA | 🔴 Aberto |
+| 2 | Senhas em texto puro em `tblUsuario` | ALTA | ✅ Resolvido em 2026-11-24 |
 | 3 | RLS em tabelas novas | MÉDIA | ✅ Resolvido em 2026-11-24 |
 | 4 | Dependências com vulnerabilidade | MÉDIA | 🔴 Aberto |
 | 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
@@ -69,7 +69,7 @@ nenhuma policy). Isso já tranca o dado mesmo com a Data API ligada.
 
 ---
 
-## 2. Senhas em texto puro em `tblUsuario` — ALTA
+## 2. Senhas em texto puro em `tblUsuario` — ALTA — ✅ Resolvido em 2026-11-24
 
 `usuariosService.verificarLogin` converte a senha para bcrypt **só no primeiro login** no sistema novo.
 Hoje **134 de 159** usuários ainda têm senha em texto puro — e, pelo item 1, elas são legíveis pela chave `anon`.
@@ -83,6 +83,13 @@ UPDATE "tblUsuario"
  WHERE senha IS NOT NULL AND senha NOT LIKE '$2%';
 ```
 Depois disso, dá para remover o ramo de comparação em texto puro do `verificarLogin`.
+
+**Feito em 2026-11-24:** migration `20261124111725-hash-plaintext-passwords-tblUsuario`
+converteu as 133 senhas em texto puro (pgcrypto `crypt()`/`gen_salt('bf', 12)`,
+hash `$2a$` — confirmado compatível com `bcryptjs`). `usuariosService.verificarLogin`
+não tem mais o ramo de comparação em texto puro nem a escrita de hash no primeiro
+login (ficaram sem uso, já que agora toda senha já nasce em bcrypt); removida
+também `atualizarSenhaHash` em `usuariosRepository.js`.
 
 ---
 
