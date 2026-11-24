@@ -117,6 +117,24 @@ foram corrigidas na mesma migration do item 1 (`20261124111408-lockdown-rls-publ
 
 Como o `package-lock.json` não é versionado, cada `npm install` (inclusive no Render) resolve versões novas — vale rodar `npm audit fix` e testar.
 
+**Checado em 2026-11-24:** as vulnerabilidades da tabela acima (proxy-addr, body-parser,
+path-to-regexp, lodash, etc.) já não aparecem mais no `npm audit` — resolvidas sozinhas
+por `npm install` normal ao longo do tempo (o lock não é versionado, cada install pega
+versão nova dentro do range do `package.json`). `npm audit fix` (sem `--force`) não mudou
+nada: hoje restam 14 vulnerabilidades (13 médias, 1 alta), e **todas** só têm correção via
+`--force`, com breaking change:
+- `vite-plugin-pwa` → `1.1.0` (major)
+- `react-router-dom` → `7.18.6` (major)
+- uma "correção" que instalaria **`sequelize@3.30.0`** — isso é um downgrade absurdo pro
+  backend inteiro (efeito colateral do resolvedor via `sequelize-auto`, que tem um range de
+  peer dependency muito aberto; não é uma correção de verdade, é o npm tentando satisfazer
+  uma restrição errada)
+- `xlsx`: continua sem correção nenhuma disponível no npm
+
+Não rodei `--force` — precisa de decisão e teste manual (upgrade de major do
+`react-router-dom`/`vite-plugin-pwa` pode mudar comportamento de rotas/build;
+o item do `sequelize` deve ser ignorado, não aplicado).
+
 ---
 
 ## 5. Arquivos que não deveriam estar no repositório — BAIXA — ✅ Resolvido em 2026-11-24
