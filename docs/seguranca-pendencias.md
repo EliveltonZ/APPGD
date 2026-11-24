@@ -17,7 +17,7 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 | 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
 | 6 | Outros pontos (estoque aberto, SSL, servidor de testes, model do plano de contas, banco único) | BAIXA | 🔴 Aberto |
 | 7 | Tabela do PIN do terminal (`tblKioskPin`) sem RLS | ALTA (se o item 1 não for resolvido) | ✅ Resolvido em 2026-11-24 |
-| 8 | PIN do terminal sem limite de tentativas | MÉDIA | 🔴 Aberto |
+| 8 | PIN do terminal sem limite de tentativas | MÉDIA | ✅ Resolvido em 2026-11-24 |
 
 Ao resolver um item, troque para `✅ Resolvido em AAAA-MM-DD` e anote o que foi feito na seção dele.
 
@@ -158,7 +158,7 @@ vazava senha é a mesma `all-select-policy` removida no item 1).
 
 ---
 
-## 8. PIN do terminal sem limite de tentativas — MÉDIA
+## 8. PIN do terminal sem limite de tentativas — MÉDIA — ✅ Resolvido em 2026-11-24
 
 Identificado em 2026-11-17, na mesma revisão.
 
@@ -167,3 +167,12 @@ Identificado em 2026-11-17, na mesma revisão.
 - Quem acerta o PIN passa a ver a lista de operadores (`/operadores`) e pode registrar apontamentos.
 
 **Correção sugerida:** aplicar um limitador de tentativas (como o do login) em `/api/apontamento-publico`, e avaliar um PIN mais longo ou bloqueio temporário após várias falhas.
+
+**Feito em 2026-11-24:** `kioskLimiter` em `server.js`, mesmo padrão do
+`loginLimiter` (20 tentativas / 15 min por IP), mas com
+`skipSuccessfulRequests: true` — o PIN é validado em toda chamada do
+terminal (não só uma vez, como o login), então só as tentativas com PIN
+errado contam; uma maquininha com PIN certo, fazendo dezenas de chamadas
+por turno, nunca é limitada. Com 6 dígitos (1M combinações) e 20
+tentativas erradas / 15 min, um ataque de força bruta levaria na faixa de
+anos — não precisou aumentar o tamanho do PIN.

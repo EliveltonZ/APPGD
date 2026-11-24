@@ -58,6 +58,20 @@ const loginLimiter = rateLimit({
 })
 
 app.use('/api/auth/login', loginLimiter)
+
+// Rate limit no terminal público: o PIN é validado em toda chamada (não só
+// no login), então conta só as que falham (PIN errado) -- uma maquininha
+// com PIN certo faz dezenas de chamadas por turno e nunca deve ser limitada.
+const kioskLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: { error: 'Muitas tentativas de PIN. Tente novamente em 15 minutos.' },
+})
+
+app.use('/api/apontamento-publico', kioskLimiter)
 app.use('/api', routes)
 app.use(errorHandler)
 
