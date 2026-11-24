@@ -14,7 +14,7 @@ Nada aqui foi alterado ainda — é uma lista para tratarmos juntos, na ordem de
 | 2 | Senhas em texto puro em `tblUsuario` | ALTA | ✅ Resolvido em 2026-11-24 |
 | 3 | RLS em tabelas novas | MÉDIA | ✅ Resolvido em 2026-11-24 |
 | 4 | Dependências com vulnerabilidade | MÉDIA | 🔴 Aberto |
-| 5 | Arquivos indevidos no repositório | BAIXA | 🔴 Aberto |
+| 5 | Arquivos indevidos no repositório | BAIXA | ✅ Resolvido em 2026-11-24 |
 | 6 | Outros pontos (estoque aberto, SSL, servidor de testes, model do plano de contas, banco único) | BAIXA | 🔴 Aberto |
 | 7 | Tabela do PIN do terminal (`tblKioskPin`) sem RLS | ALTA (se o item 1 não for resolvido) | ✅ Resolvido em 2026-11-24 |
 | 8 | PIN do terminal sem limite de tentativas | MÉDIA | ✅ Resolvido em 2026-11-24 |
@@ -119,7 +119,7 @@ Como o `package-lock.json` não é versionado, cada `npm install` (inclusive no 
 
 ---
 
-## 5. Arquivos que não deveriam estar no repositório — BAIXA
+## 5. Arquivos que não deveriam estar no repositório — BAIXA — ✅ Resolvido em 2026-11-24
 
 | Caminho | O que é | Ação |
 |---|---|---|
@@ -129,6 +129,16 @@ Como o `package-lock.json` não é versionado, cada `npm install` (inclusive no 
 | `tbl_Fornecedores.xlsx`, `tbl_Produtos.xlsx` | planilhas usadas na importação inicial | confirmar se ainda servem; se não, remover |
 
 Nenhum desses arquivos é usado pelo código — remover não afeta o funcionamento.
+
+**Feito em 2026-11-24:** os 5 XMLs, `.vite/deps/`, `.claude/worktrees/` e as
+2 planilhas foram removidos do `HEAD` (`git rm`), e `.vite` / `.claude/worktrees`
+entraram no `.gitignore` pra não voltarem. **Importante:** isso remove do
+estado atual do repositório, mas **não apaga do histórico** — os XMLs reais
+de cliente continuam recuperáveis via `git log`/commits antigos, do mesmo
+jeito que a chave do Supabase do item 1 (nota no topo deste arquivo).
+Apagar do histórico de verdade exigiria reescrever o histórico (`git filter-repo`
++ force-push), o que quebra qualquer clone existente — não fiz isso sem
+alinhar com vocês dois primeiro.
 
 ---
 

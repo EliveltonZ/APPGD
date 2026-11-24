@@ -37,3 +37,9 @@ backend/dist
 
 # Lock file — gerado localmente no Windows; o Render (Linux) precisa gerar o próprio
 package-lock.json
+
+# Cache gerado pelo Vite
+.vite
+
+# Worktree temporário de agente do Claude Code (gitlink, não é código do projeto)
+.claude/worktrees
