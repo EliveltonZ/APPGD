@@ -79,10 +79,6 @@ async function buscarParaLogin(id) {
   return Usuario.findOne({ where: { id: Number(id), ativo: true } });
 }
 
-async function atualizarSenhaHash(id, senhaHash) {
-  await Usuario.update({ senha: senhaHash }, { where: { id: Number(id) } });
-}
-
 async function buscarMaiorId() {
   const max = await Usuario.max('id');
   return [{ max_id: max ?? 0 }];
@@ -221,7 +217,6 @@ async function alterarSenha(p_id, p_senha) {
 
 module.exports = {
   buscarParaLogin,
-  atualizarSenhaHash,
   buscarMaiorId,
   inserirUsuario,
   listarAcessos,
