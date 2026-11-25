@@ -27,7 +27,7 @@ export function Barcode({ value, height = 50, width = 1.4, className }: Props) {
         margin: 0,
       });
     } catch {
-      // valor incompatível com CODE128 — não deve acontecer com hash hex
+      // valor incompatível com CODE128 — não deve acontecer com código numérico
     }
   }, [value, height, width]);
 
