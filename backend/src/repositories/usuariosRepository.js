@@ -191,18 +191,31 @@ async function atualizarUsuario(id, data) {
   );
 }
 
+const CRACHA_DIGITOS = 20;
+
+// crypto.randomInt só aceita faixa de até 2^48 -- gera em blocos de 10
+// dígitos (10^10, bem dentro do limite) e concatena até bater o tamanho
+// pedido.
+function gerarCodigoNumerico(digitos) {
+  let codigo = '';
+  while (codigo.length < digitos) {
+    codigo += String(crypto.randomInt(0, 10 ** 10)).padStart(10, '0');
+  }
+  return codigo.slice(0, digitos);
+}
+
 // Crachá do terminal público de apontamento — código numérico impresso como
 // código de barras, lido no lugar de digitar o ID do operador. Só dígitos
 // (não hex) pra aproveitar a compactação do CODE128C (2 dígitos por símbolo)
 // -- um hash hex de 32 caracteres virava um código de barras largo demais
-// pra alguns leitores conseguirem ler. 10 dígitos aleatórios: distinto do
-// comprimento de pedido (4-6) e etapa (9), e com margem de sobra contra
-// colisão (10^10 combinações pra poucas centenas de crachás).
+// pra alguns leitores conseguirem ler, e 10 dígitos ficou visualmente curto
+// demais pro tamanho do crachá. 20 dígitos: ainda distinto do comprimento de
+// pedido (4-6) e etapa (9), com margem enorme contra colisão.
 async function gerarCracha(id) {
   let codigo;
   let tentativas = 0;
   do {
-    codigo = String(crypto.randomInt(0, 10 ** 10)).padStart(10, '0');
+    codigo = gerarCodigoNumerico(CRACHA_DIGITOS);
     tentativas += 1;
   } while (
     tentativas < 10 &&
