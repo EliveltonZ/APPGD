@@ -191,18 +191,31 @@ async function atualizarUsuario(id, data) {
   );
 }
 
-// Crachá do terminal público de apontamento — hash aleatório impresso como
-// código de barras, lido no lugar de digitar o ID do operador.
+// Crachá do terminal público de apontamento — código numérico impresso como
+// código de barras, lido no lugar de digitar o ID do operador. Só dígitos
+// (não hex) pra aproveitar a compactação do CODE128C (2 dígitos por símbolo)
+// -- um hash hex de 32 caracteres virava um código de barras largo demais
+// pra alguns leitores conseguirem ler. 10 dígitos aleatórios: distinto do
+// comprimento de pedido (4-6) e etapa (9), e com margem de sobra contra
+// colisão (10^10 combinações pra poucas centenas de crachás).
 async function gerarCracha(id) {
-  const hash = crypto.randomBytes(16).toString('hex');
-  await Usuario.update({ crachaHash: hash }, { where: { id: Number(id) } });
-  return hash;
+  let codigo;
+  let tentativas = 0;
+  do {
+    codigo = String(crypto.randomInt(0, 10 ** 10)).padStart(10, '0');
+    tentativas += 1;
+  } while (
+    tentativas < 10 &&
+    (await Usuario.findOne({ where: { crachaHash: codigo }, attributes: ['id'] }))
+  );
+  await Usuario.update({ crachaHash: codigo }, { where: { id: Number(id) } });
+  return codigo;
 }
 
-async function buscarOperadorPorCracha(hash) {
-  if (!hash) return null;
+async function buscarOperadorPorCracha(codigo) {
+  if (!codigo) return null;
   const row = await Usuario.findOne({
-    where: { crachaHash: String(hash), ativo: true, local: 'FABRICA' },
+    where: { crachaHash: String(codigo), ativo: true, local: 'FABRICA' },
     attributes: ['id', 'login'],
   });
   return row ? { id: row.id, nome: row.login } : null;

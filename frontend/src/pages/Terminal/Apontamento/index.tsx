@@ -27,11 +27,11 @@ import "./index.css";
 
 type ScanFeedback = { msg: string; ok: boolean } | null;
 
-// Crachá = hash hex de 32 caracteres (gerado em Cadastro de Usuários) —
+// Crachá = código numérico de 10 dígitos (gerado em Cadastro de Usuários) —
 // comprimento fixo e distinto dos códigos de pedido (4-6 dígitos) e de
 // etapa (9 dígitos), então dá pra diferenciar só pelo tamanho, sem
 // ambiguidade com parseBarcode.
-const CRACHA_LENGTH = 32;
+const CRACHA_LENGTH = 10;
 
 function PinGate({ onUnlock }: { onUnlock: () => void }) {
   const [pin, setPin] = useState("");
