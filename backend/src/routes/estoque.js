@@ -4,12 +4,10 @@ const c = require('../controllers/estoqueController');
 const xmlC = require('../controllers/xmlImportacaoController');
 const pedidoC = require('../controllers/pedidoItensController');
 
-// `estoque_reservar` (tela "Validar XML") ainda não tem coluna real em
-// tblUsuario — decisão explícita do usuário, mantida por enquanto. Liberado
-// pra qualquer usuário autenticado.
-router.post('/xml/preview',   xmlC.postPreview);
-router.post('/xml/vincular',  xmlC.postVincular);
-router.post('/xml/confirmar', xmlC.postConfirmar);
+// `estoque_reservar` (tela "Validar XML") já tem coluna real em tblUsuario.
+router.post('/xml/preview',   rp('estoque_reservar'), xmlC.postPreview);
+router.post('/xml/vincular',  rp('estoque_reservar'), xmlC.postVincular);
+router.post('/xml/confirmar', rp('estoque_reservar'), xmlC.postConfirmar);
 
 // `/lista-separacao` é usada só pela impressão (/impressao/lista-separacao,
 // aberta a partir da Expedição já autenticada) — sem permissão própria,
