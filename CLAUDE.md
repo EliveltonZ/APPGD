@@ -7,7 +7,8 @@ Usado exclusivamente pela equipe interna. Não é um e-commerce público.
 
 **Stack:** monorepo — `frontend/` (React 19 + TypeScript + Vite) e `backend/` (Node.js + Express 4 + Sequelize)
 **Banco:** PostgreSQL no Supabase, acessado por conexão direta (`DATABASE_URL`) — não usamos mais a API/RPC do Supabase
-**Deploy:** Render — um único serviço Node serve a API (`/api/*`) e o frontend compilado
+**Deploy:** Render — um único serviço Node serve a API (`/api/*`) e o frontend compilado.
+⚠️ **Deploy NÃO é automático** — não há auto-deploy configurado no push pro `main`. É preciso entrar no painel do Render e disparar "Manual Deploy" toda vez (já aconteceu de ficar 3 dias com o `main` à frente do que estava realmente no ar). URL real de produção: `https://appgd.onrender.com` (não confundir com `appgd-6pe2.onrender.com`, endereço antigo de um serviço anterior/abandonado).
 **Responsáveis:** Matheus (gestor/dono do negócio, não é programador) e Elivelton (dev responsável)
 
 > **Com quem você está falando?** Identifique pelas instruções pessoais de quem conduz a sessão
@@ -49,7 +50,7 @@ Para os dois:
 2. Sempre atualize o `main` (`git pull`) antes de começar — Matheus e Elivelton mexem no mesmo código em paralelo; evite trabalhar nos mesmos arquivos ao mesmo tempo
 3. Rode `npm run build` antes de enviar — erro de TypeScript bloqueia o deploy no Render
 4. Teste — ⚠️ *servidor de testes no Render em redefinição (a `AppGD-testes` ainda roda o sistema antigo)*
-5. O que entra no `main` é publicado em produção pelo Render
+5. O que entra no `main` só vai pro ar depois de alguém disparar o "Manual Deploy" no painel do Render — não esquecer esse passo (não é automático, ver aviso no topo deste arquivo)
 
 **Funcionalidade nova ou mudança relevante (vale para os dois):** trabalhar em `claude/nome-da-feature`, criada a partir do `main`, e abrir Pull Request → `main`.
 - Quem abriu o PR pode fazer o merge depois de testar — vale para o Matheus e para o Elivelton.
