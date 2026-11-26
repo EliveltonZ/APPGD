@@ -227,11 +227,10 @@ async function buscarParaEditar(ordemdecompra) {
       'tipoProjeto', 'motivoAssistencia', 'numeroSolicitacao',
       'urgente', 'supervisor', 'tipoSolicitacao', 'origemMontagem',
       'origemPromob', 'origemCobrada', 'origemEntrega', 'bairro', 'tempo', 'destino',
-      'observacoes', 'idResponsavel', 'dataCriacao', 'liberador',
+      'observacoes', 'idResponsavel', 'responsavel', 'dataCriacao', 'liberador',
     ],
     include: [
-      { model: Clientes, as: 'tblCliente',     attributes: ['name'],  required: false },
-      { model: Usuario,  as: 'usuarioResponsavel', attributes: ['login'], required: false },
+      { model: Clientes, as: 'tblCliente', attributes: ['name'], required: false },
     ],
   });
   if (!p) return [];
@@ -278,7 +277,7 @@ async function buscarParaEditar(ordemdecompra) {
     destino:                p.destino,
     liberador_nome:         p.liberador,
     observacoes:            p.observacoes,
-    responsavel:            p.usuarioResponsavel?.login ?? null,
+    responsavel:            p.responsavel,
     id_responsavel:         p.idResponsavel,
     data_criacao:           p.dataCriacao,
     equipe,
@@ -358,12 +357,9 @@ async function buscarParaDeletar(ordemdecompra) {
       'numproj', 'vendedor', 'liberador', 'loja', 'etapa', 'tipocontrato',
       'datacontrato', 'dataassinatura', 'chegoufabrica', 'dataentrega',
       'valorbruto', 'valornegociado', 'customaterial', 'customaterialadicional',
-      'idResponsavel', 'supervisor', 'motivoAssistencia', 'numeroSolicitacao',
+      'idResponsavel', 'responsavel', 'supervisor', 'motivoAssistencia', 'numeroSolicitacao',
       'tipoSolicitacao', 'origemMontagem', 'origemPromob', 'origemCobrada', 'origemEntrega',
       'bairro', 'tempo', 'destino',
-    ],
-    include: [
-      { model: Usuario, as: 'usuarioResponsavel', attributes: ['login'], required: false },
     ],
   });
   if (!p) return [];
@@ -395,7 +391,7 @@ async function buscarParaDeletar(ordemdecompra) {
     valornegociado:         p.valornegociado,
     customaterial:          p.customaterial,
     customaterialadicional: p.customaterialadicional,
-    responsavel:            p.usuarioResponsavel?.login ?? null,
+    responsavel:            p.responsavel,
     supervisor:             p.supervisor,
     motivo_assistencia:     p.motivoAssistencia,
     numero_solicitacao:     p.numeroSolicitacao,
