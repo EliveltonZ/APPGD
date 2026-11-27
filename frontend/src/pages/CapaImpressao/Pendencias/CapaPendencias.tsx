@@ -25,7 +25,7 @@ export function CapaPendencias({ data = {} }: { data?: CapaData }) {
       <HeaderCapa />
       <IdentificacaoSection data={data} />
       <InfoContrato data={data} />
-      <CoresObservacoes />
+      <CoresObservacoes observacoes={data.observacoes} />
       <InfoProducao data={data} />
       <EtapasSection etapas={data.etapas} filled />
       <PendenciasSection />
