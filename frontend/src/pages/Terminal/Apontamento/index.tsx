@@ -378,12 +378,13 @@ export function ApontamentoPublicoPage() {
     setSaving(true);
     try {
       await saveApontamentoPublico(project);
-      setDirty(false);
-      setDirtyStageIds(new Set());
       message("Apontamentos salvos com sucesso", true);
+      // Recarrega a página pra deixar o terminal pronto pro próximo operador
+      // (volta tudo — crachá, pedido, etapas — pro estado inicial). Um
+      // pequeno atraso só pra dar tempo da mensagem de sucesso aparecer.
+      setTimeout(() => window.location.reload(), 700);
     } catch (err) {
       if (!handleAuthError(err)) message("Erro ao salvar — tente novamente", false);
-    } finally {
       setSaving(false);
     }
   }, [project, saving, dirtyStageIds]);

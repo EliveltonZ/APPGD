@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Search, Barcode, Save, Loader2, X, IdCard } from "lucide-react";
 import type { Operator } from "../../../features/apontamento/types";
 
@@ -33,9 +33,24 @@ export function KioskHeader({
   operadorAtual,
 }: Props) {
   const pedidoRef = useRef<HTMLInputElement>(null);
+  const stageRef = useRef<HTMLInputElement>(null);
   const [pedidoInput, setPedidoInput] = useState("");
   const [stageInput, setStageInput] = useState("");
   const [badgeInput, setBadgeInput] = useState("");
+
+  // Avança o foco sozinho conforme cada etapa do fluxo é concluída — o
+  // operador nunca precisa clicar em campo nenhum, só continuar bipando.
+  // Reage ao estado já resolvido (operador identificado / pedido carregado),
+  // não ao sucesso da chamada em si, então só avança quando o scan deu certo
+  // de verdade (crachá inválido ou pedido não encontrado não mudam esse
+  // estado, e o foco continua onde está pra tentar de novo).
+  useEffect(() => {
+    if (operadorAtual) pedidoRef.current?.focus();
+  }, [operadorAtual]);
+
+  useEffect(() => {
+    if (hasPedido) stageRef.current?.focus();
+  }, [hasPedido]);
 
   function handlePedidoKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return;
@@ -89,6 +104,7 @@ export function KioskHeader({
             onChange={(e) => setBadgeInput(e.target.value)}
             onKeyDown={handleBadgeKey}
             autoComplete="off"
+            autoFocus
           />
         </div>
       </div>
@@ -135,6 +151,7 @@ export function KioskHeader({
         <div className="apt-header__input-wrap">
           <Barcode className="apt-header__icon" size={16} />
           <input
+            ref={stageRef}
             className="apt-header__input"
             type="text"
             inputMode="numeric"
